@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 @import './tokens.css';
 
 @theme inline {
@@ -21,6 +22,26 @@
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
   --color-surface-blur: var(--surface-blur);
+  /* shadcn/ui 词汇 → 本项目语义 token（组件用 bg-background/text-muted-foreground 等，
+     全部落到左侧我们的 token；圆角走上面已定义的 --radius-sm/md/lg/xl 乘法体系，不引入 shadcn 的 --radius 计算） */
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--text);
+  --color-primary: var(--pri);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--surface-2);
+  --color-secondary-foreground: var(--text);
+  --color-muted: var(--surface-2);
+  --color-muted-foreground: var(--text-3);
+  --color-accent: var(--surface-2);
+  --color-accent-foreground: var(--text);
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: #ffffff;
+  --color-input: var(--border);
+  --color-ring: var(--pri);
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);

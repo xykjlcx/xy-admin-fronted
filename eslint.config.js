@@ -52,4 +52,12 @@ export default tseslint.config(
       'react-refresh/only-export-components': 'off',
     },
   },
+  {
+    // shadcn 生成的 UI 基元（button 导出 buttonVariants、sheet 导出 SheetContent 等）：
+    // 组件 + variants/常量同文件导出是官方约定，且这些文件不手改，豁免 react-refresh 单导出约束。
+    files: ['src/components/ui/**'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 );

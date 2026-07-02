@@ -20,5 +20,74 @@
     "403": "无权访问该页面",
     "404": "页面不存在",
     "backHome": "返回首页"
+  },
+  "shell": {
+    "search": "搜索功能导航、组织数据、角色详情等",
+    "switcher": {
+      "title": "切换子系统",
+      "soon": "即将上线"
+    },
+    "notification": "消息通知",
+    "appearance": "界面定制",
+    "darkMode": "深色模式",
+    "lightMode": "浅色模式",
+    "language": "语言 / Language",
+    "nav": {
+      "collapse": "收起导航"
+    },
+    "user": {
+      "profile": "个人中心",
+      "account": "账号设置",
+      "changePassword": "修改密码",
+      "language": "语言",
+      "switchAccount": "切换账号",
+      "help": "帮助与反馈",
+      "logout": "退出登录"
+    },
+    "toast": {
+      "notification": "消息中心开发中（M1）",
+      "search": "全局搜索开发中（M1）",
+      "stub": "功能开发中（M1）",
+      "logoutFailed": "退出登录失败，请重试"
+    },
+    "appearanceDrawer": {
+      "title": "外观设置",
+      "subtitle": "调整界面风格、主题色与布局",
+      "flavor": "界面风格",
+      "layout": "导航布局",
+      "accent": "主题色",
+      "accentCustom": "自定义",
+      "accentInvalid": "请输入合法的十六进制颜色（如 #c96442）",
+      "pageAnim": "页面切换动画",
+      "pageAnimHint": "切换菜单时内容区的进场方式",
+      "zoom": "显示比例",
+      "zoomHint": "整体缩放界面，适配不同屏幕与视力偏好",
+      "radius": "圆角风格",
+      "radiusHint": "调整全站卡片、按钮与控件的圆角",
+      "flavorFeishu": "飞书风格",
+      "flavorFeishuDesc": "经典蓝 · 清爽中性灰",
+      "flavorClaude": "Claude 风格",
+      "flavorClaudeDesc": "陶土橙 · 温暖纸感米色",
+      "layoutSidebar": "侧栏树",
+      "layoutSidebarDesc": "飞书经典",
+      "layoutRail": "图标栏",
+      "layoutRailDesc": "图标+面板",
+      "layoutInset": "嵌入式",
+      "layoutInsetDesc": "浮起卡片",
+      "animNone": "无",
+      "animFade": "淡入",
+      "animSlide": "左滑",
+      "animUp": "上浮",
+      "animScale": "缩放",
+      "zoomSm": "小",
+      "zoomSmHint": "紧凑",
+      "zoomMd": "中",
+      "zoomMdHint": "标准",
+      "zoomLg": "大",
+      "zoomLgHint": "宽松",
+      "radiusSharp": "直角",
+      "radiusDefault": "默认",
+      "radiusRound": "圆润"
+    }
   }
 }
