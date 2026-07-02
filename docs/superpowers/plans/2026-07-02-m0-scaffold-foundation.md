@@ -890,7 +890,7 @@ export function ErrorScreen({ code }: { code: '403' | '404' }) {
 }
 ```
 
-`common.json` 加 `"errors": { "403": "无权访问该页面", "404": "页面不存在", "backHome": "返回首页" }`（en-US 同步加 key 留空值）。
+`common.json` 加 `"errors": { "403": "无权访问该页面", "404": "页面不存在", "backHome": "返回首页" }`（en-US 保持空对象 `{}`——i18next 对空串 value 不走 fallback 会显示空白，空对象才能正确兜底 zh-CN；M2 翻译时才填 en 词条）。
 
 ```tsx
 // src/routes/_auth/admin/dashboard.tsx
