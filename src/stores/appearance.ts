@@ -26,13 +26,25 @@ export const useAppearance = create<AppearanceStore>()(
       collapsed: {},
       set: (patch) => {
         set(patch);
-        applyAppearance({ ...get(), ...patch });
+        applyAppearance(get()); // zustand set 同步生效，get() 已是合并后状态，无需再 spread patch
       },
       setFlavor: (flavor) => get().set({ flavor, accent: flavorDefaultAccent(flavor) }), // 原型 L4951
       toggleCollapsed: (k) => set((s) => ({ collapsed: { ...s.collapsed, [k]: !s.collapsed[k] } })),
     }),
     {
       name: 'appearance',
+      // 只持久化数据字段，排除函数（避免把 set/setFlavor/toggleCollapsed 序列化进 localStorage）
+      partialize: (s) => ({
+        flavor: s.flavor,
+        mode: s.mode,
+        accent: s.accent,
+        customAccent: s.customAccent,
+        zoom: s.zoom,
+        radius: s.radius,
+        layout: s.layout,
+        pageAnim: s.pageAnim,
+        collapsed: s.collapsed,
+      }),
       // Task 2 review I-2：rehydrate 必须重放 accent 注入，否则 F5 后自选主题色丢失回蓝
       onRehydrateStorage: () => (state) => {
         if (state) applyAppearance(state);

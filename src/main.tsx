@@ -1,8 +1,3 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './styles/global.css'
-import App from './App.tsx'
-
 async function bootstrap() {
   if (import.meta.env.VITE_ENABLE_MOCK === 'true') {
     try {
@@ -16,11 +11,8 @@ async function bootstrap() {
       return
     }
   }
-  // Task 8 抽成 app/mount
-  createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
-  )
+  // 路由/Provider/i18n 装配抽到 app/mount（含 mount 前 await i18nInit）
+  const { mountApp } = await import('./app/mount')
+  await mountApp()
 }
 void bootstrap()

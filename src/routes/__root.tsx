@@ -1,3 +1,12 @@
-import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import type { QueryClient } from '@tanstack/react-query';
+import { ErrorScreen } from '@/components/pro/ErrorScreen';
 
-export const Route = createRootRoute({ component: Outlet });
+export interface RouterContext {
+  queryClient: QueryClient;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+  component: Outlet,
+  notFoundComponent: () => <ErrorScreen code="404" />,
+});

@@ -35,6 +35,8 @@ test('toggleCollapsed 只影响对应 layout key（per-layout 隔离）', () => 
   expect(useAppearance.getState().collapsed.rail).toBeUndefined();
 });
 
+// ⚠️ 本用例依赖 vi.resetModules() 产生独立 store 实例（重跑 rehydrate），
+// 必须保持在文件最后/可独立运行——否则污染后续用例共享的模块单例。
 test('rehydrate 时重放 accent 注入（F5 后自选主题色不丢失）', async () => {
   localStorage.setItem(
     'appearance',

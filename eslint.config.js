@@ -43,4 +43,13 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // 文件式路由约定：路由文件导出 Route（createFileRoute 结果）+ 一个仅供 component 使用的本地页面组件。
+    // react-refresh 启发式对这种"定义组件却只导出 Route"的形态误报，而 TanStack Router 自带路由级 HMR，
+    // 故对 routes/ 关闭该规则（其余目录仍全量守护）。
+    files: ['src/routes/**/*.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 );
