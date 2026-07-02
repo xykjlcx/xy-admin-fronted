@@ -1149,13 +1149,13 @@ export const menusQuery = (subsystem: string) => queryOptions({
 - [ ] **Step 4: dev 校验（菜单路径 ⊆ 路由树，spec §7.4）**
 
 ```ts
-// src/modules/registry.ts 追加
-import { routeTree } from '@/routeTree.gen';
-if (import.meta.env.DEV) {
-  // RoutePath 类型已在编译期拦截 manifest 种子；此断言防运行时数据（未来 DB 菜单）漂移
-  const flatten = (r: { fullPath?: string; children?: unknown[] }): string[] =>
-    [r.fullPath ?? '', ...((r.children as never[] | undefined) ?? []).flatMap(flatten)];
-  const valid = new Set(flatten(routeTree as never));
+// ⚠️ 执行修正（批次 A 实测）：漂移校验不能放 registry.ts 的 import 期——
+// routeTree 的 fullPath 在 createRouter() 之前未计算，import 期校验会全量误报。
+// 实际落位：app/mount.tsx 的 createRouter 之后调用 assertMenuPathsValid()（DEV only）。
+// 校验函数本体放 registry.ts 导出，mount 只负责在正确时机调用。
+export function assertMenuPathsValid(router: AnyRouter): void {
+  if (!import.meta.env.DEV) return;
+  const valid = new Set(Object.keys(router.routesByPath));
   for (const m of manifests) for (const rec of m.menuSeed)
     if (rec.path && !valid.has(rec.path)) console.error(`[menu-drift] 菜单 ${rec.id} 指向不存在路由: ${rec.path}`);
 }
