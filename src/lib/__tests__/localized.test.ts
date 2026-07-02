@@ -4,3 +4,5 @@ test('取当前语言', () => expect(lv({ 'zh-CN': '运单', 'en-US': 'Shipments
 test('缺失回退 zh-CN', () => expect(lv({ 'zh-CN': '运单' }, 'en-US')).toBe('运单'));
 test('再缺回退首个非空', () => expect(lv({ 'ja-JP': '運送' }, 'en-US')).toBe('運送'));
 test('空对象返回空串', () => expect(lv({}, 'zh-CN')).toBe(''));
+test('当前语言空串视同缺失，回退 zh-CN', () => expect(lv({ 'en-US': '', 'zh-CN': '运单' }, 'en-US')).toBe('运单'));
+test('zh-CN 也空串，回退首个非空', () => expect(lv({ 'en-US': '', 'zh-CN': '', 'ja-JP': 'x' }, 'en-US')).toBe('x'));
