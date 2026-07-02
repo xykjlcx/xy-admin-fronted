@@ -1106,11 +1106,13 @@ export function buildMenuTree(records: MenuRecord[], permissions: string[]): Men
 
 - [ ] **Step 3: mock handlers + API 模块 + Query（Shell 只吃 API，不 import manifest——spec §6 数据流同构）**
 
+> 来自 Task 5 review 的待办：① handler 用共享 helper `import { ok, biz } from '@/mocks/http'`（勿重新声明）；② 新 handlers 追加进 `src/mocks/handlers.ts` 的 allHandlers 聚合；③ 本 task 是 db 的第二个域——落地 collection helper 模式（id 生成 + CRUD + resetDb()），后续 18 个域照此模板，别让每个域手写 find/set 样板。
+
 ```ts
 // src/modules/admin/mocks/menu.handlers.ts
-import { http, HttpResponse } from 'msw';
+import { http } from 'msw';
+import { ok } from '@/mocks/http';
 import { manifests } from '@/modules/registry';
-const ok = <T>(data: T) => HttpResponse.json({ code: 0, data, message: '' });
 // 种子灌入内存表（浅拷贝，支持后续 CRUD）
 const subsystems = manifests.map((m) => ({ ...m.subsystem }));
 const menus = manifests.flatMap((m) => m.menuSeed.map((r) => ({ ...r })));
