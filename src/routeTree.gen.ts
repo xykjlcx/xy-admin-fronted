@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as R403RouteImport } from './routes/403'
 import { Route as AuthAdminDashboardRouteImport } from './routes/_auth/admin/dashboard'
 
 const LoginRoute = LoginRouteImport.update({
@@ -22,6 +23,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const R403Route = R403RouteImport.update({
+  id: '/403',
+  path: '/403',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthAdminDashboardRoute = AuthAdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
@@ -29,30 +35,34 @@ const AuthAdminDashboardRoute = AuthAdminDashboardRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/403': typeof R403Route
   '/': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/dashboard': typeof AuthAdminDashboardRoute
 }
 export interface FileRoutesByTo {
+  '/403': typeof R403Route
   '/': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/dashboard': typeof AuthAdminDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/403': typeof R403Route
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/_auth/admin/dashboard': typeof AuthAdminDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/admin/dashboard'
+  fullPaths: '/403' | '/' | '/login' | '/admin/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/admin/dashboard'
-  id: '__root__' | '/_auth' | '/login' | '/_auth/admin/dashboard'
+  to: '/403' | '/' | '/login' | '/admin/dashboard'
+  id: '__root__' | '/403' | '/_auth' | '/login' | '/_auth/admin/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  R403Route: typeof R403Route
   AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
@@ -71,6 +81,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/403': {
+      id: '/403'
+      path: '/403'
+      fullPath: '/403'
+      preLoaderRoute: typeof R403RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/admin/dashboard': {
@@ -94,6 +111,7 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  R403Route: R403Route,
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
 }
