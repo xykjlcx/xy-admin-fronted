@@ -1,0 +1,19 @@
+{
+  "app": { "name": "通用后台管理" },
+  "actions": {
+    "create": "新增",
+    "edit": "编辑",
+    "delete": "删除",
+    "detail": "详情",
+    "search": "搜索",
+    "confirm": "确定",
+    "cancel": "取消",
+    "export": "导出"
+  },
+  "auth": {
+    "login": "登录",
+    "logout": "退出登录",
+    "username": "用户名",
+    "password": "密码"
+  }
+}
