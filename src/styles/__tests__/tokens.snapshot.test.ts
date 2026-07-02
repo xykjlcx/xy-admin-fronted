@@ -109,6 +109,16 @@ test('tooltip 恒深底 token 与原型一致', () => {
   expect(css).toContain('--tooltip-bg: #1f2329;');
 });
 
+// 弹层/悬浮阴影 token（原型 box-shadow 精确值）：组件禁 shadow-[...] 任意值，统一走这些 token。
+test('弹层阴影 token 与原型精确值一致', () => {
+  expect(css).toContain('--shadow-popover: 0 12px 40px rgba(0, 0, 0, 0.16);');
+  expect(css).toContain('--shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.18);');
+  expect(css).toContain('--shadow-drawer: -8px 0 32px rgba(0, 0, 0, 0.14);');
+  expect(css).toContain('--shadow-tooltip: 0 4px 14px rgba(0, 0, 0, 0.18);');
+  expect(css).toContain('--shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);');
+  expect(css).toContain('--shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.08);');
+});
+
 // 锁 FOUC 脚本与 store 的契约不被静默删除：localStorage key 'appearance' + dataset.flavor/mode 写入，
 // 以及 Task 14 的首帧防闪蓝——脚本必须读派生值注入 --pri（否则自选主题色首帧闪回蓝）。
 test('index.html FOUC 脚本契约不被静默删除（含 --pri 注入）', () => {

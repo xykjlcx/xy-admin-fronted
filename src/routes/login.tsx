@@ -31,7 +31,7 @@ function LoginPage() {
     }
   });
   return (
-    <div className="flex h-screen items-center justify-center bg-bg">
+    <div className="flex h-app items-center justify-center bg-bg">
       <form onSubmit={onSubmit} className="w-[360px] rounded-lg border border-border bg-surface p-8">
         <h1 className="mb-6 text-[22px] font-semibold text-text">{t('app.name')}</h1>
         <input
