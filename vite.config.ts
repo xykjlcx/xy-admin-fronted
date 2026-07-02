@@ -1,17 +1,20 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import path from 'node:path';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [tanstackRouter({ target: 'react', autoCodeSplitting: true }), react()],
+  plugins: [
+    tanstackRouter({ target: 'react', autoCodeSplitting: true }),
+    react(),
+    tailwindcss(),
+  ],
   resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
   test: {
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test-setup.ts',
-    // Task 2 落地首个测试后移除，防止 glob 配错静默通过
-    passWithNoTests: true,
   },
 });

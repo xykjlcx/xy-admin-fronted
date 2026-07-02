@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-chrome: var(--chrome);
+  --color-surface-2: var(--surface-2);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-border: var(--border);
+  --color-pri: var(--pri);
+  --color-pri-soft: var(--pri-soft);
+  --color-pri-hover: var(--pri-hover);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --font-sans: 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', system-ui, sans-serif;
+}
+
+html { font-family: var(--font-sans); }
+html[data-zoom='sm'] { zoom: 0.9; }
+html[data-zoom='lg'] { zoom: 1.08; }  /* 原型实际系数 1.08（L2848），README"110%"有误 */
+body { margin: 0; background: var(--bg); color: var(--text); font-size: 14px;
+  -webkit-font-smoothing: antialiased; }
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+@keyframes ovl-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sheet-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes modal-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes pg-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pg-slide { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pg-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pg-scale { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }

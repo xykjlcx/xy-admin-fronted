@@ -1,0 +1,40 @@
+/* src/styles/tokens.css —— 权威源：原型 FLAVORS 对象（L4796-4805）。
+   耦合规则见 spec §8.1：暗色下 --pri-soft 与主题色无关。 */
+
+:root, [data-flavor='feishu'][data-mode='light'] {
+  --pri: #3370ff; --pri-soft: #eef3ff;
+  --bg: #f5f6f7; --canvas: #eceef1; --surface: #ffffff; --chrome: #ffffff;
+  --surface-2: #f2f3f5; --surface-blur: rgba(255, 255, 255, 0.72);
+  --text: #1f2329; --text-2: #4e5969; --text-3: #8f959e; --border: #e5e6eb;
+}
+[data-flavor='feishu'][data-mode='dark'] {
+  --pri-soft: rgba(255, 255, 255, 0.08);
+  --bg: #111318; --canvas: #0c0d10; --surface: #1b1d23; --chrome: #16181d;
+  --surface-2: #262931; --surface-blur: rgba(27, 29, 35, 0.72);
+  --text: #e7e9ec; --text-2: #a3aab3; --text-3: #7a818b; --border: #2c2f38;
+}
+[data-flavor='claude'][data-mode='light'] {
+  --bg: #f0eee6; --canvas: #e7e3d7; --surface: #fdfcf8; --chrome: #f4f1e8;
+  --surface-2: #efece1; --surface-blur: rgba(244, 241, 232, 0.78);
+  --text: #2a2521; --text-2: #6b6459; --text-3: #978f80; --border: #e5e0d3;
+}
+[data-flavor='claude'][data-mode='dark'] {
+  --pri-soft: rgba(255, 255, 255, 0.09);
+  --bg: #1c1917; --canvas: #161311; --surface: #262220; --chrome: #211d1a;
+  --surface-2: #302b27; --surface-blur: rgba(33, 29, 26, 0.78);
+  --text: #ece6dd; --text-2: #a89f92; --text-3: #7d7568; --border: #3a342e;
+}
+
+:root {
+  --pri-hover: color-mix(in srgb, var(--pri) 85%, black);
+  --success: #16a34a; --success-soft: #e8f7ee;
+  --warning: #ff8000; --warning-soft: #fff3e8;
+  --danger: #f53f3f; --danger-soft: #feecec;
+  --radius-factor: 1;
+  --radius-sm: calc(6px * var(--radius-factor));
+  --radius-md: calc(8px * var(--radius-factor));
+  --radius-lg: calc(12px * var(--radius-factor));
+  --radius-xl: calc(14px * var(--radius-factor));
+}
+[data-radius='sharp'] { --radius-factor: 0.28; }
+[data-radius='round'] { --radius-factor: 1.55; }
