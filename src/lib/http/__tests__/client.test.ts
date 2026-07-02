@@ -11,6 +11,10 @@ const server = setupServer(
   mswHttp.get('/api/server-err', () => new HttpResponse(null, { status: 500 })),
   mswHttp.get('/api/bad-shape', () => HttpResponse.json({ foo: 'bar' })),
   mswHttp.get('/api/network-err', () => HttpResponse.error()),
+  mswHttp.get(
+    '/api/invalid-json',
+    () => new HttpResponse('not json', { headers: { 'Content-Type': 'application/json' } }),
+  ),
   mswHttp.get('/api/params', ({ request }) => {
     const url = new URL(request.url);
     return HttpResponse.json({ code: 0, data: Object.fromEntries(url.searchParams), message: '' });
@@ -39,6 +43,11 @@ test('200 但响应体非 envelope 形状 → 抛 HttpError（防伪装成空 Bi
 });
 test('网络错误（无响应）→ 抛 HttpError', async () => {
   await expect(http.get('/api/network-err')).rejects.toThrow(HttpError);
+});
+test('响应体不是合法 JSON → 抛 HttpError，message 为 invalid json response', async () => {
+  await expect(http.get('/api/invalid-json')).rejects.toMatchObject({
+    message: 'invalid json response',
+  });
 });
 test('number 类型 params 正确字符串化，undefined 值被跳过，不产生 page=undefined/keyword=undefined', async () => {
   const data = await http.get<Record<string, string>>('/api/params', {
