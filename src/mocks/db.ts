@@ -1,6 +1,8 @@
 // 关系型内存库；M0 只建 auth/menu/subsystem 域，M1 扩其余域（见 spec §5.3）
 import { faker } from '@faker-js/faker/locale/zh_CN';
 
+faker.seed(42); // 固定种子，防视觉回归截图因随机数据 flaky
+
 export interface MockUser {
   id: string;
   username: string;

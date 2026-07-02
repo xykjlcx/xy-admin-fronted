@@ -17,6 +17,7 @@ test('登录成功返回 token，me 返回权限集', async () => {
     await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${login.data.token}` } })
   ).json();
   expect(me.data.permissions).toEqual(['*:*:*']);
+  expect(me.data.user.password).toBeUndefined();
 });
 
 test('密码错误 → code 4010，data 为 null', async () => {
