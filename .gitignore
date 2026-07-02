@@ -3,7 +3,10 @@ node_modules/
 dist/
 dist-ssr/
 .env
-.env.local
+.env.*
+!.env.development
+!.env.demo
+!.env.production
 *.local
 
 # Logs
@@ -24,3 +27,9 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Test / build artifacts
+test-results/
+playwright-report/
+coverage/
+.tanstack/

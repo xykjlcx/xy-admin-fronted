@@ -11,5 +11,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test-setup.ts',
+    // Task 2 落地首个测试后移除，防止 glob 配错静默通过
+    passWithNoTests: true,
   },
 });
