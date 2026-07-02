@@ -34,7 +34,8 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
+        // 原型遮罩（L2651）：rgba(0,0,0,.22) + backdrop-blur(6px) + ovl-fade .2s
+        "anim-ovl-fade fixed inset-0 z-50 bg-[rgba(0,0,0,0.22)] backdrop-blur-[6px]",
         className
       )}
       {...props}
@@ -58,15 +59,16 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500",
+          "fixed z-50 flex flex-col gap-4 bg-background",
+          // 原型抽屉（L2652）：右滑入 sheet-in-right .28s + shadow -8px 0 32px .14（M0 只用 right）
           side === "right" &&
-            "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+            "anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-border shadow-[-8px_0_32px_rgba(0,0,0,0.14)] sm:max-w-sm",
           side === "left" &&
-            "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
+            "inset-y-0 left-0 h-full w-3/4 border-r data-[state=open]:animate-in data-[state=open]:slide-in-from-left data-[state=open]:duration-300 sm:max-w-sm",
           side === "top" &&
-            "inset-x-0 top-0 h-auto border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+            "inset-x-0 top-0 h-auto border-b data-[state=open]:animate-in data-[state=open]:slide-in-from-top data-[state=open]:duration-300",
           side === "bottom" &&
-            "inset-x-0 bottom-0 h-auto border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+            "inset-x-0 bottom-0 h-auto border-t data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300",
           className
         )}
         {...props}

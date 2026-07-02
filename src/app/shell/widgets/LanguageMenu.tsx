@@ -29,7 +29,7 @@ export function LanguageMenu() {
           <Globe className="size-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={8} className="w-[200px] p-1.5">
+      <DropdownMenuContent align="end" sideOffset={8} className="w-[200px] rounded-lg p-1.5">
         <div className="px-2.5 pb-1.5 pt-2 text-[11px] font-semibold text-text-3">
           {t('shell.language')}
         </div>

@@ -67,3 +67,10 @@ body { margin: 0; background: var(--bg); color: var(--text); font-size: 14px;
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* 弹层/抽屉进场动效（原型 keyframes L19-25 + 时长缓动 L185/L266/L2652 逐字提取）。
+   只做进场（enter）：原型无退场动画，关闭即卸载。shadcn 基元用这些类替换其默认 animate-in/zoom/slide。 */
+.anim-ovl-fade { animation: ovl-fade 0.2s ease; }
+.anim-sheet-in-right { animation: sheet-in-right 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+.anim-modal-in { animation: modal-in 0.18s cubic-bezier(0.4, 0, 0.2, 1); }
+.anim-modal-in-lg { animation: modal-in 0.22s cubic-bezier(0.4, 0, 0.2, 1); }

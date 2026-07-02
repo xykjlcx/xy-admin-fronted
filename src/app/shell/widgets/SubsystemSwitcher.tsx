@@ -66,9 +66,9 @@ export function SubsystemSwitcher({
             )}
           </button>
         ) : (
-          <button className="flex h-9 items-center gap-2.5 rounded-md pl-2.5 pr-3 hover:bg-pri-soft">
+          <button className="flex h-9 items-center gap-[9px] rounded-md pl-2.5 pr-3 hover:bg-pri-soft">
             <span
-              className="flex size-6 shrink-0 items-center justify-center rounded-md text-white"
+              className="flex size-6 shrink-0 items-center justify-center rounded-sm text-white"
               style={{ background: active?.builtin ? 'var(--pri)' : active?.color }}
             >
               <Icon name={active?.icon} className="size-[15px]" />
