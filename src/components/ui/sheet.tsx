@@ -62,7 +62,7 @@ function SheetContent({
           "fixed z-50 flex flex-col gap-4 bg-background",
           // 原型抽屉（L2652）：右滑入 sheet-in-right .28s + shadow -8px 0 32px .14（M0 只用 right）
           side === "right" &&
-            "anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-border shadow-[-8px_0_32px_rgba(0,0,0,0.14)] sm:max-w-sm",
+            "anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-border shadow-drawer sm:max-w-sm",
           side === "left" &&
             "inset-y-0 left-0 h-full w-3/4 border-r data-[state=open]:animate-in data-[state=open]:slide-in-from-left data-[state=open]:duration-300 sm:max-w-sm",
           side === "top" &&

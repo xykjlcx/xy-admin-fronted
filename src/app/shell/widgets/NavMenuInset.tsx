@@ -50,7 +50,7 @@ export function NavMenuInset({
                   to={p.path}
                   title={collapsed ? lv(p.label, i18n.language) : undefined}
                   className={cn(
-                    'my-0.5 flex h-[38px] items-center gap-2.5 rounded-lg text-sm',
+                    'my-0.5 flex h-[38px] items-center gap-2.5 rounded-9 text-sm',
                     collapsed ? 'justify-center px-0' : 'px-3',
                     pathname === p.path
                       ? 'bg-surface font-semibold text-text shadow-[0_1px_2px_rgba(0,0,0,0.08)]'

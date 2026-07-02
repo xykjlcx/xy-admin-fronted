@@ -25,7 +25,7 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
               key={g.node.id}
               onClick={() => first?.path && nav({ to: first.path })}
               className={cn(
-                'flex w-[60px] flex-col items-center gap-[5px] rounded-lg py-2.5',
+                'flex w-[60px] flex-col items-center gap-[5px] rounded-10 py-2.5',
                 active ? 'bg-pri-soft text-pri' : 'text-text-3 hover:bg-bg',
               )}
             >
@@ -48,7 +48,7 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
                 key={p.id}
                 to={p.path}
                 className={cn(
-                  'my-0.5 flex h-[38px] items-center rounded-md px-3.5 text-sm',
+                  'my-0.5 flex h-[38px] items-center rounded-8 px-3.5 text-sm',
                   pathname === p.path
                     ? 'bg-pri-soft font-semibold text-pri'
                     : 'text-text-2 hover:bg-surface-2',

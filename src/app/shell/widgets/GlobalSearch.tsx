@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 export function GlobalSearch() {
   const { t } = useTranslation();
   return (
-    <div className="flex h-9 w-[440px] max-w-[34vw] items-center gap-2 rounded-md bg-surface-2 px-3">
+    <div className="flex h-9 w-[440px] max-w-[34vw] items-center gap-2 rounded-8 bg-surface-2 px-3">
       <Search className="size-4 shrink-0 text-text-3" />
       <input
         readOnly

@@ -29,7 +29,7 @@ export function LanguageMenu() {
           <Globe className="size-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={8} className="w-[200px] rounded-lg p-1.5">
+      <DropdownMenuContent align="end" sideOffset={8} className="w-[200px] rounded-12 p-1.5">
         <div className="px-2.5 pb-1.5 pt-2 text-[11px] font-semibold text-text-3">
           {t('shell.language')}
         </div>
@@ -40,7 +40,7 @@ export function LanguageMenu() {
               key={l.code}
               onClick={() => choose(l.code)}
               className={cn(
-                'flex h-11 w-full items-center gap-2.5 rounded-md px-2.5 text-left',
+                'flex h-11 w-full items-center gap-2.5 rounded-8 px-2.5 text-left',
                 active ? 'bg-pri-soft' : 'hover:bg-surface-2',
               )}
             >

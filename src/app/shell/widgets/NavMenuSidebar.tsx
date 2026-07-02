@@ -25,7 +25,7 @@ export function NavMenuSidebar({
 
   const leafClass = (active: boolean) =>
     cn(
-      'mx-2 flex h-[38px] items-center rounded-md pl-11 pr-3 text-sm',
+      'mx-2 flex h-[38px] items-center rounded-8 pl-11 pr-3 text-sm',
       active ? 'bg-pri-soft font-semibold text-pri' : 'text-text-2 hover:bg-surface-2',
     );
 
@@ -43,7 +43,7 @@ export function NavMenuSidebar({
                 key={node.id}
                 to={node.path}
                 className={cn(
-                  'mx-2 mb-0.5 flex h-[42px] items-center gap-2.5 rounded-md px-4 text-sm font-medium',
+                  'mx-2 mb-0.5 flex h-[42px] items-center gap-2.5 rounded-8 px-4 text-sm font-medium',
                   active ? 'bg-pri-soft text-pri' : 'text-text-2 hover:bg-bg',
                   collapsed && 'justify-center px-0',
                 )}
@@ -61,7 +61,7 @@ export function NavMenuSidebar({
               <button
                 onClick={() => toggleDir(node.id)}
                 className={cn(
-                  'mx-2 flex h-[42px] w-[calc(100%-16px)] items-center gap-2.5 rounded-md px-4 text-sm font-medium text-text-2 hover:bg-bg',
+                  'mx-2 flex h-[42px] w-[calc(100%-16px)] items-center gap-2.5 rounded-8 px-4 text-sm font-medium text-text-2 hover:bg-bg',
                   collapsed && 'justify-center px-0',
                 )}
                 title={collapsed ? lv(node.label, i18n.language) : undefined}
