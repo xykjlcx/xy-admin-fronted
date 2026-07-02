@@ -26,20 +26,32 @@ async function request<T>(
 ): Promise<T> {
   const qs = params ? toQueryString(params) : '';
   const token = getToken();
-  const res = await fetch(`${BASE}${url}${qs ? `?${qs}` : ''}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${url}${qs ? `?${qs}` : ''}`, {
+      method,
+      headers: {
+        ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch (e) {
+    throw new HttpError(0, 'network error', { cause: e });
+  }
   if (res.status === 401) {
     authEvents.emit('expired');
     throw new AuthExpiredError('登录已过期');
   }
   if (!res.ok) throw new HttpError(res.status, res.statusText);
-  const env = adapter.parseEnvelope<T>(await res.json());
+  let raw: unknown;
+  try {
+    raw = await res.json();
+  } catch (e) {
+    throw new HttpError(res.status, 'invalid json response', { cause: e });
+  }
+  const env = adapter.parseEnvelope<T>(raw);
+  if (typeof env.code !== 'number') throw new HttpError(res.status, 'unexpected response shape');
   if (!adapter.isOk(env.code)) throw new BizError(env.code, env.message);
   return env.data;
 }
