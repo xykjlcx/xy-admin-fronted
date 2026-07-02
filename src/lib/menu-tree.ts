@@ -19,11 +19,10 @@ export function buildMenuTree(records: MenuRecord[], permissions: string[]): Men
     list.push({ ...r });
     byParent.set(r.parentId, list);
   }
-  const attach = (n: MenuNode): MenuNode => ({
-    ...n,
-    children: (byParent.get(n.id) ?? []).map(attach),
-  });
-  return (byParent.get(null) ?? [])
-    .map(attach)
-    .filter((n) => n.type === 'menu' || (n.children != null && n.children.length > 0)); // 剪空目录
+  // 自底向上剪枝：先递归组装并剪掉子级空目录，再由父级判定自身——嵌套多级空目录也能整支剪掉
+  const prune = (nodes: MenuNode[]): MenuNode[] =>
+    nodes
+      .map((n) => ({ ...n, children: prune(byParent.get(n.id) ?? []) }))
+      .filter((n) => n.type === 'menu' || n.children!.length > 0);
+  return prune(byParent.get(null) ?? []);
 }

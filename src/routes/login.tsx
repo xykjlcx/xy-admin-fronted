@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { authApi } from '@/modules/admin/api/auth.api';
-import { useAuth } from '@/stores/auth';
+import { resetAuth } from '@/lib/reset-auth';
 
 const searchSchema = z.object({ redirect: z.string().optional() });
 export const Route = createFileRoute('/login')({
@@ -23,7 +23,7 @@ function LoginPage() {
   const onSubmit = handleSubmit(async (dto) => {
     try {
       const { token } = await authApi.login(dto);
-      useAuth.getState().setToken(token);
+      resetAuth(token); // 清上个账号的 me 缓存 + 存新 token，防权限串号
       await router.invalidate(); // 关键：登录后 beforeLoad 不会自动重跑（spec §9）
       void nav({ to: to ?? '/admin/dashboard' });
     } catch (e) {

@@ -5,9 +5,9 @@ import { routeTree } from '@/routeTree.gen';
 import { Providers } from './providers';
 import { queryClient } from './query';
 import { authEvents } from '@/lib/http/events';
-import { useAuth } from '@/stores/auth';
+import { resetAuth } from '@/lib/reset-auth';
 import { i18nInit } from '@/lib/i18n';
-import { manifests } from '@/modules/registry';
+import { assertMenuPathsValid } from '@/modules/registry';
 import '@/styles/global.css';
 
 export const router = createRouter({
@@ -23,20 +23,18 @@ declare module '@tanstack/react-router' {
 
 // dev 菜单漂移校验：种子已由 RoutePath 编译期收窄，此处防未来运行时（DB）菜单指向不存在路由。
 // 必须在 createRouter 之后跑——fullPath 由路由树初始化时计算，此时 routesByPath 才完整。
-if (import.meta.env.DEV) {
-  const valid = new Set(Object.keys(router.routesByPath));
-  for (const m of manifests)
-    for (const rec of m.menuSeed)
-      if (rec.path && !valid.has(rec.path))
-        console.error(`[menu-drift] 菜单 ${rec.id} 指向不存在路由: ${rec.path}`);
-}
+if (import.meta.env.DEV) assertMenuPathsValid(Object.keys(router.routesByPath));
 
-// 401 统一处理：清 token → 失效 me 缓存 → 回登录（事件解耦，spec §9；http 层不感知路由）
-authEvents.on('expired', () => {
-  useAuth.getState().setToken(null);
-  queryClient.removeQueries({ queryKey: ['auth'] });
-  void router.navigate({ to: '/login', search: { redirect: location.pathname } });
+// 401 统一处理：清 token + auth 缓存 → 回登录（事件解耦，spec §9；http 层不感知路由）。
+// 退订接 HMR dispose，防开发期 mount 模块反复求值导致订阅堆积。logout 接线在 Task 11，同用 resetAuth。
+const offAuthExpired = authEvents.on('expired', () => {
+  resetAuth(null);
+  void router.navigate({
+    to: '/login',
+    search: { redirect: location.pathname + location.search },
+  });
 });
+import.meta.hot?.dispose(offAuthExpired);
 
 export async function mountApp() {
   await i18nInit; // 与 MSW 启动同级纪律：i18n ready 前不 mount，防首屏 key 闪现

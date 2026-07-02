@@ -13,8 +13,9 @@ export interface MockUser {
   permissions: string[]; // 通配符演示：admin 账号 ['*:*:*']
 }
 
-// ── 通用集合工厂（id 生成 + CRUD + reset）──────────────────────────────
+// ── 通用集合工厂（CRUD + reset；id 生成用独立的 genId，工厂本身不自动生成）──────────
 // 每个域一行 createCollection(seed, key) 即得完整 CRUD，免手写 find/set 样板。
+// 注意：all()/find() 返回内存活引用（可被直接 mutate），仅限 mock 内部使用。
 const collections: { reset: () => void }[] = [];
 let idSeq = 0;
 
