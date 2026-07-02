@@ -1,4 +1,5 @@
 // src/lib/appearance-dom.ts —— 外观状态写入 <html> 的唯一出口；耦合规则集中在此
+// 契约：boot/rehydrate 时必须调用一次 applyAppearance，否则 --pri 注入丢失（CSS 只有 feishu 蓝兜底）
 export type Flavor = 'feishu' | 'claude';
 export type Mode = 'light' | 'dark';
 export type Zoom = 'sm' | 'md' | 'lg';
@@ -12,8 +13,13 @@ export const ACCENTS = [
 ] as const;
 export type AccentKey = (typeof ACCENTS)[number]['key'] | 'custom';
 
+const FLAVOR_DEFAULT_ACCENT: Record<Flavor, AccentKey> = {
+  feishu: 'blue',
+  claude: 'claude',
+}; // 原型 L4785
+
 export function flavorDefaultAccent(flavor: Flavor): AccentKey {
-  return flavor === 'claude' ? 'claude' : 'blue'; // 原型 L4785
+  return FLAVOR_DEFAULT_ACCENT[flavor];
 }
 
 export function hexToSoft(hex: string): string {
