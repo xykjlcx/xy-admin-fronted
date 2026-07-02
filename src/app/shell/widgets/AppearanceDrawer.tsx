@@ -94,7 +94,7 @@ export function AppearanceDrawer() {
                 key={f.key}
                 onClick={() => setFlavor(f.key as Flavor)}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg border p-2.5 text-left transition-colors',
+                  'flex items-center gap-3 rounded-11 border p-2.5 text-left transition-colors',
                   flavor === f.key ? 'border-pri bg-pri-soft' : 'border-border bg-surface',
                 )}
               >
@@ -126,7 +126,7 @@ export function AppearanceDrawer() {
                 key={k}
                 onClick={() => set({ layout: k })}
                 className={cn(
-                  'relative flex flex-col gap-2 rounded-lg border p-2 transition-colors',
+                  'relative flex flex-col gap-2 rounded-12 border p-2 transition-colors',
                   layout === k ? 'border-pri bg-pri-soft' : 'border-border bg-surface-2',
                 )}
               >
@@ -158,7 +158,7 @@ export function AppearanceDrawer() {
                 className="flex flex-col items-center gap-1.5"
               >
                 <span
-                  className="flex h-11 w-full items-center justify-center rounded-lg transition-transform"
+                  className="flex h-11 w-full items-center justify-center rounded-11 transition-transform"
                   style={{ background: a.pri, boxShadow: accent === a.key ? RING(a.pri) : OUTLINE }}
                 >
                   {accent === a.key && <Check className="size-[17px] text-white" />}
@@ -168,7 +168,7 @@ export function AppearanceDrawer() {
             ))}
             <label className="flex cursor-pointer flex-col items-center gap-1.5">
               <span
-                className="relative flex h-11 w-full items-center justify-center rounded-lg"
+                className="relative flex h-11 w-full items-center justify-center rounded-11"
                 style={{
                   background: accent === 'custom' ? customAccent : CUSTOM_ACCENT_GRADIENT,
                   boxShadow: accent === 'custom' ? RING(customAccent) : OUTLINE,
@@ -201,7 +201,7 @@ export function AppearanceDrawer() {
                 key={k}
                 onClick={() => set({ pageAnim: k })}
                 className={cn(
-                  'h-9 flex-1 rounded-md border text-[13px] transition-colors',
+                  'h-9 flex-1 rounded-8 border text-[13px] transition-colors',
                   pageAnim === k
                     ? 'border-pri bg-pri-soft font-semibold text-pri'
                     : 'border-border bg-surface text-text-2',
@@ -221,7 +221,7 @@ export function AppearanceDrawer() {
                 key={o.key}
                 onClick={() => set({ zoom: o.key })}
                 className={cn(
-                  'flex h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-md border transition-colors',
+                  'flex h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-9 border transition-colors',
                   zoom === o.key
                     ? 'border-pri bg-pri-soft text-pri'
                     : 'border-border bg-surface text-text-2',
@@ -242,7 +242,7 @@ export function AppearanceDrawer() {
                 key={o.key}
                 onClick={() => set({ radius: o.key })}
                 className={cn(
-                  'flex h-[76px] flex-1 flex-col items-center justify-center gap-2 rounded-md border text-[13px] transition-colors',
+                  'flex h-[76px] flex-1 flex-col items-center justify-center gap-2 rounded-9 border text-[13px] transition-colors',
                   radius === o.key
                     ? 'border-pri bg-pri-soft text-pri'
                     : 'border-border bg-surface text-text-2',

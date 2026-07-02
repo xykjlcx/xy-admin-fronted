@@ -49,9 +49,9 @@ export function UserMenu() {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2.5 rounded-md px-2 py-1 hover:bg-surface-2">
-          <Avatar className="size-[30px] rounded-md">
-            <AvatarFallback className="rounded-md bg-pri text-[13px] font-semibold text-white">
+        <button className="flex items-center gap-2.5 rounded-8 px-2 py-1 hover:bg-surface-2">
+          <Avatar className="size-[30px] rounded-8">
+            <AvatarFallback className="rounded-8 bg-pri text-[13px] font-semibold text-white">
               {initial}
             </AvatarFallback>
           </Avatar>

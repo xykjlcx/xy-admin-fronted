@@ -42,11 +42,11 @@ export function SubsystemSwitcher({
               'flex items-center gap-2.5',
               collapsed
                 ? 'justify-center'
-                : 'w-full rounded-lg bg-surface px-2.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.06)]',
+                : 'w-full rounded-10 bg-surface px-2.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.06)]',
             )}
           >
             <span
-              className="flex size-8 shrink-0 items-center justify-center rounded-md text-white"
+              className="flex size-8 shrink-0 items-center justify-center rounded-8 text-white"
               style={{ background: active?.builtin ? 'var(--pri)' : active?.color }}
             >
               <Icon name={active?.icon} className="size-[18px]" />
@@ -68,7 +68,7 @@ export function SubsystemSwitcher({
         ) : (
           <button className="flex h-9 items-center gap-[9px] rounded-7 pl-2.5 pr-3 hover:bg-pri-soft">
             <span
-              className="flex size-6 shrink-0 items-center justify-center rounded-sm text-white"
+              className="flex size-6 shrink-0 items-center justify-center rounded-6 text-white"
               style={{ background: active?.builtin ? 'var(--pri)' : active?.color }}
             >
               <Icon name={active?.icon} className="size-[15px]" />
@@ -100,7 +100,7 @@ export function SubsystemSwitcher({
                 disabled={soon}
                 onClick={() => select(s)}
                 className={cn(
-                  'relative flex items-center gap-3 rounded-lg border p-3 text-left transition-colors',
+                  'relative flex items-center gap-3 rounded-12 border p-3 text-left transition-colors',
                   isActive
                     ? 'border-pri bg-pri-soft'
                     : 'border-border bg-surface hover:border-pri',
@@ -108,7 +108,7 @@ export function SubsystemSwitcher({
                 )}
               >
                 <span
-                  className="flex size-10 shrink-0 items-center justify-center rounded-lg text-white"
+                  className="flex size-10 shrink-0 items-center justify-center rounded-10 text-white"
                   style={{ background: s.builtin ? 'var(--pri)' : s.color }}
                 >
                   <Icon name={s.icon} className="size-5" />
@@ -122,7 +122,7 @@ export function SubsystemSwitcher({
                   </div>
                 </div>
                 {soon && (
-                  <span className="absolute right-2 top-2 rounded-sm bg-surface-2 px-1.5 py-px text-[10px] text-text-3">
+                  <span className="absolute right-2 top-2 rounded-4 bg-surface-2 px-1.5 py-px text-[10px] text-text-3">
                     {t('shell.switcher.soon')}
                   </span>
                 )}
