@@ -320,10 +320,11 @@ const css = readFileSync('src/styles/tokens.css', 'utf8');
 // tokens.css 动态提取——那会让断言跟着文件漂移，失去守护意义）。
 // 验收标准：突变任一 token 值（如 --pri 改错色）必须至少 FAIL 一条。
 const MUST_CONTAIN = [
-  /* 此处为全表 40+ 条，从 tokens.css 逐条提取硬编码，示例： */
-  '--bg: #f5f6f7', '--chrome: #16181d', '--surface: #fdfcf8', '--canvas: #e7e3d7',
-  '--surface-blur: rgba(33, 29, 26, 0.78)', '--pri-soft: rgba(255, 255, 255, 0.08)',
-  '--text-3: #978f80', '--border: #3a342e',
+  /* 全表 58 条，从 tokens.css 逐条提取硬编码。断言带结尾分号做精确声明匹配，
+     防数值前缀碰撞（'--radius-factor: 1' 会被 '1.55' 子串误命中）。示例： */
+  '--bg: #f5f6f7;', '--chrome: #16181d;', '--surface: #fdfcf8;', '--canvas: #e7e3d7;',
+  '--surface-blur: rgba(33, 29, 26, 0.78);', '--pri-soft: rgba(255, 255, 255, 0.08);',
+  '--text-3: #978f80;', '--border: #3a342e;',
   /* …其余全部声明（含 :root 的 --pri/--pri-soft/语义色×6/--pri-hover） */
 ];
 test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain(t));
