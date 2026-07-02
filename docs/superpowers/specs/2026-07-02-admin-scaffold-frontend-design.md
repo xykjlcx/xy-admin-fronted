@@ -1,224 +1,301 @@
 # 通用后台管理前端脚手架 — 设计文档
 
-- 日期：2026-07-02
+- 日期：2026-07-02（v2，吸收三方对抗性 review 后重写）
 - 状态：待批准
 - 上游输入：`README.md`（交接稿）+ `后台管理脚手架.dc.html`（高保真原型，唯一视觉基准）
+- ⚠️ 已证实交接稿 README 存在与原型代码不符之处（显示比例实现、档位系数、动画命名）。**冲突时以原型代码 grep 实证为准**，本文档标注了已知冲突点。
 
 ## 1. 背景与目标
 
-把 Claude Design 产出的单页面高保真原型（约 25 个页面、两个子系统、重度主题体系），落地为一套**可持续演进、可维护的前端工程模板**，作为后续若干项目的基础骨架。
+把 Claude Design 产出的高保真原型（30 屏：27 个 shell 内页面 + 3 个鉴权屏，两个子系统，重度主题体系），落地为一套可持续演进、可维护的前端工程模板，作为后续若干项目的基础骨架。
 
-**成功标准：**
+**成功标准（均须可验收，验收方法见 §13）：**
 
-1. 像素级还原原型的视觉与交互（颜色、间距、圆角、动效均以原型内联样式为准）
-2. 新项目 `degit` 复制即可起步，接真后端时页面代码零改动
-3. 加一个新子系统 / 新布局 / 新界面风格，都只需"新增文件 + 注册"，不修改既有代码
-4. 界面上可动态管理子系统、菜单、权限（数据驱动，非代码写死）
+1. 像素级还原原型的视觉与交互——基准限定：中文语言、100% 显示比例档；验收 = token 快照比对 + 视觉回归 diff + 交互 checklist
+2. 新项目 degit 即起步；接真后端时**页面与 queryOptions 层零改动**（API 模块层允许按后端重写，见 §6）；验收 = 三个演练（§13.3）
+3. 新增子系统 / 布局 / 界面风格 = 新增文件 + 有限注册点，不修改既有代码；验收 = 演练新增 demo 子系统后 git diff 只含新增文件与注册行
+4. 子系统、菜单、权限可在界面上动态管理（数据驱动）
 
 ## 2. 复用形态：模板仓库
 
-脚手架是一个 **template repo**。每个新项目复制一份独立演进，升级不自动回流（接受此代价，换取最低工程复杂度）。由此推论：**模板中每处设计都会被复制 N 次，上游质量标准从严**。
+Template repo，每个新项目复制独立演进，升级不自动回流。缓解措施（低成本三件套）：
 
-不采用：monorepo 共享包（项目间耦合）、npm 私有包（维护成本过高）、微前端（过度工程化）。
+- 维护 `CHANGELOG.md`；模板版本号写入 `package.json`，degit 后可追溯 fork 基线
+- `components/pro/` 与 `lib/` 保持自包含、互相低耦合——模板修 bug 后老项目可整文件 cherry-pick
+- 模板 `CLAUDE.md` 记录全部铁律与操作清单（§14）
 
-## 3. 技术栈
+不采用：monorepo 共享包、npm 私有包、微前端。
 
-| 层 | 选型 | 理由 |
+## 3. 技术栈与浏览器基线
+
+| 层 | 选型 | 备注 |
 |---|---|---|
-| 构建 | Vite（SPA） | 后台无 SEO 诉求，静态产物配任意后端；不用 Next.js（SSR/RSC 白付成本）、不用 TanStack Start（2026-03 刚 1.0，过新且 SSR 用不上） |
-| 语言 | TypeScript（strict） | — |
-| 路由 | TanStack Router（file-based） | typed search params 精确命中 9+ 列表页的筛选/分页 URL 化刚需；与 Query/Table 同生态 |
-| 服务端状态 | TanStack Query | 事实标准 |
-| 表格 | TanStack Table（headless） | 自建 DataTable 的逻辑层 |
-| UI | shadcn/ui + Tailwind CSS v4 | 与原型的纯 CSS 变量主题体系同构；源码在项目内，可自由魔改；不用 AntD（CSS-in-JS token 体系与像素级双风格复刻对抗） |
-| 客户端状态 | zustand（+ persist） | 只管纯客户端状态：外观设置、auth、侧栏折叠 |
-| 表单 | React Hook Form + zod | shadcn 标准搭配 |
-| Mock | MSW | 网络层拦截，请求代码真实走通；切真后端零改动 |
-| i18n | react-i18next | 原型要求中英切换，成熟标准 |
-| 图表 | ECharts（薄封装，主题色联动） | 国内后台事实标准 |
-| 图标 | lucide-react | 原型图标即 lucide 风格 |
-| 测试 | Vitest + Testing Library（复用 MSW） | — |
+| 构建 | Vite（SPA） | 不用 Next.js / TanStack Start，理由见 v1 讨论记录 |
+| 语言 | TypeScript strict | — |
+| 路由 | TanStack Router（file-based） | typed search params + 路由树类型用于 manifest 收窄（§7.4） |
+| 服务端状态 | TanStack Query | 含菜单/子系统/用户权限数据（§9） |
+| 表格 | TanStack Table | DataTable 逻辑层 |
+| UI | shadcn/ui + Tailwind CSS v4 | token 词汇裁决见 §8.1 |
+| 客户端状态 | zustand + persist | 仅外观设置、token、侧栏折叠（per-layout） |
+| 表单 | React Hook Form + zod | — |
+| Mock | MSW 2.x | 剥离模式与启动时序见 §5.3 |
+| i18n | react-i18next | 架构见 §11 |
+| 图表 | 自研 SVG 图表组件（复刻原型） | **不引入 ECharts**——原型图表即手绘 SVG，模板不预付重图表库成本；复刻时修正原型渐变色不随主题联动的 bug（改用 `var(--pri)`） |
+| 图标 | lucide-react + icon registry | registry：字符串 → 组件，DB 可存 |
+| 测试 | Vitest + Testing Library + Playwright（视觉回归） | — |
 | 包管理 | pnpm | — |
 
-**状态边界铁律**：服务端数据全归 TanStack Query，zustand 只管纯客户端状态，两者不重叠。
+**浏览器基线：Chrome/Edge 111+、Safari 16.4+、Firefox 128+**。依据：原型自身使用 `color-mix()` 与 `backdrop-filter`；显示比例采用标准化 CSS `zoom`（2024-05 Baseline）。不支持旧内核浏览器（360 兼容模式等），写入模板 README。
+
+**状态边界铁律**：服务端数据（含菜单/子系统/用户与权限）全归 TanStack Query；zustand 只存纯客户端状态（外观设置、auth token、折叠状态）。§9 的 auth 设计遵守此律。
 
 ## 4. 目录结构
 
 ```
 src/
-  app/                  ← 应用装配：providers、router 实例、Shell
+  app/                    ← 应用装配：providers、router 实例
     shell/
-      layouts/          ← SidebarLayout / RailLayout / InsetLayout + registry
-      widgets/          ← 布局无关部件：子系统切换器、导航菜单、Header 动作区、
-                           用户菜单、外观设置抽屉、面包屑
+      layouts/            ← SidebarLayout / RailLayout / InsetLayout + registry.ts
+      widgets/            ← 布局无关部件（完整清单见 §8.3）
   components/
-    ui/                 ← shadcn 组件（复制进来的源码）
-    pro/                ← 自建重组件：DataTable、PageHeader、DetailDrawer、
-                           TreeSelect、Upload、StatusBadge…
-  lib/                  ← http client、utils、icon registry
-  stores/               ← zustand：appearance / auth
-  modules/              ← 子系统
+    ui/                   ← shadcn 组件源码
+    pro/                  ← DataTable、PageHeader、DetailDrawer、IndentSelect（缩进下拉，
+                             替代 TreeSelect——原型部门树无拖拽无勾选，勿镀金）、
+                             Upload、StatusBadge、ConfirmDialog、I18nInput（§11.2）、
+                             SvgChart（折线/柱条，复刻原型）
+  lib/                    ← http client + adapter、utils、icon-registry、i18n 装配
+  stores/                 ← appearance.ts / auth.ts（仅 token）
+  modules/
+    registry.ts           ← ★ manifest 聚合注册点（子系统增删的唯一注册文件）
     admin/
-      manifest.ts       ← 页面资源注册表 + 菜单种子数据
-      api/              ← API 模块 + DTO 类型
-      mocks/            ← MSW handlers
-      components/       ← 子系统内部组件
-    lastmile/           ← 同上（兼作"如何新增子系统"的活例子）
-  routes/               ← TanStack Router file-based 路由（页面本体）
-    _auth/              ← 鉴权布局（含 Shell），未登录重定向 /login
-      admin/…
-      lastmile/…
+      manifest.ts         ← 子系统声明 + 菜单种子
+      api/  mocks/  components/
+    lastmile/             ← 同上；兼作新增子系统范例
+  routes/                 ← file-based 路由；页面权限经 staticData 声明（§7.4）
+    __root.tsx
+    _auth/                ← 鉴权布局（Shell 在此）
+      admin/…  lastmile/…
+      403.tsx  404 由 notFoundComponent 提供
     login.tsx
-  mocks/                ← MSW 启动装配（汇总各 module handlers）
-  styles/               ← 主题 token（见 §7）
-  locales/              ← i18n 资源（zh-CN / en-US）
+  mocks/                  ← MSW 装配（browser.ts + db.ts 内存数据库）
+  styles/                 ← tokens.css（§8.1）+ 动画 keyframes
+  locales/
+    zh-CN/{common,admin,lastmile}.json   ← per-module namespace（子系统可整目录删除）
+    en-US/…
 ```
 
-URL 约定：第一段为子系统 key，如 `/admin/users`、`/lastmile/shipments/$id`。
+URL 约定：第一段为子系统 key。`modules/registry.ts` 是子系统唯一聚合点（review 发现 v1 未定义此文件导致"注册点在哪"悬空）。
 
 ## 5. 数据层
 
-三层结构，依赖单向向下：
+三层结构不变：`页面 → queryOptions 工厂 → API 模块 → HTTP client`。
 
-```
-页面组件 → queryOptions 工厂 → API 模块（领域 DTO + 类型化函数） → HTTP client
-```
+### 5.1 契约
 
-**契约（定死在模板里）：**
+- 响应 envelope：`{ code: 0, data: T, message: string }`；业务异常（code≠0）统一 toast，传输异常分类处理（401 → §9）
+- 分页：请求 `{ page, pageSize, ...filters }`，响应 `{ list: T[], total: number }`
+- Query key：`[领域, 资源, 参数]`，变更后前缀失效
 
-- 响应 envelope：`{ code: number; data: T; message: string }`，`code !== 0` 抛业务异常（统一 toast），HTTP 层错误抛传输异常（401 → 跳登录；其余统一兜底提示）。新项目后端结构不同时，在 HTTP client 的 adapter（防腐层）归一化，改一处全站生效。
-- 分页请求 `{ page, pageSize, ...filters }`，分页响应 `{ list: T[]; total: number }`。
-- Query key 分层：`[领域, 资源, 参数]`，如 `['shipment', 'list', { status, page }]`；变更后按前缀失效。
+### 5.2 Adapter（防腐层）的完整职责边界
 
-**Mock：** MSW 按领域拆 handler（与 API 模块一一对应），faker 造数据 + 内存 CRUD（增删改在演示时真实生效，支持模拟延迟与错误）。环境变量 `VITE_ENABLE_MOCK` 控制开关；接真后端 = 关开关 + 配 `VITE_API_BASE_URL`。
+v1 只写了"响应归一化"，实测对接（如 RuoYi 系）需要三类归一，全部收敛在 `lib/http/adapter.ts` 单文件：
 
-## 6. 子系统机制
+1. **请求侧**：参数名映射（`page → pageNum` 等）——queryOptions 拼参后、发出前统一改写
+2. **响应侧**：多形状识别与归一（列表平铺形 `{code,msg,rows,total}` vs 普通形 `{code,msg,data}`）、code 语义映射（200 vs 0）
+3. **权限符映射**（§7.5）
 
-**分界线：代码注册"能力"，数据库管理"配置"。**
+**诚实边界**：adapter 归一"形状"，归一不了"接口路径不存在 / 语义不同 / 一拆二（login+getInfo）"——那属于 API 模块层重写，此层允许按后端改动（成功标准 2 的措辞依据）。
 
-| 归属 | 内容 |
-|---|---|
-| 代码 | 页面组件、路由映射、页面所需权限点声明 |
-| 数据（API/DB） | 子系统列表（key/名称/图标/颜色/启停/排序）、菜单树（层级/顺序/指向路由/挂权限点）、角色-权限分配 |
+### 5.3 Mock 机制
 
-manifest 的两个角色：
+- **生产剥离模式（强制）**：入口用静态判断 + dynamic import——`if (import.meta.env.VITE_ENABLE_MOCK === 'true') { const { enableMocking } = await import('@/mocks/browser'); await enableMocking(); }`。Vite 构建期常量替换 + DCE 保证 msw/faker/种子数据不进生产包。**验收标准：生产构建产物 grep 不到 faker**
+- **启动时序（强制）**：`await enableMocking()` 完成后再 mount React——TanStack Router 的 beforeLoad/loader 在 worker ready 前发请求必挂
+- faker 放 dependencies（被 src 引用）；`public/mockServiceWorker.js` 随产物无害，README 说明
+- 构建脚本：`build`（生产，mock off）/ `build:demo`（演示站，mock on）
+- mock 内存 DB（`mocks/db.ts`）：**关系型**，覆盖约 20 个资源域（用户/部门/角色/权限/日志×2/文件/消息/字典/子系统/菜单/运单+轨迹/客户+授权+流水/渠道→承运商→供应商三层关联/账单/概览统计×2），faker 种子 + 增删改真实生效 + 可选 localStorage 持久化（演示站体验）。**此块为独立工作包，估算占总量 ~12%，勿轻估**
 
-1. **页面资源注册表**（永久）：本子系统有哪些页面（路由路径 + 名称 + 所需权限点）。菜单管理界面"新建菜单项"时从这份清单选页面。
-2. **种子数据**（mock 期）：默认子系统信息与菜单树。**MSW 把它当数据库内容 serve**；Shell 只消费菜单 API，不直接 import manifest。接真后端时种子导成 SQL 初始化脚本。
+## 6. 后端接口契约（新增章节）
+
+**模板交付一份成文契约，作为 mock 与真后端的共同上游**（v1 的契约只活在 mock 代码里，违反接口先行，review R1）。交付物：
+
+1. `docs/api-contract.md`：endpoint 清单 + 请求/响应 DTO 索引（TS 类型为权威源，文档生成/链接）。覆盖：auth（login / me / logout / refresh）、subsystems CRUD、menus CRUD、users/depts、roles + 角色-权限读写（保存形状：权限符 `string[]`）、admins、logs×2 + 导出、files + 上传（multipart，envelope 外例外协议）、messages、dicts、profile、lastmile 全域（shipments/customers/channels/carriers/suppliers/billing/stats）
+2. **AuthProvider 契约**（接口先行，把"一步还是两步登录"藏进实现）：
 
 ```ts
-interface SubsystemManifest {
-  key: string;                    // 'lastmile'
-  label: string;
-  icon: string;                   // icon registry key，DB 可存
-  color: string;
-  home: string;                   // 默认落地路由
-  pages: PageResource[];          // 页面资源注册表
-  menuSeed: MenuNode[];           // 菜单树种子
+interface AuthProvider {
+  login(dto: LoginDto): Promise<{ token: string }>;
+  fetchProfile(): Promise<{ user: UserInfo; roles: string[]; permissions: string[] }>;
+  logout(): Promise<void>;
+  refresh?(): Promise<{ token: string }>;
 }
-interface PageResource {
-  path: string;
-  label: string;
-  permission: string;             // 页面访问权限符：'admin:user:view'
-  actions?: ActionPermission[];   // 页面内动作权限点（按钮级）
-}
-interface ActionPermission { code: string; label: string }
-// 例：{ code: 'admin:user:create', label: '新建成员' }
-//     { code: 'lastmile:shipment:export', label: '导出运单' }
-interface MenuNode { label: string; icon?: string; path?: string; permission?: string; children?: MenuNode[] }
 ```
 
-**权限符规范**：冒号分割三段式 `子系统:资源:动作`。页面访问权限约定动作为 `view`；动作权限如 `create` / `update` / `delete` / `export` / `detail` 等，按页面实际功能声明，不搞固定矩阵（与原型"模块分组 → 资源 → 可变动作 chip"的权限配置 UI 一致）。
+3. **参考 DDL**（subsystem / menu / role / role_permission 四表，含 JSON label 列）+ `scripts/export-seed.ts`（manifest 种子 → SQL INSERT，薄脚本）
 
-"角色与权限"页的可配置项清单，就来自全部 manifest 聚合出的 资源 × 动作 树（代码声明的能力全集）；角色-权限的分配关系属于数据（DB/API）。
+## 7. 子系统机制
 
-数据流（mock 与真后端同构）：`Shell → GET /api/subsystems + /api/menus →（MSW 读种子并支持 CRUD ｜ 真后端读 DB）`。登录后按用户权限集过滤菜单树，无权限菜单不渲染、直达路由则 403。
+分界线不变：**代码注册能力，数据管理配置**。以下为 review 后的修正。
 
-物理约束（明示，非缺陷）：页面组件必须先存在于代码中，界面上只能编排已注册页面，不能凭空造页面。图标经 icon registry（字符串 → lucide 组件）解耦。
+### 7.1 数据模型（修正：v1 的 MenuNode 撑不起菜单管理 CRUD）
 
-## 7. App Shell：三层解耦
+```ts
+type LocalizedString = Record<string, string>;   // { "zh-CN": "运单管理", "en-US": "Shipments" }
+                                                  // DB 存 JSON 列；加语言不改表结构
 
-### 7.1 Design Token 层
+interface Subsystem {
+  key: string; label: LocalizedString; desc: LocalizedString;
+  icon: string; color: string; home: RoutePath;
+  builtin: boolean;            // 内置不可删（admin）
+  enabled: boolean;            // false = 切换器上"即将上线"占位（hr/crm/project/data 四个种子）
+  sort: number;
+}
 
-五个正交外观维度，各自独立开关、互不感知、任意组合：
+// 管理行形状（菜单表 DTO，菜单管理页 CRUD 的对象）
+interface MenuRecord {
+  id: string; parentId: string | null; subsystemKey: string;
+  type: 'dir' | 'menu' | 'action';   // action 型 = 按钮权限行（对接 RuoYi 式菜单表时使用；
+                                      // 模板自身种子只用 dir/menu，按钮权限走 manifest actions）
+  label: LocalizedString;
+  icon?: string;                      // dir 与 menu 均可挂（inset 布局叶子需要图标）
+  shortLabel?: LocalizedString;       // rail 布局的短标签（原型 NAV.short）
+  path?: RoutePath;                   // menu 型必填
+  permission?: string;
+  visible: boolean; sort: number;
+}
+// 渲染树形状 = MenuRecord 按 parentId 组树 + 权限过滤 + visible 过滤后的产物，仅 Shell 消费
+```
 
-| 维度 | 取值 | 载体 |
+**菜单深度约束（明文）**：导航树最大两级（dir → menu），rail 布局的"组→页"模型结构性放不下第三级；菜单 API 校验，action 型不进导航渲染。
+
+### 7.2 菜单编辑器（决策：一次做到位）
+
+原型中菜单项增删改均为 toast 桩，编辑器属**新增设计，无原型视觉基准**：表单（I18nInput 双语名/图标选择/类型）+ 从页面资源清单选路由 + 排序 + 校验（深度/路径存在性/权限符格式）。验收标准："与全站设计语言一致"（线框级），不适用像素级条款。原型 MENU_TREE 种子自身的不一致（finance 树无对应子系统、路径体系脱节）**不复刻**，种子数据以修正后的一致版本为准。
+
+### 7.3 子系统编辑器沿用原型（subEditor 是真实现），删除等破坏性操作统一加 ConfirmDialog（原型缺失，模板补齐）。
+
+### 7.4 路由 × 菜单闭环（修正：焊死最后一环）
+
+- **权限元数据单一真相在路由文件**：每个路由用 TanStack Router `staticData` 声明 `{ label, permission, actions, group }`；**页面资源清单从路由树推导**（不再在 manifest 手写 pages 数组），路径与权限永不脱钩
+- `RoutePath` = 路由生成文件导出的联合类型；manifest 菜单种子的 `path` 用它收窄——**种子里的路径 typo / 路由改名 = 编译错误**
+- DB 存量菜单（运行时数据）兜底：dev 启动断言"菜单路径 ⊆ 路由树"；菜单管理界面对孤儿路径标红
+- 约定：beforeLoad 权限拒绝只 `throw redirect()`，禁止 toast 副作用（`defaultPreload: 'intent'` 下 hover 即触发 beforeLoad）
+
+### 7.5 权限模型（修正：对齐原型 + 兼容真实后端）
+
+- 权限符三段式 `域:资源:动作`。**统一裁决**（v1 规范与原型种子分裂）：采用原型种子的**业务域前缀**风格（`iam:user:view`、`audit:oplog:view`），动作命名向原型对齐（`del/resetpwd/assign` 等按原型，新增的取通用名）
+- **一页多资源**：staticData 的 actions 允许携带异资源前缀（成员与部门页挂 `iam:user:*` + `iam:dept:*`）；`group` 字段提供"模块"分组标签（角色权限配置页的三层 UI：模块→资源→动作，照原型）
+- **通配符匹配（强制支持）**：`usePermission` 实现 `*:*:*`、`iam:*` 段通配——RuoYi 系超管返回 `["*:*:*"]`，纯字符串相等会导致超管全站 403
+- **权限符映射扩展点**：adapter 提供 `mapPermission(backendCode) => templateCode` 钩子（一张映射表），后端符号体系不同时改一处
+- **权限目录 source of truth 双模式**（写入 CLAUDE.md）：模板模式 = 路由树 staticData 聚合为目录，后端只存分配关系；对接模式 = 后端 permission/menu 表为准，前端 staticData 仅作声明校验
+
+### 7.6 子系统操作清单（CLAUDE.md 之源）
+
+**新增（7 步）**：① `modules/<key>/` 建 manifest/api/mocks；② `routes/_auth/<key>/` 建页面（staticData 声明权限）；③ `modules/registry.ts` 注册 manifest；④ `mocks/browser.ts` 挂 handlers；⑤ `locales/*/<key>.json` 建 namespace；⑥ 新图标进 icon-registry；⑦（真后端）种子入库。
+**删除（4 步）**：删 `modules/<key>/` + 删 `routes/_auth/<key>/` + registry 除名 + locales 删 namespace。
+**admin 内核页标注**：Shell widgets 依赖消息中心与个人中心（铃铛/头像菜单直达），此二页 + 登录属不可删内核，在 CLAUDE.md 标注。
+
+## 8. App Shell
+
+### 8.1 Design Token 层（修正："正交"降级为"受控耦合"）
+
+五个外观维度 + **耦合矩阵**（原型实证，v1 宣称的完全正交不成立）：
+
+| 维度 | 载体 | 耦合规则（照原型） |
 |---|---|---|
-| 风格 flavor | feishu / claude | `<html data-flavor>` 切换整套中性色 |
-| 明暗 mode | light / dark | `<html data-mode>` |
-| 主题色 | 4 预设 + 自定义取色 | JS 注入 `--pri` / `--pri-soft`（自定义色需运行时计算） |
-| 圆角 | sharp / default / round | `--radius` 基准 × 分级 |
-| 显示比例 | 90 / 100 / 110% | 根元素 `zoom`（沿用原型方案） |
+| flavor（feishu/claude） | `<html data-flavor>` | 切换时**重置主题色**为 flavor 默认（feishu→经典蓝，claude→陶土橙） |
+| mode（light/dark） | `<html data-mode>` | 暗色下 `--pri-soft` 固定 `rgba(255,255,255,.08)`，**与主题色无关** |
+| 主题色 accent | JS 注入 `--pri`/`--pri-soft`/`--pri-hover` | 亮色下 soft：预设色用手调值，自定义色用 `rgba(pri,.12)` 公式；`--pri-hover` 用 `color-mix(in srgb, var(--pri) 85%, black)`（修正原型硬编码深蓝的 bug） |
+| 圆角 | `--radius-factor`（0.28/1/1.55） | 全套 `--radius-N: calc(Npx * var(--radius-factor))` 乘法 token（shadcn 默认加法偏移与原型乘法不等价）；**禁用 `rounded-[Npx]` 任意值**（ESLint 约束） |
+| 显示比例 | `html { zoom }`，档位 0.9/1.0/1.08（原型实际系数，README 的"110%"有误） | 独立维度。CSS zoom 2024-05 标准化（Baseline）。**决策记录**：原型的 JS 遍历缩放依赖全内联样式，工程不可复用；其"不缩宽度"是实现妥协，业界（飞书/钉钉/VS Code 客户端）显示比例均为等比缩放。像素验收基准限定 100% 档；90/108 档验"无溢出/无截断"。M0 实测项：Safari 下 Radix 弹层 + zoom 定位 |
 
-Token 分级：primitive（原始色板，仅 token 文件内部使用）→ semantic（`--surface` `--surface-2` `--text` `--text-2` `--text-3` `--border` `--pri` `--pri-soft` + 语义色，即原型 README 那套）。
+**Token 权威源是原型代码 L4796-4808 的 FLAVORS 对象**（2 flavor × 2 mode × 12 变量），不是 README。补齐 v1 遗漏：`--bg / --canvas / --chrome`（侧栏与 Header 底色，飞书白/Claude 米）`/ --surface-blur`（毛玻璃底）。
 
-**铁律：组件只消费 semantic token，组件代码中禁止出现十六进制色值。** 像素级复刻 = 原型变量值原样搬入 token 文件；新增风格 = 新增一组变量。
+**shadcn 词汇裁决**：`@theme` 中把 shadcn 变量（`--background/--card/--popover/--muted/--accent/--ring/--input`…）alias 到原型语义 token（`--bg/--surface/--surface-2/--pri-soft/--pri/--border`…），实现期产出完整映射表并冻结；**铁律：业务代码只准使用原型语义 token；组件代码禁止十六进制色值**（ESLint/grep 进 CI）。
 
-页面切换动画（无/淡入/切入/上滑/缩放）与导航过渡沿用原型 keyframes，作为全局样式迁移。
+**FOUC 防护**：`index.html` 内联脚本在样式加载前读 localStorage 写 `data-flavor/data-mode`（zustand persist 恢复晚于首帧，暗色用户否则每次刷新闪白）。可选：storage 事件跨 tab 同步。
 
-### 7.2 布局层（策略模式）
+### 8.2 布局层（修正：契约重写）
+
+v1 的 `header: ReactNode` 大 prop 拆不开"inset 布局把子系统切换器搬进侧栏"（原型实证：两处切换器弹层规格不同），废弃。修正：
 
 ```ts
 interface ShellLayoutProps {
-  menuTree: MenuNode[];          // 权限过滤后的菜单
-  subsystems: Subsystem[];       // 切换器数据
-  collapsed: boolean;
-  header: ReactNode;             // Header 动作区（部件组合）
-  children: ReactNode;           // 页面内容
+  menuTree: MenuNode[];              // 渲染树（已过滤）
+  subsystems: Subsystem[];
+  collapsed: boolean;                 // per-layout：stores 按 Record<layoutKey, boolean> 存
+  onCollapsedChange(v: boolean): void;
+  children: ReactNode;                // 仅页面内容
 }
 ```
 
-`SidebarLayout` / `RailLayout` / `InsetLayout` 各自实现此接口，注册到 `layouts/registry.ts`。外观设置的"导航布局"读注册表。**新增布局 = 新文件 + 注册一行。**
+**布局直接 import 部件并自行组合**——部件不感知位置，"位置知识"归布局（这才是原型真实结构：sidebar 布局把切换器放 Header 左上、inset 放侧栏顶，同一部件不同摆位与弹层规格由布局传参）。"新增布局 = 新文件 + registry 注册一行"仍成立，成立条件即"布局自由组合部件"。
 
-### 7.3 部件层
+### 8.3 部件层（补全 v1 遗漏的 Header 碎片件）
 
-子系统切换器、导航菜单、Header 动作区、用户菜单、外观设置抽屉、面包屑——布局无关，不感知自己的摆放位置。
+完整清单：SubsystemSwitcher（弹层规格可参数化）、NavMenu（sidebar 组树 + grid 0fr↔1fr 过渡 / rail 短标签 + 二级面板 / inset 平铺，三形态组件）、**GlobalSearch**（Header 440px 搜索框，v1 遗漏）、**DarkModeToggle**（Header 快捷钮，与外观抽屉状态同源）、**NotificationBell**（未读徽标，点击直达消息中心）、UserMenu（含 5 个 stub 项照原型保留为 toast）、AppearanceDrawer（全部外观项）、Breadcrumb（菜单树 + 路由 staticData.label 兜底——详情页不在菜单树）、LanguageMenu。
+**Header 行为**：滚动毛玻璃吸顶（`--surface-blur` + blur(14px)；inset 布局未滚动时 header 透明），照原型。
+页面切换动画五种，命名照原型实际：无/淡入/**左滑**/**上浮**/缩放。
 
-数据流向明确为：**Shell 容器**统一发起菜单/子系统查询（TanStack Query），经布局 props 下发给切换器、导航菜单等数据部件；用户菜单、外观设置抽屉等自治部件直接读全局 store。依赖方向严格单向：**Shell 容器取数 → 布局摆放 → 部件呈现；部件与布局均不反向引用。**
+## 9. 鉴权（修正：遵守自己的状态铁律）
 
-## 8. 鉴权
+- zustand 只存 **token**；用户资料 + roles + permissions 走 `GET /api/me` 的 Query（`['auth','me']`）——v1 把权限集存 zustand+localStorage 是铁律的第一个违反者（F5 后权限过期到下次登录）
+- `_auth` 布局 `beforeLoad`：`queryClient.ensureQueryData(meQuery)`；未登录 `throw redirect({ to: '/login', search: { redirect } })`
+- **登录/登出/权限变更后显式 `router.invalidate()`**（TanStack Router 不因 store 变化重跑 beforeLoad，标准坑）
+- 401：http client 发布 `auth:expired` 事件，app 层订阅后清 token + invalidate + 跳登录（事件解耦，避免 http↔router 循环 import）
+- 403 页、404（notFoundComponent）进交付清单
+- 登录页三 Tab UI 全做，密码流走通，短信/扫码 UI + mock 提示
+- 三级权限控制（菜单过滤 / beforeLoad / `<AuthGuard>` + `usePermission` 含通配符）见 §7.5；mock 预置多角色账号切换演示
 
-- 登录页三 Tab（密码/短信/扫码）UI 全做，mock 阶段密码登录走通全流程，短信/扫码留 UI + mock 提示
-- token 存 localStorage，HTTP client 统一注入 `Authorization` header（模板文档注明可切 httpOnly cookie 方案，需后端配合）
-- 路由守卫：`_auth` 布局路由 `beforeLoad` 校验登录态，未登录带 `redirect` 参数跳 `/login`
-- 401 统一处理：清 auth store → 跳登录；预留 refresh token 扩展点
-- 权限：登录响应携带权限符集合（`string[]`），存 auth store。三级控制：
-  1. **菜单级**：按权限集过滤菜单树（§6），无权限不渲染
-  2. **页面级**：路由 `beforeLoad` 校验页面 `view` 权限符，无权限跳 403
-  3. **按钮级**：`<AuthGuard permission="admin:user:create">` 包裹组件（无权限时不渲染，可配 `fallback` 为禁用态）+ `usePermission()` hook 供逻辑分支使用；DataTable 工具栏主按钮、行内操作、导出等全部挂权限符
-- mock 阶段：MSW 按预置角色返回对应权限集，切换测试账号即可演示不同权限视图
-- 边界说明：前端权限控制是**展示层体验**，不是安全边界——真正的鉴权必须由后端接口执行（模板 CLAUDE.md 中注明，防止新项目误把前端显隐当安全）
+## 10. DataTable
 
-## 9. DataTable（核心公共组件）
+同 v1（原型 std* 规格 + TanStack Table + 状态外置于 typed search params + 三态内置），无 review 异议。工具栏主按钮、行内操作、导出挂权限符。
 
-原型 `std*` 表格体系的组件化，TanStack Table 做逻辑层：
+## 11. i18n（新增章节）
 
-- 视觉规格照原型：面板 1px 边框 + 12px 圆角、表头 44px `--surface-2`、行 56px、hover `--surface-2`、选中 `--pri-soft`、sticky 表头
-- 组成：工具栏（搜索框 + 筛选 Tab + 右侧主按钮）、列定义（含徽标/主色链接/"···"更多列的预置渲染器）、行选择、右下分页（当前页主色实底）
-- 状态外置：筛选/分页/搜索状态由页面经 typed search params 持有，DataTable 受控——列表视图可刷新、可分享 URL
-- 内置 loading（骨架屏）/ 空态 / 错误态
+### 11.1 静态文案
+- react-i18next，per-module namespace（§4）；key 规范 `<ns>.<page>.<label>` 在 M0 定稿，**页面开发时直接写 t(key)**，禁止先硬编码后补
+- **事实与预期管理**：原型语言切换是 toast 桩，全站 0 条英文——约 1100 条英文文案从零撰写，占总工作量 ~9%，排 M2；英文态验收 = "无溢出/无截断巡检"（英文更长，像素基准仅中文态）
 
-所有列表页（成员、角色、日志、字典、渠道、承运商、供应商、运单、客户）复用此组件。
+### 11.2 数据侧（决策：JSON 节点）
+- 所有需多语言的数据字段（菜单/子系统/字典的 label、desc）类型为 `LocalizedString`（JSON 列），加语言不改表
+- 读取：按当前 locale 取值，fallback 链 `当前语言 → zh-CN → 首个非空`
+- **`<I18nInput>` 公共组件**：输入框 + 地球图标按钮 → 弹窗编辑各语言键值对，默认展示当前语言值；菜单/子系统/字典编辑表单统一使用（通用性由组件解决，不摊向每个表单）
 
-## 10. 交付范围
+### 11.3 剥离立场（写入 CLAUDE.md）
+不需要英文的新项目：保留 t() 层、只维护 zh-CN 资源；**不要**拆 react-i18next。
 
-- **admin 子系统**：全部页面（企业概览、成员与部门、角色与权限、菜单管理、日志审计、文件中心、消息中心、企业信息、字典管理、个人中心）
-- **lastmile 子系统**：全部页面（运营概览、运单列表/新建/详情/打单/轨迹、客户、渠道/承运商/供应商、计费）——兼作业务子系统范例
-- **鉴权**：登录/注册/找回密码分屏页
-- **外观系统**：五维度全部实现
-- 承运商 logo 用文字色块占位、面单条码用 CSS 占位（照原型，README 已注明正式项目替换）
+## 12. 交付范围
 
-## 11. 测试与工程化
+- 30 屏全量：admin 27 屏内含消息中心/个人中心/sub_home 占位页（未启用子系统落地页，含"去菜单管理"入口）；lastmile 全页；登录/注册/找回
+- 4 个"即将上线"子系统种子（hr/crm/project/data，enabled:false）照原型出现在切换器
+- 菜单编辑器一次做全（§7.2）；子系统编辑器照原型
+- 面单打印：`window.print()` 最简实现 + 面单区域打印样式；热敏纸精确适配留真项目
+- 文件预览抽屉 = 占位交互照原型（防镀金标注）；承运商 logo 文字色块、条码 CSS 占位照原型
+- 403/404 页
 
-- 测试重点：`lib/`（http client/envelope 拆包）与 `components/pro/`（DataTable 等）单测 + 登录/列表 CRUD 少量集成测试（复用 MSW）；不追求覆盖率数字
-- ESLint + Prettier、husky + lint-staged、GitHub Actions（lint + typecheck + test + build）
-- `.gitignore` 覆盖 `.env*` / `node_modules` / `dist` / `.DS_Store`；根目录 `CLAUDE.md`（含本项目约定：token 铁律、状态边界、query key 约定、子系统新增步骤）
-- 环境变量：`VITE_ENABLE_MOCK`、`VITE_API_BASE_URL`
+## 13. 验收体系（新增章节）
 
-## 12. 明确不做（YAGNI）
+1. **Token 快照（确定性）**：FLAVORS 12 变量 × 4 组合逐值断言，零成本硬验收
+2. **视觉回归**：Playwright 脚本驱动原型（单 HTML 可 state 切换）产 30 屏基准截图；实现侧同 viewport diff（阈值 1-2%）。默认组合跑全屏；主题矩阵 pairwise 抽 8-12 组合 × 3 代表页（dashboard/users/ship_detail）——正交性主要由"构造保证"（token 铁律 CI 强制），不靠目检 2700 组合
+3. **三演练**：① fresh degit → pnpm i → dev 全功能；② 照 §7.6 清单新增 demo 子系统，diff 仅新增文件+注册行；③ 关 mock 指向最小假后端，页面层 0 diff
+4. 交互 checklist：README Interactions 段逐条人工核对
+5. 生产包检查：构建产物 grep 不到 faker/msw
 
-- 微前端、monorepo、npm 包发布
-- SSR/SEO 相关一切
-- 移动端适配（原型为桌面后台；表格页最小宽度 + 横向滚动兜底）
-- 真实短信/扫码登录、真实文件存储（mock 走通交互）
-- 主题编辑器之外的运行时 token 修改 GUI
+## 14. 测试与工程化
+
+- 单测重点：lib/http（envelope/adapter/权限通配符匹配）、pro 组件；集成：登录流 + 列表 CRUD（复用 MSW）。**测试边界声明**：MSW 测试验证的是"前端遵守契约"，不验证后端遵守——契约变更时 mock 同步更新是纪律
+- ESLint（含禁 hex 色值、禁 rounded 任意值两条自定义规则）+ Prettier、husky + lint-staged、GitHub Actions：lint + typecheck + test + build + token 快照
+- 模板 CLAUDE.md 内容清单：token 铁律 / 状态边界 / query key 约定 / 子系统增删清单 / 权限双模式 / i18n 剥离立场 / 前端权限非安全边界 / mock 剥离验收
+- `.gitignore` 覆盖敏感与产物文件；环境变量 `VITE_ENABLE_MOCK` / `VITE_API_BASE_URL`
+
+## 15. 分期（按上游杠杆定律切）
+
+- **M0 骨架期（模具，返工放大系数最高）**：token 体系全量（含耦合矩阵、zoom、--chrome/--surface-blur）→ 三布局 Shell + 全部 widgets + 外观抽屉 + 切页动画 → 路由/鉴权/401/403/404 + envelope + MSW 装配（启动时序）→ 菜单数据流（Shell 只吃 API）+ registry + staticData 机制 → i18n 架构（key 规范 + LocalizedString + I18nInput）→ DataTable v1 → **垂直切片：成员与部门页**（树+表+抽屉+弹窗+批量，逼出全部 pro 组件）→ CI + token 快照 + 视觉回归脚手架 + 基准截图脚本 → **Safari zoom 弹层实测**
+- **M1 量产期**：admin 余页 → lastmile 全页（playbook 复制）→ 三级权限落地 → SVG 图表组件 + 两个概览页 → 登录三屏 → 菜单编辑器
+- **M2 收尾期**：i18n 全量词条 + EN 巡检 → 打印样式 → 视觉回归全矩阵跑批 → CLAUDE.md/文档 → 三演练验收
+
+工作量结构预警（review 实测盘点）：页面本体 <1/3；Shell+主题 ~18%、pro 组件 ~15%、**mock 关系数据层 ~12%**、i18n ~9%、验收工具链 ~6% ——后三项 v1 均一句话带过，勿再低估。
+
+## 16. 明确不做（YAGNI）
+
+微前端 / monorepo / npm 包发布、SSR、移动端适配（最小宽度 + 横向滚动兜底）、真实短信/扫码/文件存储、ECharts 等重图表库、热敏打印精确适配、TreeSelect 拖拽勾选树（原型无此交互）、运行时 token 编辑 GUI。
