@@ -116,9 +116,21 @@ interface SubsystemManifest {
   pages: PageResource[];          // 页面资源注册表
   menuSeed: MenuNode[];           // 菜单树种子
 }
-interface PageResource { path: string; label: string; permissions: string[] }
+interface PageResource {
+  path: string;
+  label: string;
+  permission: string;             // 页面访问权限符：'admin:user:view'
+  actions?: ActionPermission[];   // 页面内动作权限点（按钮级）
+}
+interface ActionPermission { code: string; label: string }
+// 例：{ code: 'admin:user:create', label: '新建成员' }
+//     { code: 'lastmile:shipment:export', label: '导出运单' }
 interface MenuNode { label: string; icon?: string; path?: string; permission?: string; children?: MenuNode[] }
 ```
+
+**权限符规范**：冒号分割三段式 `子系统:资源:动作`。页面访问权限约定动作为 `view`；动作权限如 `create` / `update` / `delete` / `export` / `detail` 等，按页面实际功能声明，不搞固定矩阵（与原型"模块分组 → 资源 → 可变动作 chip"的权限配置 UI 一致）。
+
+"角色与权限"页的可配置项清单，就来自全部 manifest 聚合出的 资源 × 动作 树（代码声明的能力全集）；角色-权限的分配关系属于数据（DB/API）。
 
 数据流（mock 与真后端同构）：`Shell → GET /api/subsystems + /api/menus →（MSW 读种子并支持 CRUD ｜ 真后端读 DB）`。登录后按用户权限集过滤菜单树，无权限菜单不渲染、直达路由则 403。
 
@@ -170,7 +182,12 @@ interface ShellLayoutProps {
 - token 存 localStorage，HTTP client 统一注入 `Authorization` header（模板文档注明可切 httpOnly cookie 方案，需后端配合）
 - 路由守卫：`_auth` 布局路由 `beforeLoad` 校验登录态，未登录带 `redirect` 参数跳 `/login`
 - 401 统一处理：清 auth store → 跳登录；预留 refresh token 扩展点
-- 权限：登录响应携带权限点集合，存 auth store；菜单过滤（§6）+ 页面级守卫 + `<AuthGuard permission>` 组件控制按钮级显隐
+- 权限：登录响应携带权限符集合（`string[]`），存 auth store。三级控制：
+  1. **菜单级**：按权限集过滤菜单树（§6），无权限不渲染
+  2. **页面级**：路由 `beforeLoad` 校验页面 `view` 权限符，无权限跳 403
+  3. **按钮级**：`<AuthGuard permission="admin:user:create">` 包裹组件（无权限时不渲染，可配 `fallback` 为禁用态）+ `usePermission()` hook 供逻辑分支使用；DataTable 工具栏主按钮、行内操作、导出等全部挂权限符
+- mock 阶段：MSW 按预置角色返回对应权限集，切换测试账号即可演示不同权限视图
+- 边界说明：前端权限控制是**展示层体验**，不是安全边界——真正的鉴权必须由后端接口执行（模板 CLAUDE.md 中注明，防止新项目误把前端显隐当安全）
 
 ## 9. DataTable（核心公共组件）
 
