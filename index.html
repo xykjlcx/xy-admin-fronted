@@ -5,7 +5,8 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>通用后台管理</title>
-    <!-- 契约：localStorage key 'appearance'（zustand persist {state} 结构）+ 默认值 feishu/light，与 src/stores/appearance.ts 三点同步 -->
+    <!-- 契约：localStorage key 'appearance'（zustand persist {state} 结构）+ 默认值 feishu/light，与 src/stores/appearance.ts 同步。
+         _priResolved/_priSoftResolved 由 store 在主题色变更时写入，此处直接注入 --pri/--pri-soft，防自选主题色首帧闪回蓝。 -->
     <script>
       (function () {
         try {
@@ -15,6 +16,8 @@
           el.dataset.mode = s.mode || 'light';
           if (s.radius && s.radius !== 'default') el.dataset.radius = s.radius;
           if (s.zoom && s.zoom !== 'md') el.dataset.zoom = s.zoom;
+          if (s._priResolved) el.style.setProperty('--pri', s._priResolved);
+          if (s._priSoftResolved) el.style.setProperty('--pri-soft', s._priSoftResolved);
         } catch (e) {}
       })();
     </script>

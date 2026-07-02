@@ -1,4 +1,11 @@
-import { applyAppearance, hexToSoft, flavorDefaultAccent } from '@/lib/appearance-dom';
+import {
+  applyAppearance,
+  hexToSoft,
+  flavorDefaultAccent,
+  isValidHex,
+  resolveAccentVars,
+  ACCENTS,
+} from '@/lib/appearance-dom';
 
 const base = {
   flavor: 'feishu',
@@ -39,4 +46,35 @@ test('applyAppearance 写入 dataset.flavor/mode', () => {
   applyAppearance({ ...base, flavor: 'claude', mode: 'dark' });
   expect(document.documentElement.dataset.flavor).toBe('claude');
   expect(document.documentElement.dataset.mode).toBe('dark');
+});
+
+// Task 14 待办①：ACCENTS 补 label 字段
+test('ACCENTS 四预设均有中文 label', () => {
+  expect(ACCENTS.map((a) => a.label)).toEqual(['经典蓝', '陶土橙', '深绿', '紫罗兰']);
+});
+
+// Task 14 待办②：自定义取色 hex 校验
+test('isValidHex 校验 #rgb / #rrggbb', () => {
+  expect(isValidHex('#c96442')).toBe(true);
+  expect(isValidHex('#abc')).toBe(true);
+  expect(isValidHex('c96442')).toBe(false);
+  expect(isValidHex('#xyz')).toBe(false);
+  expect(isValidHex('')).toBe(false);
+});
+
+test('resolveAccentVars：亮色含 soft，暗色 soft 交还 CSS（null）', () => {
+  expect(resolveAccentVars({ ...base })).toEqual({ pri: '#3370ff', soft: '#eef3ff' });
+  expect(resolveAccentVars({ ...base, mode: 'dark' })).toEqual({ pri: '#3370ff', soft: null });
+});
+
+test('resolveAccentVars：非法自定义色回退经典蓝，不产 rgba(NaN)', () => {
+  const r = resolveAccentVars({ ...base, accent: 'custom', customAccent: 'not-a-color' });
+  expect(r).toEqual({ pri: '#3370ff', soft: '#eef3ff' });
+});
+
+test('resolveAccentVars：合法自定义色走 soft 公式', () => {
+  expect(resolveAccentVars({ ...base, accent: 'custom', customAccent: '#c96442' })).toEqual({
+    pri: '#c96442',
+    soft: 'rgba(201,100,66,.12)',
+  });
 });

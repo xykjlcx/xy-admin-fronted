@@ -84,11 +84,13 @@ test('圆角因子三档 + 四条 calc 公式', () => {
   expect(css).toContain('--radius-xl: calc(14px * var(--radius-factor));');
 });
 
-// 锁 FOUC 脚本与 store 的三点契约不被静默删除：localStorage key 'appearance' +
-// dataset.flavor / dataset.mode 写入，避免首屏闪烁（FOUC）回归。
-test('index.html FOUC 脚本三点契约不被静默删除', () => {
+// 锁 FOUC 脚本与 store 的契约不被静默删除：localStorage key 'appearance' + dataset.flavor/mode 写入，
+// 以及 Task 14 的首帧防闪蓝——脚本必须读派生值注入 --pri（否则自选主题色首帧闪回蓝）。
+test('index.html FOUC 脚本契约不被静默删除（含 --pri 注入）', () => {
   const html = readFileSync('index.html', 'utf8');
   expect(html).toContain('appearance');
   expect(html).toContain('dataset.flavor');
   expect(html).toContain('dataset.mode');
+  expect(html).toContain('--pri');
+  expect(html).toContain('_priResolved');
 });

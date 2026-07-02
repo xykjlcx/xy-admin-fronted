@@ -8,6 +8,7 @@ import { GlobalSearch } from '../widgets/GlobalSearch';
 import { NotificationBell } from '../widgets/NotificationBell';
 import { HeaderActions } from '../widgets/HeaderActions';
 import { NavMenuSidebar } from '../widgets/NavMenuSidebar';
+import { PageTransition } from '@/components/pro/PageTransition';
 
 // 飞书经典：通栏 Header 在上，下方 = 侧栏树 + 内容区（原型 rootStyle 列向分支 L4810-4824）。
 // Header 绝对定位覆于顶部，侧栏与 main 各 pt-14 让出 56px。
@@ -63,7 +64,7 @@ export function SidebarLayout({
           />
         </aside>
         <main id="shell-main" className="min-w-0 flex-1 overflow-y-auto pt-14">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { GlobalSearch } from '../widgets/GlobalSearch';
 import { NotificationBell } from '../widgets/NotificationBell';
 import { HeaderActions } from '../widgets/HeaderActions';
 import { NavMenuInset } from '../widgets/NavMenuInset';
+import { PageTransition } from '@/components/pro/PageTransition';
 
 // 嵌入式布局（原型 L167-219 + shellStyle inset L4814）：整屏 canvas 底，通顶侧栏在左，
 // 内容区是浮起白卡（m-2 ml-0 rounded-xl border shadow），Header 嵌卡内、未滚动时透明。
@@ -49,7 +50,7 @@ export function InsetLayout({
           transparentUntilScroll
         />
         <main id="shell-main" className="min-w-0 flex-1 overflow-y-auto pt-14">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
     </div>
