@@ -736,6 +736,8 @@ git add -A && git commit -m "feat: appearance/auth stores（per-layout 折叠 + 
 
 ### Task 8: 路由装配 + 鉴权守卫 + 401/403/404
 
+> 来自 Task 6 review 的待办：① i18n resources 聚合收敛到 `src/locales/index.ts`（唯一聚合点，i18n.ts 只 import 它——否则加子系统时硬编码 import 会破坏"整目录删除"承诺，删除清单的 locale 步骤 = 删 json + 删 index 两行）；② mount 前 `await i18nInit`（比照 MSW 启动纪律，防将来接 lazy-load backend 退化）；③ LanguageMenu 写 localStorage 用 `LOCALE_STORAGE_KEY` 常量（已在 lib/i18n-config.ts）。
+
 **Files:**
 - Create: `src/app/mount.tsx`, `src/app/providers.tsx`, `src/routes/__root.tsx`, `src/routes/login.tsx`, `src/routes/_auth.tsx`, `src/routes/_auth/admin/dashboard.tsx`（占位内容，M1 充实）, `src/app/query.ts`, `src/modules/admin/api/auth.api.ts`
 - Test: 手动 e2e 流（本 task 验收即登录闭环）
