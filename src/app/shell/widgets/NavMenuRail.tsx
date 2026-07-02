@@ -16,7 +16,7 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
 
   return (
     <>
-      <nav className="flex h-screen w-[76px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-border bg-chrome py-2.5">
+      <nav className="h-app flex w-[76px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-border bg-chrome py-2.5">
         {groups.map((g) => {
           const active = g === activeGroup;
           const first = g.pages[0];
@@ -37,7 +37,7 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
           );
         })}
       </nav>
-      <aside className="flex h-screen w-[192px] shrink-0 flex-col overflow-y-auto border-r border-border bg-chrome py-4">
+      <aside className="h-app flex w-[192px] shrink-0 flex-col overflow-y-auto border-r border-border bg-chrome py-4">
         <div className="px-5 pb-3 text-[15px] font-bold text-text">
           {activeGroup ? lv(activeGroup.node.label, i18n.language) : ''}
         </div>

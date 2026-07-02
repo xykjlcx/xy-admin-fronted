@@ -30,11 +30,32 @@
   --success: #16a34a; --success-soft: #e8f7ee;
   --warning: #ff8000; --warning-soft: #fff3e8;
   --danger: #f53f3f; --danger-soft: #feecec;
+  /* Tooltip 恒深底白字（原型 .hicon-tip L32：background #1f2329，明暗两 flavor 都不反转）。
+     走 token 供组件 bg-tooltip 消费，禁组件内写 hex（ESLint 拦）。 */
+  --tooltip-bg: #1f2329;
   --radius-factor: 1;
   --radius-sm: calc(6px * var(--radius-factor));
   --radius-md: calc(8px * var(--radius-factor));
   --radius-lg: calc(12px * var(--radius-factor));
   --radius-xl: calc(14px * var(--radius-factor));
+  /* 圆角数字全档（原型各控件精确值 7/9/11 等，取最近 sm/md/lg/xl 档会失真）。
+     全部乘 --radius-factor，随圆角风格档缩放。旧 sm/md/lg/xl 别名保留（既有代码在用）。 */
+  --radius-4: calc(4px * var(--radius-factor));
+  --radius-5: calc(5px * var(--radius-factor));
+  --radius-6: calc(6px * var(--radius-factor));
+  --radius-7: calc(7px * var(--radius-factor));
+  --radius-8: calc(8px * var(--radius-factor));
+  --radius-9: calc(9px * var(--radius-factor));
+  --radius-10: calc(10px * var(--radius-factor));
+  --radius-11: calc(11px * var(--radius-factor));
+  --radius-12: calc(12px * var(--radius-factor));
+  --radius-14: calc(14px * var(--radius-factor));
 }
 [data-radius='sharp'] { --radius-factor: 0.28; }
 [data-radius='round'] { --radius-factor: 1.55; }
+
+/* zoom 反向系数：CSS zoom 不缩放 vh，Shell 根用 h-app=calc(100vh*var(--zoom-inverse)) 抵消档位缩放，
+   否则 zoom<1 底部留白、zoom>1 整页滚动。必须与 global.css 的 html[data-zoom] zoom 值互为倒数（sm 1/0.9=1.1112, lg 1/1.08=0.926）。 */
+:root { --zoom-inverse: 1; }
+[data-zoom='sm'] { --zoom-inverse: 1.1112; }
+[data-zoom='lg'] { --zoom-inverse: 0.926; }

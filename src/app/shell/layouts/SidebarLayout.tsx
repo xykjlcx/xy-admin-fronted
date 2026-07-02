@@ -21,7 +21,7 @@ export function SidebarLayout({
 }: ShellLayoutProps) {
   const { t } = useTranslation();
   return (
-    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-bg text-text">
+    <div className="h-app relative flex w-full flex-col overflow-hidden bg-bg text-text">
       <ShellHeader
         left={
           <>

@@ -11,7 +11,7 @@ import { PageTransition } from '@/components/pro/PageTransition';
 // 切换器随原型置于 Header（notInset 分支），不重复放入 rail 顶部。collapsed 对 rail 无意义（rail 恒为图标态）。
 export function RailLayout({ menuTree, subsystems, children }: ShellLayoutProps) {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-surface text-text">
+    <div className="h-app flex w-full overflow-hidden bg-surface text-text">
       <NavMenuRail tree={menuTree} />
       <div className="relative flex min-w-0 flex-1 flex-col bg-bg">
         <ShellHeader

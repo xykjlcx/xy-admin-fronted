@@ -66,8 +66,8 @@ export function UserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={8} className="w-[280px] overflow-hidden p-0">
         <div className="flex items-center gap-3 p-[18px] pb-4">
-          <Avatar className="size-11 rounded-lg">
-            <AvatarFallback className="rounded-lg bg-pri text-base font-semibold text-white">
+          <Avatar className="size-11 rounded-11">
+            <AvatarFallback className="rounded-11 bg-pri text-base font-semibold text-white">
               {initial}
             </AvatarFallback>
           </Avatar>

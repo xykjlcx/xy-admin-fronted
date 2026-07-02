@@ -74,6 +74,12 @@ const MUST_CONTAIN = [
 ];
 test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain(t));
 
+test('zoom 反向系数三档（防 CSS zoom 不缩放 vh 的留白/整页滚动，Shell 根 h-app 消费）', () => {
+  expect(css).toContain('--zoom-inverse: 1;'); // 默认档（分号防 1.1112 前缀误命中）
+  expect(css).toContain('--zoom-inverse: 1.1112;'); // sm = 1/0.9
+  expect(css).toContain('--zoom-inverse: 0.926;'); // lg = 1/1.08
+});
+
 test('圆角因子三档 + 四条 calc 公式', () => {
   expect(css).toContain('--radius-factor: 1;'); // 默认档
   expect(css).toContain('--radius-factor: 0.28;'); // sharp
@@ -82,6 +88,25 @@ test('圆角因子三档 + 四条 calc 公式', () => {
   expect(css).toContain('--radius-md: calc(8px * var(--radius-factor));');
   expect(css).toContain('--radius-lg: calc(12px * var(--radius-factor));');
   expect(css).toContain('--radius-xl: calc(14px * var(--radius-factor));');
+});
+
+// 圆角数字全档（原型精确 7/9/11 档，取最近 sm/md/lg/xl 会失真）。每条含完整 calc 串防前缀碰撞。
+test('圆角数字全档 10 档 calc 公式', () => {
+  expect(css).toContain('--radius-4: calc(4px * var(--radius-factor));');
+  expect(css).toContain('--radius-5: calc(5px * var(--radius-factor));');
+  expect(css).toContain('--radius-6: calc(6px * var(--radius-factor));');
+  expect(css).toContain('--radius-7: calc(7px * var(--radius-factor));');
+  expect(css).toContain('--radius-8: calc(8px * var(--radius-factor));');
+  expect(css).toContain('--radius-9: calc(9px * var(--radius-factor));');
+  expect(css).toContain('--radius-10: calc(10px * var(--radius-factor));');
+  expect(css).toContain('--radius-11: calc(11px * var(--radius-factor));');
+  expect(css).toContain('--radius-12: calc(12px * var(--radius-factor));');
+  expect(css).toContain('--radius-14: calc(14px * var(--radius-factor));');
+});
+
+// Tooltip 恒深底白字 token（原型 .hicon-tip L32 background #1f2329，明暗都不反转）。
+test('tooltip 恒深底 token 与原型一致', () => {
+  expect(css).toContain('--tooltip-bg: #1f2329;');
 });
 
 // 锁 FOUC 脚本与 store 的契约不被静默删除：localStorage key 'appearance' + dataset.flavor/mode 写入，

@@ -22,6 +22,7 @@
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
   --color-surface-blur: var(--surface-blur);
+  --color-tooltip: var(--tooltip-bg);
   /* shadcn/ui 词汇 → 本项目语义 token（组件用 bg-background/text-muted-foreground 等，
      全部落到左侧我们的 token；圆角走上面已定义的 --radius-sm/md/lg/xl 乘法体系，不引入 shadcn 的 --radius 计算） */
   --color-background: var(--bg);
@@ -46,12 +47,38 @@
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
+  /* 数字全档 → rounded-4…rounded-14 工具类（原型精确 7/9/11 档）；圆角乘法体系见 tokens.css */
+  --radius-4: var(--radius-4);
+  --radius-5: var(--radius-5);
+  --radius-6: var(--radius-6);
+  --radius-7: var(--radius-7);
+  --radius-8: var(--radius-8);
+  --radius-9: var(--radius-9);
+  --radius-10: var(--radius-10);
+  --radius-11: var(--radius-11);
+  --radius-12: var(--radius-12);
+  --radius-14: var(--radius-14);
   --font-sans: 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', system-ui, sans-serif;
+}
+
+/* Tailwind v4 preflight 默认 border-color=currentColor（深色）→ 统一改回语义 --border（浅灰）。
+   否则 shadcn 弹层/卡片的 bare `border` 会显示近黑边框（原型是 1px 浅 --border）。此为 shadcn 标准做法，
+   手动装 shadcn 时漏了这层就会出现"所有弹层一圈深边框"。 */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop {
+    border-color: var(--border);
+  }
 }
 
 html { font-family: var(--font-sans); }
 html[data-zoom='sm'] { zoom: 0.9; }
 html[data-zoom='lg'] { zoom: 1.08; }  /* 原型实际系数 1.08（L2848），README"110%"有误 */
+
+/* CSS zoom 不缩放 vh：Shell 根用 h-app 抵消档位缩放（--zoom-inverse 见 tokens.css），防 zoom<1 底部留白 / zoom>1 整页滚动 */
+.h-app { height: calc(100vh * var(--zoom-inverse, 1)); }
 body { margin: 0; background: var(--bg); color: var(--text); font-size: 14px;
   -webkit-font-smoothing: antialiased; }
 .tabular-nums { font-variant-numeric: tabular-nums; }

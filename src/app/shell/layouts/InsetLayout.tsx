@@ -20,7 +20,7 @@ export function InsetLayout({
 }: ShellLayoutProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-canvas text-text">
+    <div className="h-app flex w-full overflow-hidden bg-canvas text-text">
       <NavMenuInset
         tree={menuTree}
         subsystems={subsystems}

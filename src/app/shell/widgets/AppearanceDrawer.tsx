@@ -99,15 +99,15 @@ export function AppearanceDrawer() {
                 )}
               >
                 <span
-                  className="flex shrink-0 gap-1 rounded-md p-2"
+                  className="flex shrink-0 gap-1 rounded-9 p-2"
                   style={{ background: f.preset.chrome }}
                 >
-                  <span className="size-[15px] rounded-sm" style={{ background: f.preset.pri }} />
+                  <span className="size-[15px] rounded-5" style={{ background: f.preset.pri }} />
                   <span
-                    className="size-[15px] rounded-sm border border-border"
+                    className="size-[15px] rounded-5 border border-border"
                     style={{ background: f.preset.chrome }}
                   />
-                  <span className="size-[15px] rounded-sm" style={{ background: f.preset.surface2 }} />
+                  <span className="size-[15px] rounded-5" style={{ background: f.preset.surface2 }} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-semibold text-text">{dk(f.label)}</div>
