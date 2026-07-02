@@ -271,7 +271,7 @@ export function AppearanceDrawer() {
 function LayoutThumb({ kind }: { kind: 'sidebar' | 'rail' | 'inset' }) {
   if (kind === 'sidebar') {
     return (
-      <div className="flex h-14 overflow-hidden rounded-sm border border-border">
+      <div className="flex h-14 overflow-hidden rounded-7 border border-border">
         <div className="w-[34%] border-r border-border bg-surface p-1">
           <div className="h-1 rounded-full bg-pri" />
           <div className="mt-1 h-1 rounded-full bg-border" />
@@ -285,7 +285,7 @@ function LayoutThumb({ kind }: { kind: 'sidebar' | 'rail' | 'inset' }) {
   }
   if (kind === 'rail') {
     return (
-      <div className="flex h-14 overflow-hidden rounded-sm border border-border">
+      <div className="flex h-14 overflow-hidden rounded-7 border border-border">
         <div className="flex w-[16%] flex-col items-center gap-1 bg-surface py-1">
           <div className="size-1 rounded-full bg-pri" />
           <div className="size-1 rounded-full bg-border" />
@@ -301,12 +301,12 @@ function LayoutThumb({ kind }: { kind: 'sidebar' | 'rail' | 'inset' }) {
     );
   }
   return (
-    <div className="flex h-14 gap-1 rounded-sm border border-border bg-canvas p-1">
+    <div className="flex h-14 gap-1 rounded-7 border border-border bg-canvas p-1">
       <div className="w-[28%] pt-0.5">
         <div className="h-1 rounded-full bg-pri" />
         <div className="mt-1 h-1 rounded-full bg-text-3 opacity-40" />
       </div>
-      <div className="flex-1 rounded-sm border border-border bg-surface shadow-sm" />
+      <div className="flex-1 rounded-5 border border-border bg-surface shadow-sm" />
     </div>
   );
 }

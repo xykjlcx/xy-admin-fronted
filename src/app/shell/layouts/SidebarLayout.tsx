@@ -27,7 +27,7 @@ export function SidebarLayout({
           <>
             <div className="flex w-[212px] shrink-0 items-center gap-2.5">
               <span
-                className="flex size-[30px] shrink-0 items-center justify-center rounded-md text-white"
+                className="flex size-[30px] shrink-0 items-center justify-center rounded-8 text-white"
                 style={{
                   background:
                     'linear-gradient(135deg, var(--pri), color-mix(in srgb, var(--pri) 60%, white))',
