@@ -314,16 +314,24 @@ git add -A && git commit -m "feat: 主题 token 体系（FLAVORS 权威值 + 耦
 import { readFileSync } from 'node:fs';
 const css = readFileSync('src/styles/tokens.css', 'utf8');
 
-// 权威值表：原型 L4796-4805 逐字对照（抽代表值 + 总量断言）
+// 权威值表：原型 L4796-4805 逐字对照。
+// ⚠️ spec §13.1 要求全表逐值断言（12 变量 × 4 flavor×mode 块 + :root 语义色/圆角），
+// MUST_CONTAIN 必须覆盖 tokens.css 的每一条变量声明（静态硬编码表，禁止运行时从
+// tokens.css 动态提取——那会让断言跟着文件漂移，失去守护意义）。
+// 验收标准：突变任一 token 值（如 --pri 改错色）必须至少 FAIL 一条。
 const MUST_CONTAIN = [
+  /* 此处为全表 40+ 条，从 tokens.css 逐条提取硬编码，示例： */
   '--bg: #f5f6f7', '--chrome: #16181d', '--surface: #fdfcf8', '--canvas: #e7e3d7',
   '--surface-blur: rgba(33, 29, 26, 0.78)', '--pri-soft: rgba(255, 255, 255, 0.08)',
   '--text-3: #978f80', '--border: #3a342e',
+  /* …其余全部声明（含 :root 的 --pri/--pri-soft/语义色×6/--pri-hover） */
 ];
 test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain(t));
-test('圆角因子三档', () => {
-  expect(css).toContain("--radius-factor: 0.28");
-  expect(css).toContain("--radius-factor: 1.55");
+test('圆角因子三档 + 乘法公式', () => {
+  expect(css).toContain('--radius-factor: 1');
+  expect(css).toContain('--radius-factor: 0.28');
+  expect(css).toContain('--radius-factor: 1.55');
+  for (const n of [6, 8, 12, 14]) expect(css).toContain(`calc(${n}px * var(--radius-factor))`);
 });
 ```
 
