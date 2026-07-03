@@ -12,11 +12,21 @@ import {
   type UsersQueryParams,
 } from '@/modules/admin/api/user.api';
 
+const booleanSearchParam = z
+  .preprocess((value) => {
+    if (value === true || value === 'true') return true;
+    if (value === false || value === 'false' || value === undefined || value === '') return false;
+    return value;
+  }, z.boolean())
+  .optional()
+  .catch(false);
+
 const searchSchema = z.object({
   page: z.coerce.number().int().min(1).catch(1),
   pageSize: z.coerce.number().int().min(5).max(50).catch(10),
   status: z.enum(['all', 'active', 'disabled', 'unactivated', 'left']).catch('all'),
   deptId: z.string().optional(),
+  directOnly: booleanSearchParam,
   keyword: z.string().catch(''),
 });
 
@@ -58,7 +68,13 @@ function UsersPage() {
   const batchDisable = useMutation({ mutationFn: userApi.batchDisableUsers, onSuccess: invalidateUsers });
 
   const handleSearchChange = (patch: Partial<UsersQueryParams>) => {
-    void navigate({ search: { ...search, ...patch, keyword: patch.keyword ?? search.keyword } });
+    const next = { ...search, ...patch, keyword: patch.keyword ?? search.keyword };
+    if (!next.deptId) {
+      delete next.deptId;
+      delete next.directOnly;
+    }
+    if (!next.directOnly) delete next.directOnly;
+    void navigate({ search: next });
   };
 
   return (

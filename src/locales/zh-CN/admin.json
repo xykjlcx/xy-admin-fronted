@@ -2,14 +2,20 @@
   "users": {
     "title": "成员与部门",
     "subtitle": "组织、账号状态与成员权限入口",
+    "breadcrumbGroup": "组织与权限",
     "deptTitle": "部门",
     "allDepts": "全部部门",
+    "allMembers": "全部成员",
+    "deptSearchPlaceholder": "搜索部门",
     "searchPlaceholder": "搜索姓名、角色、手机号",
     "selectedCount": "已选 {{count}} 人",
     "empty": "暂无成员",
     "loading": "正在加载成员",
     "refreshing": "正在更新",
     "total": "共 {{total}} 人，第 {{page}} / {{pageCount}} 页",
+    "countPeople": "共 {{count}} 人",
+    "countMembers": "共 {{count}} 名成员",
+    "memberCount": "{{count}} 人",
     "selectPage": "选择本页成员",
     "selectUser": "选择{{name}}",
     "status": {
@@ -24,13 +30,16 @@
       "dept": "部门",
       "role": "角色",
       "contact": "联系方式",
+      "phone": "手机号码",
       "status": "账号状态",
       "joinedAt": "入职日期",
+      "memberCount": "成员数",
       "actions": "操作"
     },
     "actions": {
       "invite": "邀请成员",
       "create": "添加成员",
+      "edit": "编辑",
       "batchDisable": "批量禁用",
       "detail": "详情",
       "delete": "删除",
@@ -59,9 +68,14 @@
     },
     "dialog": {
       "createTitle": "添加成员",
+      "editTitle": "编辑成员",
       "deleteTitle": "确认删除成员",
       "deleteDesc": "删除后该成员会从当前列表移除。",
       "detailFallback": "成员详情"
+    },
+    "deptList": {
+      "title": "组织架构",
+      "subtitle": "管理企业部门层级"
     },
     "detail": {
       "dept": "部门",

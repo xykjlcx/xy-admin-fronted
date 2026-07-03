@@ -11,6 +11,7 @@ export interface DeptDto {
   parentId: string | null;
   name: string;
   sort: number;
+  memberCount: number;
 }
 
 export interface UserDto {
@@ -29,6 +30,7 @@ export interface UsersQueryParams {
   pageSize: number;
   status: 'all' | UserDto['status'];
   deptId?: string;
+  directOnly?: boolean;
   keyword?: string;
 }
 

@@ -10,14 +10,14 @@ import type {
 } from '@/modules/admin/api/user.api';
 
 const deptSeed: DeptDto[] = [
-  { id: 'rd', parentId: null, name: '产品研发中心', sort: 1 },
-  { id: 'rd_fe', parentId: 'rd', name: '前端组', sort: 2 },
-  { id: 'rd_be', parentId: 'rd', name: '后端组', sort: 3 },
-  { id: 'rd_qa', parentId: 'rd', name: '测试组', sort: 4 },
-  { id: 'mkt', parentId: null, name: '市场营销部', sort: 5 },
-  { id: 'hr', parentId: null, name: '人力资源部', sort: 6 },
-  { id: 'fin', parentId: null, name: '财务部', sort: 7 },
-  { id: 'admin', parentId: null, name: '行政部', sort: 8 },
+  { id: 'rd', parentId: null, name: '产品研发中心', sort: 1, memberCount: 0 },
+  { id: 'rd_fe', parentId: 'rd', name: '前端组', sort: 2, memberCount: 0 },
+  { id: 'rd_be', parentId: 'rd', name: '后端组', sort: 3, memberCount: 0 },
+  { id: 'rd_qa', parentId: 'rd', name: '测试组', sort: 4, memberCount: 0 },
+  { id: 'mkt', parentId: null, name: '市场营销部', sort: 5, memberCount: 0 },
+  { id: 'hr', parentId: null, name: '人力资源部', sort: 6, memberCount: 0 },
+  { id: 'fin', parentId: null, name: '财务部', sort: 7, memberCount: 0 },
+  { id: 'admin', parentId: null, name: '行政部', sort: 8, memberCount: 0 },
 ];
 
 const userSeed: UserDto[] = [
@@ -70,8 +70,20 @@ function collectDeptIds(rootId: string) {
   return ids;
 }
 
+function countDeptMembers(deptId: string) {
+  const scope = collectDeptIds(deptId);
+  return users.filter((user) => user.status !== 'left' && scope.has(user.deptId)).length;
+}
+
 export const userHandlers = [
-  http.get('/api/depts', () => ok(depts.all().sort((a, b) => a.sort - b.sort))),
+  http.get('/api/depts', () =>
+    ok(
+      depts
+        .all()
+        .sort((a, b) => a.sort - b.sort)
+        .map((dept) => ({ ...dept, memberCount: countDeptMembers(dept.id) })),
+    ),
+  ),
 
   http.get('/api/users', ({ request }) => {
     const search = new URL(request.url).searchParams;
@@ -79,11 +91,15 @@ export const userHandlers = [
     const pageSize = parsePositiveInt(search.get('pageSize'), 10);
     const status = search.get('status') ?? 'all';
     const deptId = search.get('deptId') ?? undefined;
+    const directOnly = search.get('directOnly') === 'true';
     const keyword = search.get('keyword')?.trim() ?? '';
 
     const deptScope = deptId ? collectDeptIds(deptId) : null;
     const filtered = users
-      .filter((user) => !deptScope || deptScope.has(user.deptId))
+      .filter((user) => {
+        if (!deptId || !deptScope) return true;
+        return directOnly ? user.deptId === deptId : deptScope.has(user.deptId);
+      })
       .filter((user) => (status === 'all' ? user.status !== 'left' : user.status === status))
       .filter((user) => includesKeyword(user, keyword));
     const start = (page - 1) * pageSize;

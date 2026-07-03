@@ -50,17 +50,6 @@ const emptyDraft: CreateUserInput = {
   email: '',
 };
 
-const deptCountFallback: Record<string, number> = {
-  rd: 6,
-  rd_fe: 2,
-  rd_be: 2,
-  rd_qa: 1,
-  mkt: 2,
-  hr: 2,
-  fin: 2,
-  admin: 2,
-};
-
 const avatarClasses = [
   'bg-pri',
   'bg-warning',
@@ -71,7 +60,7 @@ const avatarClasses = [
 ];
 const memberGridTemplate =
   'calc(44px * var(--app-scale)) 1.4fr 1fr 1.4fr 1fr calc(120px * var(--app-scale))';
-const deptGridTemplate = '1fr calc(120px * var(--app-scale)) calc(80px * var(--app-scale))';
+const deptGridTemplate = '1fr calc(120px * var(--app-scale))';
 
 function buildDepthMap(depts: DeptDto[]) {
   const byId = new Map(depts.map((dept) => [dept.id, dept]));
@@ -103,6 +92,7 @@ export function UsersView({
   search,
   onSearchChange,
   onCreateUser,
+  onUpdateUser,
   onDeleteUser,
   onBatchDisable,
 }: UsersViewProps) {
@@ -110,7 +100,8 @@ export function UsersView({
   const [tab, setTab] = useState<TabKey>(search.status === 'left' ? 'left' : 'members');
   const [statusOpen, setStatusOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [createOpen, setCreateOpen] = useState(false);
+  const [memberFormOpen, setMemberFormOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserDto | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserDto | null>(null);
   const [detailUser, setDetailUser] = useState<UserDto | null>(null);
   const [draft, setDraft] = useState<CreateUserInput>({ ...emptyDraft });
@@ -124,9 +115,13 @@ export function UsersView({
   }, [deptKeyword, depts]);
   const pageCount = Math.max(1, Math.ceil(usersPage.total / search.pageSize));
   const canCreate = matchPermission(permissions, 'iam:user:create');
+  const canUpdate = matchPermission(permissions, 'iam:user:update');
   const canDelete = matchPermission(permissions, 'iam:user:del');
   const canDisable = matchPermission(permissions, 'iam:user:resign');
-  const selectedDeptLabel = search.deptId ? deptById.get(search.deptId)?.name : '全部成员';
+  const selectedDeptLabel = search.deptId ? deptById.get(search.deptId)?.name : t('users.allMembers');
+  const allMemberCount = depts
+    .filter((dept) => !dept.parentId)
+    .reduce((total, dept) => total + dept.memberCount, 0);
   const allPageIds = usersPage.list.map((user) => user.id);
   const selectedVisibleIds = selectedIds.filter((id) => allPageIds.includes(id));
   const allSelected = allPageIds.length > 0 && allPageIds.every((id) => selectedVisibleIds.includes(id));
@@ -155,10 +150,32 @@ export function UsersView({
         : [...new Set([...current, ...allPageIds])],
     );
   };
-  const submitCreate = async () => {
-    await onCreateUser({ ...draft, deptId: draft.deptId || depts[0]?.id || '' });
+  const openCreateForm = () => {
+    setEditingUser(null);
     setDraft({ ...emptyDraft });
-    setCreateOpen(false);
+    setMemberFormOpen(true);
+  };
+  const openEditForm = (user: UserDto) => {
+    setEditingUser(user);
+    setDraft({
+      name: user.name,
+      deptId: user.deptId,
+      role: user.role,
+      phone: user.phone,
+      email: user.email,
+    });
+    setMemberFormOpen(true);
+  };
+  const submitCreate = async () => {
+    const dto = { ...draft, deptId: draft.deptId || depts[0]?.id || '' };
+    if (editingUser) {
+      await onUpdateUser(editingUser.id, dto);
+    } else {
+      await onCreateUser(dto);
+    }
+    setEditingUser(null);
+    setDraft({ ...emptyDraft });
+    setMemberFormOpen(false);
   };
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -177,7 +194,7 @@ export function UsersView({
       style={{ padding: 'calc(20px * var(--app-scale)) calc(28px * var(--app-scale))' }}
     >
       <div className="mb-4 flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
-        <span>组织与权限</span>
+        <span>{t('users.breadcrumbGroup')}</span>
         <span>›</span>
         <span className="text-text">{t('users.title')}</span>
       </div>
@@ -210,7 +227,7 @@ export function UsersView({
             <div className="mb-3 flex h-[calc(34px*var(--app-scale))] items-center gap-2 rounded-8 bg-surface-2 px-2.5">
               <Search className="size-3.5 text-text-3" />
               <input
-                placeholder="搜索部门"
+                placeholder={t('users.deptSearchPlaceholder')}
                 value={deptKeyword}
                 className="min-w-0 flex-1 bg-transparent text-[calc(13px*var(--app-scale))] outline-none placeholder:text-text-3"
                 onChange={(event) => setDeptKeyword(event.target.value)}
@@ -223,10 +240,11 @@ export function UsersView({
                 !search.deptId ? 'bg-pri-soft font-semibold text-pri' : 'text-text-2',
               )}
               onClick={() => patchSearch({ deptId: undefined, page: 1 })}
+              aria-label={`${t('users.allMembers')} ${allMemberCount}`}
             >
               <Folder className="size-4 opacity-70" />
-              <span className="flex-1">{t('users.allDepts').replace('部门', '成员')}</span>
-              <span className="text-xs text-text-3">{usersPage.total}</span>
+              <span className="flex-1">{t('users.allMembers')}</span>
+              <span className="text-xs text-text-3">{allMemberCount}</span>
             </button>
             {visibleDepts.map((dept) => (
               <button
@@ -238,10 +256,11 @@ export function UsersView({
                 )}
                 style={{ paddingLeft: `calc(${12 + (deptDepth.get(dept.id) ?? 0) * 18}px * var(--app-scale))` }}
                 onClick={() => patchSearch({ deptId: dept.id, page: 1 })}
+                aria-label={`${dept.name} ${dept.memberCount}`}
               >
                 <Folder className="size-4 opacity-70" />
                 <span className="min-w-0 flex-1 truncate">{dept.name}</span>
-                <span className="text-xs text-text-3">{deptCountFallback[dept.id] ?? 0}</span>
+                <span className="text-xs text-text-3">{dept.memberCount}</span>
               </button>
             ))}
           </aside>
@@ -254,7 +273,7 @@ export function UsersView({
                 <div className="mb-4 flex items-center">
                   <span className="text-base font-bold">{selectedDeptLabel}</span>
                   <span className="ml-3 text-[calc(13px*var(--app-scale))] text-text-3">
-                    共 {usersPage.total} 人
+                    {t('users.countPeople', { count: usersPage.total })}
                   </span>
                 </div>
 
@@ -289,7 +308,16 @@ export function UsersView({
                           </div>
                         )}
                       </div>
-                      <button className="flex h-[calc(34px*var(--app-scale))] items-center rounded-8 border border-border px-3 text-[calc(13px*var(--app-scale))] text-text-2 hover:border-pri">
+                      <button
+                        type="button"
+                        aria-pressed={!!search.directOnly}
+                        disabled={!search.deptId}
+                        className={cn(
+                          'flex h-[calc(34px*var(--app-scale))] items-center rounded-8 border px-3 text-[calc(13px*var(--app-scale))] hover:border-pri disabled:cursor-not-allowed disabled:opacity-50',
+                          search.directOnly ? 'border-pri bg-pri-soft text-pri' : 'border-border text-text-2',
+                        )}
+                        onClick={() => patchSearch({ directOnly: !search.directOnly, page: 1 })}
+                      >
                         {t('users.filters.directOnly')}
                       </button>
                     </>
@@ -297,12 +325,9 @@ export function UsersView({
                   <div className="flex-1" />
                   {canCreate && activeTab === 'members' && (
                     <>
-                      <button className="flex h-[calc(34px*var(--app-scale))] items-center rounded-8 border border-pri px-3.5 text-[calc(13px*var(--app-scale))] text-pri hover:bg-pri-soft">
-                        {t('users.actions.invite')}
-                      </button>
                       <button
                         className="flex h-[calc(34px*var(--app-scale))] items-center gap-1.5 rounded-8 bg-pri px-4 text-[calc(13px*var(--app-scale))] text-white hover:bg-pri-hover"
-                        onClick={() => setCreateOpen(true)}
+                        onClick={openCreateForm}
                       >
                         <Plus className="size-3.5" />
                         {t('users.actions.create')}
@@ -323,7 +348,7 @@ export function UsersView({
                       </div>
                       <div>{t('users.columns.name')}</div>
                       <div>{t('users.columns.status')}</div>
-                      <div>手机号码</div>
+                      <div>{t('users.columns.phone')}</div>
                       <div>{t('users.columns.dept')}</div>
                       <div>{t('users.columns.actions')}</div>
                     </TableShellHeader>
@@ -342,7 +367,7 @@ export function UsersView({
                   pagination={
                     <div className="mt-4 flex items-center justify-between">
                       <span className="text-[calc(13px*var(--app-scale))] text-text-3">
-                        共 {usersPage.total} 名成员
+                        {t('users.countMembers', { count: usersPage.total })}
                         {usersRefreshing && (
                           <span className="ml-3 text-pri">{t('users.refreshing')}</span>
                         )}
@@ -390,6 +415,11 @@ export function UsersView({
                             <button className="text-pri" onClick={() => setDetailUser(user)}>
                               {t('users.actions.detail')}
                             </button>
+                            {canUpdate && (
+                              <button className="text-pri" onClick={() => openEditForm(user)}>
+                                {t('users.actions.edit')}
+                              </button>
+                            )}
                             {canDelete && (
                               <button className="font-bold leading-none text-text-3" onClick={() => setDeleteTarget(user)}>
                                 <MoreHorizontal className="size-4" />
@@ -407,10 +437,19 @@ export function UsersView({
         </div>
       </div>
 
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <Dialog
+        open={memberFormOpen}
+        onOpenChange={(open) => {
+          setMemberFormOpen(open);
+          if (!open) {
+            setEditingUser(null);
+            setDraft({ ...emptyDraft });
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('users.dialog.createTitle')}</DialogTitle>
+            <DialogTitle>{editingUser ? t('users.dialog.editTitle') : t('users.dialog.createTitle')}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-3">
             <Input placeholder={t('users.form.name')} value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} />
@@ -427,7 +466,7 @@ export function UsersView({
             <Input placeholder={t('users.form.email')} value={draft.email} onChange={(event) => setDraft((current) => ({ ...current, email: event.target.value }))} />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>{t('users.actions.cancel')}</Button>
+            <Button variant="outline" onClick={() => setMemberFormOpen(false)}>{t('users.actions.cancel')}</Button>
             <Button onClick={submitCreate} disabled={!draft.name || !draft.role || !draft.phone || !draft.email}>{t('users.actions.save')}</Button>
           </DialogFooter>
         </DialogContent>
@@ -474,16 +513,15 @@ function DeptList({
   return (
     <div>
       <div className="mb-4 flex items-center">
-        <span className="text-base font-bold">组织架构</span>
-        <span className="ml-3 text-[calc(13px*var(--app-scale))] text-text-3">管理企业部门层级</span>
+        <span className="text-base font-bold">{t('users.deptList.title')}</span>
+        <span className="ml-3 text-[calc(13px*var(--app-scale))] text-text-3">{t('users.deptList.subtitle')}</span>
       </div>
       <TableShell
         className="rounded-10"
         header={
           <TableShellHeader gridTemplateColumns={deptGridTemplate} className="px-4">
-            <div>部门名称</div>
-            <div>成员数</div>
-            <div>操作</div>
+            <div>{t('users.columns.dept')}</div>
+            <div>{t('users.columns.memberCount')}</div>
           </TableShellHeader>
         }
       >
@@ -497,8 +535,7 @@ function DeptList({
               <Folder className="size-4 text-text-3" />
               <span className="text-sm text-text">{dept.name}</span>
             </div>
-            <div className="text-[calc(13px*var(--app-scale))] text-text-2">{deptCountFallback[dept.id] ?? 0} 人</div>
-            <button className="text-left text-[calc(13px*var(--app-scale))] text-pri">{t('users.actions.detail')}</button>
+            <div className="text-[calc(13px*var(--app-scale))] text-text-2">{t('users.memberCount', { count: dept.memberCount })}</div>
           </TableShellRow>
         ))}
       </TableShell>

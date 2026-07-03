@@ -9,11 +9,11 @@ beforeAll(async () => {
   await i18nInit;
 });
 
-const deptFixtures = [{ id: 'rd', parentId: null, name: '产品研发中心', sort: 1 }];
+const deptFixtures = [{ id: 'rd', parentId: null, name: '产品研发中心', sort: 1, memberCount: 6 }];
 const deptTreeFixtures = [
-  { id: 'rd', parentId: null, name: '产品研发中心', sort: 1 },
-  { id: 'rd_fe', parentId: 'rd', name: '前端组', sort: 2 },
-  { id: 'rd_be', parentId: 'rd', name: '后端组', sort: 3 },
+  { id: 'rd', parentId: null, name: '产品研发中心', sort: 1, memberCount: 6 },
+  { id: 'rd_fe', parentId: 'rd', name: '前端组', sort: 2, memberCount: 2 },
+  { id: 'rd_be', parentId: 'rd', name: '后端组', sort: 3, memberCount: 2 },
 ];
 const userPageFixture = {
   list: [
@@ -64,6 +64,7 @@ test('viewer 看不到添加成员按钮但能看列表', async () => {
   renderUsersView();
 
   expect(screen.queryByRole('button', { name: '添加成员' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '邀请成员' })).not.toBeInTheDocument();
   expect(await screen.findByText('成员与部门')).toBeInTheDocument();
   expect(screen.getByText('李长昕')).toBeInTheDocument();
 });
@@ -78,6 +79,34 @@ test('状态筛选和分页回调给路由层写 URL 的 next search', async () 
 
   await userEvent.click(screen.getByRole('button', { name: '›' }));
   expect(onSearchChange).toHaveBeenCalledWith({ page: 2 });
+});
+
+test('直属成员筛选写入 URL 状态，不在按钮里做本地假过滤', async () => {
+  const onSearchChange = vi.fn();
+  renderUsersView({
+    permissions: ['*:*:*'],
+    search: { ...defaultSearch, deptId: 'rd' },
+    onSearchChange,
+  });
+
+  await userEvent.click(screen.getByRole('button', { name: '仅展示部门直属成员' }));
+
+  expect(onSearchChange).toHaveBeenCalledWith({ directOnly: true, page: 1 });
+});
+
+test('admin 可以编辑成员并提交更新回调', async () => {
+  const onUpdateUser = vi.fn();
+  renderUsersView({ permissions: ['*:*:*'], onUpdateUser });
+
+  await userEvent.click(screen.getByRole('button', { name: '编辑' }));
+  await userEvent.clear(screen.getByPlaceholderText('角色'));
+  await userEvent.type(screen.getByPlaceholderText('角色'), '运营负责人');
+  await userEvent.click(screen.getByRole('button', { name: '保存' }));
+
+  expect(onUpdateUser).toHaveBeenCalledWith(
+    'u-1',
+    expect.objectContaining({ role: '运营负责人', name: '李长昕' }),
+  );
 });
 
 test('外部 URL 状态切到已离职时同步 tab 并隐藏成员筛选工具栏', () => {
@@ -159,6 +188,18 @@ test('部门搜索框过滤部门树但保留全部成员入口', async () => {
   expect(screen.getAllByText('全部成员').length).toBeGreaterThan(0);
   expect(screen.getByText('后端组')).toBeInTheDocument();
   expect(screen.queryByText('前端组')).not.toBeInTheDocument();
+});
+
+test('部门树成员数来自部门数据，不受当前列表筛选 total 误导', () => {
+  renderUsersView({
+    depts: deptTreeFixtures,
+    search: { ...defaultSearch, deptId: 'rd_fe' },
+    usersPage: { ...userPageFixture, total: 2 },
+  });
+
+  expect(screen.getByRole('button', { name: '全部成员 6' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '产品研发中心 6' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '前端组 2' })).toBeInTheDocument();
 });
 
 test('成员表选择框使用自定义表格 checkbox 样式', () => {

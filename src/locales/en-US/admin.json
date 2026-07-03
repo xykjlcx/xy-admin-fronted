@@ -2,14 +2,20 @@
   "users": {
     "title": "Members & Departments",
     "subtitle": "Organization, account status, and member permission entry",
+    "breadcrumbGroup": "Organization & Permissions",
     "deptTitle": "Departments",
     "allDepts": "All departments",
+    "allMembers": "All members",
+    "deptSearchPlaceholder": "Search departments",
     "searchPlaceholder": "Search name, role, or phone",
     "selectedCount": "{{count}} selected",
     "empty": "No members",
     "loading": "Loading members",
     "refreshing": "Refreshing",
     "total": "{{total}} members, page {{page}} / {{pageCount}}",
+    "countPeople": "{{count}} people",
+    "countMembers": "{{count}} members",
+    "memberCount": "{{count}} people",
     "selectPage": "Select current page",
     "selectUser": "Select {{name}}",
     "status": {
@@ -24,13 +30,16 @@
       "dept": "Department",
       "role": "Role",
       "contact": "Contact",
+      "phone": "Phone",
       "status": "Account status",
       "joinedAt": "Joined",
+      "memberCount": "Members",
       "actions": "Actions"
     },
     "actions": {
       "invite": "Invite",
       "create": "Add member",
+      "edit": "Edit",
       "batchDisable": "Disable selected",
       "detail": "Details",
       "delete": "Delete",
@@ -59,9 +68,14 @@
     },
     "dialog": {
       "createTitle": "Add member",
+      "editTitle": "Edit member",
       "deleteTitle": "Confirm deletion",
       "deleteDesc": "This member will be removed from the current list.",
       "detailFallback": "Member details"
+    },
+    "deptList": {
+      "title": "Organization",
+      "subtitle": "Manage department hierarchy"
     },
     "detail": {
       "dept": "Department",
