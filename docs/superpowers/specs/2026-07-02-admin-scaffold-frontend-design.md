@@ -256,12 +256,16 @@ interface ShellLayoutProps {
 
 **2026-07-03 像素级补充：** 成员页视觉以 `后台管理脚手架.dc.html` 的 USER MANAGEMENT 与 STANDARD TABLE SYSTEM 为准：外层 `pageWrapStyle`、`contentPanelStyle`、tabs、248px 左部门树、`stdThead/stdRow/stdBadge/stdCheck`、成员 seed 与状态语义都按原型落地；不得用普通后台双卡片布局替代。
 
+**2026-07-03 成员页复盘结论：** `/admin/users` 已证明"表格视觉壳、行高/表头/空态/分页槽位、状态徽标、确认弹窗"具备稳定边界，可以沉到 `components/pro`；但"部门树、成员状态流转、权限按钮、批量动作、URL search params、query invalidation、行操作菜单"仍强绑定成员页业务，不进入通用组件。当前不抽 `DataTable v1`：如果现在定义 columns DSL、内置查询协议、内置选择/批量/toolbar，只会把一个页面的业务耦合搬进配置层，不能让下一个页面明显更简单。
+
 执行原则：
 
 - **先页面，后抽象**：`/admin/users` 先允许页面内局部实现表格结构和工具栏，不预设一个通用 `<DataTable>` API。抽象必须来自已跑通的真实交互，而不是从原型 std* 规格直接脑补。
 - **状态边界不变**：筛选、分页、当前部门、关键词等可分享状态仍走 TanStack Router typed search params；服务端数据仍走 Query；选中行、弹窗开关、表单草稿等纯 UI 状态留在页面局部。
-- **可抽候选先不承诺**：分页器、表格容器、空/加载/错误态、批量操作条、状态徽标、确认弹窗、详情抽屉都可以作为候选，但必须在成员页实现后按重复度、稳定性和组件边界再裁决。
+- **Task 16 裁决**：抽轻量 `TableShell`、`StatusBadge`、`ConfirmDialog`，只负责视觉与确认交互；不接管数据请求、URL、列 DSL、权限、批量动作或行菜单。详情抽屉暂不抽，当前只有成员资料这一种形态，抽出去不会降低复杂度。
 - **不做过早通用化**：M0 不为尚未出现的列表页预留复杂列 DSL、内置查询协议、导出协议或全量 toolbar 配置。后续如果角色、日志、文件等页面复用同一模式，再抽 `DataTable v1`。
+
+如果后续真的抽 `DataTable v1`，最小 props 只能来自两个以上真实页面：`columns`、`rows`、`rowKey`、`pagination`、`selection`、`empty`、`toolbar`。明确不做：内置 TanStack Query、内置 Router search params、内置权限判断、内置业务批量动作、内置导出/列设置/复杂筛选。
 
 成员页稳定后再抽象的最低条件：
 

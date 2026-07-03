@@ -1733,7 +1733,7 @@ git commit -m "feat: 成员与部门页面先行实现"
 - 仅在成员页证明边界稳定时创建：`src/components/pro/{ConfirmDialog,StatusBadge,DetailDrawer}.tsx`
 - 仅为已抽出的组件补测试：`src/components/pro/__tests__/*.test.tsx`
 
-- [ ] **Step 1: 写复盘记录**
+- [x] **Step 1: 写复盘记录**
 
 在 spec §10 下补一段"成员页复盘结论"，必须回答：
 
@@ -1742,7 +1742,7 @@ git commit -m "feat: 成员与部门页面先行实现"
 3. 如果现在抽 DataTable，最小 props 是什么？哪些 props 明确不做？
 4. 抽象会不会让下一个页面更简单，还是只会增加配置层？
 
-- [ ] **Step 2: 做抽象裁决**
+- [x] **Step 2: 做抽象裁决**
 
 三选一，写进 plan：
 
@@ -1752,7 +1752,9 @@ git commit -m "feat: 成员与部门页面先行实现"
 
 默认推荐顺序是 1 → 2 → 3，除非成员页实现证明 3 的收益高于配置成本。
 
-- [ ] **Step 3: 若决定抽象，先写失败测试**
+**2026-07-03 裁决：选择 2，并附带两个小组件。** 抽轻量 `TableShell` 承接 STANDARD TABLE SYSTEM 的视觉壳、表头、行、空态和分页槽位；抽 `StatusBadge`、`ConfirmDialog` 两个稳定小组件。暂不抽 `DataTable v1`，暂不抽 `DetailDrawer`。本次抽象不接管 query、URL search params、权限、批量动作或行菜单。
+
+- [x] **Step 3: 若决定抽象，先写失败测试**
 
 例如选择轻量 TableShell 时：
 
@@ -1773,11 +1775,11 @@ test('TableShell 渲染表头、行和分页槽位', () => {
 
 Run 对应单测，确认 FAIL，再实现最小组件。
 
-- [ ] **Step 4: 抽象后回灌成员页**
+- [x] **Step 4: 抽象后回灌成员页**
 
 抽象只能替换成员页里已经稳定的重复结构；不得为了迁就抽象改坏成员页交互。回灌后必须重新跑成员页浏览器验收，尤其是 URL search params、权限按钮、批量操作、抽屉/弹窗。
 
-- [ ] **Step 5: 验证 + Commit**
+- [x] **Step 5: 验证 + Commit**
 
 Run:
 
