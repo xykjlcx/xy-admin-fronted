@@ -64,6 +64,7 @@ const MUST_CONTAIN = [
   '--warning-soft: #fff3e8;',
   '--danger: #f53f3f;',
   '--danger-soft: #feecec;',
+  '--control-border: color-mix(in srgb, var(--border) 70%, var(--text-3));',
   '--radius-factor: 1;',
   '--radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));',
   '--radius-md: calc(8px * var(--radius-factor) * var(--app-scale));',

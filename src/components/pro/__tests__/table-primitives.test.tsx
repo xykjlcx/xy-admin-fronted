@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
 import { StatusBadge } from '@/components/pro/StatusBadge';
-import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
+import { TableCheckbox, TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 
 test('TableShell 渲染表头、行、空态和分页槽位', () => {
   const grid = 'calc(44px * var(--app-scale)) 1fr';
@@ -71,4 +71,29 @@ test('ConfirmDialog 点击确认和取消时触发对应回调', async () => {
 
   await userEvent.click(screen.getByRole('button', { name: '取消' }));
   expect(onOpenChange).toHaveBeenCalledWith(false);
+});
+
+test('TableCheckbox 使用自定义视觉而不是原生 checkbox 外观', async () => {
+  const onChange = vi.fn();
+  const { rerender } = render(
+    <TableCheckbox ariaLabel="选择成员" checked={false} onCheckedChange={onChange} />,
+  );
+
+  const checkbox = screen.getByRole('checkbox', { name: '选择成员' });
+  expect(checkbox).toHaveClass('appearance-none');
+  expect(checkbox.getAttribute('style')).toContain('background-color: var(--surface)');
+  expect(checkbox.getAttribute('style')).toContain('border-color: var(--control-border)');
+  expect(checkbox.getAttribute('style')).toContain('border-width: calc(1.5px * var(--app-scale))');
+
+  await userEvent.click(checkbox);
+  expect(onChange).toHaveBeenCalledWith(true);
+
+  rerender(<TableCheckbox ariaLabel="选择成员" checked onCheckedChange={onChange} />);
+  expect(screen.getByRole('checkbox', { name: '选择成员' }).getAttribute('style')).toContain(
+    'background-color: var(--pri)',
+  );
+  expect(screen.getByRole('checkbox', { name: '选择成员' }).getAttribute('style')).toContain(
+    'border-color: var(--pri)',
+  );
+  expect(screen.getByTestId('table-checkbox-check')).toBeInTheDocument();
 });

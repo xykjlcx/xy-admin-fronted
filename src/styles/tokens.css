@@ -30,6 +30,8 @@
   --success: #16a34a; --success-soft: #e8f7ee;
   --warning: #ff8000; --warning-soft: #fff3e8;
   --danger: #f53f3f; --danger-soft: #feecec;
+  /* 表单/表格小控件边框。比普通分割线更清楚，接近原型 stdCheck 未选中边框。 */
+  --control-border: color-mix(in srgb, var(--border) 70%, var(--text-3));
   /* Tooltip 恒深底白字（原型 .hicon-tip L32：background #1f2329，明暗两 flavor 都不反转）。
      走 token 供组件 bg-tooltip 消费，禁组件内写 hex（ESLint 拦）。 */
   --tooltip-bg: #1f2329;

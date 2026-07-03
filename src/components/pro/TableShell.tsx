@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +15,13 @@ export interface TableShellProps {
   empty?: ReactNode;
   pagination?: ReactNode;
   selectedBar?: ReactNode;
+  className?: string;
+}
+
+export interface TableCheckboxProps {
+  ariaLabel: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
   className?: string;
 }
 
@@ -60,5 +68,34 @@ export function TableShellRow({ gridTemplateColumns, children, className, style 
     >
       {children}
     </div>
+  );
+}
+
+export function TableCheckbox({ ariaLabel, checked, onCheckedChange, className }: TableCheckboxProps) {
+  return (
+    <span className={cn('relative flex size-[calc(16px*var(--app-scale))] shrink-0 items-center justify-center', className)}>
+      <input
+        type="checkbox"
+        aria-label={ariaLabel}
+        checked={checked}
+        onChange={(event) => onCheckedChange(event.currentTarget.checked)}
+        className={cn(
+          'peer size-full appearance-none rounded-4 border-solid outline-none transition-colors',
+          'hover:border-pri focus-visible:ring-[calc(2px*var(--app-scale))] focus-visible:ring-ring/45',
+          className,
+        )}
+        style={{
+          backgroundColor: checked ? 'var(--pri)' : 'var(--surface)',
+          borderColor: checked ? 'var(--pri)' : 'var(--control-border)',
+          borderWidth: 'calc(1.5px * var(--app-scale))',
+        }}
+      />
+      {checked && (
+        <Check
+          data-testid="table-checkbox-check"
+          className="pointer-events-none absolute size-[calc(12px*var(--app-scale))] stroke-[3px] text-white"
+        />
+      )}
+    </span>
   );
 }

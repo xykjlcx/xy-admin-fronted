@@ -160,3 +160,10 @@ test('部门搜索框过滤部门树但保留全部成员入口', async () => {
   expect(screen.getByText('后端组')).toBeInTheDocument();
   expect(screen.queryByText('前端组')).not.toBeInTheDocument();
 });
+
+test('成员表选择框使用自定义表格 checkbox 样式', () => {
+  renderUsersView({ permissions: ['*:*:*'] });
+
+  expect(screen.getByLabelText('选择本页成员')).toHaveClass('appearance-none');
+  expect(screen.getByLabelText('选择李长昕')).toHaveClass('appearance-none');
+});

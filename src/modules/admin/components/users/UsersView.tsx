@@ -3,7 +3,7 @@ import { Folder, MoreHorizontal, Plus, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
 import { StatusBadge, type StatusBadgeTone } from '@/components/pro/StatusBadge';
-import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
+import { TableCheckbox, TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -311,7 +311,11 @@ export function UsersView({
                   header={
                     <TableShellHeader gridTemplateColumns={memberGridTemplate}>
                       <div className="flex justify-center">
-                        <input aria-label={t('users.selectPage')} type="checkbox" checked={allSelected} onChange={togglePage} />
+                        <TableCheckbox
+                          ariaLabel={t('users.selectPage')}
+                          checked={allSelected}
+                          onCheckedChange={togglePage}
+                        />
                       </div>
                       <div>{t('users.columns.name')}</div>
                       <div>{t('users.columns.status')}</div>
@@ -358,11 +362,10 @@ export function UsersView({
                           className={cn(selectedIds.includes(user.id) && 'bg-pri-soft')}
                         >
                           <div className="flex justify-center">
-                            <input
-                              aria-label={t('users.selectUser', { name: user.name })}
-                              type="checkbox"
+                            <TableCheckbox
+                              ariaLabel={t('users.selectUser', { name: user.name })}
                               checked={selectedIds.includes(user.id)}
-                              onChange={() => toggleRow(user.id)}
+                              onCheckedChange={() => toggleRow(user.id)}
                             />
                           </div>
                           <div className="flex min-w-0 items-center gap-2.5">
