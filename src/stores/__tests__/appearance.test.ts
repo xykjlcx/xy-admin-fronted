@@ -35,6 +35,17 @@ test('toggleCollapsed 只影响对应 layout key（per-layout 隔离）', () => 
   expect(useAppearance.getState().collapsed.rail).toBeUndefined();
 });
 
+test('setCollapsed 按传入布尔值显式设置 layout 折叠态', () => {
+  useAppearance.getState().setCollapsed('sidebar', true);
+  expect(useAppearance.getState().collapsed.sidebar).toBe(true);
+
+  useAppearance.getState().setCollapsed('sidebar', true);
+  expect(useAppearance.getState().collapsed.sidebar).toBe(true);
+
+  useAppearance.getState().setCollapsed('sidebar', false);
+  expect(useAppearance.getState().collapsed.sidebar).toBe(false);
+});
+
 // ⚠️ 本用例依赖 vi.resetModules() 产生独立 store 实例（重跑 rehydrate），
 // 必须保持在文件最后/可独立运行——否则污染后续用例共享的模块单例。
 test('rehydrate 时重放 accent 注入（F5 后自选主题色不丢失）', async () => {

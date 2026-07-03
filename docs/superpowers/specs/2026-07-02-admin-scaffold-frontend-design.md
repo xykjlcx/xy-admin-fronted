@@ -146,7 +146,7 @@ interface Subsystem {
   key: string; label: LocalizedString; desc: LocalizedString;
   icon: string; color: string; home: RoutePath;
   builtin: boolean;            // 内置不可删（admin）
-  enabled: boolean;            // false = 切换器上"即将上线"占位（hr/crm/project/data 四个种子）
+  enabled: boolean;            // false = 切换器上"即将上线"占位；M0 不预置未来子系统，后续按注册清单逐个加
   sort: number;
 }
 
@@ -271,7 +271,7 @@ interface ShellLayoutProps {
 ## 12. 交付范围
 
 - 30 屏全量：admin 27 屏内含消息中心/个人中心/sub_home 占位页（未启用子系统落地页，含"去菜单管理"入口）；lastmile 全页；登录/注册/找回
-- 4 个"即将上线"子系统种子（hr/crm/project/data，enabled:false）照原型出现在切换器
+- 子系统切换器支持 `enabled:false` 的"即将上线"展示；M0 只交付 admin 单子系统，HR/CRM/Project/Data 等未来模块不预置空壳，后续按 §7.6 注册清单逐个加入
 - 菜单编辑器一次做全（§7.2）；子系统编辑器照原型
 - 面单打印：`window.print()` 最简实现 + 面单区域打印样式；热敏纸精确适配留真项目
 - 文件预览抽屉 = 占位交互照原型（防镀金标注）；承运商 logo 文字色块、条码 CSS 占位照原型

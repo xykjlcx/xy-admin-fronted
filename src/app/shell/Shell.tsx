@@ -20,7 +20,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const layout = useAppearance((s) => s.layout);
   const collapsed = useAppearance((s) => s.collapsed[layout] ?? false);
-  const toggleCollapsed = useAppearance((s) => s.toggleCollapsed);
+  const setCollapsed = useAppearance((s) => s.setCollapsed);
   const Layout = layoutRegistry[layout] ?? layoutRegistry.sidebar!;
 
   return (
@@ -28,7 +28,7 @@ export function Shell({ children }: { children: ReactNode }) {
       menuTree={menuTree}
       subsystems={subsystems}
       collapsed={collapsed}
-      onCollapsedChange={() => toggleCollapsed(layout)}
+      onCollapsedChange={(next) => setCollapsed(layout, next)}
     >
       {children}
     </Layout>

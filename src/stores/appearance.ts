@@ -18,6 +18,7 @@ interface AppearanceStore extends AppearanceState {
   _priSoftResolved: string | null;
   set: (patch: Partial<AppearanceStore>) => void;
   setFlavor: (f: AppearanceState['flavor']) => void; // 耦合：切 flavor 重置 accent
+  setCollapsed: (layoutKey: string, collapsed: boolean) => void;
   toggleCollapsed: (layoutKey: string) => void;
 }
 
@@ -44,6 +45,8 @@ export const useAppearance = create<AppearanceStore>()(
         set({ _priResolved: pri, _priSoftResolved: soft });
       },
       setFlavor: (flavor) => get().set({ flavor, accent: flavorDefaultAccent(flavor) }), // 原型 L4951
+      setCollapsed: (k, collapsed) =>
+        set((s) => ({ collapsed: { ...s.collapsed, [k]: collapsed } })),
       toggleCollapsed: (k) => set((s) => ({ collapsed: { ...s.collapsed, [k]: !s.collapsed[k] } })),
     }),
     {

@@ -59,7 +59,7 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-background",
+          "fixed z-50 flex flex-col gap-4 bg-surface",
           // 原型抽屉（L2652）：右滑入 sheet-in-right .28s + shadow -8px 0 32px .14（M0 只用 right）
           side === "right" &&
             "anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-border shadow-drawer sm:max-w-sm",
