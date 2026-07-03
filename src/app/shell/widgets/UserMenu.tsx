@@ -32,6 +32,7 @@ export function UserMenu() {
   const { data: me } = useSuspenseQuery(meQuery);
   const [open, setOpen] = useState(false);
   const initial = me.user.name.slice(0, 1);
+  const roleLabel = me.roles[0] ? t(`shell.roles.${me.roles[0]}`, me.roles[0]) : '';
 
   const stub = () => toast(t('shell.toast.stub'));
 
@@ -57,7 +58,7 @@ export function UserMenu() {
           </Avatar>
           <div className="text-left leading-tight">
             <div className="text-[calc(13px*var(--app-scale))] font-semibold text-text">{me.user.name}</div>
-            <div className="text-[calc(11px*var(--app-scale))] text-text-3">{me.roles[0] ?? ''}</div>
+            <div className="text-[calc(11px*var(--app-scale))] text-text-3">{roleLabel}</div>
           </div>
           <ChevronDown
             className={cn('size-3.5 text-text-3 transition-transform', open && 'rotate-180')}

@@ -1,5 +1,5 @@
 {
-  "app": { "name": "通用后台管理" },
+  "app": { "name": "Ship Any" },
   "actions": {
     "create": "新增",
     "edit": "编辑",
@@ -14,7 +14,41 @@
     "login": "登录",
     "logout": "退出登录",
     "username": "用户名",
-    "password": "密码"
+    "password": "密码",
+    "welcome": "欢迎回来",
+    "welcomeDesc": "登录你的管理后台账号，开启今天的工作。",
+    "switchTheme": "切换主题",
+    "passwordLoginOnly": "M0 演示仅接通密码登录",
+    "account": "账号",
+    "forgotPassword": "忘记密码?",
+    "remember": "记住登录状态 · 30 天",
+    "enterpriseLogin": "或使用企业账号登录",
+    "noAccount": "还没有账号?",
+    "register": "注册",
+    "phone": "手机号",
+    "smsCode": "验证码",
+    "smsPlaceholder": "6 位验证码",
+    "getSmsCode": "获取验证码",
+    "qrHint": "打开企业 App 扫码，安全登录",
+    "tabs": {
+      "password": "密码登录",
+      "sms": "短信验证码",
+      "qr": "扫码登录"
+    },
+    "hero": {
+      "mark": "昕",
+      "brand": "昕越管理后台",
+      "subtitle": "企业数字化底座",
+      "headline1": "一个可伸缩的",
+      "headline2": "企业管理底座",
+      "desc": "多主题、多布局、多语言。同一套后台，同时服务于协同 SaaS、HR 与物流 ERP。",
+      "points": {
+        "permission": "开箱即用的权限、菜单、成员模块",
+        "business": "完整的业务线示例（发票、公告）",
+        "design": "可持续演进的设计系统"
+      },
+      "footer": "© 2026 昕越科技 · v4.2.0 · 稳定版"
+    }
   },
   "errors": {
     "403": "无权访问该页面",
@@ -43,6 +77,10 @@
       "switchAccount": "切换账号",
       "help": "帮助与反馈",
       "logout": "退出登录"
+    },
+    "roles": {
+      "superadmin": "超级管理员",
+      "viewer": "只读成员"
     },
     "toast": {
       "notification": "消息中心开发中（M1）",

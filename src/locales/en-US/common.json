@@ -1,1 +1,135 @@
-{}
+{
+  "app": { "name": "Ship Any" },
+  "actions": {
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "detail": "Details",
+    "search": "Search",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "export": "Export"
+  },
+  "auth": {
+    "login": "Log in",
+    "logout": "Log out",
+    "username": "Username",
+    "password": "Password",
+    "welcome": "Welcome back",
+    "welcomeDesc": "Log in to your admin account and start today's work.",
+    "switchTheme": "Switch theme",
+    "passwordLoginOnly": "M0 demo only supports password login",
+    "account": "Account",
+    "forgotPassword": "Forgot password?",
+    "remember": "Remember me · 30 days",
+    "enterpriseLogin": "Or use enterprise login",
+    "noAccount": "No account?",
+    "register": "Register",
+    "phone": "Phone",
+    "smsCode": "Code",
+    "smsPlaceholder": "6-digit code",
+    "getSmsCode": "Get code",
+    "qrHint": "Open the enterprise app and scan to log in",
+    "tabs": {
+      "password": "Password",
+      "sms": "SMS code",
+      "qr": "QR code"
+    },
+    "hero": {
+      "mark": "X",
+      "brand": "Xinyue Admin",
+      "subtitle": "Enterprise digital foundation",
+      "headline1": "A scalable",
+      "headline2": "admin foundation",
+      "desc": "Multi-theme, multi-layout, multilingual. One admin template for collaboration SaaS, HR, and logistics ERP.",
+      "points": {
+        "permission": "Ready-to-use permissions, menus, and members",
+        "business": "Complete business examples",
+        "design": "A design system ready to evolve"
+      },
+      "footer": "© 2026 Xinyue Tech · v4.2.0 · Stable"
+    }
+  },
+  "errors": {
+    "403": "You do not have access",
+    "404": "Page not found",
+    "backHome": "Back home"
+  },
+  "shell": {
+    "search": "Search navigation, organization data, role details...",
+    "switcher": {
+      "title": "Switch subsystem",
+      "soon": "Coming soon"
+    },
+    "notification": "Notifications",
+    "appearance": "Appearance",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "language": "Language",
+    "nav": {
+      "collapse": "Collapse navigation"
+    },
+    "user": {
+      "profile": "Profile",
+      "account": "Account settings",
+      "changePassword": "Change password",
+      "language": "Language",
+      "switchAccount": "Switch account",
+      "help": "Help",
+      "logout": "Log out"
+    },
+    "roles": {
+      "superadmin": "Super Admin",
+      "viewer": "Viewer"
+    },
+    "toast": {
+      "notification": "Message center is planned for M1",
+      "search": "Global search is planned for M1",
+      "stub": "This feature is planned for M1",
+      "logoutFailed": "Failed to log out"
+    },
+    "appearanceDrawer": {
+      "title": "Appearance",
+      "subtitle": "Adjust style, theme color, and layout",
+      "flavor": "Style",
+      "layout": "Navigation layout",
+      "accent": "Theme color",
+      "accentBlue": "Classic blue",
+      "accentClaude": "Clay orange",
+      "accentGreen": "Deep green",
+      "accentViolet": "Violet",
+      "accentCustom": "Custom",
+      "accentInvalid": "Enter a valid hex color",
+      "pageAnim": "Page transition",
+      "pageAnimHint": "Content transition when switching menus",
+      "zoom": "Display scale",
+      "zoomHint": "Scale the interface for different screens",
+      "radius": "Radius",
+      "radiusHint": "Adjust card, button, and control radius",
+      "flavorFeishu": "Feishu",
+      "flavorFeishuDesc": "Classic blue",
+      "flavorClaude": "Claude",
+      "flavorClaudeDesc": "Warm paper",
+      "layoutSidebar": "Sidebar",
+      "layoutSidebarDesc": "Classic",
+      "layoutRail": "Rail",
+      "layoutRailDesc": "Icons + panel",
+      "layoutInset": "Inset",
+      "layoutInsetDesc": "Floating card",
+      "animNone": "None",
+      "animFade": "Fade",
+      "animSlide": "Slide",
+      "animUp": "Up",
+      "animScale": "Scale",
+      "zoomSm": "Small",
+      "zoomSmHint": "Compact",
+      "zoomMd": "Medium",
+      "zoomMdHint": "Standard",
+      "zoomLg": "Large",
+      "zoomLgHint": "Roomy",
+      "radiusSharp": "Sharp",
+      "radiusDefault": "Default",
+      "radiusRound": "Round"
+    }
+  }
+}

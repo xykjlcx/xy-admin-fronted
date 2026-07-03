@@ -1,7 +1,8 @@
 {
   "name": "admin-scaffold-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.7.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +11,10 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "lint": "eslint src",
+    "visual": "node scripts/visual-agent-browser.mjs all",
+    "visual:baseline": "node scripts/visual-agent-browser.mjs baseline",
+    "visual:app": "node scripts/visual-agent-browser.mjs app",
+    "visual:scale": "node scripts/visual-agent-browser.mjs scale",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -36,7 +41,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.61.1",
     "@tanstack/router-devtools": "^1.167.0",
     "@tanstack/router-plugin": "^1.168.19",
     "@testing-library/jest-dom": "^6.9.1",

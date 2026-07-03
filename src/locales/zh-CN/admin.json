@@ -1,4 +1,63 @@
 {
+  "dashboard": {
+    "navGroup": "工作台",
+    "navTitle": "企业概览",
+    "company": {
+      "mark": "倪",
+      "name": "小倪科技",
+      "status": "未认证",
+      "meta": "企业编号：FM4BG629BGE ｜ 软件和信息技术 · 128 人",
+      "action": "立即认证 >"
+    },
+    "metrics": {
+      "compare": "较上周",
+      "newMembers": { "label": "新增成员" },
+      "activeUsers": { "label": "活跃用户" },
+      "newRoles": { "label": "新增角色" },
+      "auditLogs": { "label": "操作日志" }
+    },
+    "quick": {
+      "title": "快捷入口",
+      "members": "成员与部门",
+      "roles": "角色权限",
+      "logs": "日志审计",
+      "files": "文件管理",
+      "company": "企业信息",
+      "reports": "数据报表"
+    },
+    "trend": {
+      "title": "活跃趋势",
+      "unit": "单位：活跃人次",
+      "tooltip": "活跃：12400",
+      "ranges": {
+        "month": "近一个月",
+        "quarter": "近3个月",
+        "halfYear": "近6个月",
+        "year": "近一年"
+      },
+      "months": {
+        "jan": "1月",
+        "mar": "3月",
+        "may": "5月",
+        "jul": "7月",
+        "sep": "9月",
+        "dec": "12月"
+      }
+    },
+    "todo": {
+      "title": "我的待办",
+      "stats": {
+        "pending": { "value": "10", "label": "待办任务" },
+        "done": { "value": "52", "label": "已完成" },
+        "overdue": { "value": "3", "label": "未完成" }
+      },
+      "items": {
+        "phone": { "title": "周五给王总打电话", "time": "09:00-12:00", "status": "进行中" },
+        "onboard": { "title": "周五拜访李总", "time": "12:00-15:00", "status": "加急" },
+        "interview": { "title": "每周六部门例会", "time": "14:00-15:00", "status": "待处理" }
+      }
+    }
+  },
   "users": {
     "title": "成员与部门",
     "subtitle": "组织、账号状态与成员权限入口",
@@ -48,7 +107,9 @@
       "next": "下一页",
       "cancel": "取消",
       "save": "保存",
-      "confirmDelete": "确认删除"
+      "confirmDelete": "确认删除",
+      "resign": "办理离职",
+      "createDept": "新建部门"
     },
     "form": {
       "name": "姓名",

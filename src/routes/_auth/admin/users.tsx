@@ -33,15 +33,15 @@ const searchSchema = z.object({
 export const Route = createFileRoute('/_auth/admin/users')({
   validateSearch: searchSchema,
   staticData: {
-    label: '成员与部门',
+    labelKey: 'users.title',
     permission: 'iam:user:view',
-    group: '组织与权限',
+    groupKey: 'users.breadcrumbGroup',
     actions: [
-      { code: 'iam:user:create', label: '添加成员' },
-      { code: 'iam:user:update', label: '编辑成员' },
-      { code: 'iam:user:del', label: '删除成员' },
-      { code: 'iam:user:resign', label: '办理离职' },
-      { code: 'iam:dept:create', label: '新建部门' },
+      { code: 'iam:user:create', labelKey: 'users.actions.create' },
+      { code: 'iam:user:update', labelKey: 'users.actions.edit' },
+      { code: 'iam:user:del', labelKey: 'users.actions.delete' },
+      { code: 'iam:user:resign', labelKey: 'users.actions.resign' },
+      { code: 'iam:dept:create', labelKey: 'users.actions.createDept' },
     ],
   },
   component: UsersPage,

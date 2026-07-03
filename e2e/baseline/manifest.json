@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-07-03T12:28:27.957Z",
+  "scenarios": [
+    {
+      "key": "login",
+      "file": "e2e/baseline/prototype-login.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "dashboard",
+      "file": "e2e/baseline/prototype-dashboard.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "users",
+      "file": "e2e/baseline/prototype-users.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    }
+  ]
+}

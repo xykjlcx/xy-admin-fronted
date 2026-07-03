@@ -1,5 +1,59 @@
 # Handoff: 通用后台管理脚手架（含尾程快递子系统）
 
+## 工程使用
+
+当前 M0 交付范围：后台管理骨架、三布局 Shell、外观五维 token、鉴权/权限、菜单数据流、`admin` 子系统与“成员与部门”垂直切片。HR、CRM、Project、Lastmile 等后续子系统按计划逐步补，不在 M0 预置种子模块。
+
+### 环境
+
+- Node.js 24
+- pnpm 11.7+
+- 可选：Agent Browser CLI，用于本地视觉验收
+- `pnpm-workspace.yaml` 目前只用于 pnpm build-script allowlist，不表示当前仓库已经是 monorepo。
+
+开发态默认启用 mock；生产构建默认关闭 mock。需要显式覆盖时使用本地 `.env.development`，不要提交 `.env*`。
+
+### 常用命令
+
+```bash
+pnpm install
+pnpm dev
+```
+
+```bash
+./node_modules/.bin/eslint src
+./node_modules/.bin/tsc -b --noEmit
+./node_modules/.bin/vitest run
+./node_modules/.bin/vite build
+```
+
+视觉验收：
+
+```bash
+pnpm visual:baseline  # 从 后台管理脚手架.dc.html 采集原型基线
+pnpm visual           # 采集实现截图、diff 与 90/100/108 显示比例报告
+```
+
+输出位置：
+
+- 原型基线：`e2e/baseline/`
+- 实现截图与报告：`test-results/m0-visual/`
+
+### 关键规则
+
+- 视觉权威源：`后台管理脚手架.dc.html`
+- 设计权威源：`docs/superpowers/specs/2026-07-02-admin-scaffold-frontend-design.md`
+- 执行计划：`docs/superpowers/plans/2026-07-02-m0-scaffold-foundation.md`
+- 模板协作规则：`CLAUDE.md`
+- 显示比例只用 `--app-scale` token 乘法，不使用 CSS `zoom`
+- 服务端数据归 TanStack Query；zustand 只存 token、外观、折叠等客户端状态
+
+---
+
+## 原型交接稿说明
+
+以下内容来自最初的原型交接稿，描述的是 `后台管理脚手架.dc.html` 的完整设计范围，不等于当前 M0 已实现范围。当前 M0 只以后台管理骨架与“成员与部门”垂直切片为准；Lastmile 与其他子系统进入 M1/M2 后按同一工程规则逐步实现。
+
 ## Overview
 一套通用企业后台管理脚手架原型，用于快速搭建 ERP / OA 类系统。含账号鉴权、组织权限、审计、文件、字典、菜单，以及一个完整的业务子系统「尾程快递」（跨境物流尾程面单/运单/渠道）。支持多子系统切换、飞书 / Claude 两套界面风格、明暗模式、主题色、三种导航布局、显示比例与圆角风格调节、中英文语言切换。
 

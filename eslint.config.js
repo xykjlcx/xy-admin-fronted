@@ -28,7 +28,7 @@ export default tseslint.config(
   },
   {
     files: ['src/**/*.tsx'],
-    ignores: ['src/components/ui/**', '**/*.test.tsx', '**/__tests__/**'],
+    ignores: ['**/*.test.tsx', '**/__tests__/**'],
     rules: {
       'no-restricted-syntax': [
         'error',

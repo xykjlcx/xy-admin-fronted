@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: ./node_modules/.bin/eslint src
+      - run: ./node_modules/.bin/tsc -b --noEmit
+      - run: ./node_modules/.bin/vitest run
+      - run: ./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build
+
+      - name: mock 剥离验收
+        run: |
+          if grep -R -E "faker|msw|mockServiceWorker" dist; then
+            echo "production bundle contains mock-only code"
+            exit 1
+          fi
+      - run: node --check scripts/visual-agent-browser.mjs

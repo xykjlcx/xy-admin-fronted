@@ -20,6 +20,19 @@ test('登录成功返回 token，me 返回权限集', async () => {
   expect(me.data.user.password).toBeUndefined();
 });
 
+test('原型视觉账号映射到管理员权限', async () => {
+  const login = await (
+    await fetch('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username: 'leah@acme.com', password: 'password123' }),
+    })
+  ).json();
+  const me = await (
+    await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${login.data.token}` } })
+  ).json();
+  expect(me.data.roles).toEqual(['superadmin']);
+});
+
 test('密码错误 → code 4010，data 为 null', async () => {
   const res = await (
     await fetch('/api/auth/login', {

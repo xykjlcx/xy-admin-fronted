@@ -6,7 +6,7 @@
 
 **Architecture:** Vite SPA；TanStack Router file-based 路由（staticData 声明权限元数据，页面资源从路由树推导）；服务端数据全走 TanStack Query（含菜单/me），zustand 只存外观/token/折叠；MSW 网络层 mock（dynamic import 剥离）；纯 CSS 变量主题（原型 FLAVORS 为权威源），Shell = token → 布局（策略注册）→ 部件三层。
 
-**Tech Stack:** pnpm, Vite, React 19, TypeScript strict, TanStack Router/Query/Table, Tailwind CSS v4, shadcn/ui, zustand, react-hook-form + zod, MSW 2, @faker-js/faker, react-i18next, lucide-react, Vitest + Testing Library, Playwright。
+**Tech Stack:** pnpm, Vite, React 19, TypeScript strict, TanStack Router/Query/Table, Tailwind CSS v4, shadcn/ui, zustand, react-hook-form + zod, MSW 2, @faker-js/faker, react-i18next, lucide-react, Vitest + Testing Library, Agent Browser。
 
 **权威参照物：** 仓库内 `后台管理脚手架.dc.html`（下称"原型"）。执行任务时按行号区间对照提取精确样式；与 README.md 冲突时以原型代码为准。设计文档：`docs/superpowers/specs/2026-07-02-admin-scaffold-frontend-design.md`（下称"spec"）。
 
@@ -38,7 +38,7 @@ pnpm create vite@latest app --template react-ts
 rsync -a app/ ./ --exclude node_modules && rm -rf app
 pnpm install
 pnpm add @tanstack/react-router @tanstack/react-query @tanstack/react-table zustand react-hook-form zod react-i18next i18next lucide-react
-pnpm add -D @tanstack/router-plugin @tanstack/router-devtools msw @faker-js/faker vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom @vitejs/plugin-react prettier typescript-eslint @playwright/test
+pnpm add -D @tanstack/router-plugin @tanstack/router-devtools msw @faker-js/faker vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom @vitejs/plugin-react prettier typescript-eslint
 ```
 
 - [ ] **Step 2: tsconfig strict + 路径别名**
@@ -83,7 +83,7 @@ export default defineConfig({
 }
 ```
 
-创建 `.env.development`（`VITE_ENABLE_MOCK=true`）、`.env.demo`（`VITE_ENABLE_MOCK=true`）、`.env.production`（`VITE_ENABLE_MOCK=false`）。
+2026-07-03 收口修订：`.env*` 不提交；开发态默认启用 mock，demo 模式或 `VITE_ENABLE_MOCK=true` 显式启用，生产构建默认关闭并剥离 mock worker。
 
 - [ ] **Step 4: 验证启动**
 
@@ -1699,7 +1699,7 @@ Expected: PASS. `UsersView` 测试只覆盖真实渲染与交互回调；URL 是
 
 - [x] **Step 7: 浏览器验收**
 
-Run dev server 后用 Chrome/Playwright 验：
+Run dev server 后用 Chrome/Agent Browser 验：
 
 1. admin 登录：进入 `/admin/users`，部门树和成员表渲染。
 2. 添加成员 → API 能读回新行；删除 → ConfirmDialog 确认后行消失；批量禁用 → 选中行状态变 disabled。
@@ -1800,21 +1800,21 @@ git commit -m "refactor: 基于成员页复盘沉淀列表组件"
 
 ## Phase 5：验收工具链与工程收尾（Task 17-18）
 
-### Task 17: 视觉回归脚手架 + 原型基准截图 + 显示比例三档实测
+### Task 17: Agent Browser 视觉验收脚手架 + 原型基准截图 + 显示比例三档实测
 
 **Files:**
-- Create: `e2e/visual.spec.ts`, `scripts/capture-prototype.ts`, `playwright.config.ts`
+- Create: `scripts/visual-agent-browser.mjs`, `e2e/baseline/manifest.json`
 
-- [ ] **Step 1: 原型基准截图脚本**：Playwright 打开 `后台管理脚手架.dc.html`（file://），用 `page.evaluate` 驱动原型 state（原型 Component 实例可通过其 DC runtime 访问；不行则模拟点击导航），截 `dashboard / users / login` 三屏 × sidebar 布局 × feishu 亮色 → `e2e/baseline/`。viewport 1440×900 固定。
+- [x] **Step 1: 原型基准截图脚本**：Agent Browser 打开 `后台管理脚手架.dc.html`（file://），用 DC runtime 固定主题/布局，并通过真实点击切到 `dashboard / users / login` 三屏，写入 `e2e/baseline/`。viewport 1440×900 固定。
 
-- [ ] **Step 2: 视觉回归 spec**：实现侧同 viewport 截同三屏，`expect(screenshot).toMatchSnapshot({ maxDiffPixelRatio: 0.02 })` 对 baseline。M0 允许 diff 超阈值（页面还没像素级打磨），**产出 diff 报告作为 M1 打磨清单**——本 task 交付的是工具链不是达标。
+- [x] **Step 2: 实现侧截图与 diff 报告**：脚本启动 dev server（mock on），Agent Browser 截同三屏并生成 diff 图与 `test-results/m0-visual/report.md`。最新报告（2026-07-03T12:29:02Z）：login 3.21%、dashboard 5.27%、users 4.16%。登录/工作台已按原型同步账号、品牌与身份；成员页保留 M0 真实编辑入口，未恢复无真实流程的邀请入口。
 
-- [ ] **Step 3: 显示比例三档实测（spec §8.1 遗留验证项）**：Playwright 下三档 `--app-scale` 分别打开 users 页，验证 DropdownMenu/Popover/Sheet 弹层定位不偏移、整页无横向/纵向溢出。至少覆盖 Chromium；若后续装齐浏览器，再补 WebKit/Safari。结果记录进 `docs/superpowers/specs/` 的设计文档"决策记录"处。
+- [x] **Step 3: 显示比例三档实测（spec §8.1 遗留验证项）**：Agent Browser 下三档 `--app-scale` 分别打开 users 页，验证筛选 Popover / 详情 Sheet 定位不偏移、整页无横向溢出。最新报告三档均通过：no horizontal overflow / status popover in viewport / detail sheet in viewport。
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**：并入 M0 收官提交。
 
 ```bash
-git add -A && git commit -m "test: 视觉回归工具链 + 原型基准截图 + 显示比例三档实测记录"
+git add -A && git commit -m "test: Agent Browser 视觉验收脚手架 + 原型基准截图 + 显示比例三档实测记录"
 ```
 
 ### Task 18: CI + 模板 CLAUDE.md + README + CHANGELOG
@@ -1823,7 +1823,7 @@ git add -A && git commit -m "test: 视觉回归工具链 + 原型基准截图 + 
 - Create: `.github/workflows/ci.yml`, `CLAUDE.md`, `CHANGELOG.md`
 - Modify: `README.md`（追加"工程使用"章节，原交接稿内容保留在后半）
 
-- [ ] **Step 1: CI**
+- [x] **Step 1: CI**
 
 ```yaml
 name: CI
@@ -1843,11 +1843,11 @@ jobs:
         run: "! grep -r 'faker' dist/assets/"
 ```
 
-- [ ] **Step 2: CLAUDE.md / AGENTS.md（内容清单照 spec §14）**：token 铁律（只用语义 token/禁 hex/禁任意圆角）、`--app-scale` 显示比例接入纪律、状态边界（服务端数据归 Query）、query key 约定、子系统新增 7 步/删除 4 步（照 spec §7.6 抄录）、admin 内核页标注、权限双模式、i18n 剥离立场、前端权限非安全边界、mock 剥离验收。
+- [x] **Step 2: CLAUDE.md / AGENTS.md（内容清单照 spec §14）**：token 铁律（只用语义 token/禁 hex/禁任意圆角）、`--app-scale` 显示比例接入纪律、状态边界（服务端数据归 Query）、query key 约定、子系统新增 7 步/删除 4 步（照 spec §7.6 抄录）、admin 内核页标注、权限双模式、i18n 剥离立场、前端权限非安全边界、mock 剥离验收。
 
-- [ ] **Step 3: CHANGELOG.md 起版 `0.1.0 (M0)`；package.json version 同步。**
+- [x] **Step 3: CHANGELOG.md 起版 `0.1.0 (M0)`；package.json version 同步。**
 
-- [ ] **Step 4: 全量回归 + Commit + tag**
+- [x] **Step 4: 全量回归 + Commit + tag**：回归通过，由本次收官提交与 `m0-done` tag 落地。
 
 Run: `pnpm lint && pnpm typecheck && pnpm test && pnpm build` 全绿。
 
@@ -1860,11 +1860,11 @@ git tag m0-done
 
 ## M0 完成定义（DoD）
 
-- [ ] 登录（多角色）→ Shell（三布局可切、外观五维可调、耦合规则正确）→ 成员与部门页全交互，e2e 手工流全通过
-- [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` 全绿；生产包无 faker
-- [ ] token 快照测试拦截任何 token 漂移；视觉回归工具链可产 diff 报告
-- [ ] 显示比例三档（90/100/108）与浮层定位实测结论记录在案
-- [ ] viewer 账号全程无越权入口（菜单/页面/按钮三级）
+- [x] 登录（多角色）→ Shell（三布局可切、外观五维可调、耦合规则正确）→ 成员与部门页全交互，e2e 手工流全通过
+- [x] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` 全绿；生产包无 faker/msw/mockServiceWorker
+- [x] token 快照测试拦截任何 token 漂移；Agent Browser 视觉验收工具链可产 diff 报告
+- [x] 显示比例三档（90/100/108）与浮层定位实测结论记录在案
+- [x] viewer 账号全程无越权入口（菜单/页面/按钮三级）
 
 ## 后续（不在本 plan）
 

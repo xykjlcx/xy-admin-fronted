@@ -1,4 +1,63 @@
 {
+  "dashboard": {
+    "navGroup": "Workbench",
+    "navTitle": "Company overview",
+    "company": {
+      "mark": "N",
+      "name": "Xiaoni Tech",
+      "status": "Unverified",
+      "meta": "Company ID: FM4BG629BGE | Software and IT · 128 people",
+      "action": "Verify now >"
+    },
+    "metrics": {
+      "compare": "vs last week",
+      "newMembers": { "label": "New members" },
+      "activeUsers": { "label": "Active users" },
+      "newRoles": { "label": "New roles" },
+      "auditLogs": { "label": "Audit logs" }
+    },
+    "quick": {
+      "title": "Quick access",
+      "members": "Members",
+      "roles": "Roles",
+      "logs": "Audit logs",
+      "files": "Files",
+      "company": "Company",
+      "reports": "Reports"
+    },
+    "trend": {
+      "title": "Activity trend",
+      "unit": "Unit: active visits",
+      "tooltip": "Active: 12400",
+      "ranges": {
+        "month": "Last month",
+        "quarter": "Last 3 months",
+        "halfYear": "Last 6 months",
+        "year": "Last year"
+      },
+      "months": {
+        "jan": "Jan",
+        "mar": "Mar",
+        "may": "May",
+        "jul": "Jul",
+        "sep": "Sep",
+        "dec": "Dec"
+      }
+    },
+    "todo": {
+      "title": "My tasks",
+      "stats": {
+        "pending": { "value": "10", "label": "Pending" },
+        "done": { "value": "52", "label": "Done" },
+        "overdue": { "value": "3", "label": "Overdue" }
+      },
+      "items": {
+        "phone": { "title": "Call customer on Friday", "time": "09:00-12:00", "status": "In progress" },
+        "onboard": { "title": "Visit client on Friday", "time": "12:00-15:00", "status": "Urgent" },
+        "interview": { "title": "Weekly department meeting", "time": "14:00-15:00", "status": "Pending" }
+      }
+    }
+  },
   "users": {
     "title": "Members & Departments",
     "subtitle": "Organization, account status, and member permission entry",
@@ -48,7 +107,9 @@
       "next": "Next",
       "cancel": "Cancel",
       "save": "Save",
-      "confirmDelete": "Confirm delete"
+      "confirmDelete": "Confirm delete",
+      "resign": "Resign",
+      "createDept": "Create department"
     },
     "form": {
       "name": "Name",

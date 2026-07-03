@@ -4,9 +4,6 @@ dist/
 dist-ssr/
 .env
 .env.*
-!.env.development
-!.env.demo
-!.env.production
 *.local
 
 # Logs
@@ -30,6 +27,5 @@ lerna-debug.log*
 
 # Test / build artifacts
 test-results/
-playwright-report/
 coverage/
 .tanstack/

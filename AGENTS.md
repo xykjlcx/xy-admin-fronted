@@ -18,4 +18,18 @@
 - 组件代码禁止硬编码十六进制色值，优先使用语义 token。
 - 禁止 `rounded-[Npx]` 任意圆角；圆角走 `--radius-*` token。
 - 服务端数据归 TanStack Query；zustand 只存纯客户端状态，如 token、外观设置、折叠状态。
+- query key 使用 `[domain, resource, params]`；变更后按前缀失效。
+- 路由 `staticData` 使用 `labelKey/groupKey/action.labelKey`，不要把用户可见中文散落在路由元数据里。
+- 前端权限只负责体验与防误触，不是安全边界；生产权限必须由后端校验。
+- 文案走 i18n key；M0 允许 `en-US` 先保底，不允许新增中文硬编码进组件。
+- mock 只在开发态、demo 模式或 `VITE_ENABLE_MOCK=true` 时启用；生产构建必须剥离 faker/msw/mock worker。
+- 环境文件 `.env*` 不提交；开发默认 mock 已由代码启用，需要覆盖时只写本地 `.env.development`。
 - 每次声称完成前，至少跑 `./node_modules/.bin/tsc -b --noEmit`、`./node_modules/.bin/vitest run`、`./node_modules/.bin/eslint src`。
+
+## 子系统清单
+
+新增子系统：建 `modules/<key>/manifest.ts`、`api/`、`mocks/`；建 `routes/_auth/<key>/` 页面并写 staticData；在 `modules/registry.ts` 注册；挂 mock handlers；补 locales；新图标进 icon registry；真后端再补 seed/menu/permission。
+
+删除子系统：删 `modules/<key>/`、删 `routes/_auth/<key>/`、registry 除名、删 locales namespace。
+
+`admin` 是内核子系统；登录、消息中心、个人中心是 Shell 入口依赖，不当普通业务页随意删除。

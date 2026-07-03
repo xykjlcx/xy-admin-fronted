@@ -103,9 +103,9 @@ export const db = {
   users: [
     {
       id: 'u1',
-      username: 'admin',
-      password: 'admin123',
-      name: '超级管理员',
+      username: 'leah@acme.com',
+      password: 'password123',
+      name: '李长昕',
       roles: ['superadmin'],
       permissions: ['*:*:*'],
     },
