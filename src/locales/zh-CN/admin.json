@@ -1,1 +1,71 @@
-{}
+{
+  "users": {
+    "title": "成员与部门",
+    "subtitle": "组织、账号状态与成员权限入口",
+    "deptTitle": "部门",
+    "allDepts": "全部部门",
+    "searchPlaceholder": "搜索姓名、角色、手机号",
+    "selectedCount": "已选 {{count}} 人",
+    "empty": "暂无成员",
+    "total": "共 {{total}} 人，第 {{page}} / {{pageCount}} 页",
+    "selectPage": "选择本页成员",
+    "selectUser": "选择{{name}}",
+    "status": {
+      "all": "全部",
+      "active": "正常",
+      "disabled": "停用",
+      "unactivated": "未激活",
+      "left": "已离职"
+    },
+    "columns": {
+      "name": "姓名",
+      "dept": "部门",
+      "role": "角色",
+      "contact": "联系方式",
+      "status": "账号状态",
+      "joinedAt": "入职日期",
+      "actions": "操作"
+    },
+    "actions": {
+      "invite": "邀请成员",
+      "create": "添加成员",
+      "batchDisable": "批量禁用",
+      "detail": "详情",
+      "delete": "删除",
+      "deleteName": "删除{{name}}",
+      "prev": "上一页",
+      "next": "下一页",
+      "cancel": "取消",
+      "save": "保存",
+      "confirmDelete": "确认删除"
+    },
+    "form": {
+      "name": "姓名",
+      "dept": "选择部门",
+      "role": "角色",
+      "phone": "手机号",
+      "email": "邮箱"
+    },
+    "tabs": {
+      "members": "成员",
+      "depts": "部门",
+      "left": "已离职成员"
+    },
+    "filters": {
+      "accountStatus": "账号状态",
+      "directOnly": "仅展示部门直属成员"
+    },
+    "dialog": {
+      "createTitle": "添加成员",
+      "deleteTitle": "确认删除成员",
+      "deleteDesc": "删除后该成员会从当前列表移除。",
+      "detailFallback": "成员详情"
+    },
+    "detail": {
+      "dept": "部门",
+      "role": "角色",
+      "contact": "联系方式",
+      "status": "状态"
+    }
+  }
+}

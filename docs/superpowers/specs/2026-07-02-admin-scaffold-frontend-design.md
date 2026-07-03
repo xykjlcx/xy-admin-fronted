@@ -250,9 +250,26 @@ interface ShellLayoutProps {
 - 登录页三 Tab UI 全做，密码流走通，短信/扫码 UI + mock 提示
 - 三级权限控制（菜单过滤 / beforeLoad / `<AuthGuard>` + `usePermission` 含通配符）见 §7.5；mock 预置多角色账号切换演示
 
-## 10. DataTable
+## 10. 列表页与 DataTable 抽象策略
 
-同 v1（原型 std* 规格 + TanStack Table + 状态外置于 typed search params + 三态内置），无 review 异议。工具栏主按钮、行内操作、导出挂权限符。
+**2026-07-03 执行期修订：不再先抽象 DataTable。** M0 的下一步先把"成员与部门"这个具体界面做出来，用真实页面压力校验表格、部门树、筛选、分页、批量操作、行操作、权限按钮、详情抽屉、确认弹窗、typed search params 与 mock CRUD 的边界；等该页跑通并通过验收后，再决定哪些部分值得沉到 `components/pro`。
+
+**2026-07-03 像素级补充：** 成员页视觉以 `后台管理脚手架.dc.html` 的 USER MANAGEMENT 与 STANDARD TABLE SYSTEM 为准：外层 `pageWrapStyle`、`contentPanelStyle`、tabs、248px 左部门树、`stdThead/stdRow/stdBadge/stdCheck`、成员 seed 与状态语义都按原型落地；不得用普通后台双卡片布局替代。
+
+执行原则：
+
+- **先页面，后抽象**：`/admin/users` 先允许页面内局部实现表格结构和工具栏，不预设一个通用 `<DataTable>` API。抽象必须来自已跑通的真实交互，而不是从原型 std* 规格直接脑补。
+- **状态边界不变**：筛选、分页、当前部门、关键词等可分享状态仍走 TanStack Router typed search params；服务端数据仍走 Query；选中行、弹窗开关、表单草稿等纯 UI 状态留在页面局部。
+- **可抽候选先不承诺**：分页器、表格容器、空/加载/错误态、批量操作条、状态徽标、确认弹窗、详情抽屉都可以作为候选，但必须在成员页实现后按重复度、稳定性和组件边界再裁决。
+- **不做过早通用化**：M0 不为尚未出现的列表页预留复杂列 DSL、内置查询协议、导出协议或全量 toolbar 配置。后续如果角色、日志、文件等页面复用同一模式，再抽 `DataTable v1`。
+
+成员页稳定后再抽象的最低条件：
+
+1. viewer / admin 权限差异可验收，按钮级入口不越权。
+2. 部门树、状态筛选、关键词、分页刷新不丢，URL 可复制复现同视图。
+3. 新建、删除、批量禁用等 mock 写操作真实影响列表。
+4. loading / empty / error / selected 状态都有页面级覆盖。
+5. 90% / 100% / 108% 显示比例下表格、抽屉、弹窗无截断和 portal 定位偏移。
 
 ## 11. i18n（新增章节）
 
@@ -294,7 +311,7 @@ interface ShellLayoutProps {
 
 ## 15. 分期（按上游杠杆定律切）
 
-- **M0 骨架期（模具，返工放大系数最高）**：token 体系全量（含耦合矩阵、`--app-scale` 显示比例、--chrome/--surface-blur）→ 三布局 Shell + 全部 widgets + 外观抽屉 + 切页动画 → 路由/鉴权/401/403/404 + envelope + MSW 装配（启动时序）→ 菜单数据流（Shell 只吃 API）+ registry + staticData 机制 → i18n 架构（key 规范 + LocalizedString + I18nInput）→ DataTable v1 → **垂直切片：成员与部门页**（树+表+抽屉+弹窗+批量，逼出全部 pro 组件）→ CI + token 快照 + 视觉回归脚手架 + 基准截图脚本 → **显示比例三档浮层实测**
+- **M0 骨架期（模具，返工放大系数最高）**：token 体系全量（含耦合矩阵、`--app-scale` 显示比例、--chrome/--surface-blur）→ 三布局 Shell + 全部 widgets + 外观抽屉 + 切页动画 → 路由/鉴权/401/403/404 + envelope + MSW 装配（启动时序）→ 菜单数据流（Shell 只吃 API）+ registry + staticData 机制 → i18n 架构（key 规范 + LocalizedString + I18nInput）→ **成员与部门页先行**（树+表+抽屉+弹窗+批量，逼出真实列表页边界）→ **基于成员页复盘抽 DataTable / pro 组件** → CI + token 快照 + 视觉回归脚手架 + 基准截图脚本 → **显示比例三档浮层实测**
 - **M1 量产期**：admin 余页 → lastmile 全页（playbook 复制）→ 三级权限落地 → SVG 图表组件 + 两个概览页 → 登录三屏 → 菜单编辑器
 - **M2 收尾期**：i18n 全量词条 + EN 巡检 → 打印样式 → 视觉回归全矩阵跑批 → CLAUDE.md/文档 → 三演练验收
 

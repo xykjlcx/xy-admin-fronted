@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 搭出脚手架的全部"模具"：工程底座、五维主题 token、三布局 Shell、数据流（http/MSW/菜单 API）、鉴权与权限、DataTable v1 + 成员与部门垂直切片页、验收工具链。
+**Goal:** 搭出脚手架的全部"模具"：工程底座、五维主题 token、三布局 Shell、数据流（http/MSW/菜单 API）、鉴权与权限、成员与部门垂直切片页、基于真实页面复盘后的 DataTable/pro 抽象、验收工具链。
 
 **Architecture:** Vite SPA；TanStack Router file-based 路由（staticData 声明权限元数据，页面资源从路由树推导）；服务端数据全走 TanStack Query（含菜单/me），zustand 只存外观/token/折叠；MSW 网络层 mock（dynamic import 剥离）；纯 CSS 变量主题（原型 FLAVORS 为权威源），Shell = token → 布局（策略注册）→ 部件三层。
 
@@ -1441,123 +1441,357 @@ git add -A && git commit -m "feat: 外观抽屉全项 + 五种切页动画"
 
 ---
 
-## Phase 4：DataTable 与垂直切片（Task 15-16）
+## Phase 4：成员与部门页面先行，复盘后抽象（Task 15-16）
 
-### Task 15: DataTable v1
+> **2026-07-03 修订说明：** 本阶段不再先做通用 `DataTable v1`。先把 `/admin/users` 这个真实界面做出来，用部门树、筛选、分页、批量操作、权限按钮、抽屉、确认弹窗、URL search params 和 mock CRUD 逼出真实边界；页面稳定后再抽象 DataTable/pro 组件。不要在 Task 15 创建 `src/components/pro/DataTable.tsx` 或 `components/pro/data-table/*`。
+> **像素级约束：** Task 15 直接对照 `后台管理脚手架.dc.html` 的 USER MANAGEMENT 段和 STANDARD TABLE SYSTEM 段实现，不允许用"标题区 + 两张卡片 + 原生表格"的普通后台布局替代。首屏结构必须是面包屑 → 单个内容面板 → tabs → 248px 部门树 → 右侧成员区域。
+
+### Task 15: 成员与部门页（页面内表格先行）
 
 **Files:**
-- Create: `src/components/pro/DataTable.tsx`, `src/components/pro/data-table/{Toolbar.tsx,Pagination.tsx,types.ts}`
-- Test: `src/components/pro/__tests__/DataTable.test.tsx`
+- Modify: `src/routes/_auth/admin/users.tsx`（从占位页替换为真实页面；路由层负责 typed search params、Query 装配、权限元数据）
+- Create: `src/modules/admin/components/users/UsersView.tsx`（成员页真实渲染组件；承接部门树、表格、工具栏、抽屉、弹窗和局部 UI 状态）
+- Create: `src/modules/admin/api/user.api.ts`
+- Create: `src/modules/admin/mocks/user.handlers.ts`
+- Modify: `src/mocks/handlers.ts`
+- Modify: `src/locales/zh-CN/admin.json`, `src/locales/en-US/admin.json`
+- Test: `src/modules/admin/mocks/__tests__/user.handlers.test.ts`, `src/modules/admin/components/users/__tests__/UsersView.test.tsx`
 
-- [ ] **Step 1: 失败测试（渲染 + 受控分页回调）**
+- [x] **Step 1: 写 mock handler 失败测试**
 
-```tsx
-// src/components/pro/__tests__/DataTable.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { DataTable } from '@/components/pro/DataTable';
+```ts
+// src/modules/admin/mocks/__tests__/user.handlers.test.ts
+import { describe, expect, test } from 'vitest';
+import '@/mocks/handlers';
 
-const columns = [{ accessorKey: 'name', header: '姓名' }];
-const data = [{ id: '1', name: '张三' }];
-test('渲染表头与行', () => {
-  render(<DataTable columns={columns} data={data} rowCount={1}
-    pagination={{ page: 1, pageSize: 10 }} onPaginationChange={() => {}} />);
-  expect(screen.getByText('姓名')).toBeInTheDocument();
-  expect(screen.getByText('张三')).toBeInTheDocument();
+interface Env<T> { code: number; data: T; message: string }
+interface Page<T> { list: T[]; total: number }
+interface UserRow { id: string; name: string; deptId: string; status: string }
+
+test('GET /api/users 支持部门、状态、关键词过滤和分页', async () => {
+  const res = (await (await fetch('/api/users?page=1&pageSize=5&deptId=rd&status=active&keyword=李')).json()) as Env<Page<UserRow>>;
+  expect(res.code).toBe(0);
+  expect(res.data.list.length).toBeLessThanOrEqual(5);
+  expect(res.data.list.every((u) => u.deptId === 'rd')).toBe(true);
+  expect(res.data.list.every((u) => u.status === 'active')).toBe(true);
+  expect(res.data.list.every((u) => u.name.includes('李'))).toBe(true);
 });
-test('翻页回调（受控，状态归页面 search params）', () => {
-  const onChange = vi.fn();
-  render(<DataTable columns={columns} data={data} rowCount={25}
-    pagination={{ page: 1, pageSize: 10 }} onPaginationChange={onChange} />);
-  fireEvent.click(screen.getByRole('button', { name: '2' }));
-  expect(onChange).toHaveBeenCalledWith({ page: 2, pageSize: 10 });
+
+test('POST /api/users 写入后能被列表查询读回', async () => {
+  const created = (await (await fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: '测试成员', deptId: 'rd', role: '开发工程师', phone: '+86 188 0000 0000', email: 'test@example.com' }),
+  })).json()) as Env<UserRow>;
+  expect(created.data.name).toBe('测试成员');
+
+  const list = (await (await fetch('/api/users?keyword=测试成员')).json()) as Env<Page<UserRow>>;
+  expect(list.data.list.some((u) => u.id === created.data.id)).toBe(true);
 });
 ```
 
-- [ ] **Step 2: 实现（TanStack Table headless + 原型 std* 规格）**
+Run: `./node_modules/.bin/vitest run src/modules/admin/mocks/__tests__/user.handlers.test.ts`
+Expected: FAIL because `/api/users` handlers do not exist.
 
-核心 props（`types.ts`）：
+- [x] **Step 2: 实现 dept/user mock 域**
+
+`src/modules/admin/mocks/user.handlers.ts` 数据形状：
 
 ```ts
-export interface DataTableProps<T> {
-  columns: ColumnDef<T, unknown>[]; data: T[]; rowCount: number;
-  pagination: { page: number; pageSize: number };
-  onPaginationChange: (p: { page: number; pageSize: number }) => void;
-  loading?: boolean; error?: string;
-  toolbar?: { search?: { value: string; onChange: (v: string) => void; placeholder?: string };
-    tabs?: { value: string; options: { value: string; label: string; count?: number }[]; onChange: (v: string) => void };
-    primary?: ReactNode };                       // 主按钮由页面传入（挂权限符）
-  rowSelection?: { selected: Record<string, boolean>; onChange: (s: Record<string, boolean>) => void };
+export interface DeptDto {
+  id: string;
+  parentId: string | null;
+  name: string;
+  sort: number;
+}
+
+export interface UserDto {
+  id: string;
+  name: string;
+  deptId: string;
+  role: string;
+  phone: string;
+  email: string;
+  status: 'active' | 'disabled' | 'unactivated' | 'left';
+  joinedAt: string;
 }
 ```
 
-视觉规格（照原型 std* 体系，README §标准表格体系）：面板 `rounded-lg border border-border overflow-hidden bg-surface`；表头行 `h-11 bg-surface-2 text-[13px] text-text-3 sticky top-0`；数据行 `h-14 border-t border-border hover:bg-surface-2 data-[selected]:bg-pri-soft`；分页右下、当前页 `bg-pri text-white`；loading = 骨架行 ×5；空态 = 居中图标 + `t('table.empty')`；error 态 = 居中文案 + 重试钮。
+实现要求：沿用 `src/mocks/db.ts` 的 `createCollection` 和 `genId`，不要为 user/dept 另起一套内存 DB。种子直接采用原型的部门树和成员样本：部门为 `产品研发中心 / 前端组 / 后端组 / 测试组 / 市场营销部 / 人力资源部 / 财务部 / 行政部`，成员为原型 `李长昕` 起的 16 条数据，其中 members tab 默认排除 `left`，所以首屏显示 `共 14 人`。接口要求：`GET /api/depts`、`GET /api/users`、`POST /api/users`、`PUT /api/users/:id`、`DELETE /api/users/:id`、`POST /api/users/batch-disable`。所有写操作必须更新内存集合，不能只 toast。
 
-- [ ] **Step 3: 测试通过 → Commit**
+- [x] **Step 3: 跑 mock 测试到通过并注册 handlers**
 
-```bash
-git add -A && git commit -m "feat: DataTable v1（std 规格/受控分页/工具栏/三态/行选择）"
-```
+Run: `./node_modules/.bin/vitest run src/modules/admin/mocks/__tests__/user.handlers.test.ts`
+Expected: PASS.
+同时在 `src/mocks/handlers.ts` 合并 `userHandlers`，避免浏览器页面请求 404。
 
-### Task 16: 垂直切片——成员与部门页（逼出全部 pro 组件）
+- [x] **Step 4: API 模块 + queryOptions**
 
-**Files:**
-- Create: `src/routes/_auth/admin/users.tsx`, `src/modules/admin/api/user.api.ts`, `src/modules/admin/mocks/user.handlers.ts`（含 dept/user 两域 faker 种子）, `src/components/pro/{PageHeader,DetailDrawer,ConfirmDialog,IndentSelect,StatusBadge}.tsx`
-- Modify: `src/mocks/browser.ts`, `src/locales/zh-CN/admin.json`
-
-- [ ] **Step 1: mock 域（部门树 8 个 + 成员 45 个，faker 固定 seed 保证可复现）**
+`src/modules/admin/api/user.api.ts` 必须提供：
 
 ```ts
-// src/modules/admin/mocks/user.handlers.ts 数据形状
-export interface DeptDto { id: string; parentId: string | null; name: string; sort: number }
-export interface UserDto { id: string; name: string; deptId: string; role: string; phone: string;
-  email: string; status: 'active' | 'disabled' | 'resigned'; joinedAt: string }
-// handlers：GET /api/depts（全量树）；GET /api/users（page/pageSize/deptId/status/keyword 过滤+分页）；
-// POST/PUT/DELETE /api/users/:id（内存真实生效）；POST /api/users/batch-disable
-faker.seed(42);
+import { queryOptions } from '@tanstack/react-query';
+import { http } from '@/lib/http/client';
+
+export interface PageResult<T> {
+  list: T[];
+  total: number;
+}
+
+export interface DeptDto {
+  id: string;
+  parentId: string | null;
+  name: string;
+  sort: number;
+}
+
+export interface UserDto {
+  id: string;
+  name: string;
+  deptId: string;
+  role: string;
+  phone: string;
+  email: string;
+  status: 'active' | 'disabled' | 'unactivated' | 'left';
+  joinedAt: string;
+}
+
+export interface UsersQueryParams {
+  page: number;
+  pageSize: number;
+  status: 'all' | 'active' | 'disabled' | 'unactivated' | 'left';
+  deptId?: string;
+  keyword?: string;
+}
+
+export interface CreateUserInput {
+  name: string;
+  deptId: string;
+  role: string;
+  phone: string;
+  email: string;
+}
+
+export interface UpdateUserInput {
+  name?: string;
+  deptId?: string;
+  role?: string;
+  phone?: string;
+  email?: string;
+  status?: 'active' | 'disabled' | 'unactivated' | 'left';
+}
+
+export const deptsQuery = queryOptions({
+  queryKey: ['iam', 'depts'],
+  queryFn: () => http.get<DeptDto[]>('/api/depts'),
+});
+
+export const usersQuery = (params: UsersQueryParams) =>
+  queryOptions({
+    queryKey: ['iam', 'users', params],
+    queryFn: () => http.get<PageResult<UserDto>>('/api/users', params),
+  });
+
+export const userApi = {
+  createUser: (dto: CreateUserInput) => http.post<UserDto>('/api/users', dto),
+  updateUser: (id: string, dto: UpdateUserInput) => http.put<UserDto>(`/api/users/${id}`, dto),
+  deleteUser: (id: string) => http.del<null>(`/api/users/${id}`),
+  batchDisableUsers: (ids: string[]) => http.post<{ updated: number }>('/api/users/batch-disable', { ids }),
+};
 ```
 
-- [ ] **Step 2: API 模块 + queryOptions**（`user.api.ts`：`deptsQuery` / `usersQuery(params)` key `['iam','users',params]`；变更 mutation 后 `invalidateQueries({ queryKey: ['iam','users'] })` 前缀失效）
+Mutation 后统一 `queryClient.invalidateQueries({ queryKey: ['iam', 'users'] })`；涉及部门新增/删除时再失效 `['iam','depts']`。
 
-- [ ] **Step 3: 页面（typed search params 是本页核心示范——spec §9/§10）**
+- [x] **Step 5: 页面内实现真实 UI，不创建通用 DataTable**
+
+`src/routes/_auth/admin/users.tsx` 保留路由为唯一权限元数据源，并把真实渲染委托给 `UsersView`。路由层只做 search params、query、mutation 与 navigate，不在 Task 15 创建通用 DataTable：
 
 ```tsx
-// src/routes/_auth/admin/users.tsx 关键骨架
 const searchSchema = z.object({
   page: z.number().int().min(1).catch(1),
-  pageSize: z.number().int().catch(10),
-  status: z.enum(['all', 'active', 'disabled', 'resigned']).catch('all'),
+  pageSize: z.number().int().min(5).max(50).catch(10),
+  status: z.enum(['all', 'active', 'disabled', 'unactivated', 'left']).catch('all'),
   deptId: z.string().optional(),
   keyword: z.string().catch(''),
 });
+
 export const Route = createFileRoute('/_auth/admin/users')({
   validateSearch: searchSchema,
   staticData: {
-    label: '成员与部门', permission: 'iam:user:view', group: '组织与权限',
+    label: '成员与部门',
+    permission: 'iam:user:view',
+    group: '组织与权限',
     actions: [
-      { code: 'iam:user:create', label: '新建成员' }, { code: 'iam:user:update', label: '编辑成员' },
-      { code: 'iam:user:del', label: '删除成员' }, { code: 'iam:user:resign', label: '办理离职' },
-      { code: 'iam:dept:create', label: '新建部门' },   // 一页多资源示范（spec §7.5）
+      { code: 'iam:user:create', label: '添加成员' },
+      { code: 'iam:user:update', label: '编辑成员' },
+      { code: 'iam:user:del', label: '删除成员' },
+      { code: 'iam:user:resign', label: '办理离职' },
+      { code: 'iam:dept:create', label: '新建部门' },
     ],
   },
   component: UsersPage,
 });
-// 页面布局：左 240px 部门树（缩进列表，非拖拽树——原型 L596-608）+ 右 DataTable
-// 筛选/分页全部读写 Route.useSearch() / navigate({ search })——刷新不丢、可分享
-// 行内"详情"开 DetailDrawer；"新建成员"按钮包 <AuthGuard permission="iam:user:create">
-// 批量选择出现底部操作条（批量禁用）；删除走 ConfirmDialog
 ```
 
-- [ ] **Step 4: e2e 验收（G1，本 task 是 M0 的总集成验收）**
+`UsersPage` 装配要求：
 
-1. viewer 登录：能看列表，"新建成员"按钮不渲染（AuthGuard）
-2. admin 登录：新建成员 → 表格出现（mock 真实写入）；筛选"离职" + 翻页 → 刷新浏览器状态不丢（URL 化）；复制 URL 新标签打开 → 同视图
-3. 删除 → ConfirmDialog → 行消失
-4. 三布局 × 明暗下该页视觉正常
+- `const search = Route.useSearch()` 作为 query 参数单一来源。
+- `const navigate = Route.useNavigate()`，筛选、分页、部门切换都通过 `navigate({ search: ... })` 写 URL。
+- `useSuspenseQuery(deptsQuery)`、`useSuspenseQuery(usersQuery(search))` 取数；mutation 成功后失效 `['iam','users']`。
+- 把 `permissions` 或 `usePermission` 的结果传给 `UsersView`，按钮级权限在渲染层明确控制。
 
-- [ ] **Step 5: Commit**
+`UsersView` 布局：对齐原型 USER MANAGEMENT。外层 `pageWrapStyle` 为 20px/28px；内容面板 `border:1px solid var(--border); border-radius:12px; min-height:640px; background:var(--surface)`；面板顶部 tabs 高度和下划线照原型；左侧部门树宽 248px；右侧成员区 padding 18px/24px；表格使用原型 `stdThead/stdRow`：表头 44px、行高 56px、grid 列 `44px 1.4fr 1fr 1.4fr 1fr 120px`。权限按钮用 `<AuthGuard>` 或明确的权限布尔值控制，不要只隐藏文案。
+
+`UsersView` props 契约：
+
+```ts
+export interface UsersViewProps {
+  permissions: string[];
+  depts: DeptDto[];
+  usersPage: PageResult<UserDto>;
+  search: UsersQueryParams;
+  onSearchChange: (patch: Partial<UsersQueryParams>) => void;
+  onCreateUser: (dto: CreateUserInput) => void;
+  onUpdateUser: (id: string, dto: UpdateUserInput) => void;
+  onDeleteUser: (id: string) => void;
+  onBatchDisable: (ids: string[]) => void;
+}
+```
+
+- [x] **Step 6: 页面级交互测试**
+
+最低覆盖：
+
+```tsx
+const deptFixtures = [{ id: 'rd', parentId: null, name: '产品研发中心', sort: 1 }];
+const userPageFixture = {
+  list: [{ id: 'u-1', name: '李长昕', deptId: 'rd', role: '超级管理员', phone: '+86 158 0611 9676', email: 'w@example.com', status: 'active', joinedAt: '2026-07-01' }],
+  total: 1,
+};
+const defaultSearch = { page: 1, pageSize: 10, status: 'all', keyword: '' } satisfies UsersQueryParams;
+const baseHandlers = {
+  onSearchChange: vi.fn(),
+  onCreateUser: vi.fn(),
+  onUpdateUser: vi.fn(),
+  onDeleteUser: vi.fn(),
+  onBatchDisable: vi.fn(),
+};
+
+test('viewer 看不到添加成员按钮但能看列表', async () => {
+  render(<UsersView {...baseHandlers} permissions={['iam:user:view']} depts={deptFixtures} usersPage={userPageFixture} search={defaultSearch} />);
+  expect(screen.queryByRole('button', { name: '添加成员' })).not.toBeInTheDocument();
+  expect(await screen.findByText('成员与部门')).toBeInTheDocument();
+});
+
+test('状态筛选和分页回调给路由层写 URL 的 next search', async () => {
+  const onSearchChange = vi.fn();
+  render(<UsersView {...baseHandlers} permissions={['*:*:*']} depts={deptFixtures} usersPage={userPageFixture} search={defaultSearch} onSearchChange={onSearchChange} />);
+  await userEvent.click(screen.getByRole('button', { name: /账号状态/ }));
+  await userEvent.click(screen.getByRole('button', { name: '停用' }));
+  expect(onSearchChange).toHaveBeenCalledWith({ status: 'disabled', page: 1 });
+  await userEvent.click(screen.getByRole('button', { name: '›' }));
+  expect(onSearchChange).toHaveBeenCalledWith({ page: 2 });
+});
+```
+
+Run: `./node_modules/.bin/vitest run src/modules/admin/components/users/__tests__/UsersView.test.tsx`
+Expected: PASS. `UsersView` 测试只覆盖真实渲染与交互回调；URL 是否真正写入浏览器地址栏放到 Step 7 的 Browser 验收。
+
+- [x] **Step 7: 浏览器验收**
+
+Run dev server 后用 Chrome/Playwright 验：
+
+1. admin 登录：进入 `/admin/users`，部门树和成员表渲染。
+2. 添加成员 → API 能读回新行；删除 → ConfirmDialog 确认后行消失；批量禁用 → 选中行状态变 disabled。
+3. 状态筛选 + 翻页 + 刷新：URL search params 不丢；复制 URL 到新标签同视图。
+4. viewer 登录：列表可见，"添加成员"、删除、批量禁用等按钮不渲染。
+5. sidebar / rail / inset × light/dark 目检；90% / 100% / 108% 下表格、弹窗、抽屉无截断和 portal 偏移。
+
+- [x] **Step 8: 验证 + Commit**
+
+Run:
 
 ```bash
-git add -A && git commit -m "feat: 成员与部门垂直切片（typed search params/AuthGuard/抽屉/批量/mock CRUD）"
+./node_modules/.bin/tsc -b --noEmit
+./node_modules/.bin/vitest run
+./node_modules/.bin/eslint src
+```
+
+Commit:
+
+```bash
+git add -A
+git commit -m "feat: 成员与部门页面先行实现"
+```
+
+### Task 16: 成员页复盘 + DataTable/pro 抽象裁决
+
+**Files:**
+- Modify: `docs/superpowers/specs/2026-07-02-admin-scaffold-frontend-design.md`
+- Modify: `docs/superpowers/plans/2026-07-02-m0-scaffold-foundation.md`
+- 仅在复盘裁决选中时创建：`src/components/pro/DataTable.tsx`, `src/components/pro/data-table/*`
+- 仅在成员页证明边界稳定时创建：`src/components/pro/{ConfirmDialog,StatusBadge,DetailDrawer}.tsx`
+- 仅为已抽出的组件补测试：`src/components/pro/__tests__/*.test.tsx`
+
+- [ ] **Step 1: 写复盘记录**
+
+在 spec §10 下补一段"成员页复盘结论"，必须回答：
+
+1. 哪些 JSX/状态/交互在成员页中出现了稳定边界？
+2. 哪些只是成员页业务特有逻辑，不应该抽出去？
+3. 如果现在抽 DataTable，最小 props 是什么？哪些 props 明确不做？
+4. 抽象会不会让下一个页面更简单，还是只会增加配置层？
+
+- [ ] **Step 2: 做抽象裁决**
+
+三选一，写进 plan：
+
+1. **不抽 DataTable，只抽小组件**：适合成员页表格逻辑高度业务化，只沉淀 `StatusBadge` / `ConfirmDialog` / `PaginationBar`。
+2. **抽轻量 TableShell**：只抽容器、表头/行/空态/分页视觉，不接管 query/search params。
+3. **抽 DataTable v1**：只有当列定义、分页、选择、三态、toolbar 在成员页里足够稳定时才选。
+
+默认推荐顺序是 1 → 2 → 3，除非成员页实现证明 3 的收益高于配置成本。
+
+- [ ] **Step 3: 若决定抽象，先写失败测试**
+
+例如选择轻量 TableShell 时：
+
+```tsx
+test('TableShell 渲染表头、行和分页槽位', () => {
+  render(
+    <TableShell
+      header={<tr><th>姓名</th></tr>}
+      rows={<tr><td>张三</td></tr>}
+      pagination={<button>下一页</button>}
+    />,
+  );
+  expect(screen.getByText('姓名')).toBeInTheDocument();
+  expect(screen.getByText('张三')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '下一页' })).toBeInTheDocument();
+});
+```
+
+Run 对应单测，确认 FAIL，再实现最小组件。
+
+- [ ] **Step 4: 抽象后回灌成员页**
+
+抽象只能替换成员页里已经稳定的重复结构；不得为了迁就抽象改坏成员页交互。回灌后必须重新跑成员页浏览器验收，尤其是 URL search params、权限按钮、批量操作、抽屉/弹窗。
+
+- [ ] **Step 5: 验证 + Commit**
+
+Run:
+
+```bash
+./node_modules/.bin/tsc -b --noEmit
+./node_modules/.bin/vitest run
+./node_modules/.bin/eslint src
+```
+
+Commit:
+
+```bash
+git add -A
+git commit -m "refactor: 基于成员页复盘沉淀列表组件"
 ```
 
 ---

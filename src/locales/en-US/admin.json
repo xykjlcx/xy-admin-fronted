@@ -1,1 +1,71 @@
-{}
+{
+  "users": {
+    "title": "Members & Departments",
+    "subtitle": "Organization, account status, and member permission entry",
+    "deptTitle": "Departments",
+    "allDepts": "All departments",
+    "searchPlaceholder": "Search name, role, or phone",
+    "selectedCount": "{{count}} selected",
+    "empty": "No members",
+    "total": "{{total}} members, page {{page}} / {{pageCount}}",
+    "selectPage": "Select current page",
+    "selectUser": "Select {{name}}",
+    "status": {
+      "all": "All",
+      "active": "Normal",
+      "disabled": "Stopped",
+      "unactivated": "Inactive",
+      "left": "Left"
+    },
+    "columns": {
+      "name": "Name",
+      "dept": "Department",
+      "role": "Role",
+      "contact": "Contact",
+      "status": "Account status",
+      "joinedAt": "Joined",
+      "actions": "Actions"
+    },
+    "actions": {
+      "invite": "Invite",
+      "create": "Add member",
+      "batchDisable": "Disable selected",
+      "detail": "Details",
+      "delete": "Delete",
+      "deleteName": "Delete {{name}}",
+      "prev": "Previous",
+      "next": "Next",
+      "cancel": "Cancel",
+      "save": "Save",
+      "confirmDelete": "Confirm delete"
+    },
+    "form": {
+      "name": "Name",
+      "dept": "Select department",
+      "role": "Role",
+      "phone": "Phone",
+      "email": "Email"
+    },
+    "tabs": {
+      "members": "Members",
+      "depts": "Departments",
+      "left": "Former members"
+    },
+    "filters": {
+      "accountStatus": "Account status",
+      "directOnly": "Direct members only"
+    },
+    "dialog": {
+      "createTitle": "Add member",
+      "deleteTitle": "Confirm deletion",
+      "deleteDesc": "This member will be removed from the current list.",
+      "detailFallback": "Member details"
+    },
+    "detail": {
+      "dept": "Department",
+      "role": "Role",
+      "contact": "Contact",
+      "status": "Status"
+    }
+  }
+}
