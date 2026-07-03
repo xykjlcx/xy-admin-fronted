@@ -76,8 +76,8 @@ function SheetContent({
         {children}
         {showCloseButton && (
           // 原型抽屉关闭钮（L2658）：30px 圆角方块（7px）+ ✕，无边框，text-3 色，hover 底 --bg
-          <SheetPrimitive.Close className="absolute right-6 top-[22px] flex size-[30px] items-center justify-center rounded-7 text-text-3 transition-colors hover:bg-bg focus:outline-hidden disabled:pointer-events-none">
-            <XIcon className="size-[18px]" />
+          <SheetPrimitive.Close className="absolute right-6 top-[calc(22px*var(--app-scale))] flex size-[calc(30px*var(--app-scale))] items-center justify-center rounded-7 text-text-3 transition-colors hover:bg-bg focus:outline-hidden disabled:pointer-events-none">
+            <XIcon className="size-[calc(18px*var(--app-scale))]" />
             <span className="sr-only">Close</span>
           </SheetPrimitive.Close>
         )}

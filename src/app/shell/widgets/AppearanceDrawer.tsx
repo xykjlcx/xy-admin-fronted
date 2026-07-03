@@ -50,7 +50,7 @@ const RADIUS_OPTS: { key: Radius; label: string; r: string }[] = [
 ];
 
 function SectionTitle({ children }: { children: string }) {
-  return <div className="mb-2.5 mt-6 text-[13px] font-semibold text-text-2">{children}</div>;
+  return <div className="mb-2.5 mt-6 text-[calc(13px*var(--app-scale))] font-semibold text-text-2">{children}</div>;
 }
 
 export function AppearanceDrawer() {
@@ -79,10 +79,10 @@ export function AppearanceDrawer() {
         </TooltipTrigger>
         <TooltipContent>{t('shell.appearance')}</TooltipContent>
       </Tooltip>
-      <SheetContent side="right" className="w-[380px] max-w-[90vw] gap-0 overflow-y-auto">
+      <SheetContent side="right" className="w-[calc(380px*var(--app-scale))] max-w-[90vw] gap-0 overflow-y-auto">
         <SheetHeader className="gap-1 p-6 pb-2">
           <SheetTitle className="text-lg font-bold">{dk('title')}</SheetTitle>
-          <SheetDescription className="text-[13px] text-text-3">{dk('subtitle')}</SheetDescription>
+          <SheetDescription className="text-[calc(13px*var(--app-scale))] text-text-3">{dk('subtitle')}</SheetDescription>
         </SheetHeader>
 
         <div className="px-6 pb-8">
@@ -102,18 +102,18 @@ export function AppearanceDrawer() {
                   className="flex shrink-0 gap-1 rounded-9 p-2"
                   style={{ background: f.preset.chrome }}
                 >
-                  <span className="size-[15px] rounded-5" style={{ background: f.preset.pri }} />
+                  <span className="size-[calc(15px*var(--app-scale))] rounded-5" style={{ background: f.preset.pri }} />
                   <span
-                    className="size-[15px] rounded-5 border border-border"
+                    className="size-[calc(15px*var(--app-scale))] rounded-5 border border-border"
                     style={{ background: f.preset.chrome }}
                   />
-                  <span className="size-[15px] rounded-5" style={{ background: f.preset.surface2 }} />
+                  <span className="size-[calc(15px*var(--app-scale))] rounded-5" style={{ background: f.preset.surface2 }} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-semibold text-text">{dk(f.label)}</div>
                   <div className="text-xs text-text-3">{dk(f.desc)}</div>
                 </div>
-                {flavor === f.key && <Check className="size-[17px] shrink-0 text-pri" />}
+                {flavor === f.key && <Check className="size-[calc(17px*var(--app-scale))] shrink-0 text-pri" />}
               </button>
             ))}
           </div>
@@ -135,7 +135,7 @@ export function AppearanceDrawer() {
                   <div className="text-xs font-semibold text-text">
                     {dk(`layout${k[0]!.toUpperCase()}${k.slice(1)}`)}
                   </div>
-                  <div className="text-[10px] text-text-3">
+                  <div className="text-[calc(10px*var(--app-scale))] text-text-3">
                     {dk(`layout${k[0]!.toUpperCase()}${k.slice(1)}Desc`)}
                   </div>
                 </div>
@@ -161,9 +161,9 @@ export function AppearanceDrawer() {
                   className="flex h-11 w-full items-center justify-center rounded-11 transition-transform"
                   style={{ background: a.pri, boxShadow: accent === a.key ? RING(a.pri) : OUTLINE }}
                 >
-                  {accent === a.key && <Check className="size-[17px] text-white" />}
+                  {accent === a.key && <Check className="size-[calc(17px*var(--app-scale))] text-white" />}
                 </span>
-                <span className="text-[10px] text-text-3">{dk(a.labelKey)}</span>
+                <span className="text-[calc(10px*var(--app-scale))] text-text-3">{dk(a.labelKey)}</span>
               </button>
             ))}
             <label className="flex cursor-pointer flex-col items-center gap-1.5">
@@ -189,7 +189,7 @@ export function AppearanceDrawer() {
                   className="absolute inset-0 cursor-pointer opacity-0"
                 />
               </span>
-              <span className="text-[10px] text-text-3">{dk('accentCustom')}</span>
+              <span className="text-[calc(10px*var(--app-scale))] text-text-3">{dk('accentCustom')}</span>
             </label>
           </div>
 
@@ -201,7 +201,7 @@ export function AppearanceDrawer() {
                 key={k}
                 onClick={() => set({ pageAnim: k })}
                 className={cn(
-                  'h-9 flex-1 rounded-8 border text-[13px] transition-colors',
+                  'h-9 flex-1 rounded-8 border text-[calc(13px*var(--app-scale))] transition-colors',
                   pageAnim === k
                     ? 'border-pri bg-pri-soft font-semibold text-pri'
                     : 'border-border bg-surface text-text-2',
@@ -221,14 +221,14 @@ export function AppearanceDrawer() {
                 key={o.key}
                 onClick={() => set({ zoom: o.key })}
                 className={cn(
-                  'flex h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-9 border transition-colors',
+                  'flex h-[calc(52px*var(--app-scale))] flex-1 flex-col items-center justify-center gap-0.5 rounded-9 border transition-colors',
                   zoom === o.key
                     ? 'border-pri bg-pri-soft text-pri'
                     : 'border-border bg-surface text-text-2',
                 )}
               >
                 <span className="text-sm font-semibold">{dk(o.label)}</span>
-                <span className="text-[11px] opacity-70">{dk(o.hint)}</span>
+                <span className="text-[calc(11px*var(--app-scale))] opacity-70">{dk(o.hint)}</span>
               </button>
             ))}
           </div>
@@ -242,14 +242,14 @@ export function AppearanceDrawer() {
                 key={o.key}
                 onClick={() => set({ radius: o.key })}
                 className={cn(
-                  'flex h-[76px] flex-1 flex-col items-center justify-center gap-2 rounded-9 border text-[13px] transition-colors',
+                  'flex h-[calc(76px*var(--app-scale))] flex-1 flex-col items-center justify-center gap-2 rounded-9 border text-[calc(13px*var(--app-scale))] transition-colors',
                   radius === o.key
                     ? 'border-pri bg-pri-soft text-pri'
                     : 'border-border bg-surface text-text-2',
                 )}
               >
                 <span
-                  className="size-[34px] border-2"
+                  className="size-[calc(34px*var(--app-scale))] border-2"
                   style={{
                     borderColor: radius === o.key ? 'var(--pri)' : 'var(--text-3)',
                     borderTopLeftRadius: o.r,

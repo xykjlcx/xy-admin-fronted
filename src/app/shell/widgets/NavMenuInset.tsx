@@ -29,7 +29,7 @@ export function NavMenuInset({
     <aside
       className={cn(
         'flex shrink-0 flex-col pt-3 transition-[width] duration-200',
-        collapsed ? 'w-16 px-3' : 'w-[248px] pl-3 pr-2.5',
+        collapsed ? 'w-16 px-3' : 'w-[calc(248px*var(--app-scale))] pl-3 pr-2.5',
       )}
     >
       <div className="mb-3.5">
@@ -39,7 +39,7 @@ export function NavMenuInset({
         {groups.map((g) => (
           <div key={g.node.id}>
             {!collapsed && (
-              <div className="px-3 pb-1.5 pt-3 text-[11px] font-semibold tracking-wide text-text-3">
+              <div className="px-3 pb-1.5 pt-3 text-[calc(11px*var(--app-scale))] font-semibold tracking-wide text-text-3">
                 {lv(g.node.label, i18n.language)}
               </div>
             )}
@@ -50,14 +50,14 @@ export function NavMenuInset({
                   to={p.path}
                   title={collapsed ? lv(p.label, i18n.language) : undefined}
                   className={cn(
-                    'my-0.5 flex h-[38px] items-center gap-2.5 rounded-9 text-sm',
+                    'my-0.5 flex h-[calc(38px*var(--app-scale))] items-center gap-2.5 rounded-9 text-sm',
                     collapsed ? 'justify-center px-0' : 'px-3',
                     pathname === p.path
                       ? 'bg-surface font-semibold text-text shadow-lift'
                       : 'text-text-2 hover:bg-surface/60',
                   )}
                 >
-                  <Icon name={p.icon ?? g.node.icon} className="size-[18px] shrink-0" />
+                  <Icon name={p.icon ?? g.node.icon} className="size-[calc(18px*var(--app-scale))] shrink-0" />
                   {!collapsed && <span className="truncate">{lv(p.label, i18n.language)}</span>}
                 </Link>
               ) : null,
@@ -68,11 +68,11 @@ export function NavMenuInset({
       <button
         onClick={onToggle}
         className={cn(
-          'mt-2 flex h-12 items-center gap-2.5 border-t border-border text-[13px] text-text-2 hover:text-pri',
+          'mt-2 flex h-12 items-center gap-2.5 border-t border-border text-[calc(13px*var(--app-scale))] text-text-2 hover:text-pri',
           collapsed ? 'justify-center px-0' : 'px-3',
         )}
       >
-        <PanelLeft className="size-[18px] shrink-0" />
+        <PanelLeft className="size-[calc(18px*var(--app-scale))] shrink-0" />
         {!collapsed && <span>{t('shell.nav.collapse')}</span>}
       </button>
     </aside>

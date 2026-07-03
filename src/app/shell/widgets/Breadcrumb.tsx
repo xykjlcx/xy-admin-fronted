@@ -12,7 +12,7 @@ export function Breadcrumb() {
   const sd = leaf?.staticData as { label?: string; group?: string } | undefined;
   if (!sd?.label) return null;
   return (
-    <nav className="flex items-center gap-1.5 text-[13px] text-text-3">
+    <nav className="flex items-center gap-1.5 text-[calc(13px*var(--app-scale))] text-text-3">
       {sd.group && (
         <>
           <span>{sd.group}</span>

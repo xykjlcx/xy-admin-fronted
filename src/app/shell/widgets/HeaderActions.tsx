@@ -10,7 +10,7 @@ export function HeaderActions() {
       <AppearanceDrawer />
       <DarkModeToggle />
       <LanguageMenu />
-      <span className="mx-1 h-[22px] w-px bg-border" />
+      <span className="mx-1 h-[calc(22px*var(--app-scale))] w-px bg-border" />
       <UserMenu />
     </div>
   );

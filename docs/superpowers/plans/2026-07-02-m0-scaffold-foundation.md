@@ -13,7 +13,7 @@
 **全局纪律（每个 task 都要遵守）：**
 - 组件代码禁止十六进制色值/`rounded-[Npx]` 任意值——只用语义 token（Task 3 上 ESLint 规则）
 - 所有界面文案写 `t('<ns>.<key>')`，不写硬编码中文（词条同步写进 `locales/zh-CN/*.json`；en-US 本期只建文件不翻译）
-- 宽度类样式一律 px；字号/间距用 Tailwind 默认 scale
+- 显示比例统一走 `--app-scale` token 乘法：业务页面优先用 Tailwind 默认 spacing/text/radius 与 pro 组件；确需任意 px 时写 `calc(Npx * var(--app-scale))`；新增第三方重组件必须测 90/100/108 三档和 portal 浮层定位
 - 每个 task 结束必须 `pnpm typecheck && pnpm test` 通过再 commit
 
 **文件结构总览（M0 涉及）：** 见 spec §4。本 plan 创建的文件在各 task 的 Files 列出。
@@ -145,15 +145,19 @@ pnpm add tailwindcss @tailwindcss/vite
   --success: #16a34a; --success-soft: #e8f7ee;
   --warning: #ff8000; --warning-soft: #fff3e8;
   --danger: #f53f3f; --danger-soft: #feecec;
-  /* 圆角乘法体系（spec §8.1）：sharp 0.28 / default 1 / round 1.55 */
+  /* 圆角乘法体系（spec §8.1）：sharp 0.28 / default 1 / round 1.55；显示比例另乘 --app-scale */
   --radius-factor: 1;
-  --radius-sm: calc(6px * var(--radius-factor));
-  --radius-md: calc(8px * var(--radius-factor));   /* 输入/按钮 */
-  --radius-lg: calc(12px * var(--radius-factor));  /* 卡片 */
-  --radius-xl: calc(14px * var(--radius-factor));  /* 大卡 */
+  --radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));
+  --radius-md: calc(8px * var(--radius-factor) * var(--app-scale));   /* 输入/按钮 */
+  --radius-lg: calc(12px * var(--radius-factor) * var(--app-scale));  /* 卡片 */
+  --radius-xl: calc(14px * var(--radius-factor) * var(--app-scale));  /* 大卡 */
 }
 [data-radius='sharp'] { --radius-factor: 0.28; }
 [data-radius='round'] { --radius-factor: 1.55; }
+/* 显示比例档系数（原型实际系数 sm 0.9 / md 1 / lg 1.08），不使用 CSS zoom。 */
+:root { --app-scale: 1; }
+[data-zoom='sm'] { --app-scale: 0.9; }
+[data-zoom='lg'] { --app-scale: 1.08; }
 ```
 
 - [ ] **Step 3: global.css（@theme 映射 + 基础样式）**
@@ -192,9 +196,14 @@ pnpm add tailwindcss @tailwindcss/vite
 }
 
 html { font-family: var(--font-sans); }
-html[data-zoom='sm'] { zoom: 0.9; }
-html[data-zoom='lg'] { zoom: 1.08; }  /* 原型实际系数 1.08（L2848），README"110%"有误 */
-body { margin: 0; background: var(--bg); color: var(--text); font-size: 14px;
+:root {
+  --spacing: calc(0.25rem * var(--app-scale));
+  --text-xs: calc(0.75rem * var(--app-scale));
+  --text-sm: calc(0.875rem * var(--app-scale));
+  --text-base: calc(1rem * var(--app-scale));
+  --text-lg: calc(1.125rem * var(--app-scale));
+}
+body { margin: 0; background: var(--bg); color: var(--text); font-size: calc(14px * var(--app-scale));
   -webkit-font-smoothing: antialiased; }
 .tabular-nums { font-variant-numeric: tabular-nums; }
 /* 滚动条、遮罩/抽屉/弹窗/切页动画 keyframes：照原型 L12-L30 原样复制 5 组 @keyframes：
@@ -1536,7 +1545,7 @@ git add -A && git commit -m "feat: 成员与部门垂直切片（typed search pa
 
 ## Phase 5：验收工具链与工程收尾（Task 17-18）
 
-### Task 17: 视觉回归脚手架 + 原型基准截图 + Safari zoom 实测
+### Task 17: 视觉回归脚手架 + 原型基准截图 + 显示比例三档实测
 
 **Files:**
 - Create: `e2e/visual.spec.ts`, `scripts/capture-prototype.ts`, `playwright.config.ts`
@@ -1545,12 +1554,12 @@ git add -A && git commit -m "feat: 成员与部门垂直切片（typed search pa
 
 - [ ] **Step 2: 视觉回归 spec**：实现侧同 viewport 截同三屏，`expect(screenshot).toMatchSnapshot({ maxDiffPixelRatio: 0.02 })` 对 baseline。M0 允许 diff 超阈值（页面还没像素级打磨），**产出 diff 报告作为 M1 打磨清单**——本 task 交付的是工具链不是达标。
 
-- [ ] **Step 3: Safari zoom 实测（spec §8.1 遗留验证项）**：`playwright webkit` 下三档 zoom 分别打开 users 页，验证 DropdownMenu/Popover/Sheet 弹层定位不偏移。结果记录进 `docs/superpowers/specs/` 的设计文档"决策记录"处（若 webkit 有偏移：记录现象 + 降级方案 = Safari UA 下隐藏 zoom 选项）。
+- [ ] **Step 3: 显示比例三档实测（spec §8.1 遗留验证项）**：Playwright 下三档 `--app-scale` 分别打开 users 页，验证 DropdownMenu/Popover/Sheet 弹层定位不偏移、整页无横向/纵向溢出。至少覆盖 Chromium；若后续装齐浏览器，再补 WebKit/Safari。结果记录进 `docs/superpowers/specs/` 的设计文档"决策记录"处。
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add -A && git commit -m "test: 视觉回归工具链 + 原型基准截图 + Safari zoom 实测记录"
+git add -A && git commit -m "test: 视觉回归工具链 + 原型基准截图 + 显示比例三档实测记录"
 ```
 
 ### Task 18: CI + 模板 CLAUDE.md + README + CHANGELOG
@@ -1579,7 +1588,7 @@ jobs:
         run: "! grep -r 'faker' dist/assets/"
 ```
 
-- [ ] **Step 2: CLAUDE.md（内容清单照 spec §14）**：token 铁律（只用语义 token/禁 hex/禁任意圆角）、状态边界（服务端数据归 Query）、query key 约定、子系统新增 7 步/删除 4 步（照 spec §7.6 抄录）、admin 内核页标注、权限双模式、i18n 剥离立场、前端权限非安全边界、mock 剥离验收、宽度用 px 纪律。
+- [ ] **Step 2: CLAUDE.md / AGENTS.md（内容清单照 spec §14）**：token 铁律（只用语义 token/禁 hex/禁任意圆角）、`--app-scale` 显示比例接入纪律、状态边界（服务端数据归 Query）、query key 约定、子系统新增 7 步/删除 4 步（照 spec §7.6 抄录）、admin 内核页标注、权限双模式、i18n 剥离立场、前端权限非安全边界、mock 剥离验收。
 
 - [ ] **Step 3: CHANGELOG.md 起版 `0.1.0 (M0)`；package.json version 同步。**
 
@@ -1599,7 +1608,7 @@ git tag m0-done
 - [ ] 登录（多角色）→ Shell（三布局可切、外观五维可调、耦合规则正确）→ 成员与部门页全交互，e2e 手工流全通过
 - [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` 全绿；生产包无 faker
 - [ ] token 快照测试拦截任何 token 漂移；视觉回归工具链可产 diff 报告
-- [ ] Safari zoom 实测结论记录在案
+- [ ] 显示比例三档（90/100/108）与浮层定位实测结论记录在案
 - [ ] viewer 账号全程无越权入口（菜单/页面/按钮三级）
 
 ## 后续（不在本 plan）

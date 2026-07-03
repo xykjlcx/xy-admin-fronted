@@ -28,7 +28,7 @@ export function ShellHeader({
   return (
     <header
       className={cn(
-        'absolute inset-x-0 top-0 z-20 flex h-14 items-center gap-[18px] border-b border-border px-5 transition-[background-color,box-shadow,border-color] duration-200',
+        'absolute inset-x-0 top-0 z-20 flex h-14 items-center gap-[calc(18px*var(--app-scale))] border-b border-border px-5 transition-[background-color,box-shadow,border-color] duration-200',
         scrolled
           ? 'bg-surface-blur shadow-header backdrop-blur-[14px] backdrop-saturate-[1.6]'
           : transparentUntilScroll

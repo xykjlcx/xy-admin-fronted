@@ -34,22 +34,24 @@
      走 token 供组件 bg-tooltip 消费，禁组件内写 hex（ESLint 拦）。 */
   --tooltip-bg: #1f2329;
   --radius-factor: 1;
-  --radius-sm: calc(6px * var(--radius-factor));
-  --radius-md: calc(8px * var(--radius-factor));
-  --radius-lg: calc(12px * var(--radius-factor));
-  --radius-xl: calc(14px * var(--radius-factor));
+  /* 圆角 = 基准 px × 圆角风格档(--radius-factor) × 显示比例档(--app-scale)。
+     两个维度独立：圆角风格改控件圆润度，显示比例整体等比缩放（原型 zoom 会连圆角一起缩）。 */
+  --radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));
+  --radius-md: calc(8px * var(--radius-factor) * var(--app-scale));
+  --radius-lg: calc(12px * var(--radius-factor) * var(--app-scale));
+  --radius-xl: calc(14px * var(--radius-factor) * var(--app-scale));
   /* 圆角数字全档（原型各控件精确值 7/9/11 等，取最近 sm/md/lg/xl 档会失真）。
-     全部乘 --radius-factor，随圆角风格档缩放。旧 sm/md/lg/xl 别名保留（既有代码在用）。 */
-  --radius-4: calc(4px * var(--radius-factor));
-  --radius-5: calc(5px * var(--radius-factor));
-  --radius-6: calc(6px * var(--radius-factor));
-  --radius-7: calc(7px * var(--radius-factor));
-  --radius-8: calc(8px * var(--radius-factor));
-  --radius-9: calc(9px * var(--radius-factor));
-  --radius-10: calc(10px * var(--radius-factor));
-  --radius-11: calc(11px * var(--radius-factor));
-  --radius-12: calc(12px * var(--radius-factor));
-  --radius-14: calc(14px * var(--radius-factor));
+     全部乘 --radius-factor + --app-scale，随圆角风格档与显示比例档缩放。旧 sm/md/lg/xl 别名保留（既有代码在用）。 */
+  --radius-4: calc(4px * var(--radius-factor) * var(--app-scale));
+  --radius-5: calc(5px * var(--radius-factor) * var(--app-scale));
+  --radius-6: calc(6px * var(--radius-factor) * var(--app-scale));
+  --radius-7: calc(7px * var(--radius-factor) * var(--app-scale));
+  --radius-8: calc(8px * var(--radius-factor) * var(--app-scale));
+  --radius-9: calc(9px * var(--radius-factor) * var(--app-scale));
+  --radius-10: calc(10px * var(--radius-factor) * var(--app-scale));
+  --radius-11: calc(11px * var(--radius-factor) * var(--app-scale));
+  --radius-12: calc(12px * var(--radius-factor) * var(--app-scale));
+  --radius-14: calc(14px * var(--radius-factor) * var(--app-scale));
   /* 弹层/悬浮阴影 token（原型 box-shadow 精确值，见直方图）：
      menu/popover 0 12px 40px .16、modal 0 16px 48px .18、drawer -8px 0 32px .14、
      tooltip 0 4px 14px .18、card 0 1px 3px .03、inset 浮起卡、lifted 项 0 1px 2px .08、
@@ -68,8 +70,12 @@
 [data-radius='sharp'] { --radius-factor: 0.28; }
 [data-radius='round'] { --radius-factor: 1.55; }
 
-/* zoom 反向系数：CSS zoom 不缩放 vh，Shell 根用 h-app=calc(100vh*var(--zoom-inverse)) 抵消档位缩放，
-   否则 zoom<1 底部留白、zoom>1 整页滚动。必须与 global.css 的 html[data-zoom] zoom 值互为倒数（sm 1/0.9=1.1112, lg 1/1.08=0.926）。 */
-:root { --zoom-inverse: 1; }
-[data-zoom='sm'] { --zoom-inverse: 1.1112; }
-[data-zoom='lg'] { --zoom-inverse: 0.926; }
+/* 显示比例档系数（原型实际系数 sm 0.9 / md 1 / lg 1.08）。取代旧 CSS zoom 方案：
+   zoom 在规范层是双坐标系（gBCR 返回视觉像素、offset* 返回未缩放像素），floating-ui 官方不支持，
+   且弹层 portal 到 body 会脱离缩放子树。改为 token 乘法（Radix Themes scaling 同款机制）——
+   --app-scale 定义在 html（data-zoom 写在 documentElement），被 body 继承，portal 弹层同样继承，
+   故尺寸/排版 token 乘它即全页等比缩放，弹层天然随档缩放，且全页零 zoom、JS 几何测量永远单坐标系。
+   谁乘：尺寸/排版/圆角 token（见上）+ global.css 盖写的 --spacing/--text-*；谁不乘：边框宽/阴影（保持锐利）。 */
+:root { --app-scale: 1; }
+[data-zoom='sm'] { --app-scale: 0.9; }
+[data-zoom='lg'] { --app-scale: 1.08; }

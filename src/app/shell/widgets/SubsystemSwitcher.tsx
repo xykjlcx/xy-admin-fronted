@@ -49,7 +49,7 @@ export function SubsystemSwitcher({
               className="flex size-8 shrink-0 items-center justify-center rounded-8 text-white"
               style={{ background: active?.builtin ? 'var(--pri)' : active?.color }}
             >
-              <Icon name={active?.icon} className="size-[18px]" />
+              <Icon name={active?.icon} className="size-[calc(18px*var(--app-scale))]" />
             </span>
             {!collapsed && active && (
               <>
@@ -66,12 +66,12 @@ export function SubsystemSwitcher({
             )}
           </button>
         ) : (
-          <button className="flex h-9 items-center gap-[9px] rounded-7 pl-2.5 pr-3 hover:bg-pri-soft">
+          <button className="flex h-9 items-center gap-[calc(9px*var(--app-scale))] rounded-7 pl-2.5 pr-3 hover:bg-pri-soft">
             <span
               className="flex size-6 shrink-0 items-center justify-center rounded-6 text-white"
               style={{ background: active?.builtin ? 'var(--pri)' : active?.color }}
             >
-              <Icon name={active?.icon} className="size-[15px]" />
+              <Icon name={active?.icon} className="size-[calc(15px*var(--app-scale))]" />
             </span>
             <span className="text-sm font-semibold text-text">
               {active ? lv(active.label, i18n.language) : ''}
@@ -85,9 +85,9 @@ export function SubsystemSwitcher({
       <PopoverContent
         align="start"
         sideOffset={variant === 'brand' ? 6 : 8}
-        className={cn(variant === 'brand' ? 'w-[320px] p-3' : 'w-[500px] p-4')}
+        className={cn(variant === 'brand' ? 'w-[calc(320px*var(--app-scale))] p-3' : 'w-[calc(500px*var(--app-scale))] p-4')}
       >
-        <div className="px-1 pb-3 pt-0.5 text-[13px] font-semibold text-text-2">
+        <div className="px-1 pb-3 pt-0.5 text-[calc(13px*var(--app-scale))] font-semibold text-text-2">
           {t('shell.switcher.title')}
         </div>
         <div className={cn(variant === 'brand' ? 'flex flex-col gap-2' : 'grid grid-cols-2 gap-2.5')}>
@@ -122,7 +122,7 @@ export function SubsystemSwitcher({
                   </div>
                 </div>
                 {soon && (
-                  <span className="absolute right-2 top-2 rounded-4 bg-surface-2 px-1.5 py-px text-[10px] text-text-3">
+                  <span className="absolute right-2 top-2 rounded-4 bg-surface-2 px-1.5 py-px text-[calc(10px*var(--app-scale))] text-text-3">
                     {t('shell.switcher.soon')}
                   </span>
                 )}

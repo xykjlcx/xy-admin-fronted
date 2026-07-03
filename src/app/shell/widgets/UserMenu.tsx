@@ -50,55 +50,55 @@ export function UserMenu() {
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2.5 rounded-8 px-2 py-1 hover:bg-surface-2">
-          <Avatar className="size-[30px] rounded-8">
-            <AvatarFallback className="rounded-8 bg-pri text-[13px] font-semibold text-white">
+          <Avatar className="size-[calc(30px*var(--app-scale))] rounded-8">
+            <AvatarFallback className="rounded-8 bg-pri text-[calc(13px*var(--app-scale))] font-semibold text-white">
               {initial}
             </AvatarFallback>
           </Avatar>
           <div className="text-left leading-tight">
-            <div className="text-[13px] font-semibold text-text">{me.user.name}</div>
-            <div className="text-[11px] text-text-3">{me.roles[0] ?? ''}</div>
+            <div className="text-[calc(13px*var(--app-scale))] font-semibold text-text">{me.user.name}</div>
+            <div className="text-[calc(11px*var(--app-scale))] text-text-3">{me.roles[0] ?? ''}</div>
           </div>
           <ChevronDown
             className={cn('size-3.5 text-text-3 transition-transform', open && 'rotate-180')}
           />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={8} className="w-[280px] overflow-hidden p-0">
-        <div className="flex items-center gap-3 p-[18px] pb-4">
+      <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(280px*var(--app-scale))] overflow-hidden p-0">
+        <div className="flex items-center gap-3 p-[calc(18px*var(--app-scale))] pb-4">
           <Avatar className="size-11 rounded-11">
             <AvatarFallback className="rounded-11 bg-pri text-base font-semibold text-white">
               {initial}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <div className="text-[15px] font-semibold text-text">{me.user.name}</div>
+            <div className="text-[calc(15px*var(--app-scale))] font-semibold text-text">{me.user.name}</div>
             <div className="mt-0.5 truncate text-xs text-text-3">{me.user.username}</div>
           </div>
         </div>
         <DropdownMenuSeparator className="my-0" />
         <DropdownMenuGroup className="p-1.5">
-          <DropdownMenuItem onClick={stub} className="h-[42px] gap-3 px-3">
+          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
             <User />
             {t('shell.user.profile')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={stub} className="h-[42px] gap-3 px-3">
+          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
             <Settings />
             {t('shell.user.account')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={stub} className="h-[42px] gap-3 px-3">
+          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
             <KeyRound />
             {t('shell.user.changePassword')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={stub} className="h-[42px] gap-3 px-3">
+          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
             <Languages />
             {t('shell.user.language')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={stub} className="h-[42px] gap-3 px-3">
+          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
             <UserCog />
             {t('shell.user.switchAccount')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={stub} className="h-[42px] gap-3 px-3">
+          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
             <HelpCircle />
             {t('shell.user.help')}
           </DropdownMenuItem>
@@ -108,7 +108,7 @@ export function UserMenu() {
           <DropdownMenuItem
             variant="destructive"
             onClick={() => void logout()}
-            className="h-[42px] gap-3 px-3"
+            className="h-[calc(42px*var(--app-scale))] gap-3 px-3"
           >
             <LogOut />
             {t('shell.user.logout')}

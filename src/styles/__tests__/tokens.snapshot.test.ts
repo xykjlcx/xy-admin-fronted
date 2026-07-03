@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 
 const css = readFileSync('src/styles/tokens.css', 'utf8');
+const globalCss = readFileSync('src/styles/global.css', 'utf8');
 
 // 权威值表：原型 L4796-4805 逐字对照，全表逐值断言（tokens.css 全部变量声明，无抽样遗漏）。
 // 静态硬编码，非运行时从 tokens.css 提取——否则文件怎么改断言都跟着变，失去守护意义。
@@ -64,44 +65,55 @@ const MUST_CONTAIN = [
   '--danger: #f53f3f;',
   '--danger-soft: #feecec;',
   '--radius-factor: 1;',
-  '--radius-sm: calc(6px * var(--radius-factor));',
-  '--radius-md: calc(8px * var(--radius-factor));',
-  '--radius-lg: calc(12px * var(--radius-factor));',
-  '--radius-xl: calc(14px * var(--radius-factor));',
+  '--radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));',
+  '--radius-md: calc(8px * var(--radius-factor) * var(--app-scale));',
+  '--radius-lg: calc(12px * var(--radius-factor) * var(--app-scale));',
+  '--radius-xl: calc(14px * var(--radius-factor) * var(--app-scale));',
   // [data-radius='sharp'] / [data-radius='round']
   '--radius-factor: 0.28;',
   '--radius-factor: 1.55;',
 ];
 test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain(t));
 
-test('zoom 反向系数三档（防 CSS zoom 不缩放 vh 的留白/整页滚动，Shell 根 h-app 消费）', () => {
-  expect(css).toContain('--zoom-inverse: 1;'); // 默认档（分号防 1.1112 前缀误命中）
-  expect(css).toContain('--zoom-inverse: 1.1112;'); // sm = 1/0.9
-  expect(css).toContain('--zoom-inverse: 0.926;'); // lg = 1/1.08
+test('显示比例三档走 --app-scale token 乘法，不再使用 CSS zoom 反向补偿', () => {
+  expect(css).toContain(':root { --app-scale: 1; }');
+  expect(css).toContain("[data-zoom='sm'] { --app-scale: 0.9; }");
+  expect(css).toContain("[data-zoom='lg'] { --app-scale: 1.08; }");
+  expect(css).not.toContain('--zoom-inverse');
+  expect(globalCss).not.toMatch(/html\[data-zoom=.*\]\s+#root\s*\{\s*zoom:/);
+  expect(globalCss).not.toContain('.h-app');
+});
+
+test('显示比例基础层覆盖 Tailwind spacing 与 text token', () => {
+  expect(globalCss).toContain('--spacing: calc(0.25rem * var(--app-scale));');
+  expect(globalCss).toContain('--text-xs: calc(0.75rem * var(--app-scale));');
+  expect(globalCss).toContain('--text-sm: calc(0.875rem * var(--app-scale));');
+  expect(globalCss).toContain('--text-base: calc(1rem * var(--app-scale));');
+  expect(globalCss).toContain('--text-lg: calc(1.125rem * var(--app-scale));');
 });
 
 test('圆角因子三档 + 四条 calc 公式', () => {
   expect(css).toContain('--radius-factor: 1;'); // 默认档
   expect(css).toContain('--radius-factor: 0.28;'); // sharp
   expect(css).toContain('--radius-factor: 1.55;'); // round
-  expect(css).toContain('--radius-sm: calc(6px * var(--radius-factor));');
-  expect(css).toContain('--radius-md: calc(8px * var(--radius-factor));');
-  expect(css).toContain('--radius-lg: calc(12px * var(--radius-factor));');
-  expect(css).toContain('--radius-xl: calc(14px * var(--radius-factor));');
+  expect(css).toContain('--radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-md: calc(8px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-lg: calc(12px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-xl: calc(14px * var(--radius-factor) * var(--app-scale));');
 });
 
 // 圆角数字全档（原型精确 7/9/11 档，取最近 sm/md/lg/xl 会失真）。每条含完整 calc 串防前缀碰撞。
 test('圆角数字全档 10 档 calc 公式', () => {
-  expect(css).toContain('--radius-4: calc(4px * var(--radius-factor));');
-  expect(css).toContain('--radius-5: calc(5px * var(--radius-factor));');
-  expect(css).toContain('--radius-6: calc(6px * var(--radius-factor));');
-  expect(css).toContain('--radius-7: calc(7px * var(--radius-factor));');
-  expect(css).toContain('--radius-8: calc(8px * var(--radius-factor));');
-  expect(css).toContain('--radius-9: calc(9px * var(--radius-factor));');
-  expect(css).toContain('--radius-10: calc(10px * var(--radius-factor));');
-  expect(css).toContain('--radius-11: calc(11px * var(--radius-factor));');
-  expect(css).toContain('--radius-12: calc(12px * var(--radius-factor));');
-  expect(css).toContain('--radius-14: calc(14px * var(--radius-factor));');
+  expect(css).toContain('--radius-4: calc(4px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-5: calc(5px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-6: calc(6px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-7: calc(7px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-8: calc(8px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-9: calc(9px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-10: calc(10px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-11: calc(11px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-12: calc(12px * var(--radius-factor) * var(--app-scale));');
+  expect(css).toContain('--radius-14: calc(14px * var(--radius-factor) * var(--app-scale));');
 });
 
 // Tooltip 恒深底白字 token（原型 .hicon-tip L32 background #1f2329，明暗都不反转）。

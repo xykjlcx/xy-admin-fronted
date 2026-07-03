@@ -16,7 +16,7 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
 
   return (
     <>
-      <nav className="h-app flex w-[76px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-border bg-chrome py-2.5">
+      <nav className="h-screen flex w-[calc(76px*var(--app-scale))] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-border bg-chrome py-2.5">
         {groups.map((g) => {
           const active = g === activeGroup;
           const first = g.pages[0];
@@ -25,20 +25,20 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
               key={g.node.id}
               onClick={() => first?.path && nav({ to: first.path })}
               className={cn(
-                'flex w-[60px] flex-col items-center gap-[5px] rounded-10 py-2.5',
+                'flex w-[calc(60px*var(--app-scale))] flex-col items-center gap-[calc(5px*var(--app-scale))] rounded-10 py-2.5',
                 active ? 'bg-pri-soft text-pri' : 'text-text-3 hover:bg-bg',
               )}
             >
               <Icon name={g.node.icon} className="size-5" />
-              <span className="text-center text-[11px] leading-none">
+              <span className="text-center text-[calc(11px*var(--app-scale))] leading-none">
                 {lv(g.node.shortLabel ?? g.node.label, i18n.language)}
               </span>
             </button>
           );
         })}
       </nav>
-      <aside className="h-app flex w-[192px] shrink-0 flex-col overflow-y-auto border-r border-border bg-chrome py-4">
-        <div className="px-5 pb-3 text-[15px] font-bold text-text">
+      <aside className="h-screen flex w-[calc(192px*var(--app-scale))] shrink-0 flex-col overflow-y-auto border-r border-border bg-chrome py-4">
+        <div className="px-5 pb-3 text-[calc(15px*var(--app-scale))] font-bold text-text">
           {activeGroup ? lv(activeGroup.node.label, i18n.language) : ''}
         </div>
         <div className="px-2">
@@ -48,7 +48,7 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
                 key={p.id}
                 to={p.path}
                 className={cn(
-                  'my-0.5 flex h-[38px] items-center rounded-8 px-3.5 text-sm',
+                  'my-0.5 flex h-[calc(38px*var(--app-scale))] items-center rounded-8 px-3.5 text-sm',
                   pathname === p.path
                     ? 'bg-pri-soft font-semibold text-pri'
                     : 'text-text-2 hover:bg-surface-2',

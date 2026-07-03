@@ -20,7 +20,7 @@ export function NotificationBell() {
         >
           <Bell className="size-5" />
           {UNREAD > 0 && (
-            <span className="absolute right-1 top-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full border-[1.5px] border-surface bg-danger px-1 text-[10px] font-semibold text-white">
+            <span className="absolute right-1 top-1 flex h-[calc(15px*var(--app-scale))] min-w-[calc(15px*var(--app-scale))] items-center justify-center rounded-full border-[1.5px] border-surface bg-danger px-1 text-[calc(10px*var(--app-scale))] font-semibold text-white">
               {UNREAD}
             </span>
           )}

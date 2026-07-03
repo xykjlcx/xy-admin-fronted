@@ -25,7 +25,7 @@ export function NavMenuSidebar({
 
   const leafClass = (active: boolean) =>
     cn(
-      'mx-2 my-px flex h-[38px] items-center rounded-8 pl-11 pr-3 text-sm',
+      'mx-2 my-px flex h-[calc(38px*var(--app-scale))] items-center rounded-8 pl-11 pr-3 text-sm',
       active ? 'bg-pri-soft font-semibold text-pri' : 'text-text-2 hover:bg-surface-2',
     );
 
@@ -43,13 +43,13 @@ export function NavMenuSidebar({
                 key={node.id}
                 to={node.path}
                 className={cn(
-                  'mx-2 mb-0.5 flex h-[42px] items-center gap-2.5 rounded-8 px-4 text-sm font-medium',
+                  'mx-2 mb-0.5 flex h-[calc(42px*var(--app-scale))] items-center gap-2.5 rounded-8 px-4 text-sm font-medium',
                   active ? 'bg-pri-soft text-pri' : 'text-text-2 hover:bg-bg',
                   collapsed && 'justify-center px-0',
                 )}
                 title={collapsed ? lv(node.label, i18n.language) : undefined}
               >
-                <Icon name={node.icon} className="size-[18px] shrink-0" />
+                <Icon name={node.icon} className="size-[calc(18px*var(--app-scale))] shrink-0" />
                 {!collapsed && <span className="flex-1 truncate">{lv(node.label, i18n.language)}</span>}
               </Link>
             );
@@ -61,12 +61,12 @@ export function NavMenuSidebar({
               <button
                 onClick={() => toggleDir(node.id)}
                 className={cn(
-                  'mx-2 flex h-[42px] w-[calc(100%-16px)] items-center gap-2.5 rounded-8 px-4 text-sm font-medium text-text-2 hover:bg-bg',
+                  'mx-2 flex h-[calc(42px*var(--app-scale))] w-[calc(100%-16px)] items-center gap-2.5 rounded-8 px-4 text-sm font-medium text-text-2 hover:bg-bg',
                   collapsed && 'justify-center px-0',
                 )}
                 title={collapsed ? lv(node.label, i18n.language) : undefined}
               >
-                <Icon name={node.icon} className="size-[18px] shrink-0" />
+                <Icon name={node.icon} className="size-[calc(18px*var(--app-scale))] shrink-0" />
                 {!collapsed && (
                   <>
                     <span className="flex-1 truncate text-left">{lv(node.label, i18n.language)}</span>
@@ -105,9 +105,9 @@ export function NavMenuSidebar({
       </nav>
       <button
         onClick={onToggle}
-        className="flex h-11 shrink-0 items-center gap-2.5 border-t border-border px-5 text-[13px] text-text-3 hover:text-pri"
+        className="flex h-11 shrink-0 items-center gap-2.5 border-t border-border px-5 text-[calc(13px*var(--app-scale))] text-text-3 hover:text-pri"
       >
-        <Menu className="size-[18px] shrink-0" />
+        <Menu className="size-[calc(18px*var(--app-scale))] shrink-0" />
         {!collapsed && <span>{t('shell.nav.collapse')}</span>}
       </button>
     </>

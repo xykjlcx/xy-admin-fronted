@@ -30,8 +30,8 @@ export function LanguageMenu() {
           <Globe className="size-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={8} className="w-[200px] rounded-12 p-1.5">
-        <div className="px-2.5 pb-1.5 pt-2 text-[11px] font-semibold text-text-3">
+      <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(200px*var(--app-scale))] rounded-12 p-1.5">
+        <div className="px-2.5 pb-1.5 pt-2 text-[calc(11px*var(--app-scale))] font-semibold text-text-3">
           {t('shell.language')}
         </div>
         {LANGS.map((l) => {
@@ -48,7 +48,7 @@ export function LanguageMenu() {
               <span className="text-base">{l.flag}</span>
               <div className="min-w-0 flex-1">
                 <div className="text-sm text-text">{l.label}</div>
-                <div className="text-[11px] text-text-3">{l.sub}</div>
+                <div className="text-[calc(11px*var(--app-scale))] text-text-3">{l.sub}</div>
               </div>
               {active && <Check className="size-4 shrink-0 text-pri" />}
             </DropdownMenuItem>

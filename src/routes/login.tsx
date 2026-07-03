@@ -32,9 +32,9 @@ function LoginPage() {
     }
   });
   return (
-    <div className="flex h-app items-center justify-center bg-bg">
-      <form onSubmit={onSubmit} className="w-[360px] rounded-lg border border-border bg-surface p-8">
-        <h1 className="mb-6 text-[22px] font-semibold text-text">{t('app.name')}</h1>
+    <div className="flex h-screen items-center justify-center bg-bg">
+      <form onSubmit={onSubmit} className="w-[calc(360px*var(--app-scale))] rounded-lg border border-border bg-surface p-8">
+        <h1 className="mb-6 text-[calc(22px*var(--app-scale))] font-semibold text-text">{t('app.name')}</h1>
         <input
           {...register('username')}
           placeholder={t('auth.username')}
@@ -47,7 +47,7 @@ function LoginPage() {
           className="mb-4 h-10 w-full rounded-md border border-border bg-surface-2 px-3 text-text"
         />
         {formState.errors.root && (
-          <p className="mb-3 text-[12px] text-danger">{formState.errors.root.message}</p>
+          <p className="mb-3 text-[calc(12px*var(--app-scale))] text-danger">{formState.errors.root.message}</p>
         )}
         <button className="h-10 w-full rounded-md bg-pri text-white hover:bg-pri-hover">
           {t('auth.login')}

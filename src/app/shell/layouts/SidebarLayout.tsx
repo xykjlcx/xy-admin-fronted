@@ -21,21 +21,21 @@ export function SidebarLayout({
 }: ShellLayoutProps) {
   const { t } = useTranslation();
   return (
-    <div className="h-app relative flex w-full flex-col overflow-hidden bg-bg text-text">
+    <div className="h-screen relative flex w-full flex-col overflow-hidden bg-bg text-text">
       <ShellHeader
         left={
           <>
-            <div className="flex w-[212px] shrink-0 items-center gap-2.5">
+            <div className="flex w-[calc(212px*var(--app-scale))] shrink-0 items-center gap-2.5">
               <span
-                className="flex size-[30px] shrink-0 items-center justify-center rounded-8 text-white"
+                className="flex size-[calc(30px*var(--app-scale))] shrink-0 items-center justify-center rounded-8 text-white"
                 style={{
                   background:
                     'linear-gradient(135deg, var(--pri), color-mix(in srgb, var(--pri) 60%, white))',
                 }}
               >
-                <LayoutGrid className="size-[18px]" />
+                <LayoutGrid className="size-[calc(18px*var(--app-scale))]" />
               </span>
-              <span className="truncate text-[17px] font-bold tracking-wide text-text">
+              <span className="truncate text-[calc(17px*var(--app-scale))] font-bold tracking-wide text-text">
                 {t('app.name')}
               </span>
             </div>
@@ -54,7 +54,7 @@ export function SidebarLayout({
         <aside
           className={cn(
             'flex shrink-0 flex-col border-r border-border bg-chrome pt-14 transition-[width] duration-200',
-            collapsed ? 'w-16' : 'w-[232px]',
+            collapsed ? 'w-16' : 'w-[calc(232px*var(--app-scale))]',
           )}
         >
           <NavMenuSidebar
