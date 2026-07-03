@@ -57,14 +57,16 @@ export function resetDb() {
   idSeq = 0;
 }
 
-// mock 会话（token -> userId）借 sessionStorage 跨刷新保活：db 是随模块重新求值而清零的内存对象，
+// mock 会话（token -> userId）借 localStorage 跨刷新保活：db 是随模块重新求值而清零的内存对象，
 // 若会话只存在内存里，浏览器刷新会让所有已登录 token 瞬间失效（表现为"刷新即被踢回登录页"），
 // 而真实后端的会话不会因客户端刷新而失效——这里让 mock 行为向真实后端对齐。
+// 用 localStorage 而非 sessionStorage：与 zustand persist 存 token 的存储域保持一致（多 tab 共享、
+// 重启浏览器后仍保活），否则会出现"token 跨 tab 有效但 session 只在开 tab 里查得到"的域错配。
 const SESSION_STORAGE_KEY = 'mock-sessions';
 
 function loadSessions(): Map<string, string> {
   try {
-    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    const raw = localStorage.getItem(SESSION_STORAGE_KEY);
     return raw ? new Map(JSON.parse(raw) as [string, string][]) : new Map();
   } catch {
     return new Map();
@@ -73,11 +75,21 @@ function loadSessions(): Map<string, string> {
 
 function createSessionStore() {
   const map = loadSessions();
-  const persist = () => sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify([...map]));
+  const persist = () => {
+    try {
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify([...map]));
+    } catch {
+      // 写失败（隐私模式/配额满）静默降级为纯内存，与读侧 loadSessions 的守护对称
+    }
+  };
   return {
     get: (token: string) => map.get(token),
     set: (token: string, userId: string) => {
       map.set(token, userId);
+      persist();
+    },
+    remove: (token: string) => {
+      map.delete(token);
       persist();
     },
     clear: () => {

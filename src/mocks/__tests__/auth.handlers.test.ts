@@ -34,3 +34,28 @@ test('无 token 访问 me → 401', async () => {
   const res = await fetch('/api/auth/me');
   expect(res.status).toBe(401);
 });
+
+test('登出后旧 token 失效，再访问 me → 401', async () => {
+  const login = await (
+    await fetch('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username: 'admin', password: 'admin123' }),
+    })
+  ).json();
+  const token = login.data.token as string;
+  const logoutRes = await fetch('/api/auth/logout', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  expect(logoutRes.status).toBe(200);
+  const me = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+  expect(me.status).toBe(401);
+});
+
+test('会话持久化到 localStorage（与 token 存储域一致，多 tab/重启共享）', async () => {
+  await fetch('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username: 'admin', password: 'admin123' }),
+  });
+  expect(localStorage.getItem('mock-sessions')).not.toBeNull();
+});

@@ -27,13 +27,13 @@ export function InsetLayout({
         collapsed={collapsed}
         onToggle={() => onCollapsedChange(!collapsed)}
       />
-      <div className="relative m-2 ml-0 flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.05)]">
+      <div className="relative m-2 ml-0 flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-inset-card">
         <ShellHeader
           left={
             <Button
               variant="ghost"
               size="icon"
-              className="text-text-2"
+              className="text-text-2 hover:text-text-2"
               onClick={() => onCollapsedChange(!collapsed)}
               aria-label={t('shell.nav.collapse')}
             >

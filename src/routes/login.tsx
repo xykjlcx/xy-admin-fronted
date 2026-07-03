@@ -25,7 +25,8 @@ function LoginPage() {
       const { token } = await authApi.login(dto);
       resetAuth(token); // 清上个账号的 me 缓存 + 存新 token，防权限串号
       await router.invalidate(); // 关键：登录后 beforeLoad 不会自动重跑（spec §9）
-      void nav({ to: to ?? '/admin/dashboard' });
+      // to 来自守卫写入的 location.href，可能带 ?query；用 href 而非 to，避免整串被当 pathname 解析导致 404
+      void nav({ href: to ?? '/admin/dashboard' });
     } catch (e) {
       setError('root', { message: (e as Error).message });
     }

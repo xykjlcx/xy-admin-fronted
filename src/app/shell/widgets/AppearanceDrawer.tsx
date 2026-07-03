@@ -163,7 +163,7 @@ export function AppearanceDrawer() {
                 >
                   {accent === a.key && <Check className="size-[17px] text-white" />}
                 </span>
-                <span className="text-[10px] text-text-3">{a.label}</span>
+                <span className="text-[10px] text-text-3">{dk(a.labelKey)}</span>
               </button>
             ))}
             <label className="flex cursor-pointer flex-col items-center gap-1.5">

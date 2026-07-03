@@ -30,7 +30,7 @@ export function ShellHeader({
       className={cn(
         'absolute inset-x-0 top-0 z-20 flex h-14 items-center gap-[18px] border-b border-border px-5 transition-[background-color,box-shadow,border-color] duration-200',
         scrolled
-          ? 'bg-surface-blur shadow-[0_1px_12px_rgba(0,0,0,0.06)] backdrop-blur-[14px] backdrop-saturate-[1.6]'
+          ? 'bg-surface-blur shadow-header backdrop-blur-[14px] backdrop-saturate-[1.6]'
           : transparentUntilScroll
             ? 'bg-transparent'
             : 'bg-chrome',

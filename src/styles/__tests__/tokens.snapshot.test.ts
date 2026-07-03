@@ -116,7 +116,10 @@ test('弹层阴影 token 与原型精确值一致', () => {
   expect(css).toContain('--shadow-drawer: -8px 0 32px rgba(0, 0, 0, 0.14);');
   expect(css).toContain('--shadow-tooltip: 0 4px 14px rgba(0, 0, 0, 0.18);');
   expect(css).toContain('--shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);');
+  expect(css).toContain('--shadow-card-sm: 0 1px 2px rgba(0, 0, 0, 0.06);');
+  expect(css).toContain('--shadow-inset-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.05);');
   expect(css).toContain('--shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.08);');
+  expect(css).toContain('--shadow-header: 0 1px 12px rgba(0, 0, 0, 0.06);');
 });
 
 // 锁 FOUC 脚本与 store 的契约不被静默删除：localStorage key 'appearance' + dataset.flavor/mode 写入，

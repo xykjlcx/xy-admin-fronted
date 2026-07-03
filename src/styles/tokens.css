@@ -52,15 +52,18 @@
   --radius-14: calc(14px * var(--radius-factor));
   /* 弹层/悬浮阴影 token（原型 box-shadow 精确值，见直方图）：
      menu/popover 0 12px 40px .16、modal 0 16px 48px .18、drawer -8px 0 32px .14、
-     tooltip 0 4px 14px .18、card 0 1px 3px .03、inset 浮起卡、lifted 项 0 1px 2px .08。
+     tooltip 0 4px 14px .18、card 0 1px 3px .03、inset 浮起卡、lifted 项 0 1px 2px .08、
+     header 滚动态 0 1px 12px .06、小卡片（子系统切换器品牌位）0 1px 2px .06。
      rgba 黑色与主题无关，故 :root 一次定义；组件禁写 shadow-[...] 任意值，统一用 shadow-popover 等 token。 */
   --shadow-popover: 0 12px 40px rgba(0, 0, 0, 0.16);
   --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.18);
   --shadow-drawer: -8px 0 32px rgba(0, 0, 0, 0.14);
   --shadow-tooltip: 0 4px 14px rgba(0, 0, 0, 0.18);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);
+  --shadow-card-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow-inset-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.05);
   --shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-header: 0 1px 12px rgba(0, 0, 0, 0.06);
 }
 [data-radius='sharp'] { --radius-factor: 0.28; }
 [data-radius='round'] { --radius-factor: 1.55; }

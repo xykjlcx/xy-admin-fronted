@@ -7,11 +7,13 @@ export type Mode = 'light' | 'dark';
 export type Zoom = 'sm' | 'md' | 'lg';
 export type Radius = 'sharp' | 'default' | 'round';
 
+// labelKey 对应 shell.appearanceDrawer.<labelKey> 词条（同 FLAVOR_OPTS 的 label/desc 走 i18n 的模式），
+// 不在此处硬编码中文——色名随语言切换，不能像 hex 值一样当常量数据处理。
 export const ACCENTS = [
-  { key: 'blue', label: '经典蓝', pri: '#3370ff', soft: '#eef3ff' },
-  { key: 'claude', label: '陶土橙', pri: '#c96442', soft: '#f8ede7' },
-  { key: 'green', label: '深绿', pri: '#16a34a', soft: '#e8f7ee' },
-  { key: 'violet', label: '紫罗兰', pri: '#7c3aed', soft: '#f3edff' },
+  { key: 'blue', labelKey: 'accentBlue', pri: '#3370ff', soft: '#eef3ff' },
+  { key: 'claude', labelKey: 'accentClaude', pri: '#c96442', soft: '#f8ede7' },
+  { key: 'green', labelKey: 'accentGreen', pri: '#16a34a', soft: '#e8f7ee' },
+  { key: 'violet', labelKey: 'accentViolet', pri: '#7c3aed', soft: '#f3edff' },
 ] as const;
 export type AccentKey = (typeof ACCENTS)[number]['key'] | 'custom';
 

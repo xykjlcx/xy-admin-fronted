@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
@@ -36,12 +37,12 @@ export function LanguageMenu() {
         {LANGS.map((l) => {
           const active = current === l.code;
           return (
-            <button
+            <DropdownMenuItem
               key={l.code}
-              onClick={() => choose(l.code)}
+              onSelect={() => choose(l.code)}
               className={cn(
-                'flex h-11 w-full items-center gap-2.5 rounded-8 px-2.5 text-left',
-                active ? 'bg-pri-soft' : 'hover:bg-surface-2',
+                'h-11 gap-2.5 rounded-8 px-2.5',
+                active ? 'bg-pri-soft focus:bg-pri-soft' : 'focus:bg-surface-2',
               )}
             >
               <span className="text-base">{l.flag}</span>
@@ -50,7 +51,7 @@ export function LanguageMenu() {
                 <div className="text-[11px] text-text-3">{l.sub}</div>
               </div>
               {active && <Check className="size-4 shrink-0 text-pri" />}
-            </button>
+            </DropdownMenuItem>
           );
         })}
       </DropdownMenuContent>

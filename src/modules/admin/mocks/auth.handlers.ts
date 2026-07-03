@@ -19,5 +19,9 @@ export const authHandlers = [
     const { password: _password, ...safe } = user;
     return ok({ user: safe, roles: user.roles, permissions: user.permissions });
   }),
-  http.post('/api/auth/logout', () => ok(null)),
+  http.post('/api/auth/logout', ({ request }) => {
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    if (token) db.sessions.remove(token);
+    return ok(null);
+  }),
 ];

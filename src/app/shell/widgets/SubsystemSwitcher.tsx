@@ -42,7 +42,7 @@ export function SubsystemSwitcher({
               'flex w-full items-center gap-2.5',
               collapsed
                 ? 'justify-center'
-                : 'rounded-10 bg-surface px-2.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.06)]',
+                : 'rounded-10 bg-surface px-2.5 py-2 shadow-card-sm',
             )}
           >
             <span

@@ -48,9 +48,14 @@ test('applyAppearance 写入 dataset.flavor/mode', () => {
   expect(document.documentElement.dataset.mode).toBe('dark');
 });
 
-// Task 14 待办①：ACCENTS 补 label 字段
-test('ACCENTS 四预设均有中文 label', () => {
-  expect(ACCENTS.map((a) => a.label)).toEqual(['经典蓝', '陶土橙', '深绿', '紫罗兰']);
+// ACCENTS 色名走 i18n key（不硬编码中文，随语言切换），labelKey 对应 shell.appearanceDrawer.<labelKey> 词条
+test('ACCENTS 四预设均有 labelKey（非硬编码中文）', () => {
+  expect(ACCENTS.map((a) => a.labelKey)).toEqual([
+    'accentBlue',
+    'accentClaude',
+    'accentGreen',
+    'accentViolet',
+  ]);
 });
 
 // Task 14 待办②：自定义取色 hex 校验

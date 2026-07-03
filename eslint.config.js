@@ -40,6 +40,10 @@ export default tseslint.config(
           selector: "Literal[value=/rounded-\\[/]",
           message: '禁止任意圆角值，使用 rounded-sm/md/lg/xl（乘法 token）',
         },
+        {
+          selector: "Literal[value=/shadow-\\[/]",
+          message: '禁止任意阴影值，使用 shadow-popover/modal/drawer/tooltip/card/lift 等语义 token',
+        },
       ],
     },
   },
