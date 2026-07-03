@@ -10,6 +10,8 @@
 
 **权威参照物：** 仓库内 `后台管理脚手架.dc.html`（下称"原型"）。执行任务时按行号区间对照提取精确样式；与 README.md 冲突时以原型代码为准。设计文档：`docs/superpowers/specs/2026-07-02-admin-scaffold-frontend-design.md`（下称"spec"）。
 
+> **2026-07-03 修订说明：** 本 plan 是执行期活文档，部分历史提交说明和 Task 片段会保留早期 `zoom` 字段名；字段名可以沿用为外观状态枚举，但实现层以当前 spec、AGENTS.md、`src/styles/tokens.css`、`src/styles/global.css` 为准。显示比例禁止恢复 CSS `zoom`、`--zoom-inverse`、`.h-app`，统一使用 `--app-scale` token 乘法；Tailwind 入口必须保留 `source('../')`，避免 docs/README/AGENTS 示例 class 进入生产 CSS。
+
 **全局纪律（每个 task 都要遵守）：**
 - 组件代码禁止十六进制色值/`rounded-[Npx]` 任意值——只用语义 token（Task 3 上 ESLint 规则）
 - 所有界面文案写 `t('<ns>.<key>')`，不写硬编码中文（词条同步写进 `locales/zh-CN/*.json`；en-US 本期只建文件不翻译）
@@ -147,10 +149,21 @@ pnpm add tailwindcss @tailwindcss/vite
   --danger: #f53f3f; --danger-soft: #feecec;
   /* 圆角乘法体系（spec §8.1）：sharp 0.28 / default 1 / round 1.55；显示比例另乘 --app-scale */
   --radius-factor: 1;
+  --radius-xs: calc(2px * var(--radius-factor) * var(--app-scale));
   --radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));
   --radius-md: calc(8px * var(--radius-factor) * var(--app-scale));   /* 输入/按钮 */
   --radius-lg: calc(12px * var(--radius-factor) * var(--app-scale));  /* 卡片 */
   --radius-xl: calc(14px * var(--radius-factor) * var(--app-scale));  /* 大卡 */
+  --radius-4: calc(4px * var(--radius-factor) * var(--app-scale));
+  --radius-5: calc(5px * var(--radius-factor) * var(--app-scale));
+  --radius-6: calc(6px * var(--radius-factor) * var(--app-scale));
+  --radius-7: calc(7px * var(--radius-factor) * var(--app-scale));
+  --radius-8: calc(8px * var(--radius-factor) * var(--app-scale));
+  --radius-9: calc(9px * var(--radius-factor) * var(--app-scale));
+  --radius-10: calc(10px * var(--radius-factor) * var(--app-scale));
+  --radius-11: calc(11px * var(--radius-factor) * var(--app-scale));
+  --radius-12: calc(12px * var(--radius-factor) * var(--app-scale));
+  --radius-14: calc(14px * var(--radius-factor) * var(--app-scale));
 }
 [data-radius='sharp'] { --radius-factor: 0.28; }
 [data-radius='round'] { --radius-factor: 1.55; }
@@ -164,7 +177,8 @@ pnpm add tailwindcss @tailwindcss/vite
 
 ```css
 /* src/styles/global.css */
-@import 'tailwindcss';
+@import 'tailwindcss' source('../');
+@import 'tw-animate-css';
 @import './tokens.css';
 
 @theme inline {
@@ -198,10 +212,15 @@ pnpm add tailwindcss @tailwindcss/vite
 html { font-family: var(--font-sans); }
 :root {
   --spacing: calc(0.25rem * var(--app-scale));
+  --container-sm: calc(24rem * var(--app-scale));
+  --container-lg: calc(32rem * var(--app-scale));
   --text-xs: calc(0.75rem * var(--app-scale));
   --text-sm: calc(0.875rem * var(--app-scale));
   --text-base: calc(1rem * var(--app-scale));
   --text-lg: calc(1.125rem * var(--app-scale));
+  --text-xl: calc(1.25rem * var(--app-scale));
+  --text-2xl: calc(1.5rem * var(--app-scale));
+  --text-3xl: calc(1.875rem * var(--app-scale));
 }
 body { margin: 0; background: var(--bg); color: var(--text); font-size: calc(14px * var(--app-scale));
   -webkit-font-smoothing: antialiased; }
@@ -306,7 +325,7 @@ Run: `pnpm test` → 4 passed。
 - [ ] **Step 7: Commit**
 
 ```bash
-git add -A && git commit -m "feat: 主题 token 体系（FLAVORS 权威值 + 耦合矩阵 + zoom + 圆角因子 + FOUC）"
+git add -A && git commit -m "feat: 主题 token 体系（FLAVORS 权威值 + 耦合矩阵 + app-scale + 圆角因子 + FOUC）"
 ```
 
 ### Task 3: token 快照测试 + ESLint 铁律规则
