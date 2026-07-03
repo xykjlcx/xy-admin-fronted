@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as R403RouteImport } from './routes/403'
 import { Route as AuthAdminUsersRouteImport } from './routes/_auth/admin/users'
 import { Route as AuthAdminRolesRouteImport } from './routes/_auth/admin/roles'
+import { Route as AuthAdminMenusRouteImport } from './routes/_auth/admin/menus'
 import { Route as AuthAdminDashboardRouteImport } from './routes/_auth/admin/dashboard'
 
 const LoginRoute = LoginRouteImport.update({
@@ -40,6 +41,11 @@ const AuthAdminRolesRoute = AuthAdminRolesRouteImport.update({
   path: '/admin/roles',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthAdminMenusRoute = AuthAdminMenusRouteImport.update({
+  id: '/admin/menus',
+  path: '/admin/menus',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthAdminDashboardRoute = AuthAdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/dashboard': typeof AuthAdminDashboardRoute
+  '/admin/menus': typeof AuthAdminMenusRoute
   '/admin/roles': typeof AuthAdminRolesRoute
   '/admin/users': typeof AuthAdminUsersRoute
 }
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/dashboard': typeof AuthAdminDashboardRoute
+  '/admin/menus': typeof AuthAdminMenusRoute
   '/admin/roles': typeof AuthAdminRolesRoute
   '/admin/users': typeof AuthAdminUsersRoute
 }
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/_auth/admin/dashboard': typeof AuthAdminDashboardRoute
+  '/_auth/admin/menus': typeof AuthAdminMenusRoute
   '/_auth/admin/roles': typeof AuthAdminRolesRoute
   '/_auth/admin/users': typeof AuthAdminUsersRoute
 }
@@ -78,6 +87,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/admin/dashboard'
+    | '/admin/menus'
     | '/admin/roles'
     | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
@@ -86,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/admin/dashboard'
+    | '/admin/menus'
     | '/admin/roles'
     | '/admin/users'
   id:
@@ -94,6 +105,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/login'
     | '/_auth/admin/dashboard'
+    | '/_auth/admin/menus'
     | '/_auth/admin/roles'
     | '/_auth/admin/users'
   fileRoutesById: FileRoutesById
@@ -141,6 +153,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAdminRolesRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/admin/menus': {
+      id: '/_auth/admin/menus'
+      path: '/admin/menus'
+      fullPath: '/admin/menus'
+      preLoaderRoute: typeof AuthAdminMenusRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/admin/dashboard': {
       id: '/_auth/admin/dashboard'
       path: '/admin/dashboard'
@@ -153,12 +172,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthAdminDashboardRoute: typeof AuthAdminDashboardRoute
+  AuthAdminMenusRoute: typeof AuthAdminMenusRoute
   AuthAdminRolesRoute: typeof AuthAdminRolesRoute
   AuthAdminUsersRoute: typeof AuthAdminUsersRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthAdminDashboardRoute: AuthAdminDashboardRoute,
+  AuthAdminMenusRoute: AuthAdminMenusRoute,
   AuthAdminRolesRoute: AuthAdminRolesRoute,
   AuthAdminUsersRoute: AuthAdminUsersRoute,
 }

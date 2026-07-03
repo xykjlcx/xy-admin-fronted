@@ -219,5 +219,87 @@
       "permissionsSaved": "权限已保存",
       "adminCreated": "管理员角色已创建"
     }
+  },
+  "menus": {
+    "title": "菜单管理",
+    "breadcrumbGroup": "组织与权限",
+    "refreshing": "正在更新",
+    "searchPlaceholder": "搜索菜单名称、路由、权限标识",
+    "treeTitle": "{{subsystem}} · 菜单树",
+    "stats": "目录 {{dirs}} · 菜单 {{menus}} · 动作 {{actions}} · 隐藏 {{hidden}}",
+    "subsystems": {
+      "title": "子系统管理",
+      "desc": "菜单按子系统隔离；当前阶段子系统由代码注册",
+      "builtin": "内置",
+      "menuCount": "{{count}} 个菜单节点"
+    },
+    "types": {
+      "dir": "目录",
+      "menu": "菜单",
+      "action": "动作"
+    },
+    "columns": {
+      "name": "菜单名称",
+      "path": "路由路径",
+      "type": "类型",
+      "permission": "权限标识",
+      "visible": "显示",
+      "actions": "操作"
+    },
+    "actions": {
+      "create": "新增菜单",
+      "expand": "展开",
+      "collapse": "折叠",
+      "edit": "编辑",
+      "delete": "删除",
+      "addChild": "添加子节点",
+      "addChildName": "添加{{name}}子节点",
+      "editName": "编辑{{name}}",
+      "deleteName": "删除{{name}}",
+      "toggleNode": "展开或折叠{{name}}",
+      "toggleVisible": "切换{{name}}显示状态",
+      "cancel": "取消",
+      "confirmCreate": "确定新增",
+      "save": "保存菜单",
+      "confirmDelete": "确认删除"
+    },
+    "dialog": {
+      "createTitle": "新增菜单",
+      "editTitle": "编辑菜单",
+      "deleteTitle": "确认删除菜单",
+      "deleteDesc": "删除后「{{name}}」会从当前菜单树移除。"
+    },
+    "form": {
+      "type": "节点类型",
+      "parent": "父级菜单",
+      "name": "菜单名称",
+      "namePlaceholder": "如：菜单管理",
+      "icon": "图标",
+      "path": "路由路径",
+      "pathPlaceholder": "请选择路由",
+      "permission": "权限标识",
+      "shortLabel": "短名称",
+      "shortLabelPlaceholder": "用于折叠导航",
+      "sort": "排序",
+      "visible": "是否显示",
+      "visibleHint": "关闭后该节点不会进入左侧导航",
+      "errors": {
+        "nameRequired": "菜单名称不能为空",
+        "pathRequired": "菜单节点必须选择路由",
+        "permissionRequired": "动作节点必须填写权限标识",
+        "parentRequired": "动作节点必须选择父级菜单"
+      }
+    },
+    "empty": {
+      "title": "该子系统暂无菜单",
+      "desc": "点击「新增菜单」开始配置"
+    },
+    "toast": {
+      "created": "菜单已创建",
+      "updated": "菜单已更新",
+      "deleted": "菜单已删除",
+      "visibilityUpdated": "显示状态已更新",
+      "failed": "操作失败"
+    }
   }
 }

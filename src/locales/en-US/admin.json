@@ -219,5 +219,87 @@
       "permissionsSaved": "Permissions saved",
       "adminCreated": "Admin role created"
     }
+  },
+  "menus": {
+    "title": "Menu Management",
+    "breadcrumbGroup": "Organization & Permissions",
+    "refreshing": "Updating",
+    "searchPlaceholder": "Search menu name, route, permission",
+    "treeTitle": "{{subsystem}} · Menu tree",
+    "stats": "Dirs {{dirs}} · Menus {{menus}} · Actions {{actions}} · Hidden {{hidden}}",
+    "subsystems": {
+      "title": "Subsystems",
+      "desc": "Menus are isolated by subsystem; subsystems are code-registered now",
+      "builtin": "Built-in",
+      "menuCount": "{{count}} menu nodes"
+    },
+    "types": {
+      "dir": "Dir",
+      "menu": "Menu",
+      "action": "Action"
+    },
+    "columns": {
+      "name": "Menu name",
+      "path": "Route path",
+      "type": "Type",
+      "permission": "Permission",
+      "visible": "Visible",
+      "actions": "Actions"
+    },
+    "actions": {
+      "create": "New menu",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "edit": "Edit",
+      "delete": "Delete",
+      "addChild": "Add child",
+      "addChildName": "Add child to {{name}}",
+      "editName": "Edit {{name}}",
+      "deleteName": "Delete {{name}}",
+      "toggleNode": "Toggle {{name}}",
+      "toggleVisible": "Toggle {{name}} visibility",
+      "cancel": "Cancel",
+      "confirmCreate": "Create",
+      "save": "Save menu",
+      "confirmDelete": "Confirm delete"
+    },
+    "dialog": {
+      "createTitle": "New menu",
+      "editTitle": "Edit menu",
+      "deleteTitle": "Confirm delete menu",
+      "deleteDesc": "\"{{name}}\" will be removed from this menu tree."
+    },
+    "form": {
+      "type": "Node type",
+      "parent": "Parent menu",
+      "name": "Menu name",
+      "namePlaceholder": "e.g. Menu management",
+      "icon": "Icon",
+      "path": "Route path",
+      "pathPlaceholder": "Select route",
+      "permission": "Permission",
+      "shortLabel": "Short label",
+      "shortLabelPlaceholder": "For collapsed nav",
+      "sort": "Sort",
+      "visible": "Visible",
+      "visibleHint": "Hidden nodes are excluded from the left navigation",
+      "errors": {
+        "nameRequired": "Menu name is required",
+        "pathRequired": "Menu nodes must select a route",
+        "permissionRequired": "Action nodes must define a permission",
+        "parentRequired": "Action nodes must select a parent menu"
+      }
+    },
+    "empty": {
+      "title": "No menus in this subsystem",
+      "desc": "Click \"New menu\" to configure"
+    },
+    "toast": {
+      "created": "Menu created",
+      "updated": "Menu updated",
+      "deleted": "Menu deleted",
+      "visibilityUpdated": "Visibility updated",
+      "failed": "Action failed"
+    }
   }
 }

@@ -66,6 +66,18 @@ const permissionTreeSeed: PermissionTreeGroupDto[] = [
           { id: 'grant', label: '分配权限' },
         ],
       },
+      {
+        id: 'iam:menu',
+        label: '菜单管理',
+        code: 'iam:menu',
+        actions: [
+          { id: 'view', label: '查看' },
+          { id: 'create', label: '新建' },
+          { id: 'update', label: '编辑' },
+          { id: 'toggle', label: '显示切换' },
+          { id: 'del', label: '删除' },
+        ],
+      },
     ],
   },
   {

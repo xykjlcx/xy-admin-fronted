@@ -35,6 +35,15 @@
         "width": 1440,
         "height": 900
       }
+    },
+    {
+      "key": "menus",
+      "file": "e2e/baseline/prototype-menus.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
     }
   ]
 }
