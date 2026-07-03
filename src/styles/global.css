@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source('../');
 @import 'tw-animate-css';
 @import './tokens.css';
 
@@ -88,13 +88,18 @@ html { font-family: var(--font-sans); }
 /* 显示比例 token 乘法（取代 CSS zoom，机制见 tokens.css --app-scale 注释）：
    盖写 Tailwind v4 内置主题变量，使 spacing 与 text 工具类随显示比例档等比缩放。
    本 :root 块刻意不放进任何 @layer——未分层规则优先级高于 @layer theme，才能盖掉 Tailwind 默认值。
-   只盖项目实际用到的档（xs/sm/base/lg）；行高伴生变量是比值不动。 */
+   覆盖常用正文/标题字号与 Dialog 宽度 token；行高伴生变量是比值不动。 */
 :root {
   --spacing: calc(0.25rem * var(--app-scale));
+  --container-sm: calc(24rem * var(--app-scale));
+  --container-lg: calc(32rem * var(--app-scale));
   --text-xs: calc(0.75rem * var(--app-scale));
   --text-sm: calc(0.875rem * var(--app-scale));
   --text-base: calc(1rem * var(--app-scale));
   --text-lg: calc(1.125rem * var(--app-scale));
+  --text-xl: calc(1.25rem * var(--app-scale));
+  --text-2xl: calc(1.5rem * var(--app-scale));
+  --text-3xl: calc(1.875rem * var(--app-scale));
 }
 body { margin: 0; background: var(--bg); color: var(--text);
   font-size: calc(14px * var(--app-scale));

@@ -36,6 +36,7 @@
   --radius-factor: 1;
   /* 圆角 = 基准 px × 圆角风格档(--radius-factor) × 显示比例档(--app-scale)。
      两个维度独立：圆角风格改控件圆润度，显示比例整体等比缩放（原型 zoom 会连圆角一起缩）。 */
+  --radius-xs: calc(2px * var(--radius-factor) * var(--app-scale));
   --radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));
   --radius-md: calc(8px * var(--radius-factor) * var(--app-scale));
   --radius-lg: calc(12px * var(--radius-factor) * var(--app-scale));

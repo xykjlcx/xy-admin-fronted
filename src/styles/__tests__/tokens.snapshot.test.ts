@@ -90,12 +90,21 @@ test('显示比例基础层覆盖 Tailwind spacing 与 text token', () => {
   expect(globalCss).toContain('--text-sm: calc(0.875rem * var(--app-scale));');
   expect(globalCss).toContain('--text-base: calc(1rem * var(--app-scale));');
   expect(globalCss).toContain('--text-lg: calc(1.125rem * var(--app-scale));');
+  expect(globalCss).toContain('--text-xl: calc(1.25rem * var(--app-scale));');
+  expect(globalCss).toContain('--text-2xl: calc(1.5rem * var(--app-scale));');
+  expect(globalCss).toContain('--text-3xl: calc(1.875rem * var(--app-scale));');
+});
+
+test('显示比例基础层覆盖 Dialog 等 shadcn container token', () => {
+  expect(globalCss).toContain('--container-sm: calc(24rem * var(--app-scale));');
+  expect(globalCss).toContain('--container-lg: calc(32rem * var(--app-scale));');
 });
 
 test('圆角因子三档 + 四条 calc 公式', () => {
   expect(css).toContain('--radius-factor: 1;'); // 默认档
   expect(css).toContain('--radius-factor: 0.28;'); // sharp
   expect(css).toContain('--radius-factor: 1.55;'); // round
+  expect(css).toContain('--radius-xs: calc(2px * var(--radius-factor) * var(--app-scale));');
   expect(css).toContain('--radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));');
   expect(css).toContain('--radius-md: calc(8px * var(--radius-factor) * var(--app-scale));');
   expect(css).toContain('--radius-lg: calc(12px * var(--radius-factor) * var(--app-scale));');
@@ -143,4 +152,8 @@ test('index.html FOUC 脚本契约不被静默删除（含 --pri 注入）', () 
   expect(html).toContain('dataset.mode');
   expect(html).toContain('--pri');
   expect(html).toContain('_priResolved');
+});
+
+test('Tailwind source 限定在 src，避免 docs 里的示例 class 污染生产 CSS', () => {
+  expect(globalCss).toContain("@import 'tailwindcss' source('../');");
 });

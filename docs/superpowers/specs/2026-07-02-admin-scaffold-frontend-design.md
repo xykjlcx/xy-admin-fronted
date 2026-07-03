@@ -214,6 +214,8 @@ interface MenuRecord {
 
 **显示比例接入纪律（基础层收敛）**：业务页面优先使用 Tailwind 默认 spacing/text/radius 与 `components/pro` 组件，默认会吃到 `--app-scale`；确需精确任意 px（如原型级宽高、图标、定位）必须写成 `calc(Npx * var(--app-scale))` 或沉到公共组件 token。新增重组件（图表、虚拟表格、富文本、代码编辑器、地图、Canvas、第三方弹层）必须在接入 PR 中检查 90/100/108 三档：尺寸是否随比例变、portal 浮层是否定位正确、是否出现整页溢出。第三方内部尺寸不天然吃本项目 token，不能默认为已适配。
 
+**Tailwind source 边界**：`global.css` 的 `@import 'tailwindcss' source('../')` 刻意把扫描范围限定在 `src`。不要让 `docs`、README、AGENTS 中的示例 class 进入生产 CSS；否则会生成 `rounded-[Npx]`、旧 px 示例等无效/误导性 utility，干扰体积和审查。
+
 **FOUC 防护**：`index.html` 内联脚本在样式加载前读 localStorage 写 `data-flavor/data-mode`（zustand persist 恢复晚于首帧，暗色用户否则每次刷新闪白）。可选：storage 事件跨 tab 同步。
 
 ### 8.2 布局层（修正：契约重写）

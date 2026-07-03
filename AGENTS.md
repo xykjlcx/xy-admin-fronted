@@ -11,6 +11,7 @@
 - 业务页面优先使用 Tailwind 默认 spacing/text/radius 与 `components/pro` 公共组件，基础层会统一吃到 `--app-scale`。
 - 确需写精确任意 px 时，必须写成 `calc(Npx * var(--app-scale))`，或沉到公共组件 / token 层。
 - 新增图表、虚拟表格、富文本、代码编辑器、地图、Canvas、第三方弹层等重组件时，必须验证 90% / 100% / 108% 三档：尺寸是否随比例变化、portal 浮层是否定位正确、整页是否出现溢出。
+- Tailwind source 限定只扫描 `src`；不要让 `docs` / README / AGENTS 里的示例 class 进入生产 CSS。
 
 ## 基础铁律
 
