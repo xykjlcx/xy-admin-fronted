@@ -82,8 +82,10 @@
 }
 
 html { font-family: var(--font-sans); }
-html[data-zoom='sm'] { zoom: 0.9; }
-html[data-zoom='lg'] { zoom: 1.08; }  /* 原型实际系数 1.08（L2848），README"110%"有误 */
+/* zoom 挂在 #root（非 html）：Radix 弹层默认 portal 到 document.body，body 是 #root 的父级、不在缩放子树内，
+   避免 body 与 #root 同处缩放上下文时 floating-ui 对 fixed+transform 定位做二次缩放补偿导致弹层错位/裁切 */
+html[data-zoom='sm'] #root { zoom: 0.9; }
+html[data-zoom='lg'] #root { zoom: 1.08; }  /* 原型实际系数 1.08（L2848），README"110%"有误 */
 
 /* CSS zoom 不缩放 vh：Shell 根用 h-app 抵消档位缩放（--zoom-inverse 见 tokens.css），防 zoom<1 底部留白 / zoom>1 整页滚动 */
 .h-app { height: calc(100vh * var(--zoom-inverse, 1)); }

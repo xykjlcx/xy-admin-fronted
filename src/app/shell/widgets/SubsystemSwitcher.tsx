@@ -39,10 +39,10 @@ export function SubsystemSwitcher({
         {variant === 'brand' ? (
           <button
             className={cn(
-              'flex items-center gap-2.5',
+              'flex w-full items-center gap-2.5',
               collapsed
                 ? 'justify-center'
-                : 'w-full rounded-10 bg-surface px-2.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.06)]',
+                : 'rounded-10 bg-surface px-2.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.06)]',
             )}
           >
             <span

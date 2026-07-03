@@ -72,7 +72,7 @@ export function AppearanceDrawer() {
       <Tooltip>
         <TooltipTrigger asChild>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-text-2" aria-label={dk('title')}>
+            <Button variant="ghost" size="icon" className="text-text-2 hover:text-text-2" aria-label={dk('title')}>
               <Palette className="size-5" />
             </Button>
           </SheetTrigger>

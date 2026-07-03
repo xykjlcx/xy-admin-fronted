@@ -25,7 +25,7 @@ export function NavMenuSidebar({
 
   const leafClass = (active: boolean) =>
     cn(
-      'mx-2 flex h-[38px] items-center rounded-8 pl-11 pr-3 text-sm',
+      'mx-2 my-px flex h-[38px] items-center rounded-8 pl-11 pr-3 text-sm',
       active ? 'bg-pri-soft font-semibold text-pri' : 'text-text-2 hover:bg-surface-2',
     );
 

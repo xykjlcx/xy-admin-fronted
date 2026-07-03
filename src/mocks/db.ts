@@ -57,6 +57,36 @@ export function resetDb() {
   idSeq = 0;
 }
 
+// mock 会话（token -> userId）借 sessionStorage 跨刷新保活：db 是随模块重新求值而清零的内存对象，
+// 若会话只存在内存里，浏览器刷新会让所有已登录 token 瞬间失效（表现为"刷新即被踢回登录页"），
+// 而真实后端的会话不会因客户端刷新而失效——这里让 mock 行为向真实后端对齐。
+const SESSION_STORAGE_KEY = 'mock-sessions';
+
+function loadSessions(): Map<string, string> {
+  try {
+    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    return raw ? new Map(JSON.parse(raw) as [string, string][]) : new Map();
+  } catch {
+    return new Map();
+  }
+}
+
+function createSessionStore() {
+  const map = loadSessions();
+  const persist = () => sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify([...map]));
+  return {
+    get: (token: string) => map.get(token),
+    set: (token: string, userId: string) => {
+      map.set(token, userId);
+      persist();
+    },
+    clear: () => {
+      map.clear();
+      persist();
+    },
+  };
+}
+
 export const db = {
   users: [
     {
@@ -76,5 +106,5 @@ export const db = {
       permissions: ['dashboard:view', 'iam:user:view', 'iam:dept:view'],
     },
   ] as MockUser[],
-  sessions: new Map<string, string>(), // token -> userId
+  sessions: createSessionStore(), // token -> userId
 };

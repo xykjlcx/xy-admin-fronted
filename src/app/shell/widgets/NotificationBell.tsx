@@ -14,7 +14,7 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative text-text-2"
+          className="relative text-text-2 hover:text-text-2"
           onClick={() => toast(t('shell.toast.notification'))}
           aria-label={t('shell.notification')}
         >

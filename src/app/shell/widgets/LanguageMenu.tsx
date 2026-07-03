@@ -25,7 +25,7 @@ export function LanguageMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-text-2" aria-label={t('shell.language')}>
+        <Button variant="ghost" size="icon" className="text-text-2 hover:text-text-2" aria-label={t('shell.language')}>
           <Globe className="size-5" />
         </Button>
       </DropdownMenuTrigger>
