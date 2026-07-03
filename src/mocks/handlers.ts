@@ -2,6 +2,7 @@
 import { authHandlers } from '@/modules/admin/mocks/auth.handlers';
 import { dashboardHandlers } from '@/modules/admin/mocks/dashboard.handlers';
 import { menuHandlers } from '@/modules/admin/mocks/menu.handlers';
+import { roleHandlers } from '@/modules/admin/mocks/role.handlers';
 import { userHandlers } from '@/modules/admin/mocks/user.handlers';
 
-export const allHandlers = [...authHandlers, ...dashboardHandlers, ...menuHandlers, ...userHandlers];
+export const allHandlers = [...authHandlers, ...dashboardHandlers, ...menuHandlers, ...userHandlers, ...roleHandlers];

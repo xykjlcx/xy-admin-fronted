@@ -34,12 +34,14 @@ const prototypeScenarios = [
   { key: 'login', file: 'prototype-login.png' },
   { key: 'dashboard', file: 'prototype-dashboard.png' },
   { key: 'users', file: 'prototype-users.png' },
+  { key: 'roles', file: 'prototype-roles.png' },
 ];
 
 const appScenarios = [
   { key: 'login', file: 'app-login.png', url: '/login', requiresAuth: false },
   { key: 'dashboard', file: 'app-dashboard.png', url: '/admin/dashboard', requiresAuth: true },
   { key: 'users', file: 'app-users.png', url: '/admin/users?page=1&pageSize=10&status=all&keyword=', requiresAuth: true },
+  { key: 'roles', file: 'app-roles.png', url: '/admin/roles', requiresAuth: true },
 ];
 
 function agent(session, args, options = {}) {
@@ -175,6 +177,7 @@ function assertPrototypeScreen(session, key) {
     login: '欢迎回来',
     dashboard: '小倪科技',
     users: '成员与部门',
+    roles: '角色与权限',
   }[key];
   evalIn(
     session,
@@ -219,6 +222,9 @@ async function capturePrototypeBaselines() {
     );
     if (scenario.key === 'users') {
       clickPrototypeText(prototypeSession, '成员与部门');
+    }
+    if (scenario.key === 'roles') {
+      clickPrototypeText(prototypeSession, '角色与权限');
     }
     if (scenario.key === 'login') {
       clickPrototypeText(prototypeSession, '李长昕');
@@ -298,6 +304,7 @@ function assertAppScreen(session, key) {
     login: '登录',
     dashboard: '小倪科技',
     users: '成员与部门',
+    roles: '角色与权限',
   }[key];
   evalIn(
     session,
@@ -452,6 +459,41 @@ function assertDetailSheet(session) {
   );
 }
 
+function assertRoleDialog(session) {
+  evalIn(
+    session,
+    `
+    const adminTab = [...document.querySelectorAll('button')].find((item) => item.textContent?.trim() === '管理员权限');
+    if (!adminTab) throw new Error('admin permissions tab not found');
+    adminTab.click();
+    true;
+    `,
+  );
+  agent(session, ['wait', '300']);
+  evalIn(
+    session,
+    `
+    const createButton = [...document.querySelectorAll('button')].find((item) => item.textContent?.includes('创建管理员角色'));
+    if (!createButton) throw new Error('create admin role button not found');
+    createButton.click();
+    true;
+    `,
+  );
+  agent(session, ['wait', '400']);
+  evalIn(
+    session,
+    `
+    const dialog = document.querySelector('[role="dialog"]');
+    if (!dialog || !dialog.textContent?.includes('创建管理员角色')) throw new Error('admin role dialog not found');
+    const rect = dialog.getBoundingClientRect();
+    if (rect.left < -1 || rect.top < -1 || rect.right > window.innerWidth + 1 || rect.bottom > window.innerHeight + 1) {
+      throw new Error('role dialog out of viewport: ' + JSON.stringify(rect.toJSON()));
+    }
+    rect.toJSON();
+    `,
+  );
+}
+
 async function runScaleChecks() {
   await ensureDir(reportDir);
   const server = await ensureDevServer();
@@ -475,11 +517,22 @@ async function runScaleChecks() {
       agent(appSession, ['screenshot', sheetShot]);
       agent(appSession, ['press', 'Escape'], { allowFailure: true });
 
+      agent(appSession, ['open', new URL('/admin/roles', baseOrigin).href]);
+      agent(appSession, ['wait', '1000']);
+      setZoom(appSession, zoom);
+      agent(appSession, ['wait', '300']);
+      assertNoHorizontalOverflow(appSession);
+      assertRoleDialog(appSession);
+      const rolesShot = path.join(reportDir, `app-roles-${zoom}-dialog.png`);
+      agent(appSession, ['screenshot', rolesShot]);
+      agent(appSession, ['press', 'Escape'], { allowFailure: true });
+
       results.push({
         zoom,
         popover: path.relative(root, popoverShot),
         sheet: path.relative(root, sheetShot),
-        assertions: ['no horizontal overflow', 'status popover in viewport', 'detail sheet in viewport'],
+        rolesDialog: path.relative(root, rolesShot),
+        assertions: ['no horizontal overflow', 'status popover in viewport', 'detail sheet in viewport', 'roles dialog in viewport'],
       });
     }
 
@@ -492,7 +545,7 @@ async function runScaleChecks() {
 async function writeReport(data) {
   await ensureDir(reportDir);
   const lines = [
-    '# M0 视觉验收报告',
+    '# M0/M1 视觉验收报告',
     '',
     `生成时间：${new Date().toISOString()}`,
     `浏览器工具：Agent Browser CLI`,
@@ -521,7 +574,7 @@ async function writeReport(data) {
   if (data.scale?.results?.length) {
     lines.push('## 显示比例三档', '');
     for (const item of data.scale.results) {
-      lines.push(`- ${item.zoom}: ${item.assertions.join(' / ')}；popover: ${item.popover}；sheet: ${item.sheet}`);
+      lines.push(`- ${item.zoom}: ${item.assertions.join(' / ')}；popover: ${item.popover}；sheet: ${item.sheet}；rolesDialog: ${item.rolesDialog}`);
     }
     lines.push('');
   }

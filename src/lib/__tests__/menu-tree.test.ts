@@ -12,6 +12,16 @@ test('通配符全量可见', () => {
   expect(buildMenuTree(adminManifest.menuSeed, ['*:*:*'])).toHaveLength(2);
 });
 
+test('角色与权限菜单受 iam:role:view 控制', () => {
+  const tree = buildMenuTree(adminManifest.menuSeed, ['iam:user:view', 'iam:role:view']);
+  const org = tree.find((node) => node.id === 'm-org');
+  expect(org?.children?.map((node) => node.path)).toEqual(['/admin/users', '/admin/roles']);
+
+  const withoutRolePermission = buildMenuTree(adminManifest.menuSeed, ['iam:user:view']);
+  const orgWithoutRole = withoutRolePermission.find((node) => node.id === 'm-org');
+  expect(orgWithoutRole?.children?.map((node) => node.path)).toEqual(['/admin/users']);
+});
+
 test('嵌套空目录自底向上剪枝：叶子无权限 → 多级空目录整支被剪', () => {
   const records: MenuRecord[] = [
     { id: 'A', parentId: null, subsystemKey: 'x', type: 'dir', label: { 'zh-CN': 'A' }, visible: true, sort: 1 },

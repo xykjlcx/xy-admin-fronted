@@ -144,5 +144,80 @@
       "contact": "联系方式",
       "status": "状态"
     }
+  },
+  "roles": {
+    "title": "角色与权限",
+    "breadcrumbGroup": "组织与权限",
+    "tabs": {
+      "roles": "业务角色",
+      "admins": "管理员权限"
+    },
+    "searchPlaceholder": "搜索角色",
+    "permissionSearchPlaceholder": "搜索权限…",
+    "adminIntro": "管理员角色决定了后台各模块的可管理范围",
+    "empty": "暂无角色",
+    "noPermissionResult": "暂无匹配权限",
+    "roleTypes": {
+      "system": "系统角色",
+      "custom": "自定义"
+    },
+    "detailTabs": {
+      "permissions": "权限配置",
+      "members": "角色成员 · {{count}}",
+      "logs": "操作日志"
+    },
+    "permission": {
+      "granted": "已授权 {{granted}} / {{total}}",
+      "groupCount": "{{granted}}/{{total}}",
+      "toggleAction": "切换{{resource}}{{action}}",
+      "toggleResource": "切换{{resource}}全部权限",
+      "toggleGroup": "切换{{group}}全部权限"
+    },
+    "columns": {
+      "adminRole": "角色名称",
+      "admin": "管理员",
+      "scope": "权限范围",
+      "actions": "操作"
+    },
+    "actions": {
+      "addRole": "新增角色",
+      "deleteRole": "删除角色",
+      "expand": "展开",
+      "collapse": "折叠",
+      "clear": "清空",
+      "grantAll": "全部授权",
+      "reset": "重置",
+      "savePermissions": "保存权限",
+      "cancel": "取消",
+      "confirmCreate": "确定创建",
+      "confirmDelete": "确认删除",
+      "createAdmin": "创建管理员角色",
+      "detail": "详情",
+      "add": "添加",
+      "removeMember": "移除"
+    },
+    "dialog": {
+      "addRoleTitle": "新增角色",
+      "deleteRoleTitle": "删除角色",
+      "deleteRoleDesc": "删除后该角色及其权限配置会从当前列表移除。",
+      "addAdminTitle": "创建管理员角色"
+    },
+    "form": {
+      "roleName": "角色名称",
+      "roleNamePlaceholder": "如：运营、客服",
+      "roleDesc": "角色描述",
+      "roleDescPlaceholder": "选填，描述该角色的职责",
+      "adminRoleName": "角色名称",
+      "adminRoleNamePlaceholder": "如：文件管理员",
+      "adminMember": "指派管理员",
+      "adminMemberPlaceholder": "请选择成员"
+    },
+    "toast": {
+      "stub": "该流程将在后续任务接入",
+      "created": "角色已创建，请配置权限",
+      "deleted": "角色已删除",
+      "permissionsSaved": "权限已保存",
+      "adminCreated": "管理员角色已创建"
+    }
   }
 }

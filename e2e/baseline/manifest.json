@@ -26,6 +26,15 @@
         "width": 1440,
         "height": 900
       }
+    },
+    {
+      "key": "roles",
+      "file": "e2e/baseline/prototype-roles.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
     }
   ]
 }

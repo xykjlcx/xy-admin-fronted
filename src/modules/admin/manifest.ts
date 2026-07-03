@@ -59,5 +59,16 @@ export const adminManifest: SubsystemManifest = {
       visible: true,
       sort: 1,
     },
+    {
+      id: 'm-roles',
+      parentId: 'm-org',
+      subsystemKey: 'admin',
+      type: 'menu',
+      label: { 'zh-CN': '角色与权限' },
+      path: '/admin/roles',
+      permission: 'iam:role:view',
+      visible: true,
+      sort: 2,
+    },
   ],
 };

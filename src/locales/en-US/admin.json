@@ -144,5 +144,80 @@
       "contact": "Contact",
       "status": "Status"
     }
+  },
+  "roles": {
+    "title": "Roles & Permissions",
+    "breadcrumbGroup": "Organization & Permissions",
+    "tabs": {
+      "roles": "Business roles",
+      "admins": "Admin permissions"
+    },
+    "searchPlaceholder": "Search roles",
+    "permissionSearchPlaceholder": "Search permissions...",
+    "adminIntro": "Admin roles determine the manageable scope of backend modules",
+    "empty": "No roles",
+    "noPermissionResult": "No matching permissions",
+    "roleTypes": {
+      "system": "System",
+      "custom": "Custom"
+    },
+    "detailTabs": {
+      "permissions": "Permissions",
+      "members": "Role members · {{count}}",
+      "logs": "Activity log"
+    },
+    "permission": {
+      "granted": "{{granted}} / {{total}} granted",
+      "groupCount": "{{granted}}/{{total}}",
+      "toggleAction": "Toggle {{resource}} {{action}}",
+      "toggleResource": "Toggle all {{resource}} permissions",
+      "toggleGroup": "Toggle all {{group}} permissions"
+    },
+    "columns": {
+      "adminRole": "Role",
+      "admin": "Admin",
+      "scope": "Scope",
+      "actions": "Actions"
+    },
+    "actions": {
+      "addRole": "Add role",
+      "deleteRole": "Delete role",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "clear": "Clear",
+      "grantAll": "Grant all",
+      "reset": "Reset",
+      "savePermissions": "Save permissions",
+      "cancel": "Cancel",
+      "confirmCreate": "Create",
+      "confirmDelete": "Confirm delete",
+      "createAdmin": "Create admin role",
+      "detail": "Details",
+      "add": "Add",
+      "removeMember": "Remove"
+    },
+    "dialog": {
+      "addRoleTitle": "Add role",
+      "deleteRoleTitle": "Delete role",
+      "deleteRoleDesc": "This role and its permissions will be removed.",
+      "addAdminTitle": "Create admin role"
+    },
+    "form": {
+      "roleName": "Role name",
+      "roleNamePlaceholder": "e.g. Operations, Support",
+      "roleDesc": "Role description",
+      "roleDescPlaceholder": "Optional role responsibilities",
+      "adminRoleName": "Role name",
+      "adminRoleNamePlaceholder": "e.g. File admin",
+      "adminMember": "Assigned admin",
+      "adminMemberPlaceholder": "Select member"
+    },
+    "toast": {
+      "stub": "This flow will be connected in a later task",
+      "created": "Role created. Configure permissions next.",
+      "deleted": "Role deleted",
+      "permissionsSaved": "Permissions saved",
+      "adminCreated": "Admin role created"
+    }
   }
 }
