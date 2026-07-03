@@ -1807,7 +1807,7 @@ git commit -m "refactor: 基于成员页复盘沉淀列表组件"
 
 - [x] **Step 1: 原型基准截图脚本**：Agent Browser 打开 `后台管理脚手架.dc.html`（file://），用 DC runtime 固定主题/布局，并通过真实点击切到 `dashboard / users / login` 三屏，写入 `e2e/baseline/`。viewport 1440×900 固定。
 
-- [x] **Step 2: 实现侧截图与 diff 报告**：脚本启动 dev server（mock on），Agent Browser 截同三屏并生成 diff 图与 `test-results/m0-visual/report.md`。最新报告（2026-07-03T12:29:02Z）：login 3.21%、dashboard 5.27%、users 4.16%。登录/工作台已按原型同步账号、品牌与身份；成员页保留 M0 真实编辑入口，未恢复无真实流程的邀请入口。
+- [x] **Step 2: 实现侧截图与 diff 报告**：脚本启动 dev server（mock on），Agent Browser 截同三屏并生成 diff 图与 `test-results/m0-visual/report.md`。最新报告（2026-07-03T12:34:45Z）：login 3.21%、dashboard 5.11%、users 4.16%。登录/工作台已按原型同步账号、品牌与身份；dashboard 图表几何已按原型公式收敛；成员页保留 M0 真实编辑入口，未恢复无真实流程的邀请入口。
 
 - [x] **Step 3: 显示比例三档实测（spec §8.1 遗留验证项）**：Agent Browser 下三档 `--app-scale` 分别打开 users 页，验证筛选 Popover / 详情 Sheet 定位不偏移、整页无横向溢出。最新报告三档均通过：no horizontal overflow / status popover in viewport / detail sheet in viewport。
 

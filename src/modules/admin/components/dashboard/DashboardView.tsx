@@ -218,28 +218,36 @@ function CompanyBanner({ overview }: { overview: DashboardOverviewDto }) {
 
 function TrendChart() {
   const { t } = useTranslation('admin');
+  const linePoints = '0,157.1 69.1,147.5 138.2,151.6 207.3,132.4 276.4,137.9 345.5,114.6 414.5,122.8 483.6,103.6 552.7,110.5 621.8,80.3 690.9,58.4 760,20';
+  const areaPoints = `0,200 ${linePoints} 760,200`;
 
   return (
-    <div className="relative h-[calc(294px*var(--app-scale))] overflow-hidden">
-      <svg viewBox="0 0 680 260" className="h-full w-full" role="img" aria-label={t('dashboard.trend.title')}>
+    <div className="relative">
+      <svg viewBox="0 0 760 200" preserveAspectRatio="none" className="h-[calc(200px*var(--app-scale))] w-full" role="img" aria-label={t('dashboard.trend.title')}>
         <defs>
+          <linearGradient id="dashboardTrendLine" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stopColor="var(--pri)" />
+            <stop offset="100%" stopColor="var(--success)" />
+          </linearGradient>
           <linearGradient id="dashboardTrendFill" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="var(--pri)" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="var(--pri)" stopOpacity="0.02" />
+            <stop offset="100%" stopColor="var(--success)" stopOpacity="0.02" />
           </linearGradient>
         </defs>
-        <path d="M 24 206 L 84 196 L 144 201 L 204 178 L 264 185 L 324 160 L 384 170 L 444 148 L 504 156 L 564 126 L 624 102 L 660 74 L 660 238 L 24 238 Z" fill="url(#dashboardTrendFill)" />
-        <path d="M 24 206 L 84 196 L 144 201 L 204 178 L 264 185 L 324 160 L 384 170 L 444 148 L 504 156 L 564 126 L 624 102 L 660 74" fill="none" stroke="var(--pri)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="660" cy="74" r="5" fill="var(--pri)" />
-        <text x="24" y="254" fill="var(--text-3)" fontSize="13">{t('dashboard.trend.months.jan')}</text>
-        <text x="145" y="254" fill="var(--text-3)" fontSize="13">{t('dashboard.trend.months.mar')}</text>
-        <text x="268" y="254" fill="var(--text-3)" fontSize="13">{t('dashboard.trend.months.may')}</text>
-        <text x="392" y="254" fill="var(--text-3)" fontSize="13">{t('dashboard.trend.months.jul')}</text>
-        <text x="530" y="254" fill="var(--text-3)" fontSize="13">{t('dashboard.trend.months.sep')}</text>
-        <text x="638" y="254" fill="var(--text-3)" fontSize="13">{t('dashboard.trend.months.dec')}</text>
+        <polygon points={areaPoints} fill="url(#dashboardTrendFill)" />
+        <polyline points={linePoints} fill="none" stroke="url(#dashboardTrendLine)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="760" cy="20" r="5" fill="var(--surface)" stroke="var(--pri)" strokeWidth="3" />
       </svg>
-      <div className="absolute right-0 top-[calc(82px*var(--app-scale))] rounded-8 bg-pri px-3 py-2 text-[calc(12px*var(--app-scale))] text-white shadow-popover">
+      <div className="absolute left-full top-[calc(20px*var(--app-scale))] -translate-x-1/2 -translate-y-[130%] rounded-8 bg-pri px-3 py-1.5 text-[calc(12px*var(--app-scale))] text-white shadow-popover">
         {t('dashboard.trend.tooltip')}
+      </div>
+      <div className="mt-2.5 flex justify-between text-[calc(11px*var(--app-scale))] text-text-3">
+        <span>{t('dashboard.trend.months.jan')}</span>
+        <span>{t('dashboard.trend.months.mar')}</span>
+        <span>{t('dashboard.trend.months.may')}</span>
+        <span>{t('dashboard.trend.months.jul')}</span>
+        <span>{t('dashboard.trend.months.sep')}</span>
+        <span>{t('dashboard.trend.months.dec')}</span>
       </div>
     </div>
   );

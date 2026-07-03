@@ -239,7 +239,7 @@ async function capturePrototypeBaselines() {
 
   await writeFile(
     path.join(baselineDir, 'manifest.json'),
-    `${JSON.stringify({ generatedAt: new Date().toISOString(), scenarios: manifest }, null, 2)}\n`,
+    `${JSON.stringify({ scenarios: manifest }, null, 2)}\n`,
   );
   return manifest;
 }
