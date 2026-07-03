@@ -7,6 +7,8 @@
     "searchPlaceholder": "Search name, role, or phone",
     "selectedCount": "{{count}} selected",
     "empty": "No members",
+    "loading": "Loading members",
+    "refreshing": "Refreshing",
     "total": "{{total}} members, page {{page}} / {{pageCount}}",
     "selectPage": "Select current page",
     "selectUser": "Select {{name}}",

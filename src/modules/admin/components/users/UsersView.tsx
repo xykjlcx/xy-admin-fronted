@@ -23,6 +23,8 @@ export interface UsersViewProps {
   permissions: string[];
   depts: DeptDto[];
   usersPage: PageResult<UserDto>;
+  usersLoading?: boolean;
+  usersRefreshing?: boolean;
   search: UsersQueryParams;
   onSearchChange: (patch: Partial<UsersQueryParams>) => void;
   onCreateUser: (dto: CreateUserInput) => void | Promise<void>;
@@ -96,6 +98,8 @@ export function UsersView({
   permissions,
   depts,
   usersPage,
+  usersLoading = false,
+  usersRefreshing = false,
   search,
   onSearchChange,
   onCreateUser,
@@ -324,7 +328,7 @@ export function UsersView({
                       <div>{t('users.columns.actions')}</div>
                     </TableShellHeader>
                   }
-                  empty={t('users.empty')}
+                  empty={usersLoading ? t('users.loading') : t('users.empty')}
                   selectedBar={
                     selectedVisibleIds.length > 0 && canDisable ? (
                       <div className="mt-4 flex items-center justify-between rounded-8 bg-pri-soft px-3.5 py-2.5">
@@ -339,6 +343,9 @@ export function UsersView({
                     <div className="mt-4 flex items-center justify-between">
                       <span className="text-[calc(13px*var(--app-scale))] text-text-3">
                         共 {usersPage.total} 名成员
+                        {usersRefreshing && (
+                          <span className="ml-3 text-pri">{t('users.refreshing')}</span>
+                        )}
                       </span>
                       <div className="flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-2">
                         <button className="flex size-[calc(30px*var(--app-scale))] items-center justify-center rounded-7 border border-border" disabled={search.page <= 1} onClick={() => patchSearch({ page: search.page - 1 })}>

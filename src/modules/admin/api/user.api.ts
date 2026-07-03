@@ -1,4 +1,4 @@
-import { queryOptions } from '@tanstack/react-query';
+import { keepPreviousData, queryOptions } from '@tanstack/react-query';
 import { http } from '@/lib/http/client';
 
 export interface PageResult<T> {
@@ -58,6 +58,7 @@ export const usersQuery = (params: UsersQueryParams) =>
   queryOptions({
     queryKey: ['iam', 'users', params],
     queryFn: () => http.get<PageResult<UserDto>>('/api/users', { ...params }),
+    placeholderData: keepPreviousData,
   });
 
 export const userApi = {

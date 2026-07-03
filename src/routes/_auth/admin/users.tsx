@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 import { UsersView } from '@/modules/admin/components/users/UsersView';
@@ -6,7 +6,9 @@ import {
   deptsQuery,
   userApi,
   usersQuery,
+  type PageResult,
   type UpdateUserInput,
+  type UserDto,
   type UsersQueryParams,
 } from '@/modules/admin/api/user.api';
 
@@ -36,6 +38,7 @@ export const Route = createFileRoute('/_auth/admin/users')({
 });
 
 type UsersSearch = UsersQueryParams & { keyword: string };
+const emptyUsersPage: PageResult<UserDto> = { list: [], total: 0 };
 
 function UsersPage() {
   const search = Route.useSearch() as UsersSearch;
@@ -43,7 +46,8 @@ function UsersPage() {
   const { me } = Route.useRouteContext();
   const queryClient = useQueryClient();
   const { data: depts } = useSuspenseQuery(deptsQuery);
-  const { data: usersPage } = useSuspenseQuery(usersQuery(search));
+  const usersResult = useQuery(usersQuery(search));
+  const usersPage = usersResult.data ?? emptyUsersPage;
   const invalidateUsers = () => queryClient.invalidateQueries({ queryKey: ['iam', 'users'] });
   const createUser = useMutation({ mutationFn: userApi.createUser, onSuccess: invalidateUsers });
   const updateUser = useMutation({
@@ -62,6 +66,8 @@ function UsersPage() {
       permissions={me.permissions}
       depts={depts}
       usersPage={usersPage}
+      usersLoading={usersResult.isPending}
+      usersRefreshing={usersResult.isFetching && !usersResult.isPending}
       search={search}
       onSearchChange={handleSearchChange}
       onCreateUser={async (dto) => {

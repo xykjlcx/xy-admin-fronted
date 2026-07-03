@@ -7,6 +7,8 @@
     "searchPlaceholder": "搜索姓名、角色、手机号",
     "selectedCount": "已选 {{count}} 人",
     "empty": "暂无成员",
+    "loading": "正在加载成员",
+    "refreshing": "正在更新",
     "total": "共 {{total}} 人，第 {{page}} / {{pageCount}} 页",
     "selectPage": "选择本页成员",
     "selectUser": "选择{{name}}",

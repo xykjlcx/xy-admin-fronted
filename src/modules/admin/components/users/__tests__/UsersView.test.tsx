@@ -167,3 +167,18 @@ test('成员表选择框使用自定义表格 checkbox 样式', () => {
   expect(screen.getByLabelText('选择本页成员')).toHaveClass('appearance-none');
   expect(screen.getByLabelText('选择李长昕')).toHaveClass('appearance-none');
 });
+
+test('成员数据加载时只在表格区域显示状态，页面外壳和部门树保持可见', () => {
+  renderUsersView({ usersPage: { list: [], total: 0 }, usersLoading: true });
+
+  expect(screen.getByText('成员与部门')).toBeInTheDocument();
+  expect(screen.getAllByText('全部成员').length).toBeGreaterThan(0);
+  expect(screen.getByText('正在加载成员')).toBeInTheDocument();
+});
+
+test('成员数据刷新时保留旧表格并显示表格级更新状态', () => {
+  renderUsersView({ usersRefreshing: true });
+
+  expect(screen.getByText('李长昕')).toBeInTheDocument();
+  expect(screen.getByText('正在更新')).toBeInTheDocument();
+});
