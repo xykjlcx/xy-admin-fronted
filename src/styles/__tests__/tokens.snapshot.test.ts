@@ -108,6 +108,15 @@ test('原生交互元素有设计体系 focus-visible 兜底', () => {
   expect(globalCss).toContain('box-shadow: 0 0 0 var(--focus-ring) var(--soft);');
 });
 
+test('shadcn semantic foreground 不再硬编码白色', () => {
+  expect(css).toContain('--on-pri: #ffffff;');
+  expect(css).toContain('--on-danger: #ffffff;');
+  expect(css).toContain('--danger-hover: color-mix(in srgb, var(--danger) 90%, transparent);');
+  expect(css).toContain("[data-mode='dark'] {\n  --pri-hover: color-mix(in srgb, var(--pri) 85%, white);");
+  expect(globalCss).toContain('--color-primary-foreground: var(--on-pri);');
+  expect(globalCss).toContain('--color-destructive-foreground: var(--on-danger);');
+});
+
 test('原生可点击元素有设计体系 pointer 光标兜底', () => {
   expect(globalCss).toContain("button:not(:disabled):not([aria-disabled='true'])");
   expect(globalCss).toContain('a[href]');
@@ -185,7 +194,9 @@ test('index.html FOUC 脚本契约不被静默删除（含 --pri 注入）', () 
   expect(html).toContain('dataset.flavor');
   expect(html).toContain('dataset.mode');
   expect(html).toContain('--pri');
+  expect(html).toContain('--on-pri');
   expect(html).toContain('_priResolved');
+  expect(html).toContain('_onPriResolved');
 });
 
 test('Tailwind source 限定在 src，避免 docs 里的示例 class 污染生产 CSS', () => {

@@ -6,6 +6,7 @@ const projectRoot = resolve(__dirname, '../../..');
 const adminRoutesDir = resolve(projectRoot, 'src/routes/_auth/admin');
 const adminApiDir = resolve(projectRoot, 'src/modules/admin/api');
 const sourceRoot = resolve(projectRoot, 'src');
+const themeStatesRoute = 'src/routes/_auth/dev/theme-states.tsx';
 
 function readProjectFile(path: string) {
   return readFileSync(resolve(projectRoot, path), 'utf8');
@@ -56,6 +57,12 @@ test('admin module does not keep legacy components page directories', () => {
 test('source tree does not keep unused starter assets or generated caches', () => {
   expect(existsSync(resolve(projectRoot, 'src/assets'))).toBe(false);
   expect(existsSync(resolve(projectRoot, 'src/node_modules'))).toBe(false);
+});
+
+test('theme states route is available for token slice verification', () => {
+  expect(existsSync(resolve(projectRoot, themeStatesRoute))).toBe(true);
+  expect(readProjectFile(themeStatesRoute)).toContain("createFileRoute('/_auth/dev/theme-states')");
+  expect(readProjectFile('src/routeTree.gen.ts')).toContain("path: '/dev/theme-states'");
 });
 
 test('root TypeScript configs expose the app alias for shadcn and external CLIs', () => {

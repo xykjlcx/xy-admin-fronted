@@ -1,7 +1,7 @@
 // src/lib/appearance-dom.ts —— 外观状态写入 <html> 的唯一出口；耦合规则集中在此
 // 契约：boot/rehydrate 时必须调用一次 applyAppearance，否则 --pri 注入丢失（CSS 只有 feishu 蓝兜底）。
-// 首帧防闪蓝：appearance store 额外持久化派生的 _priResolved/_priSoftResolved（= resolveAccentVars 结果），
-//   index.html FOUC 脚本读到就直接 setProperty --pri/--pri-soft（亮色才有 soft），避免自选主题色首帧闪回蓝。
+// 首帧防闪：appearance store 额外持久化派生的 _priResolved/_priSoftResolved/_onPriResolved（= resolveAccentVars 结果），
+//   index.html FOUC 脚本读到就直接 setProperty --pri/--pri-soft/--on-pri，避免自选主题色首帧闪回默认值。
 export type Flavor = 'feishu' | 'claude' | 'shadcn';
 export type Mode = 'light' | 'dark';
 export type Zoom = 'sm' | 'md' | 'lg';
@@ -12,7 +12,7 @@ export type Radius = 'sharp' | 'default' | 'round';
 export const ACCENTS = [
   { key: 'blue', labelKey: 'accentBlue', pri: '#3370ff', soft: '#eef3ff' },
   { key: 'claude', labelKey: 'accentClaude', pri: '#c96442', soft: '#f8ede7' },
-  { key: 'shadcn', labelKey: 'accentShadcn', pri: '#18181b', soft: '#f4f4f5' },
+  { key: 'shadcn', labelKey: 'accentShadcn', pri: '#18181b', priDark: '#fafafa', soft: '#f4f4f5' },
   { key: 'green', labelKey: 'accentGreen', pri: '#16a34a', soft: '#e8f7ee' },
   { key: 'violet', labelKey: 'accentViolet', pri: '#7c3aed', soft: '#f3edff' },
 ] as const;
@@ -56,6 +56,43 @@ export function hexToSoft(hex: string): string {
   return `rgba(${r},${g},${b},.12)`;
 }
 
+const LIGHT_ON_PRIMARY = '#ffffff';
+const DARK_ON_PRIMARY = '#18181b';
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const h = hex.replace('#', '');
+  const n = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  return {
+    r: parseInt(n.slice(0, 2), 16),
+    g: parseInt(n.slice(2, 4), 16),
+    b: parseInt(n.slice(4, 6), 16),
+  };
+}
+
+function toLinearChannel(value: number): number {
+  const v = value / 255;
+  return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(hex: string): number {
+  const { r, g, b } = hexToRgb(hex);
+  return 0.2126 * toLinearChannel(r) + 0.7152 * toLinearChannel(g) + 0.0722 * toLinearChannel(b);
+}
+
+function contrastRatio(a: string, b: string): number {
+  const l1 = relativeLuminance(a);
+  const l2 = relativeLuminance(b);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function foregroundForBackground(hex: string): string {
+  return contrastRatio(hex, DARK_ON_PRIMARY) > contrastRatio(hex, LIGHT_ON_PRIMARY)
+    ? DARK_ON_PRIMARY
+    : LIGHT_ON_PRIMARY;
+}
+
 export interface AppearanceState {
   flavor: Flavor;
   mode: Mode;
@@ -65,17 +102,18 @@ export interface AppearanceState {
   radius: Radius;
 }
 
-// 解析主题色 → 注入用的 --pri / --pri-soft。耦合规则（原型 L4798-4803）：暗色下 soft 交还 CSS 白 alpha（返回 null）。
+// 解析主题色 → 注入用的 --pri / --pri-soft / --on-pri。耦合规则（原型 L4798-4803）：暗色下 soft 交还 CSS 白 alpha（返回 null）。
 // 自定义色非法时回退经典蓝，防 rgba(NaN,…)。此函数是 applyAppearance 与 FOUC 派生值的共同真相源。
-export function resolveAccentVars(s: AppearanceState): { pri: string; soft: string | null } {
+export function resolveAccentVars(s: AppearanceState): { pri: string; soft: string | null; onPri: string } {
   if (s.accent === 'custom') {
     const valid = isValidHex(s.customAccent);
     const pri = valid ? s.customAccent : ACCENTS[0].pri;
     const soft = valid ? hexToSoft(s.customAccent) : ACCENTS[0].soft;
-    return { pri, soft: s.mode === 'light' ? soft : null };
+    return { pri, soft: s.mode === 'light' ? soft : null, onPri: foregroundForBackground(pri) };
   }
   const acc = ACCENTS.find((a) => a.key === s.accent) ?? ACCENTS[0];
-  return { pri: acc.pri, soft: s.mode === 'light' ? acc.soft : null };
+  const pri = s.mode === 'dark' && 'priDark' in acc ? acc.priDark : acc.pri;
+  return { pri, soft: s.mode === 'light' ? acc.soft : null, onPri: foregroundForBackground(pri) };
 }
 
 export function applyAppearance(s: AppearanceState): void {
@@ -86,8 +124,9 @@ export function applyAppearance(s: AppearanceState): void {
   else el.dataset.radius = s.radius;
   if (s.zoom === 'md') delete el.dataset.zoom;
   else el.dataset.zoom = s.zoom;
-  const { pri, soft } = resolveAccentVars(s);
+  const { pri, soft, onPri } = resolveAccentVars(s);
   el.style.setProperty('--pri', pri);
+  el.style.setProperty('--on-pri', onPri);
   if (soft) el.style.setProperty('--pri-soft', soft);
   else el.style.removeProperty('--pri-soft');
 }

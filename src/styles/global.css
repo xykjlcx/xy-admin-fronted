@@ -46,7 +46,7 @@
   --color-popover: var(--surface);
   --color-popover-foreground: var(--text);
   --color-primary: var(--pri);
-  --color-primary-foreground: #ffffff;
+  --color-primary-foreground: var(--on-pri);
   --color-secondary: var(--surface-2);
   --color-secondary-foreground: var(--text);
   --color-muted: var(--surface-2);
@@ -54,7 +54,7 @@
   --color-accent: var(--surface-2);
   --color-accent-foreground: var(--text);
   --color-destructive: var(--danger);
-  --color-destructive-foreground: #ffffff;
+  --color-destructive-foreground: var(--on-danger);
   --color-input: var(--border);
   --color-ring: var(--pri);
   --radius-sm: var(--radius-sm);

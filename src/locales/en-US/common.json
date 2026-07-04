@@ -58,6 +58,23 @@
     "404": "Page not found",
     "backHome": "Back home"
   },
+  "dev": {
+    "themeStates": {
+      "eyebrow": "Theme verification",
+      "title": "Theme States",
+      "description": "Runtime switches for visual QA. Each token slice will add its state matrix here.",
+      "mode": "Mode",
+      "light": "Light",
+      "dark": "Dark",
+      "primaryAction": "Primary action",
+      "primary": "Primary",
+      "outline": "Outline",
+      "inputFocus": "Input focus",
+      "focusPlaceholder": "Focus target",
+      "customAccentPlaceholder": "e.g. #3370ff",
+      "currentContract": "Current contract"
+    }
+  },
   "shell": {
     "search": "Search navigation, organization data, role details...",
     "switcher": {

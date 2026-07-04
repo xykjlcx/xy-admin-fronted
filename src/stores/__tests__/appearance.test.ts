@@ -48,6 +48,15 @@ test('setCollapsed 按传入布尔值显式设置 layout 折叠态', () => {
   expect(useAppearance.getState().collapsed.sidebar).toBe(false);
 });
 
+test('set 持久化 --on-pri 派生值，供 FOUC 脚本首帧注入', () => {
+  useAppearance.getState().set({ accent: 'custom', customAccent: '#f5c518' });
+
+  expect(useAppearance.getState()._priResolved).toBe('#f5c518');
+  expect(useAppearance.getState()._priSoftResolved).toBe('rgba(245,197,24,.12)');
+  expect(useAppearance.getState()._onPriResolved).toBe('#18181b');
+  expect(document.documentElement.style.getPropertyValue('--on-pri')).toBe('#18181b');
+});
+
 // ⚠️ 本用例依赖 vi.resetModules() 产生独立 store 实例（重跑 rehydrate），
 // 必须保持在文件最后/可独立运行——否则污染后续用例共享的模块单例。
 test('rehydrate 时重放 accent 注入（F5 后自选主题色不丢失）', async () => {
@@ -61,4 +70,5 @@ test('rehydrate 时重放 accent 注入（F5 后自选主题色不丢失）', as
 
   expect(mod.useAppearance.getState().accent).toBe('violet');
   expect(document.documentElement.style.getPropertyValue('--pri')).toBe('#7c3aed');
+  expect(mod.useAppearance.getState()._onPriResolved).toBe('#ffffff');
 });

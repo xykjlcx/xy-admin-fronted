@@ -58,6 +58,23 @@
     "404": "页面不存在",
     "backHome": "返回首页"
   },
+  "dev": {
+    "themeStates": {
+      "eyebrow": "主题验收",
+      "title": "主题状态面板",
+      "description": "用于视觉 QA 的运行时切换入口。后续每个 token 切片都会在这里补充对应的状态矩阵。",
+      "mode": "明暗模式",
+      "light": "浅色",
+      "dark": "深色",
+      "primaryAction": "主按钮",
+      "primary": "主按钮",
+      "outline": "描边按钮",
+      "inputFocus": "输入框聚焦",
+      "focusPlaceholder": "聚焦验证",
+      "customAccentPlaceholder": "例如 #3370ff",
+      "currentContract": "当前契约"
+    }
+  },
   "shell": {
     "search": "搜索功能导航、组织数据、角色详情等",
     "switcher": {
