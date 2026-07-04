@@ -42,15 +42,17 @@ export function LanguageMenu() {
               onSelect={() => choose(l.code)}
               className={cn(
                 'h-11 gap-2.5 rounded-8 px-2.5',
-                active ? 'bg-pri-soft focus:bg-pri-soft' : 'focus:bg-surface-2',
+                active && 'bg-(--option-bg-selected) text-(--option-fg-selected) focus:bg-(--option-bg-selected) focus:text-(--option-fg-selected)',
               )}
             >
               <span className="text-base">{l.flag}</span>
               <div className="min-w-0 flex-1">
-                <div className="text-sm text-text">{l.label}</div>
-                <div className="text-[calc(11px*var(--app-scale))] text-text-3">{l.sub}</div>
+                <div className={cn('text-sm', active ? 'text-(--option-fg-selected)' : 'text-text')}>{l.label}</div>
+                <div className={cn('text-[calc(11px*var(--app-scale))]', active ? 'text-(--option-fg-selected)' : 'text-text-3')}>
+                  {l.sub}
+                </div>
               </div>
-              {active && <Check className="size-4 shrink-0 text-pri" />}
+              {active && <Check className="size-4 shrink-0 text-(--option-check)" />}
             </DropdownMenuItem>
           );
         })}

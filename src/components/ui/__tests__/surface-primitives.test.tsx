@@ -7,6 +7,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Empty } from '@/components/ui/empty';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -325,6 +336,71 @@ test('SelectControl 使用自定义下拉层而不是原生 select', async () =>
   await userEvent.click(trigger);
   await userEvent.click(await screen.findByRole('option', { name: '研发部' }));
   expect(onValueChange).toHaveBeenCalledWith('rd');
+});
+
+test('SelectItem 与 DropdownMenuItem 分别消费 Option/Menu token', async () => {
+  const { unmount } = render(
+    <SelectControl
+      aria-label="部门"
+      value="rd"
+      options={[
+        { value: 'rd', label: '研发部' },
+        { value: 'mk', label: '市场部' },
+      ]}
+      onValueChange={vi.fn()}
+    />,
+  );
+
+  await userEvent.click(screen.getByRole('combobox', { name: '部门' }));
+  const selectedOption = await screen.findByRole('option', { name: '研发部' });
+  expect(selectedOption).toHaveClass('text-(--option-fg)');
+  expect(selectedOption).toHaveClass('focus:bg-(--option-bg-highlighted)');
+  expect(selectedOption).toHaveClass('data-[state=checked]:bg-(--option-bg-selected)');
+  expect(selectedOption).toHaveClass('data-[state=checked]:text-(--option-fg-selected)');
+  expect(selectedOption.querySelector('[data-slot="select-item-indicator"]')).toHaveClass('text-(--option-check)');
+
+  unmount();
+
+  render(
+    <DropdownMenu open>
+      <DropdownMenuContent>
+        <DropdownMenuItem>系统设置</DropdownMenuItem>
+        <DropdownMenuItem variant="destructive">删除</DropdownMenuItem>
+        <DropdownMenuCheckboxItem checked>显示隐藏节点</DropdownMenuCheckboxItem>
+        <DropdownMenuRadioGroup value="compact">
+          <DropdownMenuRadioItem value="compact">紧凑</DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+        <DropdownMenuSub open>
+          <DropdownMenuSubTrigger>更多</DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem>导出</DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+      </DropdownMenuContent>
+    </DropdownMenu>,
+  );
+
+  const menuItem = screen.getByText('系统设置').closest('[data-slot="dropdown-menu-item"]');
+  expect(menuItem).toHaveClass('text-(--menu-item-fg)');
+  expect(menuItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
+  expect(menuItem).toHaveClass('focus:text-(--menu-item-fg-highlighted)');
+
+  const destructiveItem = screen.getByText('删除').closest('[data-slot="dropdown-menu-item"]');
+  expect(destructiveItem).toHaveClass('data-[variant=destructive]:text-(--menu-item-fg-danger)');
+  expect(destructiveItem).toHaveClass('data-[variant=destructive]:focus:bg-(--menu-item-bg-danger-highlighted)');
+
+  const checkboxItem = screen.getByText('显示隐藏节点').closest('[data-slot="dropdown-menu-checkbox-item"]');
+  expect(checkboxItem).toHaveClass('text-(--menu-item-fg)');
+  expect(checkboxItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
+
+  const radioItem = screen.getByText('紧凑').closest('[data-slot="dropdown-menu-radio-item"]');
+  expect(radioItem).toHaveClass('text-(--menu-item-fg)');
+  expect(radioItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
+
+  const subTrigger = screen.getByText('更多').closest('[data-slot="dropdown-menu-sub-trigger"]');
+  expect(subTrigger).toHaveClass('text-(--menu-item-fg)');
+  expect(subTrigger).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
+  expect(subTrigger).toHaveClass('data-[state=open]:bg-(--menu-item-bg-highlighted)');
 });
 
 test('Badge、Skeleton、Empty 提供基础展示原子件', () => {

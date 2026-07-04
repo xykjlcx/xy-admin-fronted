@@ -109,6 +109,18 @@
   --overlay-close-fg: var(--button-icon-fg);
   --overlay-close-fg-hover: var(--button-icon-fg-hover);
   --overlay-close-bg-hover: var(--button-icon-bg-hover);
+  --option-fg: var(--text);
+  --option-fg-muted: var(--text-3);
+  --option-bg-highlighted: var(--pri-soft);
+  --option-fg-highlighted: var(--pri);
+  --option-bg-selected: var(--pri-soft);
+  --option-fg-selected: var(--pri);
+  --option-check: var(--pri);
+  --menu-item-fg: var(--text);
+  --menu-item-bg-highlighted: var(--surface-2);
+  --menu-item-fg-highlighted: var(--text);
+  --menu-item-fg-danger: var(--danger);
+  --menu-item-bg-danger-highlighted: var(--danger-bg);
   --focus-ring: calc(3px * var(--app-scale));
   --font-display: var(--font-sans);
   --field-bg: var(--surface-2);
@@ -169,6 +181,7 @@
   --pri-hover: color-mix(in srgb, var(--pri) 85%, white);
   --pri-active: color-mix(in srgb, var(--pri) 76%, white);
   --field-ring-invalid: color-mix(in srgb, var(--danger) 24%, transparent);
+  --menu-item-bg-danger-highlighted: color-mix(in srgb, var(--danger) 20%, transparent);
 }
 [data-flavor='claude'] {
   --field-bg: var(--surface);
@@ -179,6 +192,9 @@
   --field-shadow: none;
   --control-btn-md: calc(36px * var(--app-scale));
   --button-font-weight: 400;
+  --option-fg-highlighted: var(--pri-active);
+  --option-fg-selected: var(--pri-active);
+  --option-check: var(--pri-active);
   --font-display: "Cormorant Garamond", Georgia, "Songti SC", serif;
 }
 [data-flavor='shadcn'] {
@@ -194,6 +210,11 @@
   --button-secondary-bg-hover: var(--surface-2);
   --button-secondary-border-hover: var(--border);
   --button-secondary-fg-hover: var(--text);
+  --option-bg-highlighted: var(--surface-2);
+  --option-fg-highlighted: var(--text);
+  --option-bg-selected: var(--surface-2);
+  --option-fg-selected: var(--text);
+  --option-check: var(--text);
 }
 html:not([data-radius])[data-flavor='feishu'] { --radius-factor: 0.75; }
 html:not([data-radius])[data-flavor='claude'] { --radius-factor: 1; }

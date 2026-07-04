@@ -11,6 +11,7 @@ const dropdownMenuSource = readFileSync('src/components/ui/dropdown-menu.tsx', '
 const selectSource = readFileSync('src/components/ui/select.tsx', 'utf8');
 const tooltipSource = readFileSync('src/components/ui/tooltip.tsx', 'utf8');
 const loginSource = readFileSync('src/routes/login.tsx', 'utf8');
+const languageMenuSource = readFileSync('src/app/shell/widgets/LanguageMenu.tsx', 'utf8');
 
 // 权威值表：原型 L4796-4805 逐字对照，全表逐值断言（tokens.css 全部变量声明，无抽样遗漏）。
 // 静态硬编码，非运行时从 tokens.css 提取——否则文件怎么改断言都跟着变，失去守护意义。
@@ -384,6 +385,54 @@ test('Overlay 族 token 与 Step 4 合同落地', () => {
   expect(selectSource).toContain('w-[var(--radix-select-trigger-width)]');
   expect(tooltipSource).toContain('bg-tooltip');
   expect(tooltipSource).not.toContain('bg-(--overlay-bg)');
+});
+
+test('Option / Menu 族 token 与 Step 5 合同落地', () => {
+  const optionMenuTokens = [
+    '--option-fg: var(--text);',
+    '--option-fg-muted: var(--text-3);',
+    '--option-bg-highlighted: var(--pri-soft);',
+    '--option-fg-highlighted: var(--pri);',
+    '--option-bg-selected: var(--pri-soft);',
+    '--option-fg-selected: var(--pri);',
+    '--option-check: var(--pri);',
+    '--menu-item-fg: var(--text);',
+    '--menu-item-bg-highlighted: var(--surface-2);',
+    '--menu-item-fg-highlighted: var(--text);',
+    '--menu-item-fg-danger: var(--danger);',
+    '--menu-item-bg-danger-highlighted: var(--danger-bg);',
+  ];
+
+  for (const token of optionMenuTokens) {
+    expect(css).toContain(token);
+  }
+
+  expect(css).toContain("--option-fg-highlighted: var(--pri-active);");
+  expect(css).toContain("--option-fg-selected: var(--pri-active);");
+  expect(css).toContain("--option-bg-highlighted: var(--surface-2);");
+  expect(css).toContain("--option-bg-selected: var(--surface-2);");
+
+  expect(selectSource).toContain('text-(--option-fg)');
+  expect(selectSource).toContain('focus:bg-(--option-bg-highlighted)');
+  expect(selectSource).toContain('focus:text-(--option-fg-highlighted)');
+  expect(selectSource).toContain('data-[state=checked]:bg-(--option-bg-selected)');
+  expect(selectSource).toContain('data-[state=checked]:text-(--option-fg-selected)');
+  expect(selectSource).toContain('text-(--option-check)');
+  expect(selectSource).not.toContain('focus:bg-pri-soft');
+
+  expect(dropdownMenuSource).toContain('text-(--menu-item-fg)');
+  expect(dropdownMenuSource).toContain('focus:bg-(--menu-item-bg-highlighted)');
+  expect(dropdownMenuSource).toContain('focus:text-(--menu-item-fg-highlighted)');
+  expect(dropdownMenuSource).toContain('data-[variant=destructive]:text-(--menu-item-fg-danger)');
+  expect(dropdownMenuSource).toContain('data-[variant=destructive]:focus:bg-(--menu-item-bg-danger-highlighted)');
+  expect(dropdownMenuSource).not.toContain('focus:bg-accent');
+  expect(dropdownMenuSource).not.toContain('focus:text-accent-foreground');
+  expect(dropdownMenuSource).not.toContain('data-[state=open]:bg-accent');
+
+  expect(languageMenuSource).toContain('bg-(--option-bg-selected)');
+  expect(languageMenuSource).toContain('text-(--option-fg-selected)');
+  expect(languageMenuSource).toContain('text-(--option-check)');
+  expect(languageMenuSource).not.toContain('bg-pri-soft focus:bg-pri-soft');
 });
 
 test('claude display font 只进入页面标题层，不污染 Field label / 表头', () => {
