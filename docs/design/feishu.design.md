@@ -5,7 +5,8 @@ description: 飞书管理后台设计体系（实测蒸馏版）。白色画布 
 colors:
   primary: "#3370ff"
   primary-soft: "#eef3ff"
-  primary-hover: "#4c88ff"
+  primary-hover: "#5285ff"
+  primary-pressed: "#2456cc"
   canvas: "#ffffff"
   sidebar: "#f2f3f5"
   surface-muted: "#f2f3f5"
@@ -13,6 +14,12 @@ colors:
   body: "#4e5969"
   muted: "#8f959e"
   hairline: "#e5e6eb"
+  border-card: "#dee0e3"
+  border-component: "#d0d3d6"
+  divider: "rgba(31, 35, 41, 0.15)"
+  fill-hover: "rgba(31, 35, 41, 0.08)"
+  fill-pressed: "rgba(31, 35, 41, 0.12)"
+  fill-selected: "rgba(51, 112, 255, 0.1)"
   field-bg: "#f2f3f5"
   on-primary: "#ffffff"
   success: "#16a34a"
@@ -106,9 +113,15 @@ components:
 唯一交互色是功能蓝 `{colors.primary}`（#3370FF），不做任何品牌化渲染。信息密度优先于呼吸感：
 按钮 32px 高、字重 400、行高紧凑、圆角小（4/6px）。整体几乎不用阴影，层次靠"白 vs 浅灰"两级表面表达。
 
-数据来源：2026-07-04 admin.feishu.cn 真实登录态 computed style 实测（企业概览 + 成员与部门页，
-`ud__input` 组件 focus 前后对比采集），详见 spec §16.5。dark mode 值不在本文件（飞书后台无深色模式），
+数据来源：2026-07-04 admin.feishu.cn 真实登录态 computed style 实测 + 飞书主应用 UD token 体系全量
+dump（13273 个变量，`docs/design/research/feishu-ud-tokens.json`；组件实测见同目录
+`feishu-admin-measurements.md`）。dark mode 值不在本文件（飞书后台无深色模式），
 本项目的 feishu 暗色映射见 `src/styles/tokens.css` 的 `[data-flavor='feishu'][data-mode='dark']` block。
+
+v4 修正（第七轮，UD 官方体系）：**hover 方向变浅**（UD primary 四态 default→hover 是升阶变浅，
+pressed 才变深；primary-hover = 主蓝混 15% 白）；**交互底 alpha 化**（hover = N900@8%、pressed = N900@12%、
+selected = 主蓝@10%，即 UD fill-* 官方值）；**边框两级**（card `#DEE0E3`=N300 / component `#D0D3D6`=N350）+
+divider N900@15%。主蓝保留 admin 实测 `#3370FF`（主应用当代蓝 `#1456F0` 记录在案不采用，用户拍板）。
 
 **Key Characteristics:**
 
