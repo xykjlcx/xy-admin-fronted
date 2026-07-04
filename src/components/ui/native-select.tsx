@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils';
 
 const nativeSelectVariants = cva(
   [
-    'w-full min-w-0 rounded-md border border-input bg-surface px-3 text-sm text-text shadow-card-sm outline-none transition-[border-color,box-shadow,background,color]',
-    'hover:border-control-border focus-visible:border-pri focus-visible:ring-[calc(3px*var(--app-scale))] focus-visible:ring-soft',
+    'ui-field w-full min-w-0 cursor-pointer rounded-md border border-input bg-surface px-3 text-sm text-text shadow-card-sm outline-none transition-[border-color,box-shadow,background,color]',
+    'hover:border-control-border focus-visible:border-pri focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-50',
     'aria-invalid:border-danger aria-invalid:ring-danger-bg',
   ].join(' '),

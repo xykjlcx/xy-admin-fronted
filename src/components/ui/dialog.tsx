@@ -45,32 +45,53 @@ function DialogOverlay({
   )
 }
 
+type DialogContentProps = React.ComponentProps<typeof DialogPrimitive.Content> & {
+  showCloseButton?: boolean
+  closeOnInteractOutside?: boolean
+}
+
 function DialogContent({
   className,
   children,
   showCloseButton = true,
+  closeOnInteractOutside = false,
+  onPointerDownOutside,
+  onInteractOutside,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
-}) {
+}: DialogContentProps) {
+  const handlePointerDownOutside: NonNullable<DialogContentProps["onPointerDownOutside"]> = (event) => {
+    onPointerDownOutside?.(event)
+    if (!closeOnInteractOutside && !event.defaultPrevented) {
+      event.preventDefault()
+    }
+  }
+  const handleInteractOutside: NonNullable<DialogContentProps["onInteractOutside"]> = (event) => {
+    onInteractOutside?.(event)
+    if (!closeOnInteractOutside && !event.defaultPrevented) {
+      event.preventDefault()
+    }
+  }
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
       <DialogPrimitive.Content
+        {...props}
         data-slot="dialog-content"
         className={cn(
           "anim-modal-in-lg fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-14 border border-border bg-surface p-6 shadow-modal outline-none sm:max-w-lg",
           className
         )}
-        {...props}
+        onPointerDownOutside={handlePointerDownOutside}
+        onInteractOutside={handleInteractOutside}
       >
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+            className="absolute right-6 top-[calc(22px*var(--app-scale))] flex size-[calc(30px*var(--app-scale))] cursor-pointer items-center justify-center rounded-7 text-text-3 outline-none transition-colors hover:bg-bg hover:text-text focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none"
           >
-            <XIcon />
+            <XIcon className="size-[calc(18px*var(--app-scale))]" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}

@@ -95,6 +95,47 @@
   ::backdrop {
     border-color: var(--border);
   }
+
+  button:focus-visible,
+  a:focus-visible,
+  [role='button']:focus-visible,
+  [role='tab']:focus-visible,
+  [role='menuitem']:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 var(--focus-ring) var(--soft);
+  }
+
+  /* Tailwind v4 / 浏览器默认不会强制 button 显示小手；设计体系要求可点击控件统一 pointer。
+     这里是语义层兜底，组件层仍会显式声明 cursor-pointer，避免 utility 顺序覆盖。 */
+  button:not(:disabled):not([aria-disabled='true']):not([data-disabled]),
+  a[href]:not([aria-disabled='true']):not([data-disabled]),
+  [role='button']:not([aria-disabled='true']):not([data-disabled]),
+  [role='tab']:not([aria-disabled='true']):not([data-disabled]),
+  [role='menuitem']:not([aria-disabled='true']):not([data-disabled]),
+  [data-clickable='true']:not([aria-disabled='true']):not([data-disabled]) {
+    cursor: pointer;
+  }
+}
+
+/* 设计体系 field 状态优先级：hover 只加深普通描边；一旦 focus-within 生效，焦点态必须压过 hover。
+   Tailwind v4 生成的 hover utility 顺序可能晚于 focus-within utility，所以用更高特异性的基础钩子兜住。 */
+.ui-field:focus-within {
+  background: var(--surface);
+}
+
+.ui-field[data-state='open'] {
+  background: var(--surface);
+}
+
+.ui-field:focus-within:hover {
+  border-color: var(--pri);
+}
+
+.ui-field[aria-invalid='true']:hover,
+.ui-field[aria-invalid='true']:focus-within,
+.ui-field[data-status='error']:hover,
+.ui-field[data-status='error']:focus-within {
+  border-color: var(--danger);
 }
 
 html { font-family: var(--font-sans); }

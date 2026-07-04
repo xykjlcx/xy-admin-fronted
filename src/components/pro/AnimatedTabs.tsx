@@ -139,7 +139,7 @@ export function AnimatedTabs<TValue extends string>({
               disabled={item.disabled}
               data-state={active ? 'active' : 'inactive'}
               className={cn(
-                'relative z-10 border-b-2 border-transparent outline-none transition-colors focus-visible:ring-[calc(3px*var(--app-scale))] focus-visible:ring-soft disabled:cursor-not-allowed disabled:opacity-50',
+                'relative z-10 cursor-pointer border-b-2 border-transparent outline-none transition-colors focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft disabled:cursor-not-allowed disabled:opacity-50',
                 variant === 'page' && 'px-1 pb-3 text-[calc(15px*var(--app-scale))]',
                 variant === 'content' && 'px-1 pb-2.5 text-sm',
                 active ? 'border-pri font-semibold text-pri' : 'border-transparent font-normal text-text-2 hover:text-text',

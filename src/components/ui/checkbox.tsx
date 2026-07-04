@@ -37,8 +37,8 @@ function Checkbox({
         disabled={disabled}
         onChange={(event) => onCheckedChange?.(event.currentTarget.checked)}
         className={cn(
-          'peer size-full appearance-none rounded-5 border-[calc(1.5px*var(--app-scale))] border-control-border bg-surface outline-none transition-colors',
-          'hover:border-pri focus-visible:ring-[calc(2px*var(--app-scale))] focus-visible:ring-soft',
+          'peer size-full cursor-pointer appearance-none rounded-5 border-[calc(1.5px*var(--app-scale))] border-control-border bg-surface outline-none transition-colors',
+          'hover:border-pri focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft',
           'checked:border-pri checked:bg-pri disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-50',
           indeterminate && 'border-pri bg-pri-soft',
         )}

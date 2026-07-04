@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
+import { SearchField } from '@/components/pro/SearchField';
 import { StatusBadge } from '@/components/pro/StatusBadge';
 import { TableCheckbox, TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 
@@ -49,6 +50,17 @@ test('StatusBadge 渲染状态文案并支持隐藏圆点', () => {
   );
   expect(screen.getByText('停用')).toBeInTheDocument();
   expect(screen.queryByTestId('status-badge-dot')).not.toBeInTheDocument();
+});
+
+test('SearchField 继承基础 InputGroup 的聚焦态', () => {
+  render(<SearchField aria-label="搜索" />);
+
+  const group = screen.getByRole('searchbox', { name: '搜索' }).closest('[data-slot="input-group"]');
+
+  expect(group).toHaveClass('ui-field');
+  expect(group).toHaveClass('bg-surface-2');
+  expect(group).toHaveClass('focus-within:ring-[length:var(--focus-ring)]');
+  expect(group).not.toHaveClass('focus-within:ring-0');
 });
 
 test('ConfirmDialog 点击确认和取消时触发对应回调', async () => {

@@ -1,20 +1,23 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
 import { vi } from 'vitest';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Empty } from '@/components/ui/empty';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { NativeSelect } from '@/components/ui/native-select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { SelectControl } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
@@ -58,6 +61,23 @@ test('DialogContent 使用 surface 背景而不是页面背景', () => {
   expect(content).not.toHaveClass('bg-background');
 });
 
+test('DialogContent 默认不会被外部点击关闭', async () => {
+  const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+  const onOpenChange = vi.fn();
+  const { container } = render(
+    <Dialog open onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogTitle>编辑资料</DialogTitle>
+        <div>Dialog body</div>
+      </DialogContent>
+    </Dialog>,
+  );
+
+  await user.click(container.querySelector('[data-slot="dialog-overlay"]')!);
+
+  expect(onOpenChange).not.toHaveBeenCalledWith(false);
+});
+
 test('SheetContent 使用 surface 背景而不是页面背景', () => {
   render(
     <Sheet open>
@@ -73,6 +93,44 @@ test('SheetContent 使用 surface 背景而不是页面背景', () => {
   expect(content).not.toHaveClass('bg-background');
 });
 
+test('DialogContent 和 SheetContent 使用统一关闭按钮视觉', () => {
+  const { unmount } = render(
+    <Dialog open>
+      <DialogContent>
+        <DialogTitle>编辑成员</DialogTitle>
+        <div>Dialog body</div>
+      </DialogContent>
+    </Dialog>,
+  );
+
+  const dialogClose = screen.getByRole('button', { name: 'Close' });
+  expect(dialogClose).toHaveClass('size-[calc(30px*var(--app-scale))]');
+  expect(dialogClose).toHaveClass('rounded-7');
+  expect(dialogClose).toHaveClass('text-text-3');
+  expect(dialogClose).toHaveClass('transition-colors');
+  expect(dialogClose).toHaveClass('hover:bg-bg');
+  expect(dialogClose.querySelector('svg')).toHaveClass('size-[calc(18px*var(--app-scale))]');
+
+  unmount();
+
+  render(
+    <Sheet open>
+      <SheetContent>
+        <SheetTitle>外观设置</SheetTitle>
+        <div>Sheet body</div>
+      </SheetContent>
+    </Sheet>,
+  );
+
+  const sheetClose = screen.getByRole('button', { name: 'Close' });
+  expect(sheetClose).toHaveClass('size-[calc(30px*var(--app-scale))]');
+  expect(sheetClose).toHaveClass('rounded-7');
+  expect(sheetClose).toHaveClass('text-text-3');
+  expect(sheetClose).toHaveClass('transition-colors');
+  expect(sheetClose).toHaveClass('hover:bg-bg');
+  expect(sheetClose.querySelector('svg')).toHaveClass('size-[calc(18px*var(--app-scale))]');
+});
+
 test('Button 使用后台设计体系变体并兼容 loading 状态', () => {
   render(
     <Button loading variant="primary">
@@ -85,6 +143,77 @@ test('Button 使用后台设计体系变体并兼容 loading 状态', () => {
   expect(button).toHaveAttribute('aria-busy', 'true');
   expect(button).toBeDisabled();
   expect(button.querySelector('[data-slot="button-spinner"]')).toBeInTheDocument();
+});
+
+test('交互型基础组件统一使用设计体系 focus ring token', () => {
+  render(
+    <>
+      <Button>保存</Button>
+      <Input aria-label="姓名" />
+      <Input aria-label="网址" addonBefore="https://" />
+      <NativeSelect aria-label="状态">
+        <option>启用</option>
+      </NativeSelect>
+      <SelectControl
+        aria-label="部门"
+        value=""
+        options={[{ value: '', label: '请选择部门' }]}
+        onValueChange={vi.fn()}
+      />
+      <Textarea aria-label="备注" />
+      <RadioGroup defaultValue="enabled">
+        <RadioGroupItem aria-label="启用" value="enabled" />
+      </RadioGroup>
+      <Tabs defaultValue="overview">
+        <TabsList>
+          <TabsTrigger value="overview">概览</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    </>,
+  );
+
+  expect(screen.getByRole('button', { name: '保存' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('textbox', { name: '姓名' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('textbox', { name: '网址' }).closest('[data-slot="input-group"]')).toHaveClass(
+    'focus-within:ring-[length:var(--focus-ring)]',
+  );
+  expect(screen.getByRole('textbox', { name: '网址' }).closest('[data-slot="input-group"]')).toHaveClass('ui-field');
+  expect(screen.getByRole('combobox', { name: '状态' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('combobox', { name: '部门' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('textbox', { name: '备注' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('radio', { name: '启用' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+});
+
+test('交互型基础组件统一使用 pointer 光标', () => {
+  render(
+    <>
+      <Button>保存</Button>
+      <Checkbox aria-label="选择成员" />
+      <SelectControl
+        aria-label="部门"
+        value=""
+        options={[{ value: '', label: '请选择部门' }]}
+        onValueChange={vi.fn()}
+      />
+      <Switch aria-label="是否启用" />
+      <RadioGroup defaultValue="enabled">
+        <RadioGroupItem aria-label="启用" value="enabled" />
+      </RadioGroup>
+      <Tabs defaultValue="overview">
+        <TabsList>
+          <TabsTrigger value="overview">概览</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    </>,
+  );
+
+  expect(screen.getByRole('button', { name: '保存' })).toHaveClass('cursor-pointer');
+  expect(screen.getByRole('checkbox', { name: '选择成员' })).toHaveClass('cursor-pointer');
+  expect(screen.getByRole('combobox', { name: '部门' })).toHaveClass('cursor-pointer');
+  expect(screen.getByRole('switch', { name: '是否启用' })).toHaveClass('cursor-pointer');
+  expect(screen.getByRole('radio', { name: '启用' })).toHaveClass('cursor-pointer');
+  expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('cursor-pointer');
 });
 
 test('Input 支持前缀组合形态和错误态', () => {

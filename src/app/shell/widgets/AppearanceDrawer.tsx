@@ -28,6 +28,7 @@ const OUTLINE = 'inset 0 0 0 1px rgba(128,128,128,.14)';
 const FLAVOR_OPTS = [
   { key: 'feishu', preset: FLAVOR_PRESETS[0], label: 'flavorFeishu', desc: 'flavorFeishuDesc' },
   { key: 'claude', preset: FLAVOR_PRESETS[1], label: 'flavorClaude', desc: 'flavorClaudeDesc' },
+  { key: 'shadcn', preset: FLAVOR_PRESETS[2], label: 'flavorShadcn', desc: 'flavorShadcnDesc' },
 ] as const;
 const ANIM_OPTS = ['none', 'fade', 'slide', 'up', 'scale'] as const;
 const ANIM_LABEL: Record<string, string> = {
@@ -150,7 +151,7 @@ export function AppearanceDrawer() {
 
           {/* 主题色 */}
           <SectionTitle>{dk('accent')}</SectionTitle>
-          <div className="grid grid-cols-5 gap-2.5">
+          <div className="grid grid-cols-6 gap-2">
             {ACCENTS.map((a) => (
               <button
                 key={a.key}

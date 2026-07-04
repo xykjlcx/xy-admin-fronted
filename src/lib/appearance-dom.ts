@@ -2,7 +2,7 @@
 // 契约：boot/rehydrate 时必须调用一次 applyAppearance，否则 --pri 注入丢失（CSS 只有 feishu 蓝兜底）。
 // 首帧防闪蓝：appearance store 额外持久化派生的 _priResolved/_priSoftResolved（= resolveAccentVars 结果），
 //   index.html FOUC 脚本读到就直接 setProperty --pri/--pri-soft（亮色才有 soft），避免自选主题色首帧闪回蓝。
-export type Flavor = 'feishu' | 'claude';
+export type Flavor = 'feishu' | 'claude' | 'shadcn';
 export type Mode = 'light' | 'dark';
 export type Zoom = 'sm' | 'md' | 'lg';
 export type Radius = 'sharp' | 'default' | 'round';
@@ -12,6 +12,7 @@ export type Radius = 'sharp' | 'default' | 'round';
 export const ACCENTS = [
   { key: 'blue', labelKey: 'accentBlue', pri: '#3370ff', soft: '#eef3ff' },
   { key: 'claude', labelKey: 'accentClaude', pri: '#c96442', soft: '#f8ede7' },
+  { key: 'shadcn', labelKey: 'accentShadcn', pri: '#18181b', soft: '#f4f4f5' },
   { key: 'green', labelKey: 'accentGreen', pri: '#16a34a', soft: '#e8f7ee' },
   { key: 'violet', labelKey: 'accentViolet', pri: '#7c3aed', soft: '#f3edff' },
 ] as const;
@@ -22,6 +23,7 @@ export type AccentKey = (typeof ACCENTS)[number]['key'] | 'custom';
 export const FLAVOR_PRESETS = [
   { key: 'feishu', pri: '#3370ff', chrome: '#ffffff', surface2: '#f2f3f5' },
   { key: 'claude', pri: '#c96442', chrome: '#f4f1e8', surface2: '#efece1' },
+  { key: 'shadcn', pri: '#18181b', chrome: '#ffffff', surface2: '#f4f4f5' },
 ] as const;
 
 // 自定义取色 tile 的彩虹底（原型 customAccentTileStyle L4964）；含十六进制，放 .ts 承载，组件 style 消费。
@@ -37,6 +39,7 @@ export function isValidHex(hex: string): boolean {
 const FLAVOR_DEFAULT_ACCENT: Record<Flavor, AccentKey> = {
   feishu: 'blue',
   claude: 'claude',
+  shadcn: 'shadcn',
 }; // 原型 L4785
 
 export function flavorDefaultAccent(flavor: Flavor): AccentKey {

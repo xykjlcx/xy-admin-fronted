@@ -12,7 +12,7 @@ export function SearchField({ className, containerClassName, ...props }: SearchF
     <InputGroup
       inputSize="sm"
       className={cn(
-        'h-[calc(34px*var(--app-scale))] border-0 bg-surface-2 px-2.5 shadow-none focus-within:ring-0',
+        'h-[calc(34px*var(--app-scale))] bg-surface-2 px-2.5',
         containerClassName,
       )}
     >

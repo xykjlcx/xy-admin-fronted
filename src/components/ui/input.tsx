@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils';
 
 const inputVariants = cva(
   [
-    'w-full min-w-0 rounded-md border border-input bg-surface px-3 text-sm text-text shadow-card-sm outline-none transition-[border-color,box-shadow,background,color]',
-    'placeholder:text-text-3 hover:border-control-border focus-visible:border-pri focus-visible:ring-[calc(3px*var(--app-scale))] focus-visible:ring-soft',
+    'ui-field w-full min-w-0 rounded-md border border-input bg-surface px-3 text-sm text-text shadow-card-sm outline-none transition-[border-color,box-shadow,background,color]',
+    'placeholder:text-text-3 hover:border-control-border focus-visible:border-pri focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-50',
     'read-only:bg-surface-2 aria-invalid:border-danger aria-invalid:ring-danger-bg',
   ].join(' '),
@@ -92,8 +92,8 @@ function InputGroup({
       data-size={inputSize}
       data-status={status}
       className={cn(
-        'flex w-full min-w-0 items-center gap-2 rounded-md border border-input bg-surface px-3 text-sm text-text shadow-card-sm transition-[border-color,box-shadow,background,color]',
-        'hover:border-control-border focus-within:border-pri focus-within:ring-[calc(3px*var(--app-scale))] focus-within:ring-soft',
+        'ui-field flex w-full min-w-0 items-center gap-2 rounded-md border border-input bg-surface px-3 text-sm text-text shadow-card-sm transition-[border-color,box-shadow,background,color]',
+        'hover:border-control-border focus-within:border-pri focus-within:ring-[length:var(--focus-ring)] focus-within:ring-soft',
         'data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-surface-2 data-[disabled=true]:opacity-50',
         inputSize === 'sm' && 'h-[var(--control-sm)] text-[calc(13px*var(--app-scale))]',
         inputSize === 'md' && 'h-[var(--control-md)] text-sm',
@@ -106,18 +106,21 @@ function InputGroup({
   );
 }
 
-function InputGroupInput({ className, ...props }: React.ComponentProps<'input'>) {
-  return (
-    <input
-      data-slot="input-group-input"
-      className={cn(
-        'min-w-0 flex-1 border-0 bg-transparent p-0 outline-none placeholder:text-text-3 disabled:cursor-not-allowed',
-        className,
-      )}
-      {...props}
-    />
-  );
-}
+const InputGroupInput = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
+  function InputGroupInput({ className, ...props }, ref) {
+    return (
+      <input
+        ref={ref}
+        data-slot="input-group-input"
+        className={cn(
+          'min-w-0 flex-1 border-0 bg-transparent p-0 outline-none placeholder:text-text-3 disabled:cursor-not-allowed',
+          className,
+        )}
+        {...props}
+      />
+    );
+  },
+);
 
 function InputGroupAddon({ className, ...props }: React.ComponentProps<'span'>) {
   return (

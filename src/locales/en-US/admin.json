@@ -232,6 +232,7 @@
     "title": "Menu Management",
     "breadcrumbGroup": "Organization & Permissions",
     "refreshing": "Updating",
+    "searchLabel": "Search menus",
     "searchPlaceholder": "Search menu name, route, permission",
     "treeTitle": "{{subsystem}} · Menu tree",
     "stats": "Dirs {{dirs}} · Menus {{menus}} · Actions {{actions}} · Hidden {{hidden}}",

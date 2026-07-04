@@ -31,6 +31,9 @@ test('自定义色 soft 公式', () => {
 test('claude flavor 默认陶土橙', () => {
   expect(flavorDefaultAccent('claude')).toBe('claude');
 });
+test('shadcn flavor 默认中性黑', () => {
+  expect(flavorDefaultAccent('shadcn')).toBe('shadcn');
+});
 test('default 档 radius/zoom 不写入 dataset（先设非默认再切回验证 delete）', () => {
   applyAppearance({ ...base, radius: 'sharp', zoom: 'lg' });
   expect('radius' in document.documentElement.dataset).toBe(true);
@@ -49,10 +52,11 @@ test('applyAppearance 写入 dataset.flavor/mode', () => {
 });
 
 // ACCENTS 色名走 i18n key（不硬编码中文，随语言切换），labelKey 对应 shell.appearanceDrawer.<labelKey> 词条
-test('ACCENTS 四预设均有 labelKey（非硬编码中文）', () => {
+test('ACCENTS 五预设均有 labelKey（非硬编码中文）', () => {
   expect(ACCENTS.map((a) => a.labelKey)).toEqual([
     'accentBlue',
     'accentClaude',
+    'accentShadcn',
     'accentGreen',
     'accentViolet',
   ]);

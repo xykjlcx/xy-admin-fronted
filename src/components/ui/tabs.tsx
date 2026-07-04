@@ -67,8 +67,8 @@ function TabsTrigger({
       data-slot="tabs-trigger"
       className={cn(
         [
-          'relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-6 border border-transparent px-3 py-1 text-sm font-medium text-text-3 outline-none transition-[background,border-color,color,box-shadow]',
-          'hover:text-text focus-visible:ring-[calc(3px*var(--app-scale))] focus-visible:ring-soft disabled:pointer-events-none disabled:opacity-50',
+          'relative inline-flex h-[calc(100%-1px)] flex-1 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-6 border border-transparent px-3 py-1 text-sm font-medium text-text-3 outline-none transition-[background,border-color,color,box-shadow]',
+          'hover:text-text focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft disabled:pointer-events-none disabled:opacity-50',
           'group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start',
           'data-[state=active]:bg-surface data-[state=active]:text-text data-[state=active]:shadow-card-sm',
           'group-data-[variant=line]/tabs-list:rounded-none group-data-[variant=line]/tabs-list:border-0 group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:px-1 group-data-[variant=line]/tabs-list:pb-3',

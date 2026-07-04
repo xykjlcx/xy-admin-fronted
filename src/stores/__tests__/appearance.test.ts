@@ -23,6 +23,8 @@ test('切 flavor 重置 accent 为 flavor 默认（原型耦合规则）', () =>
   expect(useAppearance.getState().accent).toBe('claude');
   useAppearance.getState().setFlavor('feishu');
   expect(useAppearance.getState().accent).toBe('blue');
+  useAppearance.getState().setFlavor('shadcn');
+  expect(useAppearance.getState().accent).toBe('shadcn');
 });
 
 test('toggleCollapsed 只影响对应 layout key（per-layout 隔离）', () => {

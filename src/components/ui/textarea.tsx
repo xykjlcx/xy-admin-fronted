@@ -19,8 +19,8 @@ function Textarea({
       data-slot="textarea"
       className={cn(
         [
-          'flex min-h-[calc(88px*var(--app-scale))] w-full rounded-md border border-input bg-surface px-3 py-2 text-sm text-text shadow-card-sm outline-none transition-[background,border-color,box-shadow,color]',
-          'placeholder:text-text-3 hover:border-control-border focus-visible:border-pri focus-visible:ring-[calc(3px*var(--app-scale))] focus-visible:ring-soft',
+          'ui-field flex min-h-[calc(88px*var(--app-scale))] w-full rounded-md border border-input bg-surface px-3 py-2 text-sm text-text shadow-card-sm outline-none transition-[background,border-color,box-shadow,color]',
+          'placeholder:text-text-3 hover:border-control-border focus-visible:border-pri focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft',
           'disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-50 aria-invalid:border-danger aria-invalid:ring-danger-bg',
           resize === 'none' && 'resize-none',
           resize === 'vertical' && 'resize-y',

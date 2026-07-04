@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { beforeAll, vi } from 'vitest';
 import { i18nInit } from '@/lib/i18n';
 import { MenusView, type MenusViewProps } from '@/modules/admin/pages/menus';
@@ -145,6 +145,16 @@ test('搜索只过滤本地树表，不触发子系统切换', async () => {
   expect(onActiveSubsystemChange).not.toHaveBeenCalled();
 });
 
+test('菜单搜索使用业务 SearchField 而不是页面内联输入框', () => {
+  renderMenusView();
+
+  const input = screen.getByRole('searchbox', { name: '搜索菜单' });
+  const group = input.closest('[data-slot="input-group"]');
+
+  expect(group).toBeInTheDocument();
+  expect(group).toHaveClass('focus-within:ring-[length:var(--focus-ring)]');
+});
+
 test('admin 可以新增菜单节点', async () => {
   const onCreateMenu = vi.fn();
   renderMenusView({ permissions: ['*:*:*'], onCreateMenu });
@@ -169,6 +179,22 @@ test('admin 可以新增菜单节点', async () => {
     visible: true,
     sort: 3,
   });
+});
+
+test('新增菜单中切换两个下拉控件时不会关闭弹窗', async () => {
+  const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+  renderMenusView({ permissions: ['*:*:*'] });
+
+  await user.click(screen.getByRole('button', { name: '新增菜单' }));
+  await user.click(screen.getByRole('combobox', { name: '节点类型' }));
+  await user.click(await screen.findByRole('option', { name: '菜单' }));
+  await user.click(screen.getByRole('combobox', { name: '图标' }));
+  expect(await screen.findByRole('option', { name: '默认图标' })).toBeInTheDocument();
+
+  await user.click(screen.getByText('请选择路由'));
+
+  expect(document.body.querySelector('[data-slot="dialog-content"]')).toBeInTheDocument();
+  expect(document.body).toHaveTextContent('新增菜单');
 });
 
 test('admin 可以编辑已有菜单', async () => {

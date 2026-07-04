@@ -24,6 +24,18 @@
   --surface-2: #302b27; --surface-blur: rgba(33, 29, 26, 0.78);
   --text: #ece6dd; --text-2: #a89f92; --text-3: #7d7568; --border: #3a342e;
 }
+[data-flavor='shadcn'][data-mode='light'] {
+  --pri: #18181b; --pri-soft: #f4f4f5;
+  --bg: #ffffff; --canvas: #fafafa; --surface: #ffffff; --chrome: #ffffff;
+  --surface-2: #f4f4f5; --surface-blur: rgba(255, 255, 255, 0.82);
+  --text: #09090b; --text-2: #3f3f46; --text-3: #71717a; --border: #e4e4e7;
+}
+[data-flavor='shadcn'][data-mode='dark'] {
+  --pri-soft: rgba(255, 255, 255, 0.10);
+  --bg: #09090b; --canvas: #09090b; --surface: #18181b; --chrome: #09090b;
+  --surface-2: #27272a; --surface-blur: rgba(24, 24, 27, 0.78);
+  --text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: #27272a;
+}
 
 :root {
   --pri-hover: color-mix(in srgb, var(--pri) 85%, black);
@@ -48,6 +60,7 @@
   --control-sm: calc(30px * var(--app-scale));
   --control-md: calc(36px * var(--app-scale));
   --control-lg: calc(42px * var(--app-scale));
+  --focus-ring: calc(3px * var(--app-scale));
   /* Tooltip 恒深底白字（原型 .hicon-tip L32：background #1f2329，明暗两 flavor 都不反转）。
      走 token 供组件 bg-tooltip 消费，禁组件内写 hex（ESLint 拦）。 */
   --tooltip-bg: #1f2329;

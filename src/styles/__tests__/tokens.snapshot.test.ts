@@ -65,6 +65,7 @@ const MUST_CONTAIN = [
   '--danger: #f53f3f;',
   '--danger-soft: #feecec;',
   '--control-border: color-mix(in srgb, var(--border) 70%, var(--text-3));',
+  '--focus-ring: calc(3px * var(--app-scale));',
   '--radius-factor: 1;',
   '--radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));',
   '--radius-md: calc(8px * var(--radius-factor) * var(--app-scale));',
@@ -99,6 +100,38 @@ test('显示比例基础层覆盖 Tailwind spacing 与 text token', () => {
 test('显示比例基础层覆盖 Dialog 等 shadcn container token', () => {
   expect(globalCss).toContain('--container-sm: calc(24rem * var(--app-scale));');
   expect(globalCss).toContain('--container-lg: calc(32rem * var(--app-scale));');
+});
+
+test('原生交互元素有设计体系 focus-visible 兜底', () => {
+  expect(globalCss).toContain('button:focus-visible');
+  expect(globalCss).toContain('a:focus-visible');
+  expect(globalCss).toContain('box-shadow: 0 0 0 var(--focus-ring) var(--soft);');
+});
+
+test('原生可点击元素有设计体系 pointer 光标兜底', () => {
+  expect(globalCss).toContain("button:not(:disabled):not([aria-disabled='true'])");
+  expect(globalCss).toContain('a[href]');
+  expect(globalCss).toContain("[role='button']:not([aria-disabled='true'])");
+  expect(globalCss).toContain("[role='tab']:not([aria-disabled='true'])");
+  expect(globalCss).toContain('cursor: pointer;');
+});
+
+test('field 聚焦态优先级高于 hover 态', () => {
+  expect(globalCss).toContain('.ui-field:focus-within {');
+  expect(globalCss).toContain('background: var(--surface);');
+  expect(globalCss).toContain('.ui-field:focus-within:hover');
+  expect(globalCss).toContain('border-color: var(--pri);');
+});
+
+test('shadcn flavor 提供官方中性基线 token', () => {
+  expect(css).toContain("[data-flavor='shadcn'][data-mode='light']");
+  expect(css).toContain('--bg: #ffffff; --canvas: #fafafa; --surface: #ffffff; --chrome: #ffffff;');
+  expect(css).toContain('--surface-2: #f4f4f5; --surface-blur: rgba(255, 255, 255, 0.82);');
+  expect(css).toContain('--text: #09090b; --text-2: #3f3f46; --text-3: #71717a; --border: #e4e4e7;');
+  expect(css).toContain("[data-flavor='shadcn'][data-mode='dark']");
+  expect(css).toContain('--bg: #09090b; --canvas: #09090b; --surface: #18181b; --chrome: #09090b;');
+  expect(css).toContain('--surface-2: #27272a; --surface-blur: rgba(24, 24, 27, 0.78);');
+  expect(css).toContain('--text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: #27272a;');
 });
 
 test('圆角因子三档 + 四条 calc 公式', () => {

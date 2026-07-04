@@ -97,6 +97,27 @@ test('ui primitive baseline is installed as local shadcn-backed source files', (
   }
 });
 
+test('page and business layers do not bypass form primitives with raw text inputs', () => {
+  const allowedRawInputFiles = new Set([
+    'src/components/ui/checkbox.tsx',
+    'src/components/ui/input.tsx',
+    'src/components/ui/native-select.tsx',
+    'src/components/ui/textarea.tsx',
+    'src/app/shell/widgets/AppearanceDrawer.tsx',
+  ]);
+  const sourceFiles = collectFiles(sourceRoot)
+    .filter((file) => file.endsWith('.tsx'))
+    .filter((file) => !file.includes('/__tests__/'))
+    .map((file) => file.replace(`${projectRoot}/`, ''));
+
+  for (const file of sourceFiles) {
+    if (allowedRawInputFiles.has(file)) continue;
+    expect(readProjectFile(file), `${file} should use Input/InputGroup/SearchField instead of raw input`).not.toMatch(
+      /<input\b/,
+    );
+  }
+});
+
 test('admin routes stay thin and keep async state in module pages', () => {
   const routeFiles = readdirSync(adminRoutesDir).filter((file) => file.endsWith('.tsx'));
   const forbiddenRouteCouplings = [

@@ -4,6 +4,14 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Input,
+  InputGroup,
+  InputGroupInput,
+  InputGroupPrefix,
+  InputGroupSuffix,
+} from '@/components/ui/input';
 import { authApi } from '@/modules/admin/api/auth.api';
 import { resetAuth } from '@/lib/reset-auth';
 import { cn } from '@/lib/utils';
@@ -118,12 +126,14 @@ function LoginPage() {
                 </p>
               )}
 
-              <button
+              <Button
                 type="submit"
-                className="mt-[calc(26px*var(--app-scale))] flex h-[calc(48px*var(--app-scale))] w-full items-center justify-center rounded-10 bg-pri text-[calc(15px*var(--app-scale))] font-semibold text-white shadow-popover hover:bg-pri-hover"
+                size="lg"
+                block
+                className="mt-[calc(26px*var(--app-scale))] h-[calc(48px*var(--app-scale))] rounded-10 text-[calc(15px*var(--app-scale))] shadow-popover"
               >
                 {t('auth.login')} ›
-              </button>
+              </Button>
 
               <div className="my-6 flex items-center gap-3.5">
                 <span className="h-px flex-1 bg-border" />
@@ -218,37 +228,45 @@ function PasswordFields({
   return (
     <>
       <div className="mt-[calc(26px*var(--app-scale))]">
-        <label className="mb-2 block text-[calc(13px*var(--app-scale))] font-medium text-text-2">{t('auth.account')}</label>
-        <div className="flex h-[calc(46px*var(--app-scale))] items-center gap-2.5 rounded-10 border border-border bg-surface px-3.5">
-          <Mail className="size-[calc(17px*var(--app-scale))] text-text-3" />
-          <input
+        <label htmlFor="login-username" className="mb-2 block text-[calc(13px*var(--app-scale))] font-medium text-text-2">{t('auth.account')}</label>
+        <InputGroup inputSize="lg" className="h-[calc(46px*var(--app-scale))] gap-2.5 rounded-10 px-3.5">
+          <InputGroupPrefix>
+            <Mail data-icon="inline-start" className="size-[calc(17px*var(--app-scale))] text-text-3" />
+          </InputGroupPrefix>
+          <InputGroupInput
+            id="login-username"
             {...register('username')}
-            className="min-w-0 flex-1 bg-transparent text-sm text-text outline-none"
+            className="text-sm text-text"
           />
-        </div>
+        </InputGroup>
       </div>
       <div className="mt-[calc(18px*var(--app-scale))]">
         <div className="mb-2 flex items-center justify-between">
-          <label className="text-[calc(13px*var(--app-scale))] font-medium text-text-2">{t('auth.password')}</label>
+          <label htmlFor="login-password" className="text-[calc(13px*var(--app-scale))] font-medium text-text-2">{t('auth.password')}</label>
           <button type="button" className="text-[calc(13px*var(--app-scale))] text-pri">{t('auth.forgotPassword')}</button>
         </div>
-        <div className="flex h-[calc(46px*var(--app-scale))] items-center gap-2.5 rounded-10 border border-border bg-surface px-3.5">
-          <Lock className="size-[calc(17px*var(--app-scale))] text-text-3" />
-          <input
+        <InputGroup inputSize="lg" className="h-[calc(46px*var(--app-scale))] gap-2.5 rounded-10 px-3.5">
+          <InputGroupPrefix>
+            <Lock data-icon="inline-start" className="size-[calc(17px*var(--app-scale))] text-text-3" />
+          </InputGroupPrefix>
+          <InputGroupInput
+            id="login-password"
             {...register('password')}
             type={showPassword ? 'text' : 'password'}
-            className="min-w-0 flex-1 bg-transparent text-sm text-text outline-none"
+            className="text-sm text-text"
           />
-          <button
-            type="button"
-            aria-label={passwordToggleLabel}
-            title={passwordToggleLabel}
-            onClick={onTogglePassword}
-            className="text-text-3 hover:text-text"
-          >
-            <Eye className="size-[calc(17px*var(--app-scale))]" />
-          </button>
-        </div>
+          <InputGroupSuffix>
+            <button
+              type="button"
+              aria-label={passwordToggleLabel}
+              title={passwordToggleLabel}
+              onClick={onTogglePassword}
+              className="text-text-3 hover:text-text"
+            >
+              <Eye data-icon="inline-start" className="size-[calc(17px*var(--app-scale))]" />
+            </button>
+          </InputGroupSuffix>
+        </InputGroup>
       </div>
     </>
   );
@@ -259,26 +277,31 @@ function SmsFields() {
   return (
     <div className="mt-[calc(26px*var(--app-scale))] grid gap-[calc(18px*var(--app-scale))]">
       <div>
-        <label className="mb-2 block text-[calc(13px*var(--app-scale))] font-medium text-text-2">{t('auth.phone')}</label>
-        <div className="flex h-[calc(46px*var(--app-scale))] items-center gap-2.5 rounded-10 border border-border bg-surface px-3.5">
-          <span className="text-sm text-text-2">+86</span>
-          <span className="h-[calc(18px*var(--app-scale))] w-px bg-border" />
-          <input
+        <label htmlFor="login-phone" className="mb-2 block text-[calc(13px*var(--app-scale))] font-medium text-text-2">{t('auth.phone')}</label>
+        <InputGroup inputSize="lg" className="h-[calc(46px*var(--app-scale))] gap-2.5 rounded-10 px-3.5">
+          <InputGroupPrefix className="items-center gap-2 text-text-2">
+            <span className="text-sm">+86</span>
+            <span className="h-[calc(18px*var(--app-scale))] w-px bg-border" />
+          </InputGroupPrefix>
+          <InputGroupInput
+            id="login-phone"
             placeholder={t('auth.phonePlaceholder')}
-            className="min-w-0 flex-1 bg-transparent text-sm text-text outline-none placeholder:text-text-3"
+            className="text-sm text-text"
           />
-        </div>
+        </InputGroup>
       </div>
       <div>
-        <label className="mb-2 block text-[calc(13px*var(--app-scale))] font-medium text-text-2">{t('auth.smsCode')}</label>
+        <label htmlFor="login-sms-code" className="mb-2 block text-[calc(13px*var(--app-scale))] font-medium text-text-2">{t('auth.smsCode')}</label>
         <div className="flex gap-2.5">
-          <input
+          <Input
+            id="login-sms-code"
+            inputSize="lg"
             placeholder={t('auth.smsPlaceholder')}
-            className="h-[calc(46px*var(--app-scale))] min-w-0 flex-1 rounded-10 border border-border bg-surface px-3.5 text-sm outline-none"
+            className="h-[calc(46px*var(--app-scale))] rounded-10 px-3.5 text-sm"
           />
-          <button type="button" className="h-[calc(46px*var(--app-scale))] w-[calc(120px*var(--app-scale))] rounded-10 border border-pri text-[calc(13px*var(--app-scale))] text-pri">
+          <Button type="button" variant="outline" size="lg" className="h-[calc(46px*var(--app-scale))] w-[calc(120px*var(--app-scale))] rounded-10 border-pri text-[calc(13px*var(--app-scale))] text-pri hover:border-pri hover:text-pri">
             {t('auth.getSmsCode')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

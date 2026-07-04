@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { ChevronsDown, ChevronsUp, Grid2X2, Plus, Search } from 'lucide-react';
+import { ChevronsDown, ChevronsUp, Grid2X2, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
+import { SearchField } from '@/components/pro/SearchField';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/lib/icon-registry';
 import { lv } from '@/lib/localized';
@@ -267,15 +268,13 @@ export function MenusView({
               </div>
             </div>
             <div className="flex-1" />
-            <div className="flex h-[calc(34px*var(--app-scale))] w-[calc(280px*var(--app-scale))] items-center gap-2 rounded-8 border border-border bg-surface px-3">
-              <Search className="size-4 text-text-3" />
-              <input
-                value={keyword}
-                placeholder={t('menus.searchPlaceholder')}
-                className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-text-3"
-                onChange={(event) => setKeyword(event.currentTarget.value)}
-              />
-            </div>
+            <SearchField
+              aria-label={t('menus.searchLabel')}
+              value={keyword}
+              placeholder={t('menus.searchPlaceholder')}
+              containerClassName="w-[calc(280px*var(--app-scale))]"
+              onChange={(event) => setKeyword(event.currentTarget.value)}
+            />
             <Button variant="outline" size="sm" onClick={() => setCollapsedIds([])}>
               <ChevronsDown className="size-4" />
               {t('menus.actions.expand')}

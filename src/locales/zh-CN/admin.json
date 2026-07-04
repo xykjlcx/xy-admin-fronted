@@ -232,6 +232,7 @@
     "title": "菜单管理",
     "breadcrumbGroup": "组织与权限",
     "refreshing": "正在更新",
+    "searchLabel": "搜索菜单",
     "searchPlaceholder": "搜索菜单名称、路由、权限标识",
     "treeTitle": "{{subsystem}} · 菜单树",
     "stats": "目录 {{dirs}} · 菜单 {{menus}} · 动作 {{actions}} · 隐藏 {{hidden}}",
