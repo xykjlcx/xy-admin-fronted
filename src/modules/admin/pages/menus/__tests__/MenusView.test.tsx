@@ -8,6 +8,11 @@ beforeAll(async () => {
   await i18nInit;
 });
 
+async function chooseSelectOption(label: string, optionName: string) {
+  await userEvent.click(screen.getByRole('combobox', { name: label }));
+  await userEvent.click(await screen.findByRole('option', { name: optionName }));
+}
+
 const subsystemsFixture = [
   {
     key: 'admin',
@@ -145,10 +150,10 @@ test('admin 可以新增菜单节点', async () => {
   renderMenusView({ permissions: ['*:*:*'], onCreateMenu });
 
   await userEvent.click(screen.getByRole('button', { name: '新增菜单' }));
-  await userEvent.selectOptions(screen.getByLabelText('节点类型'), 'menu');
-  await userEvent.selectOptions(screen.getByLabelText('父级菜单'), 'm-org');
+  await chooseSelectOption('节点类型', '菜单');
+  await chooseSelectOption('父级菜单', '组织与权限');
   await userEvent.type(screen.getByLabelText('菜单名称'), '菜单配置');
-  await userEvent.selectOptions(screen.getByLabelText('路由路径'), '/admin/users');
+  await chooseSelectOption('路由路径', '成员与部门 · /admin/users');
   await userEvent.type(screen.getByLabelText('权限标识'), 'iam:menu:view');
   await userEvent.click(screen.getByRole('button', { name: '确定新增' }));
 

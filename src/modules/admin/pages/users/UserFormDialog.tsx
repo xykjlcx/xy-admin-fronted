@@ -4,7 +4,7 @@ import { FormDialogContent } from '@/components/pro/FormDialog';
 import { Dialog } from '@/components/ui/dialog';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { NativeSelect } from '@/components/ui/native-select';
+import { SelectControl } from '@/components/ui/select';
 import type { CreateUserInput, DeptDto, UserDto } from '@/modules/admin/api/user.api';
 import { emptyDraft } from './model';
 
@@ -115,18 +115,15 @@ function UserFormDialogContent({
       </Field>
       <Field>
         <FieldLabel htmlFor="user-dept">{t('users.form.dept')}</FieldLabel>
-        <NativeSelect
+        <SelectControl
           id="user-dept"
           value={draft.deptId}
-          onChange={(event) => setDraft((current) => ({ ...current, deptId: event.target.value }))}
-        >
-          <option value="">{t('users.form.dept')}</option>
-          {depts.map((dept) => (
-            <option key={dept.id} value={dept.id}>
-              {dept.name}
-            </option>
-          ))}
-        </NativeSelect>
+          options={[
+            { value: '', label: t('users.form.dept') },
+            ...depts.map((dept) => ({ value: dept.id, label: dept.name })),
+          ]}
+          onValueChange={(deptId) => setDraft((current) => ({ ...current, deptId }))}
+        />
       </Field>
       <Field>
         <FieldLabel htmlFor="user-role">{t('users.form.role')}</FieldLabel>

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
 import type { TFunction } from 'i18next';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SelectControl, type SelectOption } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { lv } from '@/lib/localized';
 import { cn } from '@/lib/utils';
@@ -144,25 +144,26 @@ function SelectField({
   id,
   value,
   disabled,
-  children,
+  options,
+  placeholder,
   onChange,
 }: {
   id: string;
   value: string;
   disabled?: boolean;
-  children: ReactNode;
+  options: SelectOption[];
+  placeholder?: string;
   onChange: (value: string) => void;
 }) {
   return (
-    <select
+    <SelectControl
       id={id}
       value={value}
       disabled={disabled}
-      className="h-9 rounded-8 border border-border bg-surface px-3 text-sm text-text outline-none transition-colors hover:border-pri focus:border-pri disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-text-3"
-      onChange={(event) => onChange(event.currentTarget.value)}
-    >
-      {children}
-    </select>
+      options={options}
+      placeholder={placeholder}
+      onValueChange={onChange}
+    />
   );
 }
 
@@ -262,11 +263,12 @@ export function MenuFormDialog({
                 value={draft.type}
                 disabled={typeLocked}
                 onChange={(value) => changeType(value as ManagedMenuType)}
-              >
-                <option value="dir">{t('menus.types.dir')}</option>
-                <option value="menu">{t('menus.types.menu')}</option>
-                <option value="action">{t('menus.types.action')}</option>
-              </SelectField>
+                options={[
+                  { value: 'dir', label: t('menus.types.dir') },
+                  { value: 'menu', label: t('menus.types.menu') },
+                  { value: 'action', label: t('menus.types.action') },
+                ]}
+              />
             </div>
 
             <div className="grid gap-2">
@@ -276,13 +278,8 @@ export function MenuFormDialog({
                 value={draft.parentId}
                 disabled={draft.type === 'dir' || currentParentOptions.length === 0}
                 onChange={changeParent}
-              >
-                {currentParentOptions.map((option) => (
-                  <option key={option.id || 'root'} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </SelectField>
+                options={currentParentOptions.map((option) => ({ value: option.id, label: option.label }))}
+              />
             </div>
           </div>
 
@@ -299,13 +296,12 @@ export function MenuFormDialog({
 
             <div className="grid gap-2">
               <FieldLabel htmlFor="menu-icon">{t('menus.form.icon')}</FieldLabel>
-              <SelectField id="menu-icon" value={draft.icon} onChange={(value) => patchDraft({ icon: value })}>
-                {iconOptions.map((option) => (
-                  <option key={option.value || 'default'} value={option.value}>
-                    {t(option.labelKey)}
-                  </option>
-                ))}
-              </SelectField>
+              <SelectField
+                id="menu-icon"
+                value={draft.icon}
+                onChange={(value) => patchDraft({ icon: value })}
+                options={iconOptions.map((option) => ({ value: option.value, label: t(option.labelKey) }))}
+              />
             </div>
           </div>
 
@@ -317,14 +313,14 @@ export function MenuFormDialog({
                 value={draft.path}
                 disabled={draft.type !== 'menu'}
                 onChange={(value) => patchDraft({ path: value })}
-              >
-                <option value="">{t('menus.form.pathPlaceholder')}</option>
-                {routeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {t(option.labelKey)} · {option.value}
-                  </option>
-                ))}
-              </SelectField>
+                options={[
+                  { value: '', label: t('menus.form.pathPlaceholder') },
+                  ...routeOptions.map((option) => ({
+                    value: option.value,
+                    label: `${t(option.labelKey)} · ${option.value}`,
+                  })),
+                ]}
+              />
             </div>
 
             <div className="grid gap-2">

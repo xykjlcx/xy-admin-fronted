@@ -88,6 +88,7 @@ Route 文件只做边界装配：
 - 基础 UI 组件以 shadcn/Radix 源码模式维护在本项目内；从 `@/components/ui/*` 引入的是项目本地组件，不是运行时从 shadcn 包导出。
 - Button 标准变体使用 `primary`、`secondary`、`dashed`、`text`、`danger`、`danger-ghost`；`default`、`outline`、`ghost`、`link`、`destructive` 只作为兼容旧调用的别名逐步迁移。
 - Input 标准形态优先用 `Input`；有前缀、后缀、拼接前缀时用 `InputGroup`、`InputGroupInput`、`InputGroupPrefix`、`InputGroupSuffix`、`InputGroupAddon` 组合，错误态通过 `status="error"` 或 `aria-invalid` 表达。
+- 业务表单下拉统一使用 `SelectControl` / Radix Select，自定义弹层、选项态、尺寸和动画必须吃项目 token；`NativeSelect` 只保留给明确需要系统原生选择器的极少数场景，不作为后台表单默认控件。
 - Badge、Skeleton、Empty、Checkbox 属于基础展示/反馈原子件；`StatusBadge`、`SearchField`、`TableShell` 这类后台通用组合必须复用它们。
 - `src/components/pro` 只沉淀业务无关的后台模式组件，例如表格壳、分页、筛选、侧边列表、表单弹窗。Pro 组件可以组合 UI 组件，但不能引入模块 DTO、接口或权限逻辑。
 - 页面层只描述业务含义和编排，不直接写原生 `<button>`、`<input>`、`<select>`、`<textarea>`，除非该控件被封装为新的 UI/Pro 组件时作为实现细节出现。

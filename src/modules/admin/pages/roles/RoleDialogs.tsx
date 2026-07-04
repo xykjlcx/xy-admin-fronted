@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { NativeSelect } from '@/components/ui/native-select';
+import { SelectControl } from '@/components/ui/select';
 import type { CreateAdminRoleInput, CreateRoleInput } from '@/modules/admin/api/role.api';
 import { emptyAdminDraft, emptyRoleDraft } from './model';
 import type { SelectableMemberDto } from './types';
@@ -121,18 +121,15 @@ export function CreateAdminRoleDialog({
           </Field>
           <Field>
             <FieldLabel required>{t('roles.form.adminMember')}</FieldLabel>
-            <NativeSelect
+            <SelectControl
               aria-label={t('roles.form.adminMember')}
               value={adminDraft.admin}
-              onChange={(event) => setAdminDraft((current) => ({ ...current, admin: event.target.value }))}
-            >
-              <option value="">{t('roles.form.adminMemberPlaceholder')}</option>
-              {selectableMembers.map((member) => (
-                <option key={member.id} value={member.name}>
-                  {member.name}
-                </option>
-              ))}
-            </NativeSelect>
+              options={[
+                { value: '', label: t('roles.form.adminMemberPlaceholder') },
+                ...selectableMembers.map((member) => ({ value: member.name, label: member.name })),
+              ]}
+              onValueChange={(admin) => setAdminDraft((current) => ({ ...current, admin }))}
+            />
           </Field>
         </FieldGroup>
         <DialogFooter>

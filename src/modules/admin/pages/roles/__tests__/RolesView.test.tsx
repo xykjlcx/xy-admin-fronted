@@ -217,7 +217,8 @@ test('管理员权限 tab 可以新增管理员角色', async () => {
   await userEvent.click(screen.getByRole('tab', { name: '管理员权限' }));
   await userEvent.click(screen.getByRole('button', { name: '创建管理员角色' }));
   await userEvent.type(screen.getByPlaceholderText('如：文件管理员'), '客服管理员');
-  await userEvent.selectOptions(screen.getByLabelText('指派管理员'), '王思远');
+  await userEvent.click(screen.getByRole('combobox', { name: '指派管理员' }));
+  await userEvent.click(await screen.findByRole('option', { name: '王思远' }));
   await userEvent.click(screen.getByRole('button', { name: '确定创建' }));
 
   expect(onCreateAdminRole).toHaveBeenCalledWith({ name: '客服管理员', admin: '王思远' });

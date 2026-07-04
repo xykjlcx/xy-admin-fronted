@@ -1,10 +1,12 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Empty } from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
-import { NativeSelect } from '@/components/ui/native-select';
+import { SelectControl } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -60,16 +62,29 @@ test('Input 支持前缀组合形态和错误态', () => {
   expect(input.closest('[data-slot="input-group"]')).toHaveAttribute('data-status', 'error');
 });
 
-test('NativeSelect 暴露统一 select 基础样式状态', () => {
-  render(
-    <NativeSelect aria-label="部门" status="error">
-      <option>研发部</option>
-    </NativeSelect>,
+test('SelectControl 使用自定义下拉层而不是原生 select', async () => {
+  const onValueChange = vi.fn();
+  const { container } = render(
+    <SelectControl
+      aria-label="部门"
+      aria-invalid
+      value=""
+      options={[
+        { value: '', label: '请选择部门' },
+        { value: 'rd', label: '研发部' },
+      ]}
+      onValueChange={onValueChange}
+    />,
   );
 
-  const select = screen.getByRole('combobox', { name: '部门' });
-  expect(select).toHaveAttribute('data-slot', 'native-select');
-  expect(select).toHaveClass('border-danger');
+  expect(container.querySelector('select')).not.toBeInTheDocument();
+  const trigger = screen.getByRole('combobox', { name: '部门' });
+  expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
+  expect(trigger).toHaveAttribute('aria-invalid', 'true');
+
+  await userEvent.click(trigger);
+  await userEvent.click(await screen.findByRole('option', { name: '研发部' }));
+  expect(onValueChange).toHaveBeenCalledWith('rd');
 });
 
 test('Badge、Skeleton、Empty 提供基础展示原子件', () => {
