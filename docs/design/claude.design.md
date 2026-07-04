@@ -3,10 +3,10 @@ version: alpha
 name: Claude-Admin
 description: Claude / Anthropic 设计体系的后台工具适配版。暖纸白画布 + 陶土珊瑚交互色 + 衬线展示标题。无硬边框文化：控件轮廓用 hairline 或极细描边阴影表达，浮起用大扩散低透明柔影。圆角比同类更大一档。整体气质：文质、温暖、编辑部感，是"看起来不像 SaaS 的 SaaS"。
 colors:
-  primary: "#d97757"
-  primary-active: "#c6613f"
+  primary: "#cc785c"
+  primary-active: "#a9583e"
   primary-disabled: "#e6dfd8"
-  primary-soft: "rgba(217, 119, 87, 0.12)"
+  primary-soft: "#f8ede7"
   canvas: "#faf9f5"
   app-canvas: "#f8f8f6"
   surface: "#ffffff"
@@ -148,11 +148,10 @@ Claude 风格是 AI 产品里最"编辑部"的一支：**暖纸白画布**（营
 `docs/design/research/claude-mcp-design-tokens.md`）+ claude.ai CDS 变量实测（`claude-ai-cds-tokens.json`，
 1308 个变量）+ getdesign 营销站分析（`claude-getdesign-analysis.md`）。dark mode 官方全表见 MCP 规范存档。
 
-v4 修正（第七轮，产品级拍板）：**clay 用 CDS 官方值 `#D97757`**（变量名 `--cds-clay`），
-active `#C6613F`（`--cds-clay-emphasized`），soft alpha 化（clay@12%）；**边框改墨色 alpha 三级**
-（`#1F1E1D` @ 40/30/15%，官方 MCP 规范；15% 档即 0.5px 描边阴影所用值；dark 反转为 `#DEDCD1` 同档）；
-实色 hairline `#E6DFD8` 降级为营销层参考值。产品 UI 字体为系统栈（CDS `--cds-font-sans`），
-衬线仅页面标题层——与既有拍板一致。
+当前实现基线（Step 3-8）：**clay 使用 getdesign 专业分析值 `#CC785C`**，active 使用 `#A9583E`，
+soft 使用 `#F8EDE7`；CDS 官方产品值 `#D97757 / #C6613F` 已存档在 research，属于后续 Step 9 精修候选，
+未进入当前实现值表。边框仍保留墨色 alpha 三级作为设计身份层参考（`#1F1E1D` @ 40/30/15%）；
+产品 UI 字体为系统栈（CDS `--cds-font-sans`），衬线仅页面标题层——与既有拍板一致。
 
 **Key Characteristics:**
 
@@ -164,8 +163,8 @@ active `#C6613F`（`--cds-clay-emphasized`），soft alpha 化（clay@12%）；*
 
 ## Colors
 
-- **Primary (`{colors.primary}` — #D97757)**：Anthropic 签名陶土，CDS 官方变量 `--cds-clay` 产品值
-  （演进链：原型 #C96442 → getdesign 营销值 #CC785C → v4 定稿产品值 #D97757，见 research 存档）。
+- **Primary (`{colors.primary}` — #CC785C)**：Anthropic 签名陶土，采用 getdesign 专业分析值。
+  CDS 官方变量 `--cds-clay` 产品值 #D97757 已存档，后续若进入 Step 9 精修，需要同时改 DESIGN.md、值表和实现。
   主按钮、focus 边、链接、选中文字。已知事实：白字 on clay 对比度低于 WCAG AA，
   Anthropic 官方接受此取舍；本项目跟随，但大段文字禁止用 on-primary on primary。
 - **Primary Active (`{colors.primary-active}` — #A9583E)**：按下/加深态，也用作浅底上的选中文字（对比度更稳）。

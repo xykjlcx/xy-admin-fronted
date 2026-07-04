@@ -103,6 +103,39 @@ Route 文件只做边界装配：
 - 可复用组件优先接收 `children` 组合结构；只有列表渲染这类需要回传数据的场景才用 render prop。
 - 组件内部函数按意图命名：`openCreateDialog`、`confirmDeleteRole`、`patchSearch`，不要把业务动作藏在匿名大函数里。
 
+## 主题 Token 纪律
+
+当前主题体系分五层：
+
+```text
+Primitive / Semantic
+  -> UI Component State Tokens
+  -> Pro Component Tokens
+  -> Shell / Page Composition Tokens
+  -> Module Page Layout
+```
+
+约束：
+
+- `src/styles/tokens.css` 是 token 定义唯一入口；组件只消费 token，不判断 `flavor`。
+- UI 组件族使用组件状态 token，例如 `--field-*`、`--button-*`、`--option-*`、`--overlay-*`、`--tabs-*`、`--choice-*`、`--table-*`。
+- Pro/Shell 组件使用组合 token，例如 `--pro-*`、`--side-list-*`、`--nav-item-*`、`--pagination-*`。
+- 组件 token 不进入 `@theme inline`，统一用 Tailwind v4 括号变量语法：`bg-(--token)`、`border-(--token)`、`text-(--token)`。
+- 状态优先级靠 `src/styles/global.css` 的状态机声明顺序，不依赖 Tailwind 变体生成顺序。
+- 业务页面不得用 `bg-pri-soft`、`text-pri`、`border-pri`、`ring-soft`、`hover:bg-surface-2` 等 primitive class 表达控件状态；已经完成 token 化的样板页会被 guard 拦住。
+- 页面层允许写布局和业务专属展示，但通用 hover/focus/active/selected/expanded/open 状态必须沉到 UI 或 Pro 组件。
+
+新增组件族流程：
+
+1. 先判断它属于 UI 原语、Pro 组件还是页面专属组合。
+2. UI 原语先查 shadcn 官方实现和 Radix 合同，保留 Portal、focus、keyboard、aria、outside click 等交互结构。
+3. 在 `docs/design/*.design.md` 或 spec 实测记录里确认值来源；新增 flavor 必须先补 DESIGN.md，再回写值表。
+4. 在 `tokens.css` 定义该族默认 token 和必要的 flavor/mode 覆盖，不提前批量创建未消费 token。
+5. 组件只消费该族 token；不要把 primitive 状态 class 写进组件或页面。
+6. 在 `/dev/theme-states` 补状态矩阵，至少覆盖默认、hover/focus 或 open、selected/active、disabled/invalid 等该族关键状态。
+7. 补 `tokens.snapshot.test.ts` 和 `theme-guards.test.ts`；完成 token 化的文件加入强约束清单。
+8. 跑 `pnpm theme:guard`、`pnpm design:lint`、`tsc`、`vitest`、`eslint`，必要时用 Agent Browser 截三 flavor × light/dark 状态图。
+
 ## 纵向样板线
 
 `users` 是当前脚手架的第一条纵向样板线。它不是只证明页面能用，而是证明“普通后台页面应该如何组合基础组件”。
@@ -129,3 +162,18 @@ Route 文件只做边界装配：
 ## 守护测试
 
 `src/app/__tests__/module-boundaries.test.ts` 会自动扫描 admin route，阻止 route 直接引用 `modules/admin/components`，要求每个 admin route 都有 `modules/admin/pages/<page>/index.tsx`，阻止 Query/Mutation/toast/i18n 业务逻辑回流到 route，并阻止旧的 `modules/admin/components` 目录回流。
+
+主题相关门禁：
+
+- `pnpm theme:guard`：单独运行 token 快照、悬空 CSS 变量引用、违规 class baseline、状态页矩阵和模块边界测试。
+- `pnpm design:lint`：运行 `@google/design.md`，校验三套 flavor 的 DESIGN.md。已知 warning 必须能追溯到 spec 白名单；新增 warning 不能静默放过。
+- CI 已显式运行 `theme:guard` 和 `design:lint`。后续新增 token、组件族或 flavor 时，不允许只靠全量 `vitest` 顺带覆盖。
+- `/dev/theme-states` 是主题验收入口。每个完成 token 化的组件族都必须在这里有可截图状态矩阵，否则视为没有验收面。
+
+主题验收 checklist：
+
+1. 三个 flavor 与 light/dark 都能在 `/dev/theme-states` 切换。
+2. Field、Button、Overlay、Option/Menu、Tabs/Choice、Table/Pro/Shell 都能看到机制级差异，不只是主色变化。
+3. shadcn dark 下主按钮文字可读，自定义亮色 accent 的前景色自动可读。
+4. Radix 浮层不破坏 Portal、outside click、autoFocus、Escape 和 `--radix-*` 定位变量。
+5. 新增页面只组合 UI/Pro 组件，不复制控件状态样式。

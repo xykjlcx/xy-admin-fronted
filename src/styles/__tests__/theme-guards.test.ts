@@ -9,7 +9,7 @@ const tokenReferenceRoots = [
   'src/styles',
   'src/components/ui',
   'src/components/pro',
-  'src/app/shell/widgets',
+  'src/app',
   'src/modules/admin/pages',
   'src/routes',
   'index.html',
@@ -20,6 +20,23 @@ const violationRoots = [
   'src/app/shell/widgets',
   'src/modules/admin/pages',
   'src/routes',
+];
+const tokenizedStateFiles = [
+  'src/components/ui/table.tsx',
+  'src/components/pro/PageScaffold.tsx',
+  'src/components/pro/Pagination.tsx',
+  'src/components/pro/SideList.tsx',
+  'src/components/pro/TableShell.tsx',
+  'src/app/shell/widgets/AppearanceDrawer.tsx',
+  'src/app/shell/widgets/NavMenuInset.tsx',
+  'src/app/shell/widgets/NavMenuRail.tsx',
+  'src/app/shell/widgets/NavMenuSidebar.tsx',
+  'src/app/shell/widgets/SubsystemSwitcher.tsx',
+  'src/modules/admin/pages/users/MembersPanel.tsx',
+  'src/modules/admin/pages/roles/RoleListPanel.tsx',
+  'src/modules/admin/pages/roles/RolePermissionEditor.tsx',
+  'src/modules/admin/pages/menus/MenuTreeTable.tsx',
+  'src/modules/admin/pages/menus/index.tsx',
 ];
 const fieldFamilyFiles = [
   'src/components/ui/input.tsx',
@@ -35,6 +52,18 @@ const forbiddenClasses = [
   'bg-pri-soft',
   'text-pri',
   'focus-visible:border-pri',
+];
+const forbiddenTokenizedStateClasses = [
+  'border-pri',
+  'ring-soft',
+  'bg-pri',
+  'bg-pri-soft',
+  'text-pri',
+  'bg-surface-2',
+  'hover:bg-surface-2',
+  'focus:bg-surface-2',
+  'data-[state=selected]:bg-surface-2',
+  'data-[state=active]:bg-surface-2',
 ];
 const forbiddenFieldPrimitiveClasses = [
   'border-input',
@@ -183,6 +212,20 @@ test('基础状态 class 命中数必须受 baseline 棘轮约束', () => {
   }
 
   expect(current).toEqual(baseline);
+});
+
+test('已完成 token 化的 UI/Pro/Shell/样板页不得回退到 primitive 状态 class', () => {
+  const offenders: string[] = [];
+
+  for (const file of tokenizedStateFiles) {
+    const source = readProjectFile(file);
+
+    for (const className of forbiddenTokenizedStateClasses) {
+      if (source.includes(className)) offenders.push(`${file}: ${className}`);
+    }
+  }
+
+  expect(offenders).toEqual([]);
 });
 
 test('Field 族基础控件不得绕过 --field-* token 直接消费 primitive 状态 class', () => {

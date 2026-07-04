@@ -11,6 +11,8 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "lint": "eslint src",
+    "theme:guard": "vitest run src/styles/__tests__/theme-guards.test.ts src/styles/__tests__/tokens.snapshot.test.ts src/app/__tests__/module-boundaries.test.ts",
+    "design:lint": "node scripts/design-md-lint.mjs",
     "visual": "node scripts/visual-agent-browser.mjs all",
     "visual:baseline": "node scripts/visual-agent-browser.mjs baseline",
     "visual:app": "node scripts/visual-agent-browser.mjs app",

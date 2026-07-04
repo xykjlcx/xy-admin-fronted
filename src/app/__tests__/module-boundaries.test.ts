@@ -123,6 +123,19 @@ test('theme states route exposes the Step 7 table and shell state matrix', () =>
   expect(source).toContain('shellTokenItems');
 });
 
+test('theme states route exposes the Step 8 overlay and option state matrix', () => {
+  const source = readProjectFile(themeStatesRoute);
+
+  expect(source).toContain('step8OverlayOptionMatrix');
+  expect(source).toContain('Popover');
+  expect(source).toContain('PopoverContent');
+  expect(source).toContain('SelectContent');
+  expect(source).toContain('SelectItem');
+  expect(source).toContain('DropdownMenuContent');
+  expect(source).toContain('DropdownMenuItem');
+  expect(source).toContain('forceMount');
+});
+
 test('shell icon buttons do not override Button icon token colors', () => {
   const shellIconFiles = [
     'src/app/shell/widgets/LanguageMenu.tsx',

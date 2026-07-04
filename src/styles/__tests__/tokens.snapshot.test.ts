@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 
 const css = readFileSync('src/styles/tokens.css', 'utf8');
 const globalCss = readFileSync('src/styles/global.css', 'utf8');
+const claudeDesignSource = readFileSync('docs/design/claude.design.md', 'utf8');
+const appearanceDomSource = readFileSync('src/lib/appearance-dom.ts', 'utf8');
 const buttonSource = readFileSync('src/components/ui/button.tsx', 'utf8');
 const dialogSource = readFileSync('src/components/ui/dialog.tsx', 'utf8');
 const sheetSource = readFileSync('src/components/ui/sheet.tsx', 'utf8');
@@ -35,6 +37,7 @@ const skeletonSource = readFileSync('src/components/ui/skeleton.tsx', 'utf8');
 const emptySource = readFileSync('src/components/ui/empty.tsx', 'utf8');
 const loginSource = readFileSync('src/routes/login.tsx', 'utf8');
 const languageMenuSource = readFileSync('src/app/shell/widgets/LanguageMenu.tsx', 'utf8');
+const themeStatesSource = readFileSync('src/routes/_auth/dev/theme-states.tsx', 'utf8');
 
 // 权威值表：原型 L4796-4805 逐字对照，全表逐值断言（tokens.css 全部变量声明，无抽样遗漏）。
 // 静态硬编码，非运行时从 tokens.css 提取——否则文件怎么改断言都跟着变，失去守护意义。
@@ -151,6 +154,16 @@ test('shadcn semantic foreground 不再硬编码白色', () => {
   expect(css).toContain("[data-mode='dark'] {\n  --pri-hover: color-mix(in srgb, var(--pri) 85%, white);");
   expect(globalCss).toContain('--color-primary-foreground: var(--on-pri);');
   expect(globalCss).toContain('--color-destructive-foreground: var(--on-danger);');
+});
+
+test('Claude 设计身份文档、token fallback 与 accent runtime 主色保持一致', () => {
+  expect(claudeDesignSource).toContain('primary: "#cc785c"');
+  expect(claudeDesignSource).toContain('primary-active: "#a9583e"');
+  expect(claudeDesignSource).toContain('primary-soft: "#f8ede7"');
+  expect(claudeDesignSource).not.toContain('primary: "#d97757"');
+  expect(claudeDesignSource).not.toContain('primary-active: "#c6613f"');
+  expect(css).toContain("[data-flavor='claude'][data-mode='light'] {\n  --pri: #cc785c; --pri-soft: #f8ede7;");
+  expect(appearanceDomSource).toContain("{ key: 'claude', labelKey: 'accentClaude', pri: '#cc785c', active: '#a9583e', soft: '#f8ede7' }");
 });
 
 test('原生可点击元素有设计体系 pointer 光标兜底', () => {
@@ -456,6 +469,16 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
   expect(languageMenuSource).toContain('text-(--option-fg-selected)');
   expect(languageMenuSource).toContain('text-(--option-check)');
   expect(languageMenuSource).not.toContain('bg-pri-soft focus:bg-pri-soft');
+});
+
+test('主题状态页暴露 Overlay / Option / Menu 可截图矩阵', () => {
+  expect(themeStatesSource).toContain('step8OverlayOptionMatrix');
+  expect(themeStatesSource).toContain('PopoverContent');
+  expect(themeStatesSource).toContain('SelectContent');
+  expect(themeStatesSource).toContain('DropdownMenuContent');
+  expect(themeStatesSource).toContain('bg-(--option-bg-highlighted)');
+  expect(themeStatesSource).toContain('bg-(--menu-item-bg-highlighted)');
+  expect(themeStatesSource).toContain('forceMount');
 });
 
 test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () => {

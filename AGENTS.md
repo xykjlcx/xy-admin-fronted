@@ -24,7 +24,10 @@
 
 - 工程结构、页面目录、Route 边界和组件设计约束以 `docs/architecture.md` 为准；历史 plan/spec 中的旧路径只作为执行记录。
 - 组件代码禁止硬编码十六进制色值，优先使用语义 token。
+- 组件状态样式必须走组件族 token：Field/Button/Overlay/Option/Menu/Tabs/Choice/Table/Pro/Shell 分别消费 `--field-*`、`--button-*`、`--overlay-*`、`--option-*`、`--menu-item-*`、`--tabs-*`、`--choice-*`、`--table-*`、`--pro-*`、`--nav-item-*` 等变量。
+- 业务页面禁止用 `bg-pri-soft`、`text-pri`、`border-pri`、`ring-soft`、`hover:bg-surface-2` 这类 primitive class 表达通用 hover/focus/active/selected/open 状态。
 - 禁止 `rounded-[Npx]` 任意圆角；圆角走 `--radius-*` token。
+- 新增或改造基础 UI / Pro 组件时，必须同步更新 `/dev/theme-states` 状态矩阵和对应 guard；没有状态矩阵的 token 化不算完成。
 - 服务端数据归 TanStack Query；zustand 只存纯客户端状态，如 token、外观设置、折叠状态。
 - query key 使用 `[domain, resource, params]`；变更后按前缀失效。
 - 路由 `staticData` 使用 `labelKey/groupKey/action.labelKey`，不要把用户可见中文散落在路由元数据里。
@@ -33,6 +36,7 @@
 - mock 只在开发态、demo 模式或 `VITE_ENABLE_MOCK=true` 时启用；生产构建必须剥离 faker/msw/mock worker。
 - 环境文件 `.env*` 不提交；开发默认 mock 已由代码启用，需要覆盖时只写本地 `.env.development`。
 - 每次声称完成前，至少跑 `./node_modules/.bin/tsc -b --noEmit`、`./node_modules/.bin/vitest run`、`./node_modules/.bin/eslint src`。
+- 涉及主题、基础组件、Pro 组件或页面样式收敛时，额外跑 `pnpm theme:guard`；涉及 DESIGN.md 或 flavor 值表时，额外跑 `pnpm design:lint`。
 
 ## 子系统清单
 

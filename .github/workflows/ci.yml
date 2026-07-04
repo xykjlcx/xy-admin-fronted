@@ -23,6 +23,8 @@ jobs:
 
       - run: ./node_modules/.bin/eslint src
       - run: ./node_modules/.bin/tsc -b --noEmit
+      - run: pnpm theme:guard
+      - run: pnpm design:lint
       - run: ./node_modules/.bin/vitest run
       - run: ./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build
 

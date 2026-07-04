@@ -8,13 +8,29 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
-import { SelectControl } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectControl,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 import { SideList, type SideListItem } from '@/components/pro/SideList';
@@ -407,6 +423,72 @@ function ThemeStatesRoute() {
               currentLabel={t('dev.themeStates.paginationCurrent')}
               onPageChange={() => undefined}
             />
+          </div>
+        </div>
+      </section>
+
+      <section data-testid="step8OverlayOptionMatrix" className="rounded-lg border border-border bg-surface p-4 pb-36 shadow-card-sm">
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.step8Matrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.step8MatrixDesc')}</p>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-3">
+          <div className="rounded-md border border-border bg-surface-2 p-4">
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.overlayPopover')}</p>
+            <Popover open>
+              <PopoverTrigger asChild>
+                <Button variant="outline">{t('dev.themeStates.overlayTrigger')}</Button>
+              </PopoverTrigger>
+              <PopoverContent
+                forceMount
+                align="start"
+                sideOffset={8}
+                className="w-[calc(220px*var(--app-scale))]"
+              >
+                <div className="grid gap-1.5">
+                  <p className="text-sm font-medium text-text">{t('dev.themeStates.overlayTitle')}</p>
+                  <p className="text-xs text-text-2">{t('dev.themeStates.overlayDesc')}</p>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="rounded-md border border-border bg-surface-2 p-4">
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.optionSelect')}</p>
+            <Select open value="rd" onValueChange={() => undefined}>
+              <SelectTrigger aria-label={t('dev.themeStates.optionSelect')} className="group">
+                <SelectValue placeholder={t('dev.themeStates.fieldSelectPlaceholder')} />
+              </SelectTrigger>
+              <SelectContent forceMount>
+                <SelectGroup>
+                  <SelectItem value="rd">{t('dev.themeStates.fieldResearch')}</SelectItem>
+                  <SelectItem
+                    value="highlighted"
+                    className="bg-(--option-bg-highlighted) text-(--option-fg-highlighted)"
+                  >
+                    {t('dev.themeStates.optionHighlighted')}
+                  </SelectItem>
+                  <SelectItem value="disabled" disabled>{t('dev.themeStates.choiceDisabled')}</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="rounded-md border border-border bg-surface-2 p-4">
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.menuMatrix')}</p>
+            <DropdownMenu open modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">{t('dev.themeStates.menuTrigger')}</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent forceMount align="start" sideOffset={8} className="w-[calc(220px*var(--app-scale))]">
+                <DropdownMenuItem>{t('dev.themeStates.menuNormal')}</DropdownMenuItem>
+                <DropdownMenuItem className="bg-(--menu-item-bg-highlighted) text-(--menu-item-fg-highlighted)">
+                  {t('dev.themeStates.menuHighlighted')}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive">{t('dev.themeStates.menuDanger')}</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </section>
