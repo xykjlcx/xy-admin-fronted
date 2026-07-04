@@ -84,11 +84,15 @@ Route 文件只做边界装配：
 
 ## 组件设计
 
-- `src/components/ui` 是基础 UI 体系入口，承接设计体系里的 token、尺寸、状态、无障碍和控件 API。普通页面不要自己实现 Button/Input/Select/Badge/Skeleton/Empty/Checkbox 这类原子控件。
+- `src/components/ui` 是基础 UI 体系入口，承接设计体系里的 token、尺寸、状态、无障碍和控件 API。普通页面不要自己实现 Button/Input/Textarea/Select/RadioGroup/Tabs/Table/Dialog/Alert/Badge/Skeleton/Empty/Checkbox 这类原子控件。
 - 基础 UI 组件以 shadcn/Radix 源码模式维护在本项目内；从 `@/components/ui/*` 引入的是项目本地组件，不是运行时从 shadcn 包导出。
+- 新增基础 UI 原语默认先查官方 shadcn 组件：`pnpm dlx shadcn@latest docs <component>`、`pnpm dlx shadcn@latest add <component> --dry-run`、必要时 `--diff <file>`。没有明确理由，不从空白文件手写 Button/Input/Select/Table/Dialog 这类基础件。
+- 已经本地定制过的基础组件不得直接 `--overwrite`；先看 shadcn diff，再把上游无障碍、组合结构和依赖更新合并到本地 token/variant 体系里。
+- 样式定制优先级：全局 token / `@theme inline` → shadcn 组件 variant → `components/pro` 组合层 → 页面 className。页面层只允许布局微调，不承担基础控件视觉定义。
 - Button 标准变体使用 `primary`、`secondary`、`dashed`、`text`、`danger`、`danger-ghost`；`default`、`outline`、`ghost`、`link`、`destructive` 只作为兼容旧调用的别名逐步迁移。
 - Input 标准形态优先用 `Input`；有前缀、后缀、拼接前缀时用 `InputGroup`、`InputGroupInput`、`InputGroupPrefix`、`InputGroupSuffix`、`InputGroupAddon` 组合，错误态通过 `status="error"` 或 `aria-invalid` 表达。
 - 业务表单下拉统一使用 `SelectControl` / Radix Select，自定义弹层、选项态、尺寸和动画必须吃项目 token；`NativeSelect` 只保留给明确需要系统原生选择器的极少数场景，不作为后台表单默认控件。
+- Textarea、RadioGroup、Tabs、Table、Separator、Alert、Form、Label 已进入基础 UI 基线；复杂业务表单优先用 `Form` + `Field` / `FormField` 组合，不在页面临时拼 label、错误文案和控件关联。
 - Badge、Skeleton、Empty、Checkbox 属于基础展示/反馈原子件；`StatusBadge`、`SearchField`、`TableShell` 这类后台通用组合必须复用它们。
 - `src/components/pro` 只沉淀业务无关的后台模式组件，例如表格壳、分页、筛选、侧边列表、表单弹窗。Pro 组件可以组合 UI 组件，但不能引入模块 DTO、接口或权限逻辑。
 - 页面层只描述业务含义和编排，不直接写原生 `<button>`、`<input>`、`<select>`、`<textarea>`，除非该控件被封装为新的 UI/Pro 组件时作为实现细节出现。

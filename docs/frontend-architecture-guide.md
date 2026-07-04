@@ -352,6 +352,25 @@ src/components/pro  后台业务无关的增强组件
 
 `components/ui` 应该像砖块，尽量不懂业务。
 
+基础砖块优先来自官方 shadcn CLI，而不是重新手写。新增 Button/Input/Select/Table/Dialog 这类原语时，先跑：
+
+```bash
+pnpm dlx shadcn@latest docs <component>
+pnpm dlx shadcn@latest add <component> --dry-run
+pnpm dlx shadcn@latest add <component> --diff <file>
+```
+
+shadcn 的模式不是运行时从 npm 包导入组件，而是把官方组件源码放进本项目。我们允许改源码，但只改 token、variant、尺寸、动画这些设计系统层；无障碍结构、Radix 组合方式和基础 API 尽量跟官方保持一致。
+
+当前基础 UI 基线包括：
+
+- 输入与表单：`Input`、`Textarea`、`Select`、`RadioGroup`、`Checkbox`、`Switch`、`Label`、`Form`、`Field`。
+- 操作与反馈：`Button`、`Alert`、`Badge`、`Progress`、`Skeleton`、`Empty`。
+- 容器与浮层：`Dialog`、`Sheet`、`Popover`、`DropdownMenu`、`Tooltip`。
+- 数据与导航：`Table`、`Tabs`、`Separator`、`Avatar`。
+
+业务页面不直接重写这些控件。需要接 API、分页、批量操作、筛选区时，继续往 `components/pro` 组合，而不是把样式逻辑散回页面。
+
 `components/pro` 是后台系统常用组件，比如：
 
 - `TableShell`：统一表格外壳。

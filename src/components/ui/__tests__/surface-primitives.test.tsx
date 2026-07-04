@@ -1,14 +1,47 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useForm } from 'react-hook-form';
 import { vi } from 'vitest';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Empty } from '@/components/ui/empty';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { SelectControl } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+
+function DemoForm() {
+  const form = useForm<{ name: string }>({ defaultValues: { name: '张三' } });
+
+  return (
+    <Form {...form}>
+      <form>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>姓名</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>用于成员展示</FormDescription>
+            </FormItem>
+          )}
+        />
+      </form>
+    </Form>
+  );
+}
 
 test('DialogContent 使用 surface 背景而不是页面背景', () => {
   render(
@@ -102,4 +135,63 @@ test('Badge、Skeleton、Empty 提供基础展示原子件', () => {
   expect(screen.getByTestId('badge-dot')).toBeInTheDocument();
   expect(screen.getByTestId('skeleton')).toHaveAttribute('data-slot', 'skeleton');
   expect(screen.getByText('暂无数据')).toBeInTheDocument();
+});
+
+test('Tabs、Table、Textarea、RadioGroup、Alert、Separator 走项目基础 UI token', () => {
+  render(
+    <>
+      <Tabs defaultValue="overview">
+        <TabsList variant="line">
+          <TabsTrigger value="overview">概览</TabsTrigger>
+          <TabsTrigger value="logs">日志</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">概览内容</TabsContent>
+      </Tabs>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>姓名</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell>张三</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+
+      <Textarea aria-label="备注" status="error" defaultValue="说明" />
+
+      <RadioGroup defaultValue="enabled">
+        <div>
+          <RadioGroupItem id="enabled" value="enabled" />
+          <Label htmlFor="enabled">启用</Label>
+        </div>
+      </RadioGroup>
+
+      <Alert variant="success">
+        <AlertTitle>保存成功</AlertTitle>
+        <AlertDescription>配置已经更新</AlertDescription>
+      </Alert>
+
+      <Separator decorative={false} />
+    </>,
+  );
+
+  expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('text-text-3');
+  expect(screen.getByRole('cell', { name: '张三' })).toHaveClass('whitespace-nowrap');
+  expect(screen.getByRole('textbox', { name: '备注' })).toHaveAttribute('aria-invalid', 'true');
+  expect(screen.getByRole('radio', { name: '启用' })).toHaveAttribute('data-state', 'checked');
+  expect(screen.getByText('保存成功').closest('[data-slot="alert"]')).toHaveClass('bg-success-bg');
+  expect(screen.getByRole('separator')).toHaveAttribute('data-slot', 'separator');
+});
+
+test('Form 原语基于 react-hook-form 并保持 label/control 关联', () => {
+  render(<DemoForm />);
+
+  const input = screen.getByLabelText('姓名');
+  expect(input).toHaveValue('张三');
+  expect(input).toHaveAttribute('aria-describedby');
+  expect(screen.getByText('用于成员展示')).toHaveAttribute('data-slot', 'form-description');
 });

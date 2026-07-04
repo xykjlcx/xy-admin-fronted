@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { parseConfigFileTextToJson } from 'typescript';
 
 const projectRoot = resolve(__dirname, '../../..');
 const adminRoutesDir = resolve(projectRoot, 'src/routes/_auth/admin');
@@ -8,6 +9,18 @@ const sourceRoot = resolve(projectRoot, 'src');
 
 function readProjectFile(path: string) {
   return readFileSync(resolve(projectRoot, path), 'utf8');
+}
+
+function readTsConfig(path: string) {
+  const parsed = parseConfigFileTextToJson(path, readProjectFile(path));
+  if (parsed.error) throw new Error(parsed.error.messageText.toString());
+  return parsed.config as {
+    compilerOptions?: {
+      baseUrl?: string;
+      ignoreDeprecations?: string;
+      paths?: Record<string, string[]>;
+    };
+  };
 }
 
 test('admin routes import page entries from module pages', () => {
@@ -43,6 +56,45 @@ test('admin module does not keep legacy components page directories', () => {
 test('source tree does not keep unused starter assets or generated caches', () => {
   expect(existsSync(resolve(projectRoot, 'src/assets'))).toBe(false);
   expect(existsSync(resolve(projectRoot, 'src/node_modules'))).toBe(false);
+});
+
+test('root TypeScript configs expose the app alias for shadcn and external CLIs', () => {
+  for (const file of ['tsconfig.json', 'tsconfig.app.json']) {
+    const config = readTsConfig(file);
+
+    expect(config.compilerOptions?.baseUrl, `${file} should expose the project root as baseUrl`).toBe('.');
+    expect(
+      config.compilerOptions?.ignoreDeprecations,
+      `${file} should keep baseUrl compatible with TypeScript 6`,
+    ).toBe('6.0');
+    expect(config.compilerOptions?.paths?.['@/*'], `${file} should resolve @/* into src/*`).toEqual(['./src/*']);
+  }
+});
+
+test('ui primitive baseline is installed as local shadcn-backed source files', () => {
+  const uiPrimitives = [
+    'alert',
+    'button',
+    'checkbox',
+    'dialog',
+    'form',
+    'input',
+    'label',
+    'radio-group',
+    'select',
+    'separator',
+    'table',
+    'tabs',
+    'textarea',
+  ];
+
+  for (const primitive of uiPrimitives) {
+    const file = `src/components/ui/${primitive}.tsx`;
+    const source = readProjectFile(file);
+
+    expect(existsSync(resolve(projectRoot, file)), `${file} should exist`).toBe(true);
+    expect(source, `${file} should expose data-slot markers`).toContain('data-slot');
+  }
 });
 
 test('admin routes stay thin and keep async state in module pages', () => {

@@ -16,7 +16,9 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Path alias (baseUrl deprecated in TS 6+; paths resolve relative to this file without it) */
+    /* Path alias: kept explicit for shadcn and other external CLIs that inspect root-style TS config. */
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": { "@/*": ["./src/*"] },
 
     /* Strict */
