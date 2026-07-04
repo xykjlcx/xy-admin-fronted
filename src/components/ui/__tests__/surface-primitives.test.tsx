@@ -145,22 +145,10 @@ test('Button 使用后台设计体系变体并兼容 loading 状态', () => {
   expect(button.querySelector('[data-slot="button-spinner"]')).toBeInTheDocument();
 });
 
-test('交互型基础组件统一使用设计体系 focus ring token', () => {
+test('非 Field 交互组件统一使用设计体系 focus ring token', () => {
   render(
     <>
       <Button>保存</Button>
-      <Input aria-label="姓名" />
-      <Input aria-label="网址" addonBefore="https://" />
-      <NativeSelect aria-label="状态">
-        <option>启用</option>
-      </NativeSelect>
-      <SelectControl
-        aria-label="部门"
-        value=""
-        options={[{ value: '', label: '请选择部门' }]}
-        onValueChange={vi.fn()}
-      />
-      <Textarea aria-label="备注" />
       <RadioGroup defaultValue="enabled">
         <RadioGroupItem aria-label="启用" value="enabled" />
       </RadioGroup>
@@ -173,14 +161,6 @@ test('交互型基础组件统一使用设计体系 focus ring token', () => {
   );
 
   expect(screen.getByRole('button', { name: '保存' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
-  expect(screen.getByRole('textbox', { name: '姓名' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
-  expect(screen.getByRole('textbox', { name: '网址' }).closest('[data-slot="input-group"]')).toHaveClass(
-    'focus-within:ring-[length:var(--focus-ring)]',
-  );
-  expect(screen.getByRole('textbox', { name: '网址' }).closest('[data-slot="input-group"]')).toHaveClass('ui-field');
-  expect(screen.getByRole('combobox', { name: '状态' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
-  expect(screen.getByRole('combobox', { name: '部门' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
-  expect(screen.getByRole('textbox', { name: '备注' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
   expect(screen.getByRole('radio', { name: '启用' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
   expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
 });
@@ -222,6 +202,53 @@ test('Input 支持前缀组合形态和错误态', () => {
   const input = screen.getByRole('textbox', { name: '邮箱' });
   expect(input).toHaveValue('demo');
   expect(input.closest('[data-slot="input-group"]')).toHaveAttribute('data-status', 'error');
+});
+
+test('Field 族控件统一挂载 ui-field 状态机并消费 Field token', () => {
+  render(
+    <>
+      <Input aria-label="姓名" />
+      <Input aria-label="网址" addonBefore="https://" />
+      <NativeSelect aria-label="状态">
+        <option>启用</option>
+      </NativeSelect>
+      <SelectControl
+        aria-label="部门"
+        value=""
+        options={[{ value: '', label: '请选择部门' }]}
+        onValueChange={vi.fn()}
+      />
+      <Textarea aria-label="备注" />
+    </>,
+  );
+
+  const input = screen.getByRole('textbox', { name: '姓名' });
+  const group = screen.getByRole('textbox', { name: '网址' }).closest('[data-slot="input-group"]');
+  const nativeSelect = screen.getByRole('combobox', { name: '状态' });
+  const selectTrigger = screen.getByRole('combobox', { name: '部门' });
+  const textarea = screen.getByRole('textbox', { name: '备注' });
+
+  for (const control of [input, group, nativeSelect, selectTrigger, textarea]) {
+    expect(control).toHaveClass('ui-field');
+    expect(control).not.toHaveClass('border-[var(--field-border)]');
+    expect(control).not.toHaveClass('bg-[var(--field-bg)]');
+    expect(control).not.toHaveClass('text-[var(--field-fg)]');
+  }
+  expect(input).not.toHaveClass('placeholder:text-[var(--field-placeholder)]');
+  expect(group).not.toHaveClass('[&_[data-icon]]:text-[var(--field-icon)]');
+  expect(selectTrigger).not.toHaveClass('data-[state=open]:border-[var(--field-border-focus)]');
+  expect(textarea).not.toHaveClass('aria-invalid:border-[var(--field-border-invalid)]');
+  expect(input).not.toHaveClass('hover:border-[var(--field-border-hover)]');
+  expect(group).not.toHaveClass('focus-within:border-[var(--field-border-focus)]');
+  expect(nativeSelect).not.toHaveClass('focus-visible:border-[var(--field-border-focus)]');
+  expect(selectTrigger).not.toHaveClass('focus-visible:border-[var(--field-border-focus)]');
+  expect(textarea).not.toHaveClass('focus-visible:border-[var(--field-border-focus)]');
+  expect(input).not.toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(group).not.toHaveClass('focus-within:ring-[length:var(--focus-ring)]');
+  expect(nativeSelect).not.toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(selectTrigger).not.toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(selectTrigger).not.toHaveClass('data-[state=open]:ring-[length:var(--focus-ring)]');
+  expect(textarea).not.toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
 });
 
 test('SelectControl 使用自定义下拉层而不是原生 select', async () => {

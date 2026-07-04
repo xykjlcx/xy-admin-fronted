@@ -152,7 +152,9 @@ test('菜单搜索使用业务 SearchField 而不是页面内联输入框', () =
   const group = input.closest('[data-slot="input-group"]');
 
   expect(group).toBeInTheDocument();
-  expect(group).toHaveClass('focus-within:ring-[length:var(--focus-ring)]');
+  expect(group).toHaveClass('ui-field');
+  expect(group).not.toHaveClass('border-[var(--field-border)]');
+  expect(group).not.toHaveClass('focus-within:ring-[length:var(--focus-ring)]');
 });
 
 test('admin 可以新增菜单节点', async () => {

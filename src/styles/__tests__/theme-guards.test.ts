@@ -21,6 +21,12 @@ const violationRoots = [
   'src/modules/admin/pages',
   'src/routes',
 ];
+const fieldFamilyFiles = [
+  'src/components/ui/input.tsx',
+  'src/components/ui/textarea.tsx',
+  'src/components/ui/native-select.tsx',
+  'src/components/pro/SearchField.tsx',
+];
 
 const forbiddenClasses = [
   'border-pri',
@@ -29,6 +35,44 @@ const forbiddenClasses = [
   'bg-pri-soft',
   'text-pri',
   'focus-visible:border-pri',
+];
+const forbiddenFieldPrimitiveClasses = [
+  'border-input',
+  'bg-surface',
+  'text-text ',
+  'text-text-3',
+  'shadow-card-sm',
+  'hover:border-control-border',
+  'focus-visible:border-pri',
+  'focus-visible:ring-soft',
+  'focus-within:border-pri',
+  'focus-within:ring-soft',
+  'aria-invalid:border-danger',
+  'aria-invalid:ring-danger-bg',
+  'disabled:bg-surface-2',
+  'read-only:bg-surface-2',
+  'border-[var(--field-border)]',
+  'bg-[var(--field-bg)]',
+  'text-[var(--field-fg)]',
+  'placeholder:text-[var(--field-placeholder)]',
+  'hover:border-[var(--field-border-hover)]',
+  'focus-visible:bg-[var(--field-bg-focus)]',
+  'focus-visible:border-[var(--field-border-focus)]',
+  'focus-visible:ring-[length:var(--focus-ring)]',
+  'focus-visible:ring-[var(--field-ring-focus)]',
+  'focus-visible:ring-[var(--field-ring-invalid)]',
+  'focus-within:bg-[var(--field-bg-focus)]',
+  'focus-within:border-[var(--field-border-focus)]',
+  'focus-within:ring-[length:var(--focus-ring)]',
+  'focus-within:ring-[var(--field-ring-focus)]',
+  'focus-within:ring-[var(--field-ring-invalid)]',
+  'data-[state=open]:border-[var(--field-border-focus)]',
+  'data-[state=open]:ring-[length:var(--focus-ring)]',
+  'data-[state=open]:ring-[var(--field-ring-focus)]',
+  'disabled:bg-[var(--field-bg-disabled)]',
+  'read-only:bg-[var(--field-bg-readonly)]',
+  'aria-invalid:border-[var(--field-border-invalid)]',
+  'aria-invalid:ring-[var(--field-ring-invalid)]',
 ];
 
 function readProjectFile(path: string) {
@@ -96,6 +140,18 @@ function countForbiddenClasses(file: string) {
   }, 0);
 }
 
+function fieldFamilySources() {
+  const sources = fieldFamilyFiles.map((file) => ({ file, source: readProjectFile(file) }));
+  const selectSource = readProjectFile('src/components/ui/select.tsx');
+  const triggerStart = selectSource.indexOf('function SelectTrigger');
+  const contentStart = selectSource.indexOf('function SelectContent');
+  sources.push({
+    file: 'src/components/ui/select.tsx#SelectTrigger',
+    source: selectSource.slice(triggerStart, contentStart),
+  });
+  return sources;
+}
+
 test('CSS 变量引用必须有定义或明确运行时白名单', () => {
   const defined = tokenDeclarations();
   const runtimePrefixes = ['--radix-', '--_'];
@@ -127,4 +183,16 @@ test('基础状态 class 命中数必须受 baseline 棘轮约束', () => {
   }
 
   expect(current).toEqual(baseline);
+});
+
+test('Field 族基础控件不得绕过 --field-* token 直接消费 primitive 状态 class', () => {
+  const offenders: string[] = [];
+
+  for (const { file, source } of fieldFamilySources()) {
+    for (const className of forbiddenFieldPrimitiveClasses) {
+      if (source.includes(className)) offenders.push(`${file}: ${className}`);
+    }
+  }
+
+  expect(offenders).toEqual([]);
 });

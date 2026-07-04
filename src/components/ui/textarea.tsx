@@ -19,13 +19,11 @@ function Textarea({
       data-slot="textarea"
       className={cn(
         [
-          'ui-field flex min-h-[calc(88px*var(--app-scale))] w-full rounded-md border border-input bg-surface px-3 py-2 text-sm text-text shadow-card-sm outline-none transition-[background,border-color,box-shadow,color]',
-          'placeholder:text-text-3 hover:border-control-border focus-visible:border-pri focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft',
-          'disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-50 aria-invalid:border-danger aria-invalid:ring-danger-bg',
+          'ui-field flex min-h-[calc(88px*var(--app-scale))] w-full rounded-md border px-3 py-2 text-sm outline-none transition-[background,border-color,box-shadow,color]',
+          'disabled:cursor-not-allowed disabled:opacity-50',
           resize === 'none' && 'resize-none',
           resize === 'vertical' && 'resize-y',
           resize === 'both' && 'resize',
-          status === 'error' && 'border-danger focus-visible:ring-danger-bg',
         ],
         className,
       )}

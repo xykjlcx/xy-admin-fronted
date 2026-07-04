@@ -38,12 +38,11 @@ function SelectTrigger({
       data-size={size}
       className={cn(
         [
-          'ui-field flex w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border border-input bg-surface px-3 text-sm text-text shadow-card-sm outline-none transition-[background,border-color,color,box-shadow]',
-          'hover:border-control-border focus-visible:border-pri focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft data-[state=open]:border-pri data-[state=open]:ring-[length:var(--focus-ring)] data-[state=open]:ring-soft',
-          'disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-50 aria-invalid:border-danger aria-invalid:ring-danger-bg data-[placeholder]:text-text-3',
+          'ui-field flex w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border px-3 text-sm outline-none transition-[background,border-color,color,box-shadow]',
+          'disabled:cursor-not-allowed disabled:opacity-50',
           'data-[size=sm]:h-[var(--control-sm)] data-[size=md]:h-[var(--control-md)] data-[size=lg]:h-[var(--control-lg)]',
           '*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2',
-          '[&_[data-icon]]:pointer-events-none [&_[data-icon]]:shrink-0 [&_[data-icon]]:size-[calc(15px*var(--app-scale))] [&_[data-icon]]:text-text-3',
+          '[&_[data-icon]]:pointer-events-none [&_[data-icon]]:shrink-0',
         ].join(' '),
         className,
       )}

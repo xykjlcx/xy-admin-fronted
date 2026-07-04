@@ -117,25 +117,68 @@
   }
 }
 
-/* 设计体系 field 状态优先级：hover 只加深普通描边；一旦 focus-within 生效，焦点态必须压过 hover。
-   Tailwind v4 生成的 hover utility 顺序可能晚于 focus-within utility，所以用更高特异性的基础钩子兜住。 */
-.ui-field:focus-within {
-  background: var(--surface);
-}
+@layer utilities {
+  /* 设计体系 Field 状态机。组件只挂 ui-field 和结构尺寸，base/hover/focus/open/invalid/disabled
+     全部从 --field-* token 读取，保证 flavor 可以独立换系。顺序即优先级：invalid > focus/open > hover > base。 */
+  .ui-field {
+    background: var(--field-bg);
+    color: var(--field-fg);
+    border-color: var(--field-border);
+    box-shadow: var(--field-shadow);
+  }
 
-.ui-field[data-state='open'] {
-  background: var(--surface);
-}
+  .ui-field::placeholder,
+  .ui-field [data-slot='input-group-input']::placeholder {
+    color: var(--field-placeholder);
+  }
 
-.ui-field:focus-within:hover {
-  border-color: var(--pri);
-}
+  .ui-field.ui-field[data-placeholder] {
+    color: var(--field-placeholder);
+  }
 
-.ui-field[aria-invalid='true']:hover,
-.ui-field[aria-invalid='true']:focus-within,
-.ui-field[data-status='error']:hover,
-.ui-field[data-status='error']:focus-within {
-  border-color: var(--danger);
+  .ui-field [data-icon],
+  .ui-field [data-slot='input-group-prefix'],
+  .ui-field [data-slot='input-group-suffix'] {
+    color: var(--field-icon);
+  }
+
+  .ui-field [data-icon] {
+    width: calc(15px * var(--app-scale));
+    height: calc(15px * var(--app-scale));
+  }
+
+  .ui-field [data-slot='input-group-addon'] {
+    background: var(--field-addon-bg);
+    color: var(--field-addon-fg);
+    border-color: var(--field-border);
+  }
+
+  .ui-field.ui-field:hover {
+    border-color: var(--field-border-hover);
+  }
+
+  .ui-field.ui-field:focus-within,
+  .ui-field.ui-field[data-state='open'] {
+    background: var(--field-bg-focus);
+    border-color: var(--field-border-focus);
+    box-shadow: 0 0 0 var(--focus-ring) var(--field-ring-focus), var(--field-shadow);
+  }
+
+  .ui-field.ui-field[disabled],
+  .ui-field.ui-field[data-disabled='true'],
+  .ui-field.ui-field[data-disabled=''] {
+    background: var(--field-bg-disabled);
+  }
+
+  .ui-field.ui-field[readonly] {
+    background: var(--field-bg-readonly);
+  }
+
+  .ui-field.ui-field[aria-invalid='true'],
+  .ui-field.ui-field[data-status='error'] {
+    border-color: var(--field-border-invalid);
+    box-shadow: 0 0 0 var(--focus-ring) var(--field-ring-invalid), var(--field-shadow);
+  }
 }
 
 html { font-family: var(--font-sans); }

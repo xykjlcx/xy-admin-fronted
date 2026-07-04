@@ -65,6 +65,20 @@ test('theme states route is available for token slice verification', () => {
   expect(readProjectFile('src/routeTree.gen.ts')).toContain("path: '/dev/theme-states'");
 });
 
+test('theme states route exposes the Field family state matrix', () => {
+  const source = readProjectFile(themeStatesRoute);
+
+  expect(source).toContain('FieldGroup');
+  expect(source).toContain('FieldError');
+  expect(source).toContain('aria-invalid');
+  expect(source).toContain('disabled');
+  expect(source).toContain('readOnly');
+  expect(source).toContain('addonBefore');
+  expect(source).toContain('NativeSelect');
+  expect(source).toContain('SelectControl');
+  expect(source).toContain('Textarea');
+});
+
 test('root TypeScript configs expose the app alias for shadcn and external CLIs', () => {
   for (const file of ['tsconfig.json', 'tsconfig.app.json']) {
     const config = readTsConfig(file);

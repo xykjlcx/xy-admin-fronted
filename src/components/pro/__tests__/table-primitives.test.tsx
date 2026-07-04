@@ -56,10 +56,13 @@ test('SearchField 继承基础 InputGroup 的聚焦态', () => {
   render(<SearchField aria-label="搜索" />);
 
   const group = screen.getByRole('searchbox', { name: '搜索' }).closest('[data-slot="input-group"]');
+  const icon = group?.querySelector('[data-icon="inline-start"]');
 
   expect(group).toHaveClass('ui-field');
-  expect(group).toHaveClass('bg-surface-2');
-  expect(group).toHaveClass('focus-within:ring-[length:var(--focus-ring)]');
+  expect(group).not.toHaveClass('[&_[data-icon]]:text-[var(--field-icon)]');
+  expect(icon).not.toHaveClass('size-3.5');
+  expect(icon).not.toHaveClass('text-text-3');
+  expect(group).not.toHaveClass('bg-surface-2');
   expect(group).not.toHaveClass('focus-within:ring-0');
 });
 

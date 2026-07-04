@@ -125,11 +125,51 @@ test('原生可点击元素有设计体系 pointer 光标兜底', () => {
   expect(globalCss).toContain('cursor: pointer;');
 });
 
-test('field 聚焦态优先级高于 hover 态', () => {
-  expect(globalCss).toContain('.ui-field:focus-within {');
-  expect(globalCss).toContain('background: var(--surface);');
-  expect(globalCss).toContain('.ui-field:focus-within:hover');
-  expect(globalCss).toContain('border-color: var(--pri);');
+test('Field 族 token 与 flavor 覆盖按 Step 2 值表落地', () => {
+  const fieldTokens = [
+    '--field-bg: var(--surface);',
+    '--field-fg: var(--text);',
+    '--field-placeholder: var(--text-3);',
+    '--field-icon: var(--text-3);',
+    '--field-border: var(--border);',
+    '--field-shadow: var(--shadow-card-sm);',
+    '--field-border-hover: var(--control-border);',
+    '--field-bg-focus: var(--surface);',
+    '--field-border-focus: var(--pri);',
+    '--field-ring-focus: var(--soft);',
+    '--field-border-invalid: var(--danger);',
+    '--field-ring-invalid: var(--danger-bg);',
+    '--field-bg-disabled: var(--surface-2);',
+    '--field-bg-readonly: var(--surface-2);',
+    '--field-addon-bg: var(--surface-2);',
+    '--field-addon-fg: var(--text-3);',
+  ];
+
+  for (const token of fieldTokens) {
+    expect(css).toContain(token);
+  }
+  expect(css).toContain("[data-flavor='claude'][data-mode='light'] {\n  --field-bg: #faf8f2;");
+  expect(css).toContain('--field-bg-focus: #ffffff;');
+  expect(css).toContain("[data-flavor='claude'],\n[data-flavor='shadcn'] {\n  --field-shadow: 0 0 0 0 rgba(0, 0, 0, 0);");
+});
+
+test('ui-field 状态机消费 Field token，并保持 invalid > focus/open > hover 优先级', () => {
+  expect(globalCss).toContain('.ui-field {');
+  expect(globalCss).toContain('background: var(--field-bg);');
+  expect(globalCss).toContain('border-color: var(--field-border);');
+  expect(globalCss).toContain('box-shadow: var(--field-shadow);');
+  expect(globalCss).toContain('.ui-field.ui-field[data-placeholder] {');
+  expect(globalCss).toContain('.ui-field.ui-field:hover {');
+  expect(globalCss).toContain('border-color: var(--field-border-hover);');
+  expect(globalCss).toContain('.ui-field.ui-field:focus-within,');
+  expect(globalCss).toContain(".ui-field.ui-field[data-state='open'] {");
+  expect(globalCss).toContain('background: var(--field-bg-focus);');
+  expect(globalCss).toContain('border-color: var(--field-border-focus);');
+  expect(globalCss).toContain('box-shadow: 0 0 0 var(--focus-ring) var(--field-ring-focus), var(--field-shadow);');
+  expect(globalCss).toContain(".ui-field.ui-field[aria-invalid='true'],");
+  expect(globalCss).toContain(".ui-field.ui-field[data-status='error'] {");
+  expect(globalCss).toContain('border-color: var(--field-border-invalid);');
+  expect(globalCss).toContain('box-shadow: 0 0 0 var(--focus-ring) var(--field-ring-invalid), var(--field-shadow);');
 });
 
 test('shadcn flavor 提供官方中性基线 token', () => {

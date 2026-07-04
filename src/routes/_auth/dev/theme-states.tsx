@@ -5,6 +5,9 @@ import { useAppearance } from '@/stores/appearance';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Textarea } from '@/components/ui/textarea';
+import { SelectControl } from '@/components/ui/select';
 
 export const Route = createFileRoute('/_auth/dev/theme-states')({
   component: ThemeStatesRoute,
@@ -25,6 +28,11 @@ const modeLabelKeys: Record<(typeof modes)[number], string> = {
 function ThemeStatesRoute() {
   const { t } = useTranslation();
   const { flavor, mode, accent, customAccent, set, setFlavor } = useAppearance();
+  const fieldSelectOptions = [
+    { value: '', label: t('dev.themeStates.fieldSelectPlaceholder') },
+    { value: 'rd', label: t('dev.themeStates.fieldResearch') },
+    { value: 'ops', label: t('dev.themeStates.fieldOperations') },
+  ];
 
   return (
     <main className="flex min-h-full flex-col gap-4 bg-page p-6 text-text">
@@ -99,11 +107,6 @@ function ThemeStatesRoute() {
         </div>
 
         <div className="rounded-md border border-border bg-surface-2 p-4">
-          <p className="text-sm font-medium text-text">{t('dev.themeStates.inputFocus')}</p>
-          <Input className="mt-3" placeholder={t('dev.themeStates.focusPlaceholder')} />
-        </div>
-
-        <div className="rounded-md border border-border bg-surface-2 p-4">
           <p className="text-sm font-medium text-text">{t('dev.themeStates.currentContract')}</p>
           <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm text-text-2">
             <dt>flavor</dt>
@@ -114,6 +117,65 @@ function ThemeStatesRoute() {
             <dd className="font-medium text-text">{accent}</dd>
           </dl>
         </div>
+      </section>
+
+      <section className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.fieldMatrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.fieldMatrixDesc')}</p>
+        </div>
+        <FieldGroup className="grid gap-4 md:grid-cols-3">
+          <Field>
+            <FieldLabel htmlFor="theme-field-default">{t('dev.themeStates.fieldDefault')}</FieldLabel>
+            <Input id="theme-field-default" placeholder={t('dev.themeStates.focusPlaceholder')} />
+            <FieldDescription>{t('dev.themeStates.fieldDefaultDesc')}</FieldDescription>
+          </Field>
+
+          <Field data-invalid>
+            <FieldLabel htmlFor="theme-field-invalid">{t('dev.themeStates.fieldInvalid')}</FieldLabel>
+            <Input id="theme-field-invalid" aria-invalid defaultValue="abc" />
+            <FieldError>{t('dev.themeStates.fieldInvalidDesc')}</FieldError>
+          </Field>
+
+          <Field data-disabled>
+            <FieldLabel htmlFor="theme-field-disabled">{t('dev.themeStates.fieldDisabled')}</FieldLabel>
+            <Input id="theme-field-disabled" disabled defaultValue={t('dev.themeStates.fieldDisabledValue')} readOnly />
+            <FieldDescription>{t('dev.themeStates.fieldDisabledDesc')}</FieldDescription>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="theme-field-readonly">{t('dev.themeStates.fieldReadonly')}</FieldLabel>
+            <Input id="theme-field-readonly" readOnly defaultValue={t('dev.themeStates.fieldReadonlyValue')} />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="theme-field-addon">{t('dev.themeStates.fieldAddon')}</FieldLabel>
+            <Input id="theme-field-addon" addonBefore="https://" defaultValue="acme.com" />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="theme-field-native-select">{t('dev.themeStates.fieldNativeSelect')}</FieldLabel>
+            <NativeSelect id="theme-field-native-select" defaultValue="active">
+              <option value="active">{t('dev.themeStates.fieldActive')}</option>
+              <option value="disabled">{t('dev.themeStates.fieldInactive')}</option>
+            </NativeSelect>
+          </Field>
+
+          <Field>
+            <FieldLabel>{t('dev.themeStates.fieldSelect')}</FieldLabel>
+            <SelectControl
+              value=""
+              options={fieldSelectOptions}
+              placeholder={t('dev.themeStates.fieldSelectPlaceholder')}
+              onValueChange={() => undefined}
+            />
+          </Field>
+
+          <Field className="md:col-span-2">
+            <FieldLabel htmlFor="theme-field-textarea">{t('dev.themeStates.fieldTextarea')}</FieldLabel>
+            <Textarea id="theme-field-textarea" placeholder={t('dev.themeStates.fieldTextareaPlaceholder')} />
+          </Field>
+        </FieldGroup>
       </section>
     </main>
   );
