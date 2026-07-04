@@ -9,20 +9,20 @@ import type {
 export const adminGridTemplate = '1.2fr 1fr 1.8fr calc(140px * var(--app-scale))';
 
 export const avatarClasses = [
-  'bg-pri',
+  'bg-(--nav-item-fg-current)',
   'bg-success',
   'bg-warning',
   'bg-danger',
   'bg-text-3',
-  'bg-pri text-white',
+  'bg-(--nav-item-fg-current) text-white',
 ];
 
 export const logToneClass: Record<RoleLogKind, string> = {
   grant: 'bg-success-soft text-success',
-  add: 'bg-pri-soft text-pri',
+  add: 'bg-info-soft text-info',
   remove: 'bg-danger-soft text-danger',
   edit: 'bg-warning-soft text-warning',
-  create: 'bg-pri-soft text-pri',
+  create: 'bg-info-soft text-info',
 };
 
 export const emptyRoleDraft: CreateRoleInput = { name: '', desc: '' };

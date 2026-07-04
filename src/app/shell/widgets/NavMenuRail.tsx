@@ -26,7 +26,9 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
               onClick={() => first?.path && nav({ to: first.path })}
               className={cn(
                 'flex w-[calc(60px*var(--app-scale))] flex-col items-center gap-[calc(5px*var(--app-scale))] rounded-10 py-2.5',
-                active ? 'bg-pri-soft text-pri' : 'text-text-3 hover:bg-bg',
+                active
+                  ? 'bg-(--nav-item-bg-current) text-(--nav-item-fg-current)'
+                  : 'text-text-3 hover:bg-(--nav-item-bg-hover)',
               )}
             >
               <Icon name={g.node.icon} className="size-5" />
@@ -50,8 +52,8 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
                 className={cn(
                   'my-0.5 flex h-[calc(38px*var(--app-scale))] items-center rounded-8 px-3.5 text-sm',
                   pathname === p.path
-                    ? 'bg-pri-soft font-semibold text-pri'
-                    : 'text-text-2 hover:bg-surface-2',
+                    ? 'bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current)'
+                    : 'text-text-2 hover:bg-(--nav-item-bg-hover)',
                 )}
               >
                 <span className="truncate">{lv(p.label, i18n.language)}</span>

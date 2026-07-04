@@ -7,7 +7,7 @@ import { lv } from '@/lib/localized';
 import { Icon } from '@/lib/icon-registry';
 import type { MenuNode } from '@/lib/menu-tree';
 
-// 侧栏两级树（原型 LAYOUT A）：dir 可折叠（grid 0fr↔1fr .26s），menu 行是路由 Link，激活项 bg-pri-soft/text-pri。
+// 侧栏两级树（原型 LAYOUT A）：dir 可折叠（grid 0fr↔1fr .26s），menu 行是路由 Link，激活态走 nav token。
 // collapsed（整栏收起）由布局下发；各 dir 的展开态是本地状态（不持久化）。
 export function NavMenuSidebar({
   tree,
@@ -26,7 +26,9 @@ export function NavMenuSidebar({
   const leafClass = (active: boolean) =>
     cn(
       'mx-2 my-px flex h-[calc(38px*var(--app-scale))] items-center rounded-8 pl-11 pr-3 text-sm',
-      active ? 'bg-pri-soft font-semibold text-pri' : 'text-text-2 hover:bg-surface-2',
+      active
+        ? 'bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current)'
+        : 'text-text-2 hover:bg-(--nav-item-bg-hover)',
     );
 
   return (
@@ -44,7 +46,9 @@ export function NavMenuSidebar({
                 to={node.path}
                 className={cn(
                   'mx-2 mb-0.5 flex h-[calc(42px*var(--app-scale))] items-center gap-2.5 rounded-8 px-4 text-sm font-medium',
-                  active ? 'bg-pri-soft text-pri' : 'text-text-2 hover:bg-bg',
+                  active
+                    ? 'bg-(--nav-item-bg-current) text-(--nav-item-fg-current)'
+                    : 'text-text-2 hover:bg-(--nav-item-bg-hover)',
                   collapsed && 'justify-center px-0',
                 )}
                 title={collapsed ? lv(node.label, i18n.language) : undefined}
@@ -61,7 +65,7 @@ export function NavMenuSidebar({
               <button
                 onClick={() => toggleDir(node.id)}
                 className={cn(
-                  'mx-2 flex h-[calc(42px*var(--app-scale))] w-[calc(100%-16px)] items-center gap-2.5 rounded-8 px-4 text-sm font-medium text-text-2 hover:bg-bg',
+                  'mx-2 flex h-[calc(42px*var(--app-scale))] w-[calc(100%-16px)] items-center gap-2.5 rounded-8 px-4 text-sm font-medium text-text-2 hover:bg-(--nav-item-bg-hover)',
                   collapsed && 'justify-center px-0',
                 )}
                 title={collapsed ? lv(node.label, i18n.language) : undefined}
@@ -105,7 +109,7 @@ export function NavMenuSidebar({
       </nav>
       <button
         onClick={onToggle}
-        className="flex h-11 shrink-0 items-center gap-2.5 border-t border-border px-5 text-[calc(13px*var(--app-scale))] text-text-3 hover:text-pri"
+        className="flex h-11 shrink-0 items-center gap-2.5 border-t border-border px-5 text-[calc(13px*var(--app-scale))] text-text-3 hover:text-(--nav-item-fg-current)"
       >
         <Menu className="size-[calc(18px*var(--app-scale))] shrink-0" />
         {!collapsed && <span>{t('shell.nav.collapse')}</span>}

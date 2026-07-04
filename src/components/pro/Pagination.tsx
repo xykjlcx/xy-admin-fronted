@@ -23,7 +23,7 @@ export function Pagination({
     <div className="mt-4 flex items-center justify-between">
       <span className="text-[calc(13px*var(--app-scale))] text-text-3">
         {totalLabel}
-        {refreshingLabel && <span className="ml-3 text-pri">{refreshingLabel}</span>}
+        {refreshingLabel && <span className="ml-3 text-(--pagination-current-fg)">{refreshingLabel}</span>}
       </span>
       <div className="flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-2">
         <Button
@@ -38,7 +38,7 @@ export function Pagination({
         <Button
           variant="outline"
           size="icon-sm"
-          className="border-pri bg-pri-soft text-pri hover:bg-pri-soft hover:text-pri"
+          className="border-(--pagination-current-border) bg-(--pagination-current-bg) text-(--pagination-current-fg) hover:bg-(--pagination-current-bg) hover:text-(--pagination-current-fg)"
           aria-label={currentLabel}
           aria-current="page"
         >

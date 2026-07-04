@@ -30,7 +30,7 @@ export function RoleListPanel({
   }, [roleKeyword, roles]);
 
   return (
-    <aside className="flex w-[calc(280px*var(--app-scale))] shrink-0 flex-col border-r border-border px-3 py-4">
+    <aside className="flex w-[calc(280px*var(--app-scale))] shrink-0 flex-col border-r border-(--side-list-border) bg-(--side-list-bg) px-3 py-4">
       <SearchField
         containerClassName="mb-3"
         placeholder={t('roles.searchPlaceholder')}
@@ -47,7 +47,9 @@ export function RoleListPanel({
               variant="ghost"
               className={cn(
                 'my-0.5 flex h-11 w-full items-center gap-2 rounded-8 px-3 text-left text-sm transition-colors hover:bg-bg',
-                role.id === currentRoleId ? 'bg-pri-soft font-semibold text-pri' : 'text-text',
+                role.id === currentRoleId
+                  ? 'bg-(--side-list-item-bg-active) font-semibold text-(--side-list-item-fg-active)'
+                  : 'text-text hover:bg-(--side-list-item-bg-hover)',
               )}
               onClick={() => onActiveRoleChange(role.id)}
             >

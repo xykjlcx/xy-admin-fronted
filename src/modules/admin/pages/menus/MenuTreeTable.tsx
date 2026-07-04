@@ -21,7 +21,7 @@ const gridTemplate =
   '2fr 1.35fr calc(88px * var(--app-scale)) 1.3fr calc(92px * var(--app-scale)) calc(150px * var(--app-scale))';
 
 const typeClass: Record<MenuRecord['type'], string> = {
-  dir: 'bg-pri-soft text-pri',
+  dir: 'bg-(--nav-item-bg-current) text-(--nav-item-fg-current)',
   menu: 'bg-success-soft text-success',
   action: 'bg-warning-soft text-warning',
 };
@@ -52,7 +52,7 @@ function VisibilityStatus({ menu }: { menu: MenuRecord }) {
     <span
       className={cn(
         'inline-flex w-fit items-center gap-1 rounded-5 px-2 py-0.5 text-xs',
-        menu.visible ? 'bg-success-soft text-success' : 'bg-surface-2 text-text-3',
+        menu.visible ? 'bg-success-soft text-success' : 'bg-(--table-header-bg) text-text-3',
       )}
     >
       {menu.visible ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
@@ -109,7 +109,7 @@ export function MenuTreeTable({
                   {hasChildren ? (
                     <button
                       type="button"
-                      className="flex size-6 shrink-0 items-center justify-center rounded-6 text-text-3 hover:bg-bg hover:text-text"
+                      className="flex size-6 shrink-0 items-center justify-center rounded-6 text-text-3 hover:bg-(--nav-item-bg-hover) hover:text-text"
                       aria-label={t('menus.actions.toggleNode', { name })}
                       onClick={() => onToggleCollapse(menu.id)}
                     >
@@ -120,7 +120,7 @@ export function MenuTreeTable({
                       <ChevronRight className="size-3 opacity-30" />
                     </span>
                   )}
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-8 bg-pri-soft text-pri">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-8 bg-(--nav-item-bg-current) text-(--nav-item-fg-current)">
                     <Icon name={menu.icon} className="size-4" />
                   </span>
                   <div className="min-w-0">
@@ -154,6 +154,7 @@ export function MenuTreeTable({
                       type="button"
                       size="icon-xs"
                       variant="ghost"
+                      className="text-(--table-action-fg)"
                       title={t('menus.actions.addChild')}
                       aria-label={t('menus.actions.addChildName', { name })}
                       onClick={() => onAddChild(menu)}
@@ -166,6 +167,7 @@ export function MenuTreeTable({
                       type="button"
                       size="icon-xs"
                       variant="ghost"
+                      className="text-(--table-action-fg)"
                       title={t('menus.actions.edit')}
                       aria-label={t('menus.actions.editName', { name })}
                       onClick={() => onEdit(menu)}
@@ -178,6 +180,7 @@ export function MenuTreeTable({
                       type="button"
                       size="icon-xs"
                       variant="ghost"
+                      className="text-(--table-action-fg)"
                       title={t('menus.actions.delete')}
                       aria-label={t('menus.actions.deleteName', { name })}
                       onClick={() => onDelete(menu)}

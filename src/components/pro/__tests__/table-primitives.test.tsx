@@ -38,6 +38,45 @@ test('TableShell 渲染表头、行、空态和分页槽位', () => {
   expect(screen.getByText('暂无成员')).toBeInTheDocument();
 });
 
+test('TableShell 消费 Table token 而不是页面 primitive 状态类', () => {
+  const grid = 'calc(44px * var(--app-scale)) 1fr';
+  render(
+    <TableShell
+      header={
+        <TableShellHeader gridTemplateColumns={grid}>
+          <div>选择</div>
+          <div>姓名</div>
+        </TableShellHeader>
+      }
+    >
+      <TableShellRow gridTemplateColumns={grid} data-state="selected">
+        <div />
+        <div>李长昕</div>
+      </TableShellRow>
+      <TableShellRow gridTemplateColumns={grid} aria-expanded>
+        <div />
+        <div>展开行</div>
+      </TableShellRow>
+    </TableShell>,
+  );
+
+  const shell = screen.getByText('姓名').parentElement?.parentElement;
+  const header = screen.getByText('姓名').parentElement;
+  const row = screen.getByText('李长昕').parentElement;
+  const expandedRow = screen.getByText('展开行').parentElement;
+
+  expect(shell).toHaveClass('border-(--table-border)');
+  expect(shell).toHaveClass('bg-(--table-bg)');
+  expect(header).toHaveClass('bg-(--table-header-bg)');
+  expect(header).toHaveClass('text-(--table-header-fg)');
+  expect(row).toHaveClass('hover:bg-(--table-row-bg-hover)');
+  expect(row).toHaveClass('data-[state=selected]:bg-(--table-row-bg-selected)');
+  expect(expandedRow).toHaveClass('aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(expandedRow).toHaveClass('has-aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(header).not.toHaveClass('bg-surface-2');
+  expect(row).not.toHaveClass('hover:bg-surface-2');
+});
+
 test('StatusBadge 渲染状态文案并支持隐藏圆点', () => {
   const { rerender } = render(<StatusBadge tone="success">正常</StatusBadge>);
   expect(screen.getByText('正常')).toBeInTheDocument();

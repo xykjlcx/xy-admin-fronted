@@ -15,7 +15,7 @@ export function PageFrame({
 }) {
   return (
     <section
-      className="flex min-h-0 flex-col text-text"
+      className="flex min-h-0 flex-col bg-(--pro-page-bg) text-text"
       style={{ padding: 'calc(20px * var(--app-scale)) calc(28px * var(--app-scale))' }}
     >
       <div className="mb-4 flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
@@ -41,7 +41,7 @@ export function PageSurface({
   return (
     <div
       className={cn(
-        'flex min-h-[calc(640px*var(--app-scale))] flex-col overflow-hidden rounded-12 border border-border bg-surface shadow-xs',
+        'flex min-h-[calc(640px*var(--app-scale))] flex-col overflow-hidden rounded-12 border border-(--pro-panel-border) bg-(--pro-panel-bg) shadow-xs',
         className,
       )}
     >

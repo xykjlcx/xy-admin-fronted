@@ -88,7 +88,7 @@ export function RoleDetailsPanel({
         className="mb-[calc(18px*var(--app-scale))]"
         trailing={
           roleDetailLoading || roleDetailRefreshing ? (
-            <span className="mb-2.5 text-[calc(12px*var(--app-scale))] text-pri">
+            <span className="mb-2.5 text-[calc(12px*var(--app-scale))] text-(--nav-item-fg-current)">
               {t('roles.refreshing')}
             </span>
           ) : null

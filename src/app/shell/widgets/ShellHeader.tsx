@@ -33,7 +33,7 @@ export function ShellHeader({
           ? 'bg-surface-blur shadow-header backdrop-blur-[14px] backdrop-saturate-[1.6]'
           : transparentUntilScroll
             ? 'bg-transparent'
-            : 'bg-chrome',
+            : 'bg-(--shell-header-bg)',
       )}
     >
       {left}

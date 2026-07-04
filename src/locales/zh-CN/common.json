@@ -134,7 +134,31 @@
       "skeletonMatrix": "骨架屏",
       "emptyTitle": "暂无结果",
       "emptyDesc": "当前筛选条件下没有可展示的数据。",
-      "emptyAction": "重置筛选"
+      "emptyAction": "重置筛选",
+      "step7Matrix": "Table / Pro / Shell 状态矩阵",
+      "step7MatrixDesc": "覆盖表格表头、行选中/展开、侧边列表 active 和分页当前页。",
+      "tableShellMatrix": "表格骨架",
+      "tableName": "名称",
+      "tableStatus": "状态",
+      "tableAction": "操作",
+      "tableSelected": "选中行",
+      "tableStatusEnabled": "启用",
+      "tableActionView": "查看",
+      "tableRows": {
+        "normal": "普通行",
+        "expanded": "展开行"
+      },
+      "shellStateMatrix": "Shell 组合态",
+      "sideList": {
+        "members": "成员与部门",
+        "roles": "角色管理",
+        "menus": "菜单管理"
+      },
+      "paginationTotal": "共 42 条",
+      "paginationRefreshing": "刷新中",
+      "paginationPrev": "上一页",
+      "paginationNext": "下一页",
+      "paginationCurrent": "当前第 2 页"
     }
   },
   "shell": {

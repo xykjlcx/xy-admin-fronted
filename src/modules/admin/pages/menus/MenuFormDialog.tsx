@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { SelectControl, type SelectOption } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { lv } from '@/lib/localized';
-import { cn } from '@/lib/utils';
 import { nextSiblingSort } from './menu-management-model';
 import type { ManagedMenuType, UpdateMenuInput } from '@/modules/admin/api/menu.api';
 import type { MenuRecord } from '@/modules/types';
@@ -376,7 +375,6 @@ export function MenuFormDialog({
             {t('menus.actions.cancel')}
           </Button>
           <Button
-            className={cn('bg-pri text-white hover:bg-pri-hover')}
             onClick={() => {
               void submit();
             }}

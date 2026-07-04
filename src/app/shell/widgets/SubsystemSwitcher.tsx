@@ -66,7 +66,7 @@ export function SubsystemSwitcher({
             )}
           </button>
         ) : (
-          <button className="flex h-9 items-center gap-[calc(9px*var(--app-scale))] rounded-7 pl-2.5 pr-3 hover:bg-pri-soft">
+          <button className="flex h-9 items-center gap-[calc(9px*var(--app-scale))] rounded-7 pl-2.5 pr-3 hover:bg-(--nav-item-bg-hover)">
             <span
               className="flex size-6 shrink-0 items-center justify-center rounded-6 text-white"
               style={{ background: active?.builtin ? 'var(--pri)' : active?.color }}
@@ -102,8 +102,8 @@ export function SubsystemSwitcher({
                 className={cn(
                   'relative flex items-center gap-3 rounded-12 border p-3 text-left transition-colors',
                   isActive
-                    ? 'border-pri bg-pri-soft'
-                    : 'border-border bg-surface hover:border-pri',
+                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current)'
+                    : 'border-border bg-surface hover:border-(--nav-item-fg-current)',
                   soon && 'cursor-not-allowed opacity-60 hover:border-border',
                 )}
               >
@@ -122,11 +122,11 @@ export function SubsystemSwitcher({
                   </div>
                 </div>
                 {soon && (
-                  <span className="absolute right-2 top-2 rounded-4 bg-surface-2 px-1.5 py-px text-[calc(10px*var(--app-scale))] text-text-3">
+                  <span className="absolute right-2 top-2 rounded-4 bg-(--table-header-bg) px-1.5 py-px text-[calc(10px*var(--app-scale))] text-text-3">
                     {t('shell.switcher.soon')}
                   </span>
                 )}
-                {isActive && <Check className="size-4 shrink-0 text-pri" />}
+                {isActive && <Check className="size-4 shrink-0 text-(--nav-item-fg-current)" />}
               </button>
             );
           })}

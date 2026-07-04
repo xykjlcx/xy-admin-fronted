@@ -134,7 +134,31 @@
       "skeletonMatrix": "Skeleton",
       "emptyTitle": "No results",
       "emptyDesc": "No data is available for the current filters.",
-      "emptyAction": "Reset filters"
+      "emptyAction": "Reset filters",
+      "step7Matrix": "Table / Pro / Shell state matrix",
+      "step7MatrixDesc": "Covers table header, selected/expanded rows, side list active state, and current pagination.",
+      "tableShellMatrix": "Table shell",
+      "tableName": "Name",
+      "tableStatus": "Status",
+      "tableAction": "Action",
+      "tableSelected": "Selected row",
+      "tableStatusEnabled": "Enabled",
+      "tableActionView": "View",
+      "tableRows": {
+        "normal": "Normal row",
+        "expanded": "Expanded row"
+      },
+      "shellStateMatrix": "Shell composition",
+      "sideList": {
+        "members": "Members and departments",
+        "roles": "Role management",
+        "menus": "Menu management"
+      },
+      "paginationTotal": "42 records",
+      "paginationRefreshing": "Refreshing",
+      "paginationPrev": "Previous page",
+      "paginationNext": "Next page",
+      "paginationCurrent": "Current page 2"
     }
   },
   "shell": {

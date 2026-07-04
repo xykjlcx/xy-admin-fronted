@@ -16,6 +16,9 @@ import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
+import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
+import { SideList, type SideListItem } from '@/components/pro/SideList';
+import { Pagination } from '@/components/pro/Pagination';
 
 export const Route = createFileRoute('/_auth/dev/theme-states')({
   component: ThemeStatesRoute,
@@ -58,11 +61,15 @@ const buttonVariantLabelKeys: Record<(typeof buttonVariantsForThemeStates)[numbe
   destructive: 'dev.themeStates.buttonDestructive',
   'danger-ghost': 'dev.themeStates.buttonDangerGhost',
 };
+const step7GridTemplate = '1.2fr 1fr calc(120px * var(--app-scale))';
+const tableTokenRows = ['selected', 'normal', 'expanded'] as const;
+const shellTokenItems = ['members', 'roles', 'menus'] as const;
 
 function ThemeStatesRoute() {
   const { t } = useTranslation();
   const { flavor, mode, accent, customAccent, set, setFlavor } = useAppearance();
   const [animatedTabsValue, setAnimatedTabsValue] = useState<'members' | 'logs'>('members');
+  const [sideListActive, setSideListActive] = useState<(typeof shellTokenItems)[number]>('members');
   const fieldSelectOptions = [
     { value: '', label: t('dev.themeStates.fieldSelectPlaceholder') },
     { value: 'rd', label: t('dev.themeStates.fieldResearch') },
@@ -72,6 +79,11 @@ function ThemeStatesRoute() {
     { value: 'members', label: t('dev.themeStates.animatedTabMembers') },
     { value: 'logs', label: t('dev.themeStates.animatedTabLogs') },
   ];
+  const sideListItems: SideListItem[] = shellTokenItems.map((id) => ({
+    id,
+    label: t(`dev.themeStates.sideList.${id}`),
+    meta: id === 'members' ? '14' : undefined,
+  }));
 
   return (
     <main className="flex min-h-full flex-col gap-4 bg-page p-6 text-text">
@@ -335,6 +347,65 @@ function ThemeStatesRoute() {
               title={t('dev.themeStates.emptyTitle')}
               description={t('dev.themeStates.emptyDesc')}
               action={<Button variant="outline">{t('dev.themeStates.emptyAction')}</Button>}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section data-testid="step7Matrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.step7Matrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.step7MatrixDesc')}</p>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(280px,0.5fr)]">
+          <div>
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.tableShellMatrix')}</p>
+            <TableShell
+              header={
+                <TableShellHeader gridTemplateColumns={step7GridTemplate}>
+                  <div>{t('dev.themeStates.tableName')}</div>
+                  <div>{t('dev.themeStates.tableStatus')}</div>
+                  <div>{t('dev.themeStates.tableAction')}</div>
+                </TableShellHeader>
+              }
+            >
+              <TableShellRow gridTemplateColumns={step7GridTemplate} data-state="selected">
+                <div className="font-medium text-text">{t('dev.themeStates.tableSelected')}</div>
+                <div className="text-sm text-text-2">{t('dev.themeStates.tableStatusEnabled')}</div>
+                <Button variant="link" size="xs">{t('dev.themeStates.tableActionView')}</Button>
+              </TableShellRow>
+              {tableTokenRows.slice(1).map((row) => (
+                <TableShellRow
+                  key={row}
+                  gridTemplateColumns={step7GridTemplate}
+                  aria-expanded={row === 'expanded'}
+                >
+                  <div className="font-medium text-text">{t(`dev.themeStates.tableRows.${row}`)}</div>
+                  <div className="text-sm text-text-2">{t('dev.themeStates.tableStatusEnabled')}</div>
+                  <Button variant="link" size="xs">{t('dev.themeStates.tableActionView')}</Button>
+                </TableShellRow>
+              ))}
+            </TableShell>
+          </div>
+
+          <div>
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.shellStateMatrix')}</p>
+            <div className="overflow-hidden rounded-10 border border-(--side-list-border)">
+              <SideList
+                items={sideListItems}
+                activeId={sideListActive}
+                onSelect={(id) => setSideListActive(id as typeof sideListActive)}
+              />
+            </div>
+            <Pagination
+              page={2}
+              pageCount={4}
+              totalLabel={t('dev.themeStates.paginationTotal')}
+              refreshingLabel={t('dev.themeStates.paginationRefreshing')}
+              prevLabel={t('dev.themeStates.paginationPrev')}
+              nextLabel={t('dev.themeStates.paginationNext')}
+              currentLabel={t('dev.themeStates.paginationCurrent')}
+              onPageChange={() => undefined}
             />
           </div>
         </div>

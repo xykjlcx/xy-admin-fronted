@@ -109,6 +109,20 @@ test('theme states route exposes the Step 6 interaction state matrix', () => {
   expect(source).toContain('switchDisabled');
 });
 
+test('theme states route exposes the Step 7 table and shell state matrix', () => {
+  const source = readProjectFile(themeStatesRoute);
+
+  expect(source).toContain('step7Matrix');
+  expect(source).toContain('TableShell');
+  expect(source).toContain('TableShellHeader');
+  expect(source).toContain('TableShellRow');
+  expect(source).toContain('data-state="selected"');
+  expect(source).toContain('SideList');
+  expect(source).toContain('Pagination');
+  expect(source).toContain('tableTokenRows');
+  expect(source).toContain('shellTokenItems');
+});
+
 test('shell icon buttons do not override Button icon token colors', () => {
   const shellIconFiles = [
     'src/app/shell/widgets/LanguageMenu.tsx',

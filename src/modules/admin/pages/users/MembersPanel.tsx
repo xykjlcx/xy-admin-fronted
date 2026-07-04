@@ -179,7 +179,7 @@ export function MembersPanel({
         empty={usersLoading ? t('users.loading') : t('users.empty')}
         selectedBar={
           selectedVisibleIds.length > 0 && canDisable ? (
-            <div className="mt-4 flex items-center justify-between rounded-8 bg-pri-soft px-3.5 py-2.5">
+            <div className="mt-4 flex items-center justify-between rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
               <span className="text-[calc(13px*var(--app-scale))] text-text-2">
                 {t('users.selectedCount', { count: selectedVisibleIds.length })}
               </span>
@@ -214,7 +214,7 @@ export function MembersPanel({
               <TableShellRow
                 key={user.id}
                 gridTemplateColumns={memberGridTemplate}
-                className={cn(selectedIdSet.has(user.id) && 'bg-pri-soft')}
+                data-state={selectedIdSet.has(user.id) ? 'selected' : undefined}
               >
                 <div className="flex justify-center">
                   <TableCheckbox

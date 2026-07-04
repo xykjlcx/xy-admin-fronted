@@ -11,7 +11,23 @@ const dropdownMenuSource = readFileSync('src/components/ui/dropdown-menu.tsx', '
 const selectSource = readFileSync('src/components/ui/select.tsx', 'utf8');
 const tooltipSource = readFileSync('src/components/ui/tooltip.tsx', 'utf8');
 const tabsSource = readFileSync('src/components/ui/tabs.tsx', 'utf8');
+const tableSource = readFileSync('src/components/ui/table.tsx', 'utf8');
 const animatedTabsSource = readFileSync('src/components/pro/AnimatedTabs.tsx', 'utf8');
+const tableShellSource = readFileSync('src/components/pro/TableShell.tsx', 'utf8');
+const pageScaffoldSource = readFileSync('src/components/pro/PageScaffold.tsx', 'utf8');
+const sideListSource = readFileSync('src/components/pro/SideList.tsx', 'utf8');
+const paginationSource = readFileSync('src/components/pro/Pagination.tsx', 'utf8');
+const appearanceDrawerSource = readFileSync('src/app/shell/widgets/AppearanceDrawer.tsx', 'utf8');
+const shellHeaderSource = readFileSync('src/app/shell/widgets/ShellHeader.tsx', 'utf8');
+const navMenuSidebarSource = readFileSync('src/app/shell/widgets/NavMenuSidebar.tsx', 'utf8');
+const navMenuRailSource = readFileSync('src/app/shell/widgets/NavMenuRail.tsx', 'utf8');
+const navMenuInsetSource = readFileSync('src/app/shell/widgets/NavMenuInset.tsx', 'utf8');
+const subsystemSwitcherSource = readFileSync('src/app/shell/widgets/SubsystemSwitcher.tsx', 'utf8');
+const membersPanelSource = readFileSync('src/modules/admin/pages/users/MembersPanel.tsx', 'utf8');
+const roleListPanelSource = readFileSync('src/modules/admin/pages/roles/RoleListPanel.tsx', 'utf8');
+const rolePermissionEditorSource = readFileSync('src/modules/admin/pages/roles/RolePermissionEditor.tsx', 'utf8');
+const menuTreeTableSource = readFileSync('src/modules/admin/pages/menus/MenuTreeTable.tsx', 'utf8');
+const menusPageSource = readFileSync('src/modules/admin/pages/menus/index.tsx', 'utf8');
 const checkboxSource = readFileSync('src/components/ui/checkbox.tsx', 'utf8');
 const radioGroupSource = readFileSync('src/components/ui/radio-group.tsx', 'utf8');
 const switchSource = readFileSync('src/components/ui/switch.tsx', 'utf8');
@@ -553,6 +569,110 @@ test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () =>
   expect(skeletonSource).not.toContain('bg-surface-2');
   expect(emptySource).toContain('text-(--empty-fg)');
   expect(emptySource).not.toContain('text-text-3');
+});
+
+test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
+  const step7Tokens = [
+    '--table-bg: var(--surface);',
+    '--table-border: var(--border);',
+    '--table-header-bg: var(--surface-2);',
+    '--table-header-fg: var(--text-3);',
+    '--table-row-bg: var(--surface);',
+    '--table-row-bg-hover: var(--surface-2);',
+    '--table-row-bg-selected: var(--pri-soft);',
+    '--table-row-bg-expanded: var(--surface-2);',
+    '--table-row-fg: var(--text);',
+    '--table-action-fg: var(--pri);',
+    '--pro-page-bg: var(--bg);',
+    '--pro-panel-bg: var(--surface);',
+    '--pro-panel-border: var(--border);',
+    '--pro-toolbar-bg: var(--surface);',
+    '--pro-filter-bg: var(--surface);',
+    '--side-list-bg: var(--surface);',
+    '--side-list-border: var(--border);',
+    '--side-list-item-bg-hover: var(--surface-2);',
+    '--side-list-item-bg-active: var(--pri-soft);',
+    '--side-list-item-fg-active: var(--pri);',
+    '--side-list-item-meta-fg-active: var(--pri);',
+    '--shell-header-bg: var(--chrome);',
+    '--nav-item-bg-hover: var(--surface-2);',
+    '--nav-item-bg-current: var(--pri-soft);',
+    '--nav-item-fg-current: var(--pri);',
+    '--pagination-current-bg: var(--pri-soft);',
+    '--pagination-current-fg: var(--pri);',
+    '--pagination-current-border: var(--pri);',
+  ];
+
+  for (const token of step7Tokens) {
+    expect(css).toContain(token);
+  }
+
+  expect(tableSource).toContain('bg-(--table-bg)');
+  expect(tableSource).toContain('text-(--table-row-fg)');
+  expect(tableSource).toContain('[&_tr]:bg-(--table-header-bg)');
+  expect(tableSource).toContain('text-(--table-header-fg)');
+  expect(tableSource).toContain('hover:bg-(--table-row-bg-hover)');
+  expect(tableSource).toContain('aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(tableSource).toContain('data-[state=selected]:bg-(--table-row-bg-selected)');
+  expect(tableSource).toContain('has-aria-expanded:bg-(--table-row-bg-expanded)');
+
+  expect(tableShellSource).toContain('border-(--table-border)');
+  expect(tableShellSource).toContain('bg-(--table-bg)');
+  expect(tableShellSource).toContain('bg-(--table-header-bg)');
+  expect(tableShellSource).toContain('text-(--table-header-fg)');
+  expect(tableShellSource).toContain('hover:bg-(--table-row-bg-hover)');
+  expect(tableShellSource).toContain('aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(tableShellSource).toContain('has-aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(tableShellSource).toContain('data-[state=selected]:bg-(--table-row-bg-selected)');
+
+  expect(pageScaffoldSource).toContain('bg-(--pro-page-bg)');
+  expect(pageScaffoldSource).toContain('border-(--pro-panel-border)');
+  expect(pageScaffoldSource).toContain('bg-(--pro-panel-bg)');
+  expect(sideListSource).toContain('bg-(--side-list-bg)');
+  expect(sideListSource).toContain('border-(--side-list-border)');
+  expect(sideListSource).toContain('hover:bg-(--side-list-item-bg-hover)');
+  expect(sideListSource).toContain('bg-(--side-list-item-bg-active)');
+  expect(sideListSource).toContain('text-(--side-list-item-fg-active)');
+  expect(sideListSource).toContain('text-(--side-list-item-meta-fg-active)');
+  expect(paginationSource).toContain('border-(--pagination-current-border)');
+  expect(paginationSource).toContain('bg-(--pagination-current-bg)');
+  expect(paginationSource).toContain('text-(--pagination-current-fg)');
+  expect(paginationSource).not.toContain('--nav-item');
+  expect(shellHeaderSource).toContain('bg-(--shell-header-bg)');
+
+  for (const source of [navMenuSidebarSource, navMenuRailSource, navMenuInsetSource, subsystemSwitcherSource]) {
+    expect(source).toContain('bg-(--nav-item-bg-current)');
+    expect(source).toContain('text-(--nav-item-fg-current)');
+  }
+  expect(appearanceDrawerSource).toContain('bg-(--nav-item-bg-current)');
+  expect(appearanceDrawerSource).toContain('text-(--nav-item-fg-current)');
+
+  expect(membersPanelSource).toContain('data-state={selectedIdSet.has(user.id) ?');
+  expect(membersPanelSource).toContain('bg-(--table-row-bg-selected)');
+  expect(roleListPanelSource).toContain('bg-(--side-list-item-bg-active)');
+  expect(rolePermissionEditorSource).toContain('bg-(--table-header-bg)');
+  expect(menuTreeTableSource).toContain('text-(--table-action-fg)');
+  expect(menusPageSource).toContain('PageFrame');
+  expect(menusPageSource).toContain('PageSurface');
+
+  const targetSources = [
+    tableSource,
+    tableShellSource,
+    pageScaffoldSource,
+    sideListSource,
+    paginationSource,
+    appearanceDrawerSource,
+    shellHeaderSource,
+    navMenuSidebarSource,
+    navMenuRailSource,
+    navMenuInsetSource,
+    subsystemSwitcherSource,
+  ];
+  for (const source of targetSources) {
+    for (const primitiveClass of ['text-pri', 'border-pri', 'bg-pri', 'bg-pri-soft', 'bg-surface-2']) {
+      expect(source).not.toContain(primitiveClass);
+    }
+  }
 });
 
 test('claude display font 只进入页面标题层，不污染 Field label / 表头', () => {

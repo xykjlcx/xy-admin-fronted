@@ -51,9 +51,9 @@ export function UserMenu() {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2.5 rounded-8 px-2 py-1 hover:bg-surface-2">
+        <button className="flex items-center gap-2.5 rounded-8 px-2 py-1 hover:bg-(--nav-item-bg-hover)">
           <Avatar className="size-[calc(30px*var(--app-scale))] rounded-8">
-            <AvatarFallback className="rounded-8 bg-pri text-[calc(13px*var(--app-scale))] font-semibold text-white">
+            <AvatarFallback className="rounded-8 bg-(--nav-item-fg-current) text-[calc(13px*var(--app-scale))] font-semibold text-white">
               {initial}
             </AvatarFallback>
           </Avatar>
@@ -69,7 +69,7 @@ export function UserMenu() {
       <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(280px*var(--app-scale))] overflow-hidden p-0">
         <div className="flex items-center gap-3 p-[calc(18px*var(--app-scale))] pb-4">
           <Avatar className="size-11 rounded-11">
-            <AvatarFallback className="rounded-11 bg-pri text-base font-semibold text-white">
+            <AvatarFallback className="rounded-11 bg-(--nav-item-fg-current) text-base font-semibold text-white">
               {initial}
             </AvatarFallback>
           </Avatar>

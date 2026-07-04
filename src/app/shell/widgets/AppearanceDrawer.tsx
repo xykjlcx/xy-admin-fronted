@@ -96,7 +96,9 @@ export function AppearanceDrawer() {
                 onClick={() => setFlavor(f.key as Flavor)}
                 className={cn(
                   'flex items-center gap-3 rounded-11 border p-2.5 text-left transition-colors',
-                  flavor === f.key ? 'border-pri bg-pri-soft' : 'border-border bg-surface',
+                  flavor === f.key
+                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current)'
+                    : 'border-border bg-surface',
                 )}
               >
                 <span
@@ -114,7 +116,7 @@ export function AppearanceDrawer() {
                   <div className="text-sm font-semibold text-text">{dk(f.label)}</div>
                   <div className="text-xs text-text-3">{dk(f.desc)}</div>
                 </div>
-                {flavor === f.key && <Check className="size-[calc(17px*var(--app-scale))] shrink-0 text-pri" />}
+                {flavor === f.key && <Check className="size-[calc(17px*var(--app-scale))] shrink-0 text-(--nav-item-fg-current)" />}
               </button>
             ))}
           </div>
@@ -128,7 +130,9 @@ export function AppearanceDrawer() {
                 onClick={() => set({ layout: k })}
                 className={cn(
                   'relative flex flex-col gap-2 rounded-12 border p-2 transition-colors',
-                  layout === k ? 'border-pri bg-pri-soft' : 'border-border bg-surface-2',
+                  layout === k
+                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current)'
+                    : 'border-border bg-(--table-header-bg)',
                 )}
               >
                 <LayoutThumb kind={k} />
@@ -141,7 +145,7 @@ export function AppearanceDrawer() {
                   </div>
                 </div>
                 {layout === k && (
-                  <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-pri">
+                  <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-(--nav-item-fg-current)">
                     <Check className="size-2.5 text-white" />
                   </span>
                 )}
@@ -204,7 +208,7 @@ export function AppearanceDrawer() {
                 className={cn(
                   'h-9 flex-1 rounded-8 border text-[calc(13px*var(--app-scale))] transition-colors',
                   pageAnim === k
-                    ? 'border-pri bg-pri-soft font-semibold text-pri'
+                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current)'
                     : 'border-border bg-surface text-text-2',
                 )}
               >
@@ -224,7 +228,7 @@ export function AppearanceDrawer() {
                 className={cn(
                   'flex h-[calc(52px*var(--app-scale))] flex-1 flex-col items-center justify-center gap-0.5 rounded-9 border transition-colors',
                   zoom === o.key
-                    ? 'border-pri bg-pri-soft text-pri'
+                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current) text-(--nav-item-fg-current)'
                     : 'border-border bg-surface text-text-2',
                 )}
               >
@@ -245,16 +249,16 @@ export function AppearanceDrawer() {
                 className={cn(
                   'flex h-[calc(76px*var(--app-scale))] flex-1 flex-col items-center justify-center gap-2 rounded-9 border text-[calc(13px*var(--app-scale))] transition-colors',
                   radius === o.key
-                    ? 'border-pri bg-pri-soft text-pri'
+                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current) text-(--nav-item-fg-current)'
                     : 'border-border bg-surface text-text-2',
                 )}
               >
                 <span
                   className="size-[calc(34px*var(--app-scale))] border-2"
                   style={{
-                    borderColor: radius === o.key ? 'var(--pri)' : 'var(--text-3)',
+                    borderColor: radius === o.key ? 'var(--nav-item-fg-current)' : 'var(--text-3)',
                     borderTopLeftRadius: o.r,
-                    background: radius === o.key ? 'var(--pri-soft)' : 'transparent',
+                    background: radius === o.key ? 'var(--nav-item-bg-current)' : 'transparent',
                   }}
                 />
                 <span>{dk(o.label)}</span>
@@ -274,7 +278,7 @@ function LayoutThumb({ kind }: { kind: 'sidebar' | 'rail' | 'inset' }) {
     return (
       <div className="flex h-14 overflow-hidden rounded-7 border border-border">
         <div className="w-[34%] border-r border-border bg-surface p-1">
-          <div className="h-1 rounded-full bg-pri" />
+          <div className="h-1 rounded-full bg-(--nav-item-fg-current)" />
           <div className="mt-1 h-1 rounded-full bg-border" />
           <div className="mt-1 h-1 rounded-full bg-border" />
         </div>
@@ -288,7 +292,7 @@ function LayoutThumb({ kind }: { kind: 'sidebar' | 'rail' | 'inset' }) {
     return (
       <div className="flex h-14 overflow-hidden rounded-7 border border-border">
         <div className="flex w-[16%] flex-col items-center gap-1 bg-surface py-1">
-          <div className="size-1 rounded-full bg-pri" />
+          <div className="size-1 rounded-full bg-(--nav-item-fg-current)" />
           <div className="size-1 rounded-full bg-border" />
         </div>
         <div className="w-[28%] border-x border-border bg-surface p-1">
@@ -304,7 +308,7 @@ function LayoutThumb({ kind }: { kind: 'sidebar' | 'rail' | 'inset' }) {
   return (
     <div className="flex h-14 gap-1 rounded-7 border border-border bg-canvas p-1">
       <div className="w-[28%] pt-0.5">
-        <div className="h-1 rounded-full bg-pri" />
+        <div className="h-1 rounded-full bg-(--nav-item-fg-current)" />
         <div className="mt-1 h-1 rounded-full bg-text-3 opacity-40" />
       </div>
       <div className="flex-1 rounded-5 border border-border bg-surface shadow-sm" />

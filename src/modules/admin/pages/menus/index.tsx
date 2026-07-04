@@ -4,6 +4,7 @@ import { ChevronsDown, ChevronsUp, Grid2X2, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
+import { PageFrame, PageSurface } from '@/components/pro/PageScaffold';
 import { SearchField } from '@/components/pro/SearchField';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/lib/icon-registry';
@@ -190,21 +191,12 @@ export function MenusView({
   };
 
   return (
-    <section
-      className="flex min-h-0 flex-col text-text"
-      style={{ padding: 'calc(20px * var(--app-scale)) calc(28px * var(--app-scale))' }}
-    >
-      <div className="mb-4 flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
-        <span>{t('menus.breadcrumbGroup')}</span>
-        <span>›</span>
-        <span className="text-text">{t('menus.title')}</span>
-      </div>
-
-      <div className="flex min-h-[calc(680px*var(--app-scale))] flex-col overflow-hidden rounded-12 border border-border bg-surface shadow-xs">
-        <div className="border-b border-border px-6 py-5">
+    <PageFrame breadcrumbs={[{ label: t('menus.breadcrumbGroup') }, { label: t('menus.title') }]}>
+      <PageSurface className="min-h-[calc(680px*var(--app-scale))]">
+        <div className="border-b border-(--pro-panel-border) px-6 py-5">
           <div className="mb-4 flex items-start justify-between gap-4">
             <div className="flex items-start gap-3">
-              <span className="flex size-9 items-center justify-center rounded-10 bg-pri-soft text-pri">
+              <span className="flex size-9 items-center justify-center rounded-10 bg-(--nav-item-bg-current) text-(--nav-item-fg-current)">
                 <Grid2X2 className="size-5" />
               </span>
               <div>
@@ -224,20 +216,20 @@ export function MenusView({
                   key={subsystem.key}
                   type="button"
                   className={cn(
-                    'min-h-[calc(112px*var(--app-scale))] rounded-10 border bg-surface p-4 text-left transition-colors hover:border-pri',
-                    active ? 'border-pri shadow-xs' : 'border-border',
+                    'min-h-[calc(112px*var(--app-scale))] rounded-10 border bg-(--pro-panel-bg) p-4 text-left transition-colors hover:border-(--nav-item-fg-current)',
+                    active ? 'border-(--nav-item-fg-current) shadow-xs' : 'border-(--pro-panel-border)',
                   )}
                   onClick={() => onActiveSubsystemChange(subsystem.key)}
                 >
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className="flex size-8 shrink-0 items-center justify-center rounded-8 bg-pri-soft text-pri">
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-8 bg-(--nav-item-bg-current) text-(--nav-item-fg-current)">
                         <Icon name={subsystem.icon} className="size-4" />
                       </span>
                       <span className="truncate text-sm font-semibold text-text">{label}</span>
                     </div>
                     {subsystem.builtin && (
-                      <span className="rounded-5 bg-pri-soft px-2 py-0.5 text-xs text-pri">
+                      <span className="rounded-5 bg-(--nav-item-bg-current) px-2 py-0.5 text-xs text-(--nav-item-fg-current)">
                         {t('menus.subsystems.builtin')}
                       </span>
                     )}
@@ -284,7 +276,7 @@ export function MenusView({
               {t('menus.actions.collapse')}
             </Button>
             {canCreate && (
-              <Button size="sm" className="bg-pri text-white hover:bg-pri-hover" onClick={() => setFormState({ mode: 'create', parentId: null, type: 'dir' })}>
+              <Button size="sm" onClick={() => setFormState({ mode: 'create', parentId: null, type: 'dir' })}>
                 <Plus className="size-4" />
                 {t('menus.actions.create')}
               </Button>
@@ -311,7 +303,7 @@ export function MenusView({
             />
           </div>
         </div>
-      </div>
+      </PageSurface>
 
       {formState && (
         <MenuFormDialog
@@ -342,6 +334,6 @@ export function MenusView({
         }}
         onConfirm={confirmDelete}
       />
-    </section>
+    </PageFrame>
   );
 }

@@ -1,12 +1,11 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
-interface GridSlotProps {
+interface GridSlotProps extends Omit<HTMLAttributes<HTMLDivElement>, 'style' | 'children'> {
   gridTemplateColumns: string;
   children: ReactNode;
-  className?: string;
   style?: CSSProperties;
 }
 
@@ -49,10 +48,10 @@ function withGridTemplate(gridTemplateColumns: string, style?: CSSProperties): C
 export function TableShell({ header, children, empty, pagination, selectedBar, className }: TableShellProps) {
   return (
     <>
-      <div className={cn('overflow-hidden rounded-10 border border-border bg-surface', className)}>
+      <div className={cn('overflow-hidden rounded-10 border border-(--table-border) bg-(--table-bg)', className)}>
         {header}
         {children ?? (
-          <div className="flex h-36 items-center justify-center border-t border-border text-sm text-text-3">
+          <div className="flex h-36 items-center justify-center border-t border-(--table-border) text-sm text-(--table-header-fg)">
             {empty}
           </div>
         )}
@@ -63,25 +62,30 @@ export function TableShell({ header, children, empty, pagination, selectedBar, c
   );
 }
 
-export function TableShellHeader({ gridTemplateColumns, children, className, style }: GridSlotProps) {
+export function TableShellHeader({ gridTemplateColumns, children, className, style, ...props }: GridSlotProps) {
   return (
     <div
       className={cn(
-        'grid h-11 items-center bg-surface-2 px-2 text-[calc(13px*var(--app-scale))] font-medium text-text-3',
+        'grid h-11 items-center bg-(--table-header-bg) px-2 text-[calc(13px*var(--app-scale))] font-medium text-(--table-header-fg)',
         className,
       )}
       style={withGridTemplate(gridTemplateColumns, style)}
+      {...props}
     >
       {children}
     </div>
   );
 }
 
-export function TableShellRow({ gridTemplateColumns, children, className, style }: GridSlotProps) {
+export function TableShellRow({ gridTemplateColumns, children, className, style, ...props }: GridSlotProps) {
   return (
     <div
-      className={cn('grid h-14 items-center border-t border-border px-2 hover:bg-surface-2', className)}
+      className={cn(
+        'grid h-14 items-center border-t border-(--table-border) bg-(--table-row-bg) px-2 hover:bg-(--table-row-bg-hover) aria-expanded:bg-(--table-row-bg-expanded) has-aria-expanded:bg-(--table-row-bg-expanded) data-[state=selected]:bg-(--table-row-bg-selected)',
+        className,
+      )}
       style={withGridTemplate(gridTemplateColumns, style)}
+      {...props}
     >
       {children}
     </div>
@@ -100,7 +104,7 @@ export function TableShellLoadingRows({
         <div
           key={rowIndex}
           data-testid="table-loading-row"
-          className="grid h-14 items-center border-t border-border px-2"
+          className="grid h-14 items-center border-t border-(--table-border) px-2"
           style={{ gridTemplateColumns }}
         >
           {Array.from({ length: cells }).map((__, cellIndex) => (

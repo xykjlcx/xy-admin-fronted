@@ -53,8 +53,8 @@ export function NavMenuInset({
                     'my-0.5 flex h-[calc(38px*var(--app-scale))] items-center gap-2.5 rounded-9 text-sm',
                     collapsed ? 'justify-center px-0' : 'px-3',
                     pathname === p.path
-                      ? 'bg-surface font-semibold text-text shadow-lift'
-                      : 'text-text-2 hover:bg-surface/60',
+                      ? 'bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current) shadow-lift'
+                      : 'text-text-2 hover:bg-(--nav-item-bg-hover)',
                   )}
                 >
                   <Icon name={p.icon ?? g.node.icon} className="size-[calc(18px*var(--app-scale))] shrink-0" />
@@ -68,7 +68,7 @@ export function NavMenuInset({
       <button
         onClick={onToggle}
         className={cn(
-          'mt-2 flex h-12 items-center gap-2.5 border-t border-border text-[calc(13px*var(--app-scale))] text-text-2 hover:text-pri',
+          'mt-2 flex h-12 items-center gap-2.5 border-t border-border text-[calc(13px*var(--app-scale))] text-text-2 hover:text-(--nav-item-fg-current)',
           collapsed ? 'justify-center px-0' : 'px-3',
         )}
       >

@@ -147,7 +147,7 @@ export function RolePermissionEditor({
     <div className="min-h-0">
       <div className="mb-4 flex flex-wrap items-center gap-3.5">
         <div className="flex shrink-0 items-center gap-2">
-          <KeyRound className="size-4 text-pri" />
+          <KeyRound className="size-4 text-(--nav-item-fg-current)" />
           <span className="text-sm font-semibold text-text">
             {t('roles.permission.granted', {
               granted: permissionStats.granted,
@@ -203,7 +203,7 @@ export function RolePermissionEditor({
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-pri text-pri hover:bg-pri-soft hover:text-pri"
+                className="border-(--table-action-fg) text-(--table-action-fg) hover:bg-(--nav-item-bg-current) hover:text-(--table-action-fg)"
                 onClick={() => setAllPermissions(true)}
               >
                 <Check data-icon="inline-start" />
@@ -227,7 +227,7 @@ export function RolePermissionEditor({
 
             return (
               <div key={group.id} className="overflow-hidden rounded-12 border border-border">
-                <div className="flex h-[calc(52px*var(--app-scale))] items-center gap-3 bg-surface-2 px-4">
+                <div className="flex h-[calc(52px*var(--app-scale))] items-center gap-3 bg-(--table-header-bg) px-4">
                   <Button
                     type="button"
                     aria-label={t(collapsed ? 'roles.permission.expandGroup' : 'roles.permission.collapseGroup', {
@@ -287,8 +287,8 @@ export function RolePermissionEditor({
                                 size="sm"
                                 className={cn(
                                   on
-                                    ? 'border border-pri bg-pri-soft text-pri hover:bg-pri-soft'
-                                    : 'border-border bg-surface text-text-2 hover:border-pri hover:text-pri',
+                                    ? 'border border-(--table-action-fg) bg-(--nav-item-bg-current) text-(--table-action-fg) hover:bg-(--nav-item-bg-current)'
+                                    : 'border-(--table-border) bg-(--table-bg) text-text-2 hover:border-(--table-action-fg) hover:text-(--table-action-fg)',
                                 )}
                                 onClick={() => toggleAction(resource, action.id)}
                               >

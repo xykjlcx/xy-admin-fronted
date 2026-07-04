@@ -12,7 +12,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     >
       <table
         data-slot="table"
-        className={cn('w-full caption-bottom text-sm text-text', className)}
+        className={cn('w-full caption-bottom bg-(--table-bg) text-sm text-(--table-row-fg)', className)}
         {...props}
       />
     </div>
@@ -23,7 +23,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn('[&_tr]:border-b [&_tr]:bg-surface-2', className)}
+      className={cn('[&_tr]:border-b [&_tr]:bg-(--table-header-bg)', className)}
       {...props}
     />
   );
@@ -44,7 +44,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
     <tfoot
       data-slot="table-footer"
       className={cn(
-        'border-t bg-surface-2 font-medium [&>tr]:last:border-b-0',
+        'border-t bg-(--table-header-bg) font-medium [&>tr]:last:border-b-0',
         className,
       )}
       {...props}
@@ -57,7 +57,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        'border-b border-border transition-colors hover:bg-surface-2 has-aria-expanded:bg-surface-2 data-[state=selected]:bg-pri-soft',
+        'border-b border-(--table-border) bg-(--table-row-bg) transition-colors hover:bg-(--table-row-bg-hover) aria-expanded:bg-(--table-row-bg-expanded) has-aria-expanded:bg-(--table-row-bg-expanded) data-[state=selected]:bg-(--table-row-bg-selected)',
         className,
       )}
       {...props}
@@ -70,7 +70,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        'h-11 px-3 text-left align-middle text-[calc(13px*var(--app-scale))] font-medium whitespace-nowrap text-text-3 [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[calc(2px*var(--app-scale))]',
+        'h-11 px-3 text-left align-middle text-[calc(13px*var(--app-scale))] font-medium whitespace-nowrap text-(--table-header-fg) [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[calc(2px*var(--app-scale))]',
         className,
       )}
       {...props}
@@ -98,7 +98,7 @@ function TableCaption({
   return (
     <caption
       data-slot="table-caption"
-      className={cn('mt-4 text-sm text-text-3', className)}
+      className={cn('mt-4 text-sm text-(--table-header-fg)', className)}
       {...props}
     />
   );

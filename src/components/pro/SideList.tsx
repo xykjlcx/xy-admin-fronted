@@ -22,7 +22,7 @@ export function SideList({
   search?: ReactNode;
 }) {
   return (
-    <aside className="w-[calc(248px*var(--app-scale))] shrink-0 border-r border-border px-3 py-4">
+    <aside className="w-[calc(248px*var(--app-scale))] shrink-0 border-r border-(--side-list-border) bg-(--side-list-bg) px-3 py-4">
       {search && <div className="mb-3">{search}</div>}
       {items.map((item) => (
         <Button
@@ -31,7 +31,9 @@ export function SideList({
           variant="ghost"
           className={cn(
             'mb-px h-9 w-full justify-start gap-2 rounded-8 pr-3 text-left text-sm',
-            item.id === activeId ? 'bg-pri-soft font-semibold text-pri hover:bg-pri-soft' : 'text-text-2',
+            item.id === activeId
+              ? 'bg-(--side-list-item-bg-active) font-semibold text-(--side-list-item-fg-active) hover:bg-(--side-list-item-bg-active)'
+              : 'text-text-2 hover:bg-(--side-list-item-bg-hover)',
           )}
           style={{ paddingLeft: `calc(${12 + (item.depth ?? 0) * 18}px * var(--app-scale))` }}
           onClick={() => onSelect(item.id)}
@@ -39,7 +41,11 @@ export function SideList({
         >
           {item.icon}
           <span className="min-w-0 flex-1 truncate">{item.label}</span>
-          {item.meta && <span className="text-xs text-text-3">{item.meta}</span>}
+          {item.meta && (
+            <span className={cn('text-xs text-text-3', item.id === activeId && 'text-(--side-list-item-meta-fg-active)')}>
+              {item.meta}
+            </span>
+          )}
         </Button>
       ))}
     </aside>
