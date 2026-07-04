@@ -451,6 +451,8 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
   expect(selectSource).toContain('text-(--option-fg)');
   expect(selectSource).toContain('focus:bg-(--option-bg-highlighted)');
   expect(selectSource).toContain('focus:text-(--option-fg-highlighted)');
+  expect(selectSource).toContain('data-[highlighted]:bg-(--option-bg-highlighted)');
+  expect(selectSource).toContain('data-[highlighted]:text-(--option-fg-highlighted)');
   expect(selectSource).toContain('data-[state=checked]:bg-(--option-bg-selected)');
   expect(selectSource).toContain('data-[state=checked]:text-(--option-fg-selected)');
   expect(selectSource).toContain('text-(--option-check)');
@@ -459,8 +461,11 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
   expect(dropdownMenuSource).toContain('text-(--menu-item-fg)');
   expect(dropdownMenuSource).toContain('focus:bg-(--menu-item-bg-highlighted)');
   expect(dropdownMenuSource).toContain('focus:text-(--menu-item-fg-highlighted)');
+  expect(dropdownMenuSource).toContain('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
+  expect(dropdownMenuSource).toContain('data-[highlighted]:text-(--menu-item-fg-highlighted)');
   expect(dropdownMenuSource).toContain('data-[variant=destructive]:text-(--menu-item-fg-danger)');
   expect(dropdownMenuSource).toContain('data-[variant=destructive]:focus:bg-(--menu-item-bg-danger-highlighted)');
+  expect(dropdownMenuSource).toContain('data-[variant=destructive]:data-[highlighted]:bg-(--menu-item-bg-danger-highlighted)');
   expect(dropdownMenuSource).not.toContain('focus:bg-accent');
   expect(dropdownMenuSource).not.toContain('focus:text-accent-foreground');
   expect(dropdownMenuSource).not.toContain('data-[state=open]:bg-accent');

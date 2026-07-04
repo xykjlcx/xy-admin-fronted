@@ -115,7 +115,7 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        'relative flex min-h-[calc(34px*var(--app-scale))] w-full cursor-pointer select-none items-center gap-2 rounded-8 py-1.5 pr-8 pl-2 text-sm text-(--option-fg) outline-none transition-colors focus:bg-(--option-bg-highlighted) focus:text-(--option-fg-highlighted) data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[state=checked]:bg-(--option-bg-selected) data-[state=checked]:font-semibold data-[state=checked]:text-(--option-fg-selected)',
+        'relative flex min-h-[calc(34px*var(--app-scale))] w-full cursor-pointer select-none items-center gap-2 rounded-8 py-1.5 pr-8 pl-2 text-sm text-(--option-fg) outline-none focus:bg-(--option-bg-highlighted) focus:text-(--option-fg-highlighted) data-[highlighted]:bg-(--option-bg-highlighted) data-[highlighted]:text-(--option-fg-highlighted) data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[state=checked]:bg-(--option-bg-selected) data-[state=checked]:font-semibold data-[state=checked]:text-(--option-fg-selected)',
         '[&_[data-icon]]:pointer-events-none [&_[data-icon]]:shrink-0 [&_[data-icon]]:size-[calc(15px*var(--app-scale))]',
         className,
       )}

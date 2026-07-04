@@ -356,7 +356,10 @@ test('SelectItem 与 DropdownMenuItem 分别消费 Option/Menu token', async () 
   await userEvent.click(screen.getByRole('combobox', { name: '部门' }));
   const selectedOption = await screen.findByRole('option', { name: '研发部' });
   expect(selectedOption).toHaveClass('text-(--option-fg)');
+  expect(selectedOption).not.toHaveClass('transition-colors');
   expect(selectedOption).toHaveClass('focus:bg-(--option-bg-highlighted)');
+  expect(selectedOption).toHaveClass('data-[highlighted]:bg-(--option-bg-highlighted)');
+  expect(selectedOption).toHaveClass('data-[highlighted]:text-(--option-fg-highlighted)');
   expect(selectedOption).toHaveClass('data-[state=checked]:bg-(--option-bg-selected)');
   expect(selectedOption).toHaveClass('data-[state=checked]:text-(--option-fg-selected)');
   expect(selectedOption.querySelector('[data-slot="select-item-indicator"]')).toHaveClass('text-(--option-check)');
@@ -386,22 +389,28 @@ test('SelectItem 与 DropdownMenuItem 分别消费 Option/Menu token', async () 
   expect(menuItem).toHaveClass('text-(--menu-item-fg)');
   expect(menuItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
   expect(menuItem).toHaveClass('focus:text-(--menu-item-fg-highlighted)');
+  expect(menuItem).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
+  expect(menuItem).toHaveClass('data-[highlighted]:text-(--menu-item-fg-highlighted)');
 
   const destructiveItem = screen.getByText('删除').closest('[data-slot="dropdown-menu-item"]');
   expect(destructiveItem).toHaveClass('data-[variant=destructive]:text-(--menu-item-fg-danger)');
   expect(destructiveItem).toHaveClass('data-[variant=destructive]:focus:bg-(--menu-item-bg-danger-highlighted)');
+  expect(destructiveItem).toHaveClass('data-[variant=destructive]:data-[highlighted]:bg-(--menu-item-bg-danger-highlighted)');
 
   const checkboxItem = screen.getByText('显示隐藏节点').closest('[data-slot="dropdown-menu-checkbox-item"]');
   expect(checkboxItem).toHaveClass('text-(--menu-item-fg)');
   expect(checkboxItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
+  expect(checkboxItem).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
 
   const radioItem = screen.getByText('紧凑').closest('[data-slot="dropdown-menu-radio-item"]');
   expect(radioItem).toHaveClass('text-(--menu-item-fg)');
   expect(radioItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
+  expect(radioItem).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
 
   const subTrigger = screen.getByText('更多').closest('[data-slot="dropdown-menu-sub-trigger"]');
   expect(subTrigger).toHaveClass('text-(--menu-item-fg)');
   expect(subTrigger).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
+  expect(subTrigger).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
   expect(subTrigger).toHaveClass('data-[state=open]:bg-(--menu-item-bg-highlighted)');
 });
 
