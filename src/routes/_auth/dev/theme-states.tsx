@@ -24,6 +24,32 @@ const modeLabelKeys: Record<(typeof modes)[number], string> = {
   light: 'dev.themeStates.light',
   dark: 'dev.themeStates.dark',
 };
+const buttonVariantsForThemeStates = [
+  'default',
+  'primary',
+  'secondary',
+  'outline',
+  'dashed',
+  'text',
+  'ghost',
+  'link',
+  'danger',
+  'destructive',
+  'danger-ghost',
+] as const;
+const buttonVariantLabelKeys: Record<(typeof buttonVariantsForThemeStates)[number], string> = {
+  default: 'dev.themeStates.buttonDefault',
+  primary: 'dev.themeStates.buttonPrimary',
+  secondary: 'dev.themeStates.buttonSecondary',
+  outline: 'dev.themeStates.buttonOutline',
+  dashed: 'dev.themeStates.buttonDashed',
+  text: 'dev.themeStates.buttonText',
+  ghost: 'dev.themeStates.buttonGhost',
+  link: 'dev.themeStates.buttonLink',
+  danger: 'dev.themeStates.buttonDanger',
+  destructive: 'dev.themeStates.buttonDestructive',
+  'danger-ghost': 'dev.themeStates.buttonDangerGhost',
+};
 
 function ThemeStatesRoute() {
   const { t } = useTranslation();
@@ -116,6 +142,25 @@ function ThemeStatesRoute() {
             <dt>accent</dt>
             <dd className="font-medium text-text">{accent}</dd>
           </dl>
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.buttonMatrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.buttonMatrixDesc')}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {buttonVariantsForThemeStates.map((variant) => (
+            <Button key={variant} variant={variant}>
+              {t(buttonVariantLabelKeys[variant])}
+            </Button>
+          ))}
+          <Button loading>{t('dev.themeStates.buttonLoading')}</Button>
+          <Button disabled>{t('dev.themeStates.buttonDisabled')}</Button>
+          <Button variant="ghost" size="icon" aria-label={t('dev.themeStates.buttonIcon')}>
+            <span data-icon="theme-states" className="font-semibold">i</span>
+          </Button>
         </div>
       </section>
 

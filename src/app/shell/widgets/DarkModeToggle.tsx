@@ -16,7 +16,6 @@ export function DarkModeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          className="text-text-2 hover:text-text-2"
           onClick={() => set({ mode: isDark ? 'light' : 'dark' })}
           aria-label={isDark ? t('shell.lightMode') : t('shell.darkMode')}
         >

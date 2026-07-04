@@ -7,24 +7,29 @@ import { cn } from '@/lib/utils';
 const buttonVariants = cva(
   [
     'inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap border border-transparent font-[var(--button-font-weight)] outline-none transition-[background,border-color,color,box-shadow,opacity]',
-    'focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft',
+    'focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--button-ring)',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45 data-[loading=true]:pointer-events-none data-[loading=true]:cursor-wait data-[loading=true]:opacity-80',
     '[&_[data-icon]]:pointer-events-none [&_[data-icon]]:shrink-0 [&_[data-icon]]:size-[calc(15px*var(--app-scale))]',
   ].join(' '),
   {
     variants: {
       variant: {
-        primary: 'bg-pri text-on-pri hover:bg-pri-hover active:bg-pri-active',
-        default: 'bg-pri text-on-pri hover:bg-pri-hover active:bg-pri-active',
-        secondary: 'border-border bg-surface text-text shadow-card-sm hover:border-pri hover:text-pri active:bg-surface-2',
-        outline: 'border-border bg-surface text-text shadow-card-sm hover:border-pri hover:text-pri active:bg-surface-2',
-        dashed: 'border-dashed border-line-strong bg-surface text-text-2 hover:border-pri hover:text-pri active:bg-surface-2',
-        text: 'bg-transparent text-pri hover:bg-pri-soft active:bg-pri-soft',
-        ghost: 'bg-transparent text-text-2 hover:bg-surface-2 hover:text-text active:bg-surface-2',
-        link: 'bg-transparent px-0 text-pri hover:bg-transparent hover:underline',
-        danger: 'bg-danger text-white hover:bg-danger/90 focus-visible:ring-danger-bg',
-        destructive: 'bg-danger text-white hover:bg-danger/90 focus-visible:ring-danger-bg',
-        'danger-ghost': 'border-danger bg-danger-bg text-danger hover:bg-danger-bg focus-visible:ring-danger-bg',
+        primary: 'bg-(--button-primary-bg) text-(--button-primary-fg) hover:bg-(--button-primary-bg-hover) active:bg-(--button-primary-bg-active)',
+        default: 'bg-(--button-primary-bg) text-(--button-primary-fg) hover:bg-(--button-primary-bg-hover) active:bg-(--button-primary-bg-active)',
+        secondary:
+          'border-(--button-secondary-border) bg-(--button-secondary-bg) text-(--button-secondary-fg) shadow-(--button-secondary-shadow) hover:border-(--button-secondary-border-hover) hover:bg-(--button-secondary-bg-hover) hover:text-(--button-secondary-fg-hover) active:bg-(--button-secondary-bg-active)',
+        outline:
+          'border-(--button-secondary-border) bg-(--button-secondary-bg) text-(--button-secondary-fg) shadow-(--button-secondary-shadow) hover:border-(--button-secondary-border-hover) hover:bg-(--button-secondary-bg-hover) hover:text-(--button-secondary-fg-hover) active:bg-(--button-secondary-bg-active)',
+        dashed:
+          'border-dashed border-(--button-dashed-border) bg-(--button-secondary-bg) text-(--button-dashed-fg) hover:border-(--button-dashed-border-hover) hover:text-(--button-dashed-fg-hover) active:bg-(--button-secondary-bg-active)',
+        text: 'bg-transparent text-(--button-text-fg) hover:bg-(--button-text-bg-hover) active:bg-(--button-text-bg-hover)',
+        ghost:
+          'bg-transparent text-(--button-ghost-fg) hover:bg-(--button-ghost-bg-hover) hover:text-(--button-ghost-fg-hover) active:bg-(--button-ghost-bg-hover)',
+        link: 'bg-transparent px-0 text-(--button-link-fg) hover:bg-transparent hover:underline',
+        danger: 'bg-(--button-danger-bg) text-(--button-danger-fg) hover:bg-(--button-danger-bg-hover) focus-visible:ring-(--button-danger-ring)',
+        destructive: 'bg-(--button-danger-bg) text-(--button-danger-fg) hover:bg-(--button-danger-bg-hover) focus-visible:ring-(--button-danger-ring)',
+        'danger-ghost':
+          'border-(--button-danger-ghost-border) bg-(--button-danger-ghost-bg) text-(--button-danger-ghost-fg) hover:bg-(--button-danger-ghost-bg) focus-visible:ring-(--button-danger-ring)',
       },
       size: {
         default: 'h-[var(--control-btn-md)] rounded-md px-[calc(18px*var(--app-scale))] text-sm',
@@ -79,6 +84,9 @@ function Button({
 }: ButtonProps) {
   const Comp = asChild ? Slot.Root : 'button';
   const isDisabled = disabled || loading;
+  const isIconButton = typeof size === 'string' && size.startsWith('icon') && variant === 'ghost';
+  const iconButtonClassName =
+    'text-(--button-icon-fg) hover:bg-(--button-icon-bg-hover) hover:text-(--button-icon-fg-hover)';
 
   return (
     <Comp
@@ -88,7 +96,7 @@ function Button({
       data-loading={loading || undefined}
       aria-busy={loading || undefined}
       disabled={isDisabled}
-      className={cn(buttonVariants({ variant, size }), block && 'w-full', className)}
+      className={cn(buttonVariants({ variant, size }), isIconButton && iconButtonClassName, block && 'w-full', className)}
       {...props}
     >
       {loading && <ButtonSpinner aria-hidden="true" />}

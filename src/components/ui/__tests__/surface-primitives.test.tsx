@@ -106,9 +106,11 @@ test('DialogContent 和 SheetContent 使用统一关闭按钮视觉', () => {
   const dialogClose = screen.getByRole('button', { name: 'Close' });
   expect(dialogClose).toHaveClass('size-[calc(30px*var(--app-scale))]');
   expect(dialogClose).toHaveClass('rounded-7');
-  expect(dialogClose).toHaveClass('text-text-3');
+  expect(dialogClose).toHaveClass('text-(--button-icon-fg)');
   expect(dialogClose).toHaveClass('transition-colors');
-  expect(dialogClose).toHaveClass('hover:bg-bg');
+  expect(dialogClose).toHaveClass('hover:bg-(--button-icon-bg-hover)');
+  expect(dialogClose).toHaveClass('hover:text-(--button-icon-fg-hover)');
+  expect(dialogClose).toHaveClass('focus-visible:ring-(--button-ring)');
   expect(dialogClose.querySelector('svg')).toHaveClass('size-[calc(18px*var(--app-scale))]');
 
   unmount();
@@ -125,24 +127,59 @@ test('DialogContent 和 SheetContent 使用统一关闭按钮视觉', () => {
   const sheetClose = screen.getByRole('button', { name: 'Close' });
   expect(sheetClose).toHaveClass('size-[calc(30px*var(--app-scale))]');
   expect(sheetClose).toHaveClass('rounded-7');
-  expect(sheetClose).toHaveClass('text-text-3');
+  expect(sheetClose).toHaveClass('text-(--button-icon-fg)');
   expect(sheetClose).toHaveClass('transition-colors');
-  expect(sheetClose).toHaveClass('hover:bg-bg');
+  expect(sheetClose).toHaveClass('hover:bg-(--button-icon-bg-hover)');
+  expect(sheetClose).toHaveClass('hover:text-(--button-icon-fg-hover)');
+  expect(sheetClose).toHaveClass('focus-visible:ring-(--button-ring)');
   expect(sheetClose.querySelector('svg')).toHaveClass('size-[calc(18px*var(--app-scale))]');
 });
 
 test('Button 使用后台设计体系变体并兼容 loading 状态', () => {
   render(
-    <Button loading variant="primary">
-      保存
-    </Button>,
+    <>
+      <Button loading variant="primary">
+        保存
+      </Button>
+      <Button variant="secondary">次按钮</Button>
+      <Button variant="outline">描边按钮</Button>
+      <Button variant="dashed">虚线按钮</Button>
+      <Button variant="text">文字按钮</Button>
+      <Button variant="ghost">幽灵按钮</Button>
+      <Button variant="link">链接按钮</Button>
+      <Button variant="danger">危险按钮</Button>
+      <Button variant="destructive">破坏按钮</Button>
+      <Button variant="danger-ghost">危险描边</Button>
+      <Button variant="ghost" size="icon" aria-label="图标按钮">
+        <span data-icon="test" />
+      </Button>
+      <Button variant="ghost" size="icon" className="text-text-2 hover:text-text-2" aria-label="自定义图标按钮">
+        <span data-icon="test" />
+      </Button>
+    </>,
   );
 
   const button = screen.getByRole('button', { name: '保存' });
   expect(button).toHaveAttribute('data-variant', 'primary');
+  expect(button).toHaveClass('bg-(--button-primary-bg)');
+  expect(button).toHaveClass('text-(--button-primary-fg)');
   expect(button).toHaveAttribute('aria-busy', 'true');
   expect(button).toBeDisabled();
   expect(button.querySelector('[data-slot="button-spinner"]')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '次按钮' })).toHaveClass('border-(--button-secondary-border)');
+  expect(screen.getByRole('button', { name: '描边按钮' })).toHaveClass('bg-(--button-secondary-bg)');
+  expect(screen.getByRole('button', { name: '虚线按钮' })).toHaveClass('border-(--button-dashed-border)');
+  expect(screen.getByRole('button', { name: '文字按钮' })).toHaveClass('text-(--button-text-fg)');
+  expect(screen.getByRole('button', { name: '幽灵按钮' })).toHaveClass('text-(--button-ghost-fg)');
+  expect(screen.getByRole('button', { name: '链接按钮' })).toHaveClass('text-(--button-link-fg)');
+  expect(screen.getByRole('button', { name: '危险按钮' })).toHaveClass('bg-(--button-danger-bg)');
+  expect(screen.getByRole('button', { name: '破坏按钮' })).toHaveClass('bg-(--button-danger-bg)');
+  expect(screen.getByRole('button', { name: '危险描边' })).toHaveClass('border-(--button-danger-ghost-border)');
+  expect(screen.getByRole('button', { name: '图标按钮' })).not.toHaveAttribute('data-icon-button');
+  expect(screen.getByRole('button', { name: '图标按钮' })).toHaveClass('text-(--button-icon-fg)');
+  expect(screen.getByRole('button', { name: '图标按钮' })).toHaveClass('hover:bg-(--button-icon-bg-hover)');
+  expect(screen.getByRole('button', { name: '自定义图标按钮' })).toHaveClass('text-text-2');
+  expect(screen.getByRole('button', { name: '自定义图标按钮' })).toHaveClass('hover:text-text-2');
 });
 
 test('非 Field 交互组件统一使用设计体系 focus ring token', () => {

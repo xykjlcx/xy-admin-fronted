@@ -79,6 +79,32 @@ test('theme states route exposes the Field family state matrix', () => {
   expect(source).toContain('Textarea');
 });
 
+test('theme states route exposes the Button family state matrix', () => {
+  const source = readProjectFile(themeStatesRoute);
+
+  expect(source).toContain('buttonVariantsForThemeStates');
+  expect(source).toContain("'default'");
+  expect(source).toContain("'danger-ghost'");
+  expect(source).toContain('loading');
+  expect(source).toContain('disabled');
+});
+
+test('shell icon buttons do not override Button icon token colors', () => {
+  const shellIconFiles = [
+    'src/app/shell/widgets/LanguageMenu.tsx',
+    'src/app/shell/widgets/AppearanceDrawer.tsx',
+    'src/app/shell/widgets/DarkModeToggle.tsx',
+    'src/app/shell/widgets/NotificationBell.tsx',
+    'src/app/shell/layouts/InsetLayout.tsx',
+  ];
+
+  for (const file of shellIconFiles) {
+    expect(readProjectFile(file), `${file} should not hard-code icon button text colors`).not.toContain(
+      'text-text-2 hover:text-text-2',
+    );
+  }
+});
+
 test('root TypeScript configs expose the app alias for shadcn and external CLIs', () => {
   for (const file of ['tsconfig.json', 'tsconfig.app.json']) {
     const config = readTsConfig(file);

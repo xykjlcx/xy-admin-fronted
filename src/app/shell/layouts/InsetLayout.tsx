@@ -33,7 +33,6 @@ export function InsetLayout({
             <Button
               variant="ghost"
               size="icon"
-              className="text-text-2 hover:text-text-2"
               onClick={() => onCollapsedChange(!collapsed)}
               aria-label={t('shell.nav.collapse')}
             >

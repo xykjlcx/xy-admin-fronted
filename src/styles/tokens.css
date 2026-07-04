@@ -66,6 +66,39 @@
   --control-btn-md: calc(32px * var(--app-scale));
   --control-lg: calc(42px * var(--app-scale));
   --button-font-weight: 400;
+  --button-primary-bg: var(--pri);
+  --button-primary-bg-hover: var(--pri-hover);
+  --button-primary-bg-active: var(--pri-active);
+  --button-primary-fg: var(--on-pri);
+  --button-secondary-bg: var(--surface);
+  --button-secondary-bg-hover: var(--surface);
+  --button-secondary-bg-active: var(--surface-2);
+  --button-secondary-fg: var(--text);
+  --button-secondary-fg-hover: var(--pri);
+  --button-secondary-border: var(--border);
+  --button-secondary-border-hover: var(--pri);
+  --button-secondary-shadow: var(--shadow-card-sm);
+  --button-dashed-fg: var(--text-2);
+  --button-dashed-fg-hover: var(--pri);
+  --button-dashed-border: var(--line-strong);
+  --button-dashed-border-hover: var(--pri);
+  --button-text-fg: var(--pri);
+  --button-text-bg-hover: var(--pri-soft);
+  --button-link-fg: var(--pri);
+  --button-ghost-fg: var(--text-2);
+  --button-ghost-fg-hover: var(--text);
+  --button-ghost-bg-hover: var(--surface-2);
+  --button-danger-bg: var(--danger);
+  --button-danger-bg-hover: var(--danger-hover);
+  --button-danger-fg: var(--on-danger);
+  --button-danger-ring: var(--danger-bg);
+  --button-danger-ghost-fg: var(--danger);
+  --button-danger-ghost-bg: var(--danger-bg);
+  --button-danger-ghost-border: var(--danger);
+  --button-icon-fg: var(--text-3);
+  --button-icon-fg-hover: var(--text);
+  --button-icon-bg-hover: var(--surface-2);
+  --button-ring: var(--soft);
   --focus-ring: calc(3px * var(--app-scale));
   --font-display: var(--font-sans);
   --field-bg: var(--surface-2);
@@ -148,6 +181,9 @@
   --control-md: calc(32px * var(--app-scale));
   --control-btn-md: calc(32px * var(--app-scale));
   --button-font-weight: 500;
+  --button-secondary-bg-hover: var(--surface-2);
+  --button-secondary-border-hover: var(--border);
+  --button-secondary-fg-hover: var(--text);
 }
 html:not([data-radius])[data-flavor='feishu'] { --radius-factor: 0.75; }
 html:not([data-radius])[data-flavor='claude'] { --radius-factor: 1; }

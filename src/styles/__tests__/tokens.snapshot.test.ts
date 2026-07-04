@@ -242,6 +242,96 @@ test('形态轴控制按钮高度与字重，按钮消费独立 button token', (
   expect(buttonSource).toContain('size-[var(--control-btn-md)]');
 });
 
+test('Button 族 token 与 Step 3 合同落地', () => {
+  const buttonTokens = [
+    '--button-primary-bg: var(--pri);',
+    '--button-primary-bg-hover: var(--pri-hover);',
+    '--button-primary-bg-active: var(--pri-active);',
+    '--button-primary-fg: var(--on-pri);',
+    '--button-secondary-bg: var(--surface);',
+    '--button-secondary-bg-hover: var(--surface);',
+    '--button-secondary-bg-active: var(--surface-2);',
+    '--button-secondary-fg: var(--text);',
+    '--button-secondary-fg-hover: var(--pri);',
+    '--button-secondary-border: var(--border);',
+    '--button-secondary-border-hover: var(--pri);',
+    '--button-secondary-shadow: var(--shadow-card-sm);',
+    '--button-dashed-fg: var(--text-2);',
+    '--button-dashed-fg-hover: var(--pri);',
+    '--button-dashed-border: var(--line-strong);',
+    '--button-dashed-border-hover: var(--pri);',
+    '--button-text-fg: var(--pri);',
+    '--button-text-bg-hover: var(--pri-soft);',
+    '--button-link-fg: var(--pri);',
+    '--button-ghost-fg: var(--text-2);',
+    '--button-ghost-fg-hover: var(--text);',
+    '--button-ghost-bg-hover: var(--surface-2);',
+    '--button-danger-bg: var(--danger);',
+    '--button-danger-bg-hover: var(--danger-hover);',
+    '--button-danger-fg: var(--on-danger);',
+    '--button-danger-ring: var(--danger-bg);',
+    '--button-danger-ghost-fg: var(--danger);',
+    '--button-danger-ghost-bg: var(--danger-bg);',
+    '--button-danger-ghost-border: var(--danger);',
+    '--button-icon-fg: var(--text-3);',
+    '--button-icon-fg-hover: var(--text);',
+    '--button-icon-bg-hover: var(--surface-2);',
+    '--button-ring: var(--soft);',
+  ];
+
+  for (const token of buttonTokens) {
+    expect(css).toContain(token);
+  }
+
+  const requiredClasses = [
+    'focus-visible:ring-(--button-ring)',
+    'bg-(--button-primary-bg)',
+    'text-(--button-primary-fg)',
+    'hover:bg-(--button-primary-bg-hover)',
+    'active:bg-(--button-primary-bg-active)',
+    'border-(--button-secondary-border)',
+    'bg-(--button-secondary-bg)',
+    'text-(--button-secondary-fg)',
+    'shadow-(--button-secondary-shadow)',
+    'hover:border-(--button-secondary-border-hover)',
+    'hover:text-(--button-secondary-fg-hover)',
+    'border-(--button-dashed-border)',
+    'text-(--button-dashed-fg)',
+    'text-(--button-text-fg)',
+    'hover:bg-(--button-text-bg-hover)',
+    'text-(--button-link-fg)',
+    'text-(--button-ghost-fg)',
+    'hover:bg-(--button-ghost-bg-hover)',
+    'bg-(--button-danger-bg)',
+    'text-(--button-danger-fg)',
+    'focus-visible:ring-(--button-danger-ring)',
+    'bg-(--button-danger-ghost-bg)',
+    'border-(--button-danger-ghost-border)',
+  ];
+
+  for (const className of requiredClasses) {
+    expect(buttonSource).toContain(className);
+  }
+  expect(buttonSource).not.toContain('data-[icon-button=true]');
+  expect(buttonSource).not.toContain('data-icon-button');
+
+  for (const primitiveClass of [
+    'bg-pri',
+    'text-on-pri',
+    'hover:bg-pri-hover',
+    'active:bg-pri-active',
+    'border-pri',
+    'text-pri',
+    'bg-pri-soft',
+    'ring-soft',
+    'bg-danger',
+    'text-white',
+    'ring-danger-bg',
+  ]) {
+    expect(buttonSource).not.toContain(primitiveClass);
+  }
+});
+
 test('claude display font 只进入页面标题层，不污染 Field label / 表头', () => {
   expect(css).toContain('--font-display: var(--font-sans);');
   expect(css).toContain('--font-display: "Cormorant Garamond", Georgia, "Songti SC", serif;');
