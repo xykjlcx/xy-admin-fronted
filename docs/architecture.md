@@ -92,6 +92,7 @@ Route 文件只做边界装配：
 - `src/components/pro` 只沉淀业务无关的后台模式组件，例如表格壳、分页、筛选、侧边列表、表单弹窗。Pro 组件可以组合 UI 组件，但不能引入模块 DTO、接口或权限逻辑。
 - 页面层只描述业务含义和编排，不直接写原生 `<button>`、`<input>`、`<select>`、`<textarea>`，除非该控件被封装为新的 UI/Pro 组件时作为实现细节出现。
 - 组件样式只消费语义 token、Tailwind 语义类和 `--app-scale` 尺寸体系；页面不得新增硬编码色值、任意圆角或脱离 token 的控件尺寸。
+- 动画属于组件契约：tabs 指示条、展开收起、加载骨架、按钮 pending、进度条等动效优先沉到 UI/Pro 组件，并提供 `motion-reduce` 降级；页面不直接写临时动画。
 - 新增、编辑、详情使用独立组件或显式变体，不用 `isCreate`、`isEdit`、`isDetail` 这种布尔组合堆复杂度。
 - 多个子组件共享同一块复杂状态时，优先把状态提升到页面或专用 Provider，再通过清晰的 props/context 下发。
 - 可复用组件优先接收 `children` 组合结构；只有列表渲染这类需要回传数据的场景才用 render prop。

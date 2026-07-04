@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { NativeSelect } from '@/components/ui/native-select';
 import type { CreateAdminRoleInput, CreateRoleInput } from '@/modules/admin/api/role.api';
 import { emptyAdminDraft, emptyRoleDraft } from './model';
 import type { SelectableMemberDto } from './types';
@@ -41,24 +43,24 @@ export function CreateRoleDialog({
         <DialogHeader>
           <DialogTitle>{t('roles.dialog.addRoleTitle')}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4">
-          <label className="grid gap-2 text-[calc(13px*var(--app-scale))] text-text-2">
-            <span>{t('roles.form.roleName')}</span>
+        <FieldGroup>
+          <Field>
+            <FieldLabel required>{t('roles.form.roleName')}</FieldLabel>
             <Input
               placeholder={t('roles.form.roleNamePlaceholder')}
               value={roleDraft.name}
               onChange={(event) => setRoleDraft((current) => ({ ...current, name: event.target.value }))}
             />
-          </label>
-          <label className="grid gap-2 text-[calc(13px*var(--app-scale))] text-text-2">
-            <span>{t('roles.form.roleDesc')}</span>
+          </Field>
+          <Field>
+            <FieldLabel>{t('roles.form.roleDesc')}</FieldLabel>
             <Input
               placeholder={t('roles.form.roleDescPlaceholder')}
               value={roleDraft.desc ?? ''}
               onChange={(event) => setRoleDraft((current) => ({ ...current, desc: event.target.value }))}
             />
-          </label>
-        </div>
+          </Field>
+        </FieldGroup>
         <DialogFooter>
           <Button variant="outline" onClick={close}>
             {t('roles.actions.cancel')}
@@ -108,20 +110,19 @@ export function CreateAdminRoleDialog({
         <DialogHeader>
           <DialogTitle>{t('roles.dialog.addAdminTitle')}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4">
-          <label className="grid gap-2 text-[calc(13px*var(--app-scale))] text-text-2">
-            <span>{t('roles.form.adminRoleName')}</span>
+        <FieldGroup>
+          <Field>
+            <FieldLabel required>{t('roles.form.adminRoleName')}</FieldLabel>
             <Input
               placeholder={t('roles.form.adminRoleNamePlaceholder')}
               value={adminDraft.name}
               onChange={(event) => setAdminDraft((current) => ({ ...current, name: event.target.value }))}
             />
-          </label>
-          <label className="grid gap-2 text-[calc(13px*var(--app-scale))] text-text-2">
-            <span>{t('roles.form.adminMember')}</span>
-            <select
+          </Field>
+          <Field>
+            <FieldLabel required>{t('roles.form.adminMember')}</FieldLabel>
+            <NativeSelect
               aria-label={t('roles.form.adminMember')}
-              className="h-9 rounded-md border border-border bg-surface px-3 text-sm text-text outline-none"
               value={adminDraft.admin}
               onChange={(event) => setAdminDraft((current) => ({ ...current, admin: event.target.value }))}
             >
@@ -131,9 +132,9 @@ export function CreateAdminRoleDialog({
                   {member.name}
                 </option>
               ))}
-            </select>
-          </label>
-        </div>
+            </NativeSelect>
+          </Field>
+        </FieldGroup>
         <DialogFooter>
           <Button variant="outline" onClick={close}>
             {t('roles.actions.cancel')}

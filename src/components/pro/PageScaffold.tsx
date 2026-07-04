@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from 'react';
+import { AnimatedTabs } from '@/components/pro/AnimatedTabs';
 import { cn } from '@/lib/utils';
 
 export interface PageBreadcrumbItem {
@@ -63,25 +64,5 @@ export function PageTabs<TValue extends string>({
   items: PageTabItem<TValue>[];
   onValueChange: (value: TValue) => void;
 }) {
-  return (
-    <div className="flex items-end border-b border-border px-6 pt-[calc(18px*var(--app-scale))]" role="tablist">
-      {items.map((item) => (
-        <button
-          key={item.value}
-          type="button"
-          role="tab"
-          aria-selected={value === item.value}
-          className={cn(
-            'mr-7 border-b-2 px-1 pb-3 text-[calc(15px*var(--app-scale))]',
-            value === item.value
-              ? 'border-pri font-semibold text-text'
-              : 'border-transparent font-normal text-text-2',
-          )}
-          onClick={() => onValueChange(item.value)}
-        >
-          {item.label}
-        </button>
-      ))}
-    </div>
-  );
+  return <AnimatedTabs value={value} items={items} onValueChange={onValueChange} variant="page" />;
 }

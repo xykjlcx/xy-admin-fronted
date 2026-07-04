@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { RoleMemberDto } from '@/modules/admin/api/role.api';
 import { avatarClasses, initials } from './model';
@@ -24,9 +25,9 @@ export function RoleMembersPanel({ members }: { members: RoleMemberDto[] }) {
               {member.deptLabel} · {member.title}
             </div>
           </div>
-          <button type="button" className="text-[calc(13px*var(--app-scale))] text-danger">
+          <Button type="button" variant="text" size="xs" className="text-danger hover:bg-danger-soft">
             {t('roles.actions.removeMember')}
-          </button>
+          </Button>
         </div>
       ))}
     </div>

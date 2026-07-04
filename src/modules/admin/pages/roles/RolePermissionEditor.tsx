@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react';
-import { Check, ChevronRight, ChevronsDown, ChevronsUp, KeyRound, Search } from 'lucide-react';
+import { Check, ChevronRight, ChevronsDown, ChevronsUp, KeyRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { SearchField } from '@/components/pro/SearchField';
 import { Button } from '@/components/ui/button';
+import { Empty } from '@/components/ui/empty';
+import { ProgressBar } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type {
   PermissionResourceDto,
@@ -152,55 +155,60 @@ export function RolePermissionEditor({
             })}
           </span>
         </div>
-        <div className="h-1.5 min-w-[calc(100px*var(--app-scale))] max-w-[calc(180px*var(--app-scale))] flex-1 overflow-hidden rounded-full bg-surface-2">
-          <div
-            className="h-full rounded-full bg-pri transition-[width]"
-            style={{ width: `${permissionStats.pct}%` }}
-          />
-        </div>
-        <div className="flex h-[calc(34px*var(--app-scale))] w-[calc(200px*var(--app-scale))] items-center gap-2 rounded-8 bg-surface-2 px-3">
-          <Search className="size-3.5 text-text-3" />
-          <input
-            value={permissionKeyword}
-            placeholder={t('roles.permissionSearchPlaceholder')}
-            className="min-w-0 flex-1 bg-transparent text-[calc(13px*var(--app-scale))] outline-none placeholder:text-text-3"
-            onChange={(event) => setPermissionKeyword(event.target.value)}
-          />
-        </div>
+        <ProgressBar
+          value={permissionStats.pct}
+          aria-label={t('roles.permission.granted', {
+            granted: permissionStats.granted,
+            total: permissionStats.total,
+          })}
+          className="min-w-[calc(100px*var(--app-scale))] max-w-[calc(180px*var(--app-scale))] flex-1"
+        />
+        <SearchField
+          containerClassName="w-[calc(200px*var(--app-scale))]"
+          value={permissionKeyword}
+          placeholder={t('roles.permissionSearchPlaceholder')}
+          onChange={(event) => setPermissionKeyword(event.target.value)}
+        />
         <div className="flex flex-wrap items-center gap-1.5">
-          <button
+          <Button
             type="button"
-            className="inline-flex h-[calc(34px*var(--app-scale))] items-center gap-1 rounded-8 px-3 text-[calc(13px*var(--app-scale))] text-text-2 hover:bg-surface-2"
+            variant="ghost"
+            size="sm"
             onClick={() => setCollapsedGroupIds([])}
           >
-            <ChevronsDown className="size-3.5" />
+            <ChevronsDown data-icon="inline-start" />
             {t('roles.actions.expand')}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="inline-flex h-[calc(34px*var(--app-scale))] items-center gap-1 rounded-8 px-3 text-[calc(13px*var(--app-scale))] text-text-2 hover:bg-surface-2"
+            variant="ghost"
+            size="sm"
             onClick={() => setCollapsedGroupIds(permissionTree.map((group) => group.id))}
           >
-            <ChevronsUp className="size-3.5" />
+            <ChevronsUp data-icon="inline-start" />
             {t('roles.actions.collapse')}
-          </button>
+          </Button>
           {canGrant && (
             <>
-              <button
+              <Button
                 type="button"
-                className="h-[calc(34px*var(--app-scale))] rounded-8 px-3 text-[calc(13px*var(--app-scale))] text-danger hover:bg-danger-soft"
+                variant="text"
+                size="sm"
+                className="text-danger hover:bg-danger-soft"
                 onClick={() => setAllPermissions(false)}
               >
                 {t('roles.actions.clear')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="inline-flex h-[calc(34px*var(--app-scale))] items-center gap-1.5 rounded-8 border border-pri px-3.5 text-[calc(13px*var(--app-scale))] text-pri hover:bg-pri-soft"
+                variant="outline"
+                size="sm"
+                className="border-pri text-pri hover:bg-pri-soft hover:text-pri"
                 onClick={() => setAllPermissions(true)}
               >
-                <Check className="size-3.5 stroke-[2.5px]" />
+                <Check data-icon="inline-start" />
                 {t('roles.actions.grantAll')}
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -220,17 +228,19 @@ export function RolePermissionEditor({
             return (
               <div key={group.id} className="overflow-hidden rounded-12 border border-border">
                 <div className="flex h-[calc(52px*var(--app-scale))] items-center gap-3 bg-surface-2 px-4">
-                  <button
+                  <Button
                     type="button"
                     aria-label={t(collapsed ? 'roles.permission.expandGroup' : 'roles.permission.collapseGroup', {
                       group: group.label,
                     })}
                     aria-expanded={!collapsed}
-                    className="flex size-5 items-center justify-center text-text-3"
+                    variant="ghost"
+                    size="icon-xs"
+                    className="text-text-3"
                     onClick={() => toggleGroupCollapsed(group.id)}
                   >
-                    <ChevronRight className={cn('size-4 transition-transform', collapsed && '-rotate-90')} />
-                  </button>
+                    <ChevronRight data-icon="inline-start" className={cn('transition-transform', collapsed && '-rotate-90')} />
+                  </Button>
                   <PermissionGroupIcon id={group.id} />
                   <span className="flex-1 text-sm font-semibold text-text">{group.label}</span>
                   <span className="text-xs text-text-3">
@@ -265,7 +275,7 @@ export function RolePermissionEditor({
                           {resource.actions.map((action) => {
                             const on = hasAction(resource.id, action.id);
                             return (
-                              <button
+                              <Button
                                 key={action.id}
                                 type="button"
                                 aria-label={t('roles.permission.toggleAction', {
@@ -273,17 +283,18 @@ export function RolePermissionEditor({
                                   action: action.label,
                                 })}
                                 disabled={!canGrant}
+                                variant={on ? 'text' : 'outline'}
+                                size="sm"
                                 className={cn(
-                                  'inline-flex h-[calc(30px*var(--app-scale))] items-center gap-1.5 rounded-7 border px-3 text-[calc(13px*var(--app-scale))] transition-colors disabled:cursor-not-allowed disabled:opacity-70',
                                   on
-                                    ? 'border-pri bg-pri-soft text-pri'
-                                    : 'border-border bg-surface text-text-2 hover:border-pri',
+                                    ? 'border border-pri bg-pri-soft text-pri hover:bg-pri-soft'
+                                    : 'border-border bg-surface text-text-2 hover:border-pri hover:text-pri',
                                 )}
                                 onClick={() => toggleAction(resource, action.id)}
                               >
-                                {on && <Check className="size-3 stroke-[3px]" />}
+                                {on && <Check data-icon="inline-start" />}
                                 {action.label}
-                              </button>
+                              </Button>
                             );
                           })}
                         </div>
@@ -295,9 +306,7 @@ export function RolePermissionEditor({
             );
           })
         ) : (
-          <div className="rounded-12 border border-border py-12 text-center text-sm text-text-3">
-            {t('roles.noPermissionResult')}
-          </div>
+          <Empty title={t('roles.noPermissionResult')} className="rounded-12 border border-border py-12" />
         )}
       </div>
 

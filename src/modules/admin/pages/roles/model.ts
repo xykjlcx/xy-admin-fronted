@@ -4,7 +4,6 @@ import type {
   PermissionResourceDto,
   RoleLogKind,
   RolePermissionMap,
-  RoleType,
 } from '@/modules/admin/api/role.api';
 
 export const adminGridTemplate = '1.2fr 1fr 1.8fr calc(140px * var(--app-scale))';
@@ -43,10 +42,6 @@ export function cleanPermissions(permissions: RolePermissionMap): RolePermission
 
 export function initials(name: string) {
   return name.slice(-2);
-}
-
-export function roleTypeClass(type: RoleType) {
-  return type === 'system' ? 'bg-pri-soft text-pri' : 'bg-success-soft text-success';
 }
 
 export function actionList(resource: PermissionResourceDto) {

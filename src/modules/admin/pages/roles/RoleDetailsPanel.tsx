@@ -1,6 +1,9 @@
 import { Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/lib/utils';
+import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
+import { Button } from '@/components/ui/button';
+import { Empty } from '@/components/ui/empty';
+import { Skeleton } from '@/components/ui/skeleton';
 import type {
   PermissionTreeGroupDto,
   RoleDto,
@@ -46,9 +49,14 @@ export function RoleDetailsPanel({
   onSaveRolePermissions: (id: string, permissions: RolePermissionMap) => void | Promise<void>;
 }) {
   const { t } = useTranslation('admin');
+  const detailTabItems: AnimatedTabItem<DetailTab>[] = [
+    { value: 'permissions', label: t('roles.detailTabs.permissions') },
+    { value: 'members', label: t('roles.detailTabs.members', { count: roleMembers.length }) },
+    { value: 'logs', label: t('roles.detailTabs.logs') },
+  ];
 
   if (!activeRole) {
-    return <div className="flex flex-1 items-center justify-center text-sm text-text-3">{t('roles.empty')}</div>;
+    return <Empty title={t('roles.empty')} className="flex-1" />;
   }
 
   return (
@@ -58,44 +66,34 @@ export function RoleDetailsPanel({
         <RoleTypeChip type={activeRole.type} label={t(`roles.roleTypes.${activeRole.type}`)} />
         <div className="flex-1" />
         {activeRole.type === 'custom' && canDeleteRole && (
-          <button
+          <Button
             type="button"
-            className="inline-flex items-center gap-1.5 text-[calc(13px*var(--app-scale))] text-danger"
+            variant="text"
+            size="sm"
+            className="text-danger hover:bg-danger-soft"
             onClick={() => onDeleteRole(activeRole)}
           >
-            <Trash2 className="size-3.5" />
+            <Trash2 data-icon="inline-start" />
             {t('roles.actions.deleteRole')}
-          </button>
+          </Button>
         )}
       </div>
       <p className="mb-4 text-[calc(13px*var(--app-scale))] text-text-3">{activeRole.desc}</p>
 
-      <div className="mb-[calc(18px*var(--app-scale))] flex items-end border-b border-border" role="tablist">
-        {[
-          ['permissions', t('roles.detailTabs.permissions')],
-          ['members', t('roles.detailTabs.members', { count: roleMembers.length })],
-          ['logs', t('roles.detailTabs.logs')],
-        ].map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={detailTab === key}
-            className={cn(
-              'mr-6 border-b-2 px-1 pb-2.5 text-sm',
-              detailTab === key ? 'border-pri font-semibold text-pri' : 'border-transparent text-text-2',
-            )}
-            onClick={() => onDetailTabChange(key as DetailTab)}
-          >
-            {label}
-          </button>
-        ))}
-        {(roleDetailLoading || roleDetailRefreshing) && (
-          <span className="mb-2.5 ml-auto text-[calc(12px*var(--app-scale))] text-pri">
-            {t('roles.refreshing')}
-          </span>
-        )}
-      </div>
+      <AnimatedTabs
+        value={detailTab}
+        items={detailTabItems}
+        onValueChange={onDetailTabChange}
+        variant="content"
+        className="mb-[calc(18px*var(--app-scale))]"
+        trailing={
+          roleDetailLoading || roleDetailRefreshing ? (
+            <span className="mb-2.5 text-[calc(12px*var(--app-scale))] text-pri">
+              {t('roles.refreshing')}
+            </span>
+          ) : null
+        }
+      />
 
       {roleDetailLoading ? (
         <RoleDetailLoadingState label={t('roles.refreshing')} />
@@ -118,20 +116,17 @@ export function RoleDetailsPanel({
 
 function RoleDetailLoadingState({ label }: { label: string }) {
   return (
-    <div role="status" aria-label={label} className="space-y-3">
+    <div role="status" aria-label={label} className="flex flex-col gap-3">
       {Array.from({ length: 4 }).map((_, rowIndex) => (
         <div
           key={rowIndex}
           data-testid="role-detail-loading-row"
           className="rounded-10 border border-border p-4"
         >
-          <div className="h-3 w-40 animate-pulse rounded-4 bg-surface-2" />
+          <Skeleton className="h-3 w-40" />
           <div className="mt-4 grid grid-cols-4 gap-2">
             {Array.from({ length: 4 }).map((__, itemIndex) => (
-              <div
-                key={itemIndex}
-                className="h-[calc(30px*var(--app-scale))] animate-pulse rounded-7 bg-surface-2"
-              />
+              <Skeleton key={itemIndex} className="h-[calc(30px*var(--app-scale))] rounded-7" />
             ))}
           </div>
         </div>

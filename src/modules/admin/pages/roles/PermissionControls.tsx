@@ -1,4 +1,5 @@
-import { Bell, Check, Folder, List, Network, Shield, SlidersHorizontal } from 'lucide-react';
+import { Bell, Folder, List, Network, Shield, SlidersHorizontal } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import type { TriState } from './types';
 
@@ -16,23 +17,20 @@ export function TriStateButton({
   disabled?: boolean;
 }) {
   return (
-    <button
-      type="button"
-      aria-label={ariaLabel}
-      disabled={disabled}
-      className={cn(
-        'flex size-[calc(18px*var(--app-scale))] shrink-0 items-center justify-center rounded-5 border transition-colors disabled:cursor-not-allowed disabled:opacity-60',
-        state === 'none' ? 'border-border bg-surface text-transparent hover:border-pri' : 'border-pri bg-pri text-white',
-        className,
-      )}
+    <span
+      className={cn('inline-flex shrink-0', className)}
       onClick={(event) => {
         event.stopPropagation();
-        onClick();
       }}
     >
-      {state === 'all' && <Check className="size-[calc(12px*var(--app-scale))] stroke-[3px]" />}
-      {state === 'some' && <Check className="size-[calc(12px*var(--app-scale))] stroke-[3px]" />}
-    </button>
+      <Checkbox
+        aria-label={ariaLabel}
+        checked={state === 'all'}
+        indeterminate={state === 'some'}
+        disabled={disabled}
+        onCheckedChange={onClick}
+      />
+    </span>
   );
 }
 

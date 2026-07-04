@@ -2,6 +2,7 @@ import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { AdminRoleDto } from '@/modules/admin/api/role.api';
 import { RoleTypeChip } from './RoleTypeChip';
@@ -23,14 +24,14 @@ export function AdminRolesPanel({
       <div className="mb-4 flex items-center justify-between">
         <span className="text-[calc(13px*var(--app-scale))] text-text-3">{t('roles.adminIntro')}</span>
         {canCreateAdmin && (
-          <button
+          <Button
             type="button"
-            className="inline-flex h-[calc(34px*var(--app-scale))] items-center gap-1.5 rounded-8 bg-pri px-4 text-[calc(13px*var(--app-scale))] text-white hover:bg-pri-hover"
+            size="sm"
             onClick={onCreateAdmin}
           >
-            <Plus className="size-3.5" />
+            <Plus data-icon="inline-start" />
             {t('roles.actions.createAdmin')}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -67,13 +68,13 @@ export function AdminRolesPanel({
               <span className="truncate text-sm text-text-2">{role.admin}</span>
             </div>
             <div className="truncate text-[calc(13px*var(--app-scale))] text-text-2">{role.scope}</div>
-            <div className="flex items-center gap-3.5 text-[calc(13px*var(--app-scale))] text-pri">
-              <button type="button" onClick={() => toast(t('roles.toast.stub'))}>
+            <div className="flex items-center gap-2">
+              <Button type="button" variant="text" size="xs" onClick={() => toast(t('roles.toast.stub'))}>
                 {t('roles.actions.detail')}
-              </button>
-              <button type="button" onClick={() => toast(t('roles.toast.stub'))}>
+              </Button>
+              <Button type="button" variant="text" size="xs" onClick={() => toast(t('roles.toast.stub'))}>
                 {t('roles.actions.add')}
-              </button>
+              </Button>
             </div>
           </TableShellRow>
         ))}

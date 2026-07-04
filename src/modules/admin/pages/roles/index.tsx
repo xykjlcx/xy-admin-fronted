@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tansta
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
+import { PageFrame, PageSurface, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
 import { matchPermission } from '@/lib/permission';
-import { cn } from '@/lib/utils';
 import {
   adminRolesQuery,
   permissionTreeQuery,
@@ -158,6 +158,10 @@ export function RolesView({
   const canDeleteRole = matchPermission(permissions, 'iam:role:del');
   const canGrant = matchPermission(permissions, 'iam:role:grant');
   const canCreateAdmin = matchPermission(permissions, 'iam:admin:create');
+  const pageTabItems: PageTabItem<PageTab>[] = [
+    { value: 'roles', label: t('roles.tabs.roles') },
+    { value: 'admins', label: t('roles.tabs.admins') },
+  ];
 
   const confirmDeleteRole = async () => {
     if (!deleteTarget) return;
@@ -166,37 +170,9 @@ export function RolesView({
   };
 
   return (
-    <section
-      className="flex min-h-0 flex-col text-text"
-      style={{ padding: 'calc(20px * var(--app-scale)) calc(28px * var(--app-scale))' }}
-    >
-      <div className="mb-4 flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
-        <span>{t('roles.breadcrumbGroup')}</span>
-        <span>›</span>
-        <span className="text-text">{t('roles.title')}</span>
-      </div>
-
-      <div className="flex min-h-[calc(640px*var(--app-scale))] flex-col overflow-hidden rounded-12 border border-border bg-surface shadow-xs">
-        <div className="flex items-end border-b border-border px-6 pt-[calc(18px*var(--app-scale))]" role="tablist">
-          {[
-            ['roles', t('roles.tabs.roles')],
-            ['admins', t('roles.tabs.admins')],
-          ].map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              role="tab"
-              aria-selected={pageTab === key}
-              className={cn(
-                'mr-7 border-b-2 px-1 pb-3 text-[calc(15px*var(--app-scale))]',
-                pageTab === key ? 'border-pri font-semibold text-text' : 'border-transparent font-normal text-text-2',
-              )}
-              onClick={() => setPageTab(key as PageTab)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+    <PageFrame breadcrumbs={[{ label: t('roles.breadcrumbGroup') }, { label: t('roles.title') }]}>
+      <PageSurface>
+        <PageTabs value={pageTab} items={pageTabItems} onValueChange={setPageTab} />
 
         {pageTab === 'roles' ? (
           <div className="flex min-h-0 flex-1">
@@ -233,7 +209,7 @@ export function RolesView({
             onCreateAdmin={() => setAdminDialogOpen(true)}
           />
         )}
-      </div>
+      </PageSurface>
 
       <CreateRoleDialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen} onCreateRole={onCreateRole} />
       <CreateAdminRoleDialog
@@ -251,6 +227,6 @@ export function RolesView({
         onOpenChange={(open) => !open && setDeleteTarget(null)}
         onConfirm={confirmDeleteRole}
       />
-    </section>
+    </PageFrame>
   );
 }
