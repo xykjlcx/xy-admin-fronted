@@ -1,17 +1,14 @@
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { UsersView } from '@/modules/admin/components/users/UsersView';
+import { UsersPage } from '@/modules/admin/pages/users';
 import {
   deptsQuery,
-  userApi,
   usersQuery,
-  type PageResult,
-  type UpdateUserInput,
-  type UserDto,
   type UsersQueryParams,
 } from '@/modules/admin/api/user.api';
 
+// 路由文件保持“薄”：只负责 URL search、loader 预热、staticData 和权限上下文转发。
+// 具体页面交互放到 modules/admin/pages/users，避免 TanStack Router 文件变成大组件。
 const booleanSearchParam = z
   .preprocess((value) => {
     if (value === true || value === 'true') return true;
@@ -30,8 +27,17 @@ const searchSchema = z.object({
   keyword: z.string().catch(''),
 });
 
+type UsersSearch = UsersQueryParams & { keyword: string };
+
 export const Route = createFileRoute('/_auth/admin/users')({
   validateSearch: searchSchema,
+  loaderDeps: ({ search }) => search,
+  // 部门树和成员列表都进 Query 缓存；点击部门只改变 search，从而只刷新内容区的数据状态。
+  loader: ({ context, deps }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(deptsQuery),
+      context.queryClient.ensureQueryData(usersQuery(deps as UsersSearch)),
+    ]),
   staticData: {
     labelKey: 'users.title',
     permission: 'iam:user:view',
@@ -44,28 +50,13 @@ export const Route = createFileRoute('/_auth/admin/users')({
       { code: 'iam:dept:create', labelKey: 'users.actions.createDept' },
     ],
   },
-  component: UsersPage,
+  component: UsersRoute,
 });
 
-type UsersSearch = UsersQueryParams & { keyword: string };
-const emptyUsersPage: PageResult<UserDto> = { list: [], total: 0 };
-
-function UsersPage() {
+function UsersRoute() {
   const search = Route.useSearch() as UsersSearch;
   const navigate = Route.useNavigate();
   const { me } = Route.useRouteContext();
-  const queryClient = useQueryClient();
-  const { data: depts } = useSuspenseQuery(deptsQuery);
-  const usersResult = useQuery(usersQuery(search));
-  const usersPage = usersResult.data ?? emptyUsersPage;
-  const invalidateUsers = () => queryClient.invalidateQueries({ queryKey: ['iam', 'users'] });
-  const createUser = useMutation({ mutationFn: userApi.createUser, onSuccess: invalidateUsers });
-  const updateUser = useMutation({
-    mutationFn: ({ id, dto }: { id: string; dto: UpdateUserInput }) => userApi.updateUser(id, dto),
-    onSuccess: invalidateUsers,
-  });
-  const deleteUser = useMutation({ mutationFn: userApi.deleteUser, onSuccess: invalidateUsers });
-  const batchDisable = useMutation({ mutationFn: userApi.batchDisableUsers, onSuccess: invalidateUsers });
 
   const handleSearchChange = (patch: Partial<UsersQueryParams>) => {
     const next = { ...search, ...patch, keyword: patch.keyword ?? search.keyword };
@@ -78,26 +69,10 @@ function UsersPage() {
   };
 
   return (
-    <UsersView
+    <UsersPage
       permissions={me.permissions}
-      depts={depts}
-      usersPage={usersPage}
-      usersLoading={usersResult.isPending}
-      usersRefreshing={usersResult.isFetching && !usersResult.isPending}
       search={search}
       onSearchChange={handleSearchChange}
-      onCreateUser={async (dto) => {
-        await createUser.mutateAsync(dto);
-      }}
-      onUpdateUser={async (id, dto) => {
-        await updateUser.mutateAsync({ id, dto });
-      }}
-      onDeleteUser={async (id) => {
-        await deleteUser.mutateAsync(id);
-      }}
-      onBatchDisable={async (ids) => {
-        await batchDisable.mutateAsync(ids);
-      }}
     />
   );
 }

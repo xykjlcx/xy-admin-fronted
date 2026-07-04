@@ -77,6 +77,11 @@
     "memberCount": "{{count}} people",
     "selectPage": "Select current page",
     "selectUser": "Select {{name}}",
+    "pagination": {
+      "prev": "Previous page",
+      "next": "Next page",
+      "current": "Current page {{page}}"
+    },
     "status": {
       "all": "All",
       "active": "Normal",
@@ -155,6 +160,7 @@
     "searchPlaceholder": "Search roles",
     "permissionSearchPlaceholder": "Search permissions...",
     "adminIntro": "Admin roles determine the manageable scope of backend modules",
+    "refreshing": "Updating",
     "empty": "No roles",
     "noPermissionResult": "No matching permissions",
     "roleTypes": {
@@ -171,7 +177,9 @@
       "groupCount": "{{granted}}/{{total}}",
       "toggleAction": "Toggle {{resource}} {{action}}",
       "toggleResource": "Toggle all {{resource}} permissions",
-      "toggleGroup": "Toggle all {{group}} permissions"
+      "toggleGroup": "Toggle all {{group}} permissions",
+      "expandGroup": "Expand {{group}} permissions",
+      "collapseGroup": "Collapse {{group}} permissions"
     },
     "columns": {
       "adminRole": "Role",
@@ -272,6 +280,7 @@
     "form": {
       "type": "Node type",
       "parent": "Parent menu",
+      "rootParent": "Root menu",
       "name": "Menu name",
       "namePlaceholder": "e.g. Menu management",
       "icon": "Icon",
@@ -289,6 +298,18 @@
         "permissionRequired": "Action nodes must define a permission",
         "parentRequired": "Action nodes must select a parent menu"
       }
+    },
+    "iconOptions": {
+      "default": "Default icon",
+      "layoutDashboard": "Dashboard",
+      "users": "User group",
+      "user": "User",
+      "shield": "Permission",
+      "menu": "Menu",
+      "list": "List",
+      "folder": "Folder",
+      "settings": "Settings",
+      "chart": "Chart"
     },
     "empty": {
       "title": "No menus in this subsystem",

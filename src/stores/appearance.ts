@@ -8,6 +8,7 @@ import {
   resolveAccentVars,
   type AppearanceState,
 } from '@/lib/appearance-dom';
+import { appearanceConfig } from '@/config';
 
 interface AppearanceStore extends AppearanceState {
   layout: 'sidebar' | 'rail' | 'inset';
@@ -25,14 +26,16 @@ interface AppearanceStore extends AppearanceState {
 export const useAppearance = create<AppearanceStore>()(
   persist(
     (set, get) => ({
-      flavor: 'feishu',
-      mode: 'light',
-      accent: 'blue',
-      customAccent: '#c96442',
-      zoom: 'md',
-      radius: 'default',
-      layout: 'sidebar',
-      pageAnim: 'fade',
+      // 默认值来自 config；这里开始才是用户可变的运行时状态。
+      // 因为主题、布局、显示比例会被用户侧边栏即时修改，所以它们属于客户端状态，不进 Query。
+      flavor: appearanceConfig.defaults.flavor,
+      mode: appearanceConfig.defaults.mode,
+      accent: appearanceConfig.defaults.accent,
+      customAccent: appearanceConfig.defaults.customAccent,
+      zoom: appearanceConfig.defaults.zoom,
+      radius: appearanceConfig.defaults.radius,
+      layout: appearanceConfig.defaults.layout,
+      pageAnim: appearanceConfig.defaults.pageAnim,
       collapsed: {},
       _priResolved: ACCENTS[0].pri,
       _priSoftResolved: ACCENTS[0].soft,
@@ -50,7 +53,7 @@ export const useAppearance = create<AppearanceStore>()(
       toggleCollapsed: (k) => set((s) => ({ collapsed: { ...s.collapsed, [k]: !s.collapsed[k] } })),
     }),
     {
-      name: 'appearance',
+      name: appearanceConfig.storageKey,
       // 只持久化数据字段，排除函数（避免把 set/setFlavor/toggleCollapsed 序列化进 localStorage）
       partialize: (s) => ({
         flavor: s.flavor,

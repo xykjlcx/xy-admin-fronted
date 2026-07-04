@@ -1,4 +1,5 @@
 // ★ 子系统唯一聚合点（spec §7.6 增删清单的注册步骤）：新子系统在此 push manifest。
+// 页面、菜单、mock 种子都围绕 manifest 注册，避免新增业务域时到处散改入口。
 import { adminManifest } from '@/modules/admin/manifest';
 
 export const manifests = [adminManifest];

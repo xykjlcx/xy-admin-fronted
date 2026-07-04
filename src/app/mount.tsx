@@ -8,8 +8,11 @@ import { authEvents } from '@/lib/http/events';
 import { resetAuth } from '@/lib/reset-auth';
 import { i18nInit } from '@/lib/i18n';
 import { assertMenuPathsValid } from '@/modules/registry';
+import { appConfig, featuresConfig } from '@/config';
 import '@/styles/global.css';
 
+// mount.tsx 是浏览器端应用装配层：路由、QueryClient、Provider、i18n 和全局事件都在这里接线。
+// 页面组件不应自己处理这些基础设施，否则会破坏 Shell 稳定性和请求缓存一致性。
 export const router = createRouter({
   routeTree,
   context: { queryClient },
@@ -23,14 +26,14 @@ declare module '@tanstack/react-router' {
 
 // dev 菜单漂移校验：种子已由 RoutePath 编译期收窄，此处防未来运行时（DB）菜单指向不存在路由。
 // 必须在 createRouter 之后跑——fullPath 由路由树初始化时计算，此时 routesByPath 才完整。
-if (import.meta.env.DEV) assertMenuPathsValid(Object.keys(router.routesByPath));
+if (featuresConfig.isDev) assertMenuPathsValid(Object.keys(router.routesByPath));
 
 // 401 统一处理：清 token + auth 缓存 → 回登录（事件解耦，spec §9；http 层不感知路由）。
 // 退订接 HMR dispose，防开发期 mount 模块反复求值导致订阅堆积。logout 接线在 Task 11，同用 resetAuth。
 const offAuthExpired = authEvents.on('expired', () => {
   resetAuth(null);
   void router.navigate({
-    to: '/login',
+    to: appConfig.routes.login,
     search: { redirect: location.pathname + location.search },
   });
 });

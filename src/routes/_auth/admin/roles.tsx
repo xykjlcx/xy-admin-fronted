@@ -1,30 +1,49 @@
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { toast } from 'sonner';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
 import {
   adminRolesQuery,
   permissionTreeQuery,
-  roleApi,
   roleLogsQuery,
   roleMembersQuery,
   rolePermissionsQuery,
   rolesQuery,
-  type CreateAdminRoleInput,
-  type CreateRoleInput,
-  type RolePermissionMap,
 } from '@/modules/admin/api/role.api';
 import { usersQuery } from '@/modules/admin/api/user.api';
-import { RolesView } from '@/modules/admin/components/roles/RolesView';
+import { RolesPage } from '@/modules/admin/pages/roles';
 
+// roleId 放在 URL search 中，让“选中某个角色”可刷新、可复制链接，也不会触发 Shell 重建。
 const searchSchema = z.object({
   roleId: z.string().catch(''),
 });
-const emptyRolePermissions: RolePermissionMap = {};
 
 export const Route = createFileRoute('/_auth/admin/roles')({
   validateSearch: searchSchema,
+  loaderDeps: ({ search }) => ({ roleId: search.roleId }),
+  loader: async ({ context, deps }) => {
+    // 角色详情右侧多个 tab 共享 activeRoleId，loader 只预热当前角色所需数据。
+    // 后续切换角色时只更新角色详情相关 query，不影响全局布局。
+    const [roles] = await Promise.all([
+      context.queryClient.ensureQueryData(rolesQuery),
+      context.queryClient.ensureQueryData(permissionTreeQuery),
+      context.queryClient.ensureQueryData(adminRolesQuery),
+    ]);
+    const activeRoleId = roles.some((role) => role.id === deps.roleId)
+      ? deps.roleId
+      : roles[0]?.id ?? '';
+
+    await Promise.all([
+      activeRoleId
+        ? context.queryClient.ensureQueryData(rolePermissionsQuery(activeRoleId))
+        : Promise.resolve(),
+      activeRoleId
+        ? context.queryClient.ensureQueryData(roleMembersQuery(activeRoleId))
+        : Promise.resolve(),
+      activeRoleId ? context.queryClient.ensureQueryData(roleLogsQuery(activeRoleId)) : Promise.resolve(),
+      context.queryClient.ensureQueryData(
+        usersQuery({ page: 1, pageSize: 50, status: 'all', keyword: '' }),
+      ),
+    ]);
+  },
   staticData: {
     labelKey: 'roles.title',
     permission: 'iam:role:view',
@@ -36,101 +55,20 @@ export const Route = createFileRoute('/_auth/admin/roles')({
       { code: 'iam:admin:create', labelKey: 'roles.actions.createAdmin' },
     ],
   },
-  component: RolesPage,
+  component: RolesRoute,
 });
 
-function RolesPage() {
-  const { t } = useTranslation('admin');
+function RolesRoute() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const { me } = Route.useRouteContext();
-  const queryClient = useQueryClient();
-
-  const { data: roles } = useSuspenseQuery(rolesQuery);
-  const { data: permissionTree } = useSuspenseQuery(permissionTreeQuery);
-  const { data: adminRoles } = useSuspenseQuery(adminRolesQuery);
-  const activeRoleId = roles.some((role) => role.id === search.roleId)
-    ? search.roleId
-    : roles[0]?.id ?? '';
-
-  const rolePermissionsResult = useQuery({
-    ...rolePermissionsQuery(activeRoleId),
-    enabled: !!activeRoleId,
-  });
-  const roleMembersResult = useQuery({
-    ...roleMembersQuery(activeRoleId),
-    enabled: !!activeRoleId,
-  });
-  const roleLogsResult = useQuery({
-    ...roleLogsQuery(activeRoleId),
-    enabled: !!activeRoleId,
-  });
-  const usersResult = useQuery(
-    usersQuery({ page: 1, pageSize: 50, status: 'all', keyword: '' }),
-  );
-
-  const createRole = useMutation({
-    mutationFn: roleApi.createRole,
-    onSuccess: async (role) => {
-      await queryClient.invalidateQueries({ queryKey: ['iam', 'roles'] });
-      void navigate({ search: { roleId: role.id } });
-      toast.success(t('roles.toast.created'));
-    },
-  });
-  const deleteRole = useMutation({
-    mutationFn: roleApi.deleteRole,
-    onSuccess: async (_data, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['iam', 'roles'] });
-      const nextRole = roles.find((role) => role.id !== id);
-      void navigate({ search: nextRole ? { roleId: nextRole.id } : { roleId: '' } });
-      toast.success(t('roles.toast.deleted'));
-    },
-  });
-  const saveRolePermissions = useMutation({
-    mutationFn: ({ id, permissions }: { id: string; permissions: RolePermissionMap }) =>
-      roleApi.saveRolePermissions(id, permissions),
-    onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['iam', 'rolePermissions', variables.id] });
-      toast.success(t('roles.toast.permissionsSaved'));
-    },
-  });
-  const createAdminRole = useMutation({
-    mutationFn: roleApi.createAdminRole,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['iam', 'adminRoles'] });
-      toast.success(t('roles.toast.adminCreated'));
-    },
-  });
-
-  const roleDetailRefreshing =
-    rolePermissionsResult.isFetching || roleMembersResult.isFetching || roleLogsResult.isFetching;
 
   return (
-    <RolesView
+    <RolesPage
       permissions={me.permissions}
-      roles={roles}
-      activeRoleId={activeRoleId}
-      permissionTree={permissionTree}
-      rolePermissions={rolePermissionsResult.data ?? emptyRolePermissions}
-      roleMembers={roleMembersResult.data ?? []}
-      roleLogs={roleLogsResult.data ?? []}
-      adminRoles={adminRoles}
-      selectableMembers={(usersResult.data?.list ?? []).map((user) => ({ id: user.id, name: user.name }))}
-      roleDetailRefreshing={roleDetailRefreshing}
-      onActiveRoleChange={(roleId) => {
+      roleId={search.roleId}
+      onRoleIdChange={(roleId) => {
         void navigate({ search: { roleId } });
-      }}
-      onCreateRole={async (dto: CreateRoleInput) => {
-        await createRole.mutateAsync(dto);
-      }}
-      onDeleteRole={async (id: string) => {
-        await deleteRole.mutateAsync(id);
-      }}
-      onSaveRolePermissions={async (id: string, permissions: RolePermissionMap) => {
-        await saveRolePermissions.mutateAsync({ id, permissions });
-      }}
-      onCreateAdminRole={async (dto: CreateAdminRoleInput) => {
-        await createAdminRole.mutateAsync(dto);
       }}
     />
   );

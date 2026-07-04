@@ -1,6 +1,8 @@
 import { QueryClient } from '@tanstack/react-query';
 import { AuthExpiredError } from '@/lib/http/errors';
 
+// QueryClient 是服务端状态的统一策略点。
+// 页面只声明 queryKey/queryFn，不在各页面重复写 retry、refetch 等全局规则。
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

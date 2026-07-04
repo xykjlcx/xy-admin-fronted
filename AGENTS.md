@@ -22,6 +22,7 @@
 
 ## 基础铁律
 
+- 工程结构、页面目录、Route 边界和组件设计约束以 `docs/architecture.md` 为准；历史 plan/spec 中的旧路径只作为执行记录。
 - 组件代码禁止硬编码十六进制色值，优先使用语义 token。
 - 禁止 `rounded-[Npx]` 任意圆角；圆角走 `--radius-*` token。
 - 服务端数据归 TanStack Query；zustand 只存纯客户端状态，如 token、外观设置、折叠状态。

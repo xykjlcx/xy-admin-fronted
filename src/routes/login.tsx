@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { authApi } from '@/modules/admin/api/auth.api';
 import { resetAuth } from '@/lib/reset-auth';
 import { cn } from '@/lib/utils';
+import { appConfig } from '@/config';
 
 const searchSchema = z.object({ redirect: z.string().optional() });
 export const Route = createFileRoute('/login')({
@@ -33,7 +34,7 @@ function LoginPage() {
     username: string;
     password: string;
   }>({
-    defaultValues: { username: 'leah@acme.com', password: 'password123' },
+    defaultValues: { username: '', password: '' },
   });
 
   const onSubmit = handleSubmit(async (dto) => {
@@ -46,7 +47,7 @@ function LoginPage() {
       resetAuth(token); // 清上个账号的 me 缓存 + 存新 token，防权限串号
       await router.invalidate(); // 关键：登录后 beforeLoad 不会自动重跑（spec §9）
       // to 来自守卫写入的 location.href，可能带 ?query；用 href 而非 to，避免整串被当 pathname 解析导致 404
-      void nav({ href: to ?? '/admin/dashboard' });
+      void nav({ href: to ?? appConfig.routes.home });
     } catch (e) {
       setError('root', { message: (e as Error).message });
     }
@@ -213,6 +214,7 @@ function PasswordFields({
   onTogglePassword: () => void;
 }) {
   const { t } = useTranslation();
+  const passwordToggleLabel = showPassword ? t('auth.hidePassword') : t('auth.showPassword');
   return (
     <>
       <div className="mt-[calc(26px*var(--app-scale))]">
@@ -237,7 +239,13 @@ function PasswordFields({
             type={showPassword ? 'text' : 'password'}
             className="min-w-0 flex-1 bg-transparent text-sm text-text outline-none"
           />
-          <button type="button" onClick={onTogglePassword} className="text-text-3 hover:text-text">
+          <button
+            type="button"
+            aria-label={passwordToggleLabel}
+            title={passwordToggleLabel}
+            onClick={onTogglePassword}
+            className="text-text-3 hover:text-text"
+          >
             <Eye className="size-[calc(17px*var(--app-scale))]" />
           </button>
         </div>
@@ -255,7 +263,10 @@ function SmsFields() {
         <div className="flex h-[calc(46px*var(--app-scale))] items-center gap-2.5 rounded-10 border border-border bg-surface px-3.5">
           <span className="text-sm text-text-2">+86</span>
           <span className="h-[calc(18px*var(--app-scale))] w-px bg-border" />
-          <input value="158 0611 9676" readOnly className="min-w-0 flex-1 bg-transparent text-sm text-text outline-none" />
+          <input
+            placeholder={t('auth.phonePlaceholder')}
+            className="min-w-0 flex-1 bg-transparent text-sm text-text outline-none placeholder:text-text-3"
+          />
         </div>
       </div>
       <div>

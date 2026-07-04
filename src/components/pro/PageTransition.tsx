@@ -1,8 +1,8 @@
 import { useLocation } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
+import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import { useAppearance } from '@/stores/appearance';
 
-// 切页动画：key={pathname} 使路由变化时 div 重挂载并重放动画（keyframes 见 global.css，Task 2）。
+// 页面过渡容器保持稳定，避免菜单或 search 导航时把内容区当整页重建。
 // 用 style.animation（原型 pageTransStyle L4827-4828）而非 Tailwind 任意值，避开 cubic-bezier 逗号解析。
 const ANIM: Record<string, string> = {
   none: '',
@@ -15,8 +15,26 @@ const ANIM: Record<string, string> = {
 export function PageTransition({ children }: { children: ReactNode }) {
   const anim = useAppearance((s) => s.pageAnim);
   const { pathname } = useLocation();
+  const frameRef = useRef<HTMLDivElement>(null);
+  const animation = ANIM[anim] || '';
+
+  useLayoutEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+
+    if (!animation) {
+      frame.style.animation = '';
+      return;
+    }
+
+    // 保持节点不重挂载，通过重置 animation 触发同一容器的进场动画。
+    frame.style.animation = 'none';
+    void frame.offsetHeight;
+    frame.style.animation = animation;
+  }, [animation, pathname]);
+
   return (
-    <div key={pathname} style={{ animation: ANIM[anim] || undefined }}>
+    <div ref={frameRef} style={{ animation: animation || undefined }}>
       {children}
     </div>
   );

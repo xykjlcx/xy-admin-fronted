@@ -1,4 +1,5 @@
-// M0 种子只含已有路由（dashboard + 成员与部门）；M1 每加一页在此补种子行。
+// admin 是内核子系统：登录后 Shell、消息、个人中心和基础权限都依赖它。
+// M0 种子只含已有路由；M1 每加一页在此补菜单/动作种子行。
 // 权限符用原型业务域风格（spec §7.5）。
 import type { SubsystemManifest } from '@/modules/types';
 

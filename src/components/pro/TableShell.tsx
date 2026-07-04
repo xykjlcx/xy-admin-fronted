@@ -18,6 +18,13 @@ export interface TableShellProps {
   className?: string;
 }
 
+export interface TableShellLoadingRowsProps {
+  gridTemplateColumns: string;
+  rows?: number;
+  cells: number;
+  ariaLabel: string;
+}
+
 export interface TableCheckboxProps {
   ariaLabel: string;
   checked: boolean;
@@ -29,6 +36,8 @@ function withGridTemplate(gridTemplateColumns: string, style?: CSSProperties): C
   return { ...style, gridTemplateColumns };
 }
 
+// TableShell 是后台列表页的公共骨架：表头、行、空态、批量操作条和分页都用同一套结构。
+// 后续新列表页优先复用它，显示比例和边框/圆角规则才会跟随基础层统一演进。
 export function TableShell({ header, children, empty, pagination, selectedBar, className }: TableShellProps) {
   return (
     <>
@@ -67,6 +76,40 @@ export function TableShellRow({ gridTemplateColumns, children, className, style 
       style={withGridTemplate(gridTemplateColumns, style)}
     >
       {children}
+    </div>
+  );
+}
+
+export function TableShellLoadingRows({
+  gridTemplateColumns,
+  rows = 5,
+  cells,
+  ariaLabel,
+}: TableShellLoadingRowsProps) {
+  return (
+    <div role="status" aria-label={ariaLabel}>
+      {Array.from({ length: rows }).map((_, rowIndex) => (
+        <div
+          key={rowIndex}
+          data-testid="table-loading-row"
+          className="grid h-14 items-center border-t border-border px-2"
+          style={{ gridTemplateColumns }}
+        >
+          {Array.from({ length: cells }).map((__, cellIndex) => (
+            <div key={cellIndex} className="px-2">
+              <div
+                className={cn(
+                  'h-3 animate-pulse rounded-4 bg-surface-2',
+                  cellIndex === 0 && 'mx-auto w-4',
+                  cellIndex === cells - 1 && 'w-16',
+                  cellIndex > 0 && cellIndex < cells - 1 && 'w-3/4',
+                )}
+              />
+            </div>
+          ))}
+        </div>
+      ))}
+      <span className="sr-only">{ariaLabel}</span>
     </div>
   );
 }

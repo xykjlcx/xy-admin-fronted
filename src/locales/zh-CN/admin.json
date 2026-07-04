@@ -77,6 +77,11 @@
     "memberCount": "{{count}} 人",
     "selectPage": "选择本页成员",
     "selectUser": "选择{{name}}",
+    "pagination": {
+      "prev": "上一页",
+      "next": "下一页",
+      "current": "当前第 {{page}} 页"
+    },
     "status": {
       "all": "全部",
       "active": "正常",
@@ -155,6 +160,7 @@
     "searchPlaceholder": "搜索角色",
     "permissionSearchPlaceholder": "搜索权限…",
     "adminIntro": "管理员角色决定了后台各模块的可管理范围",
+    "refreshing": "正在更新",
     "empty": "暂无角色",
     "noPermissionResult": "暂无匹配权限",
     "roleTypes": {
@@ -171,7 +177,9 @@
       "groupCount": "{{granted}}/{{total}}",
       "toggleAction": "切换{{resource}}{{action}}",
       "toggleResource": "切换{{resource}}全部权限",
-      "toggleGroup": "切换{{group}}全部权限"
+      "toggleGroup": "切换{{group}}全部权限",
+      "expandGroup": "展开{{group}}权限分组",
+      "collapseGroup": "折叠{{group}}权限分组"
     },
     "columns": {
       "adminRole": "角色名称",
@@ -272,6 +280,7 @@
     "form": {
       "type": "节点类型",
       "parent": "父级菜单",
+      "rootParent": "根级菜单",
       "name": "菜单名称",
       "namePlaceholder": "如：菜单管理",
       "icon": "图标",
@@ -289,6 +298,18 @@
         "permissionRequired": "动作节点必须填写权限标识",
         "parentRequired": "动作节点必须选择父级菜单"
       }
+    },
+    "iconOptions": {
+      "default": "默认图标",
+      "layoutDashboard": "工作台",
+      "users": "用户组",
+      "user": "用户",
+      "shield": "权限",
+      "menu": "菜单",
+      "list": "列表",
+      "folder": "文件夹",
+      "settings": "设置",
+      "chart": "图表"
     },
     "empty": {
       "title": "该子系统暂无菜单",

@@ -1,6 +1,7 @@
 // 关系型内存库；M0 建 auth/menu/subsystem 域，M1 扩其余域（见 spec §5.3）。
 // auth(users/sessions) 是模式落地前的手写域；menu/subsystem 起用 createCollection 模式，M1 的 18 个域照此复制。
 import { faker } from '@faker-js/faker/locale/zh_CN';
+import { appConfig } from '@/config';
 
 faker.seed(42); // 固定种子，防视觉回归截图因随机数据 flaky
 
@@ -62,7 +63,7 @@ export function resetDb() {
 // 而真实后端的会话不会因客户端刷新而失效——这里让 mock 行为向真实后端对齐。
 // 用 localStorage 而非 sessionStorage：与 zustand persist 存 token 的存储域保持一致（多 tab 共享、
 // 重启浏览器后仍保活），否则会出现"token 跨 tab 有效但 session 只在开 tab 里查得到"的域错配。
-const SESSION_STORAGE_KEY = 'mock-sessions';
+const SESSION_STORAGE_KEY = appConfig.storageKeys.mockSessions;
 
 function loadSessions(): Map<string, string> {
   try {

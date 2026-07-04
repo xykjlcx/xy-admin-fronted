@@ -25,6 +25,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { meQuery, authApi } from '@/modules/admin/api/auth.api';
 import { resetAuth } from '@/lib/reset-auth';
+import { appConfig } from '@/config';
 
 export function UserMenu() {
   const { t } = useTranslation();
@@ -44,7 +45,7 @@ export function UserMenu() {
       toast.error(t('shell.toast.logoutFailed'));
     }
     resetAuth(null);
-    void nav({ to: '/login' });
+    void nav({ to: appConfig.routes.login });
   };
 
   return (
