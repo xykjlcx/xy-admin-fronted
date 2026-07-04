@@ -183,11 +183,22 @@ test('ui-field 状态机消费中间态 token，并保持 disabled > invalid > f
   expect(globalCss).toContain(".ui-field.ui-field[aria-invalid='true'],");
   expect(globalCss).toContain(".ui-field.ui-field[data-status='error'] {");
   expect(globalCss).toContain('--_field-border: var(--field-border-invalid);');
+  const invalidBlockStart = globalCss.indexOf(".ui-field.ui-field[aria-invalid='true'],");
+  const invalidBlockEnd = globalCss.indexOf('}', invalidBlockStart);
+  const invalidBlock = globalCss.slice(invalidBlockStart, invalidBlockEnd);
+  expect(invalidBlock).not.toContain('--_field-ring-color: var(--field-ring-invalid);');
+  expect(invalidBlock).not.toContain('box-shadow: 0 0 0 var(--focus-ring)');
+  expect(globalCss).toContain(".ui-field.ui-field[aria-invalid='true']:focus-within,");
+  expect(globalCss).toContain(".ui-field.ui-field[aria-invalid='true'][data-state='open'],");
+  expect(globalCss).toContain(".ui-field.ui-field[data-status='error']:focus-within,");
+  expect(globalCss).toContain(".ui-field.ui-field[data-status='error'][data-state='open'] {");
   expect(globalCss).toContain('--_field-ring-color: var(--field-ring-invalid);');
 
   const invalidIndex = globalCss.indexOf(".ui-field.ui-field[aria-invalid='true']");
+  const invalidFocusIndex = globalCss.indexOf(".ui-field.ui-field[aria-invalid='true']:focus-within");
   const disabledIndex = globalCss.indexOf('.ui-field.ui-field:disabled');
   expect(disabledIndex).toBeGreaterThan(invalidIndex);
+  expect(disabledIndex).toBeGreaterThan(invalidFocusIndex);
   expect(globalCss.slice(disabledIndex)).toContain('--_field-bg: var(--field-bg-disabled);');
   expect(globalCss.slice(disabledIndex)).toContain('--_field-border: var(--field-border);');
   expect(globalCss.slice(disabledIndex)).toContain('--_field-ring-color: transparent;');
@@ -202,6 +213,7 @@ test('shadcn flavor 提供官方中性基线 token', () => {
   expect(css).toContain('--bg: #09090b; --canvas: #09090b; --surface: #18181b; --chrome: #09090b;');
   expect(css).toContain('--surface-2: #27272a; --surface-blur: rgba(24, 24, 27, 0.78);');
   expect(css).toContain('--text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: #27272a;');
+  expect(css).toContain('--field-ring-invalid: color-mix(in srgb, var(--danger) 24%, transparent);');
 });
 
 test('圆角因子三档 + 四条 calc 公式', () => {

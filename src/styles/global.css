@@ -175,6 +175,12 @@
   .ui-field.ui-field[aria-invalid='true'],
   .ui-field.ui-field[data-status='error'] {
     --_field-border: var(--field-border-invalid);
+  }
+
+  .ui-field.ui-field[aria-invalid='true']:focus-within,
+  .ui-field.ui-field[aria-invalid='true'][data-state='open'],
+  .ui-field.ui-field[data-status='error']:focus-within,
+  .ui-field.ui-field[data-status='error'][data-state='open'] {
     --_field-ring-color: var(--field-ring-invalid);
     box-shadow: 0 0 0 var(--focus-ring) var(--_field-ring-color);
   }

@@ -125,6 +125,7 @@
 [data-mode='dark'] {
   --pri-hover: color-mix(in srgb, var(--pri) 85%, white);
   --pri-active: color-mix(in srgb, var(--pri) 76%, white);
+  --field-ring-invalid: color-mix(in srgb, var(--danger) 24%, transparent);
 }
 [data-flavor='claude'] {
   --field-bg: var(--surface);

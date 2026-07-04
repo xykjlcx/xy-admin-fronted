@@ -234,6 +234,10 @@ test('Field 族控件统一挂载 ui-field 状态机并消费 Field token', () =
     expect(control).not.toHaveClass('bg-[var(--field-bg)]');
     expect(control).not.toHaveClass('text-[var(--field-fg)]');
   }
+  expect(group).toHaveAttribute('data-addon-before', 'true');
+  expect(group).toHaveClass('overflow-hidden');
+  expect(group).toHaveClass('data-[addon-before=true]:pl-0');
+  expect(group?.querySelector('[data-slot="input-group-addon"]')).not.toHaveClass('-ml-3');
   expect(input).not.toHaveClass('placeholder:text-[var(--field-placeholder)]');
   expect(group).not.toHaveClass('[&_[data-icon]]:text-[var(--field-icon)]');
   expect(selectTrigger).not.toHaveClass('data-[state=open]:border-[var(--field-border-focus)]');

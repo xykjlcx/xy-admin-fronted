@@ -48,7 +48,12 @@ function Input({
 }: InputProps) {
   if (prefix || suffix || addonBefore) {
     return (
-      <InputGroup inputSize={inputSize} status={status} data-disabled={disabled || undefined}>
+      <InputGroup
+        inputSize={inputSize}
+        status={status}
+        data-addon-before={addonBefore ? true : undefined}
+        data-disabled={disabled || undefined}
+      >
         {addonBefore && <InputGroupAddon>{addonBefore}</InputGroupAddon>}
         {prefix && <InputGroupPrefix>{prefix}</InputGroupPrefix>}
         <InputGroupInput
@@ -90,8 +95,9 @@ function InputGroup({
       data-size={inputSize}
       data-status={status}
       className={cn(
-        'ui-field flex w-full min-w-0 items-center gap-2 rounded-md border px-3 transition-[border-color,box-shadow,background,color]',
+        'ui-field flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md border px-3 transition-[border-color,box-shadow,background,color]',
         'data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50',
+        'data-[addon-before=true]:pl-0',
         inputSize === 'sm' && 'h-[var(--control-sm)] text-[calc(13px*var(--app-scale))]',
         inputSize === 'md' && 'h-[var(--control-md)] text-sm',
         inputSize === 'lg' && 'h-[var(--control-lg)] text-[calc(15px*var(--app-scale))]',
@@ -123,7 +129,7 @@ function InputGroupAddon({ className, ...props }: React.ComponentProps<'span'>) 
     <span
       data-slot="input-group-addon"
       className={cn(
-        '-ml-3 inline-flex self-stretch items-center border-r px-3',
+        'inline-flex self-stretch items-center border-r px-3',
         className,
       )}
       {...props}
