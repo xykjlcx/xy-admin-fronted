@@ -35,7 +35,7 @@ function SheetOverlay({
       data-slot="sheet-overlay"
       className={cn(
         // 原型遮罩（L2651）：rgba(0,0,0,.22) + backdrop-blur(6px) + ovl-fade .2s
-        "anim-ovl-fade fixed inset-0 z-50 bg-[rgba(0,0,0,0.22)] backdrop-blur-[6px]",
+        "anim-ovl-fade fixed inset-0 z-50 bg-(--overlay-mask-bg) backdrop-blur-[var(--overlay-mask-blur)]",
         className
       )}
       {...props}
@@ -59,26 +59,26 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-surface",
-          // 原型抽屉（L2652）：右滑入 sheet-in-right .28s + shadow -8px 0 32px .14（M0 只用 right）
+          "fixed z-50 flex flex-col gap-4 bg-(--overlay-bg) text-(--overlay-fg)",
+          // 抽屉阴影纳入 overlay 族，后续只调整 token，不在组件里散落阴影实现。
           side === "right" &&
-            "anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-border shadow-drawer sm:max-w-sm",
+            "anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-(--overlay-border) shadow-(--overlay-shadow-modal) sm:max-w-sm",
           side === "left" &&
-            "inset-y-0 left-0 h-full w-3/4 border-r data-[state=open]:animate-in data-[state=open]:slide-in-from-left data-[state=open]:duration-300 sm:max-w-sm",
+            "inset-y-0 left-0 h-full w-3/4 border-r border-(--overlay-border) data-[state=open]:animate-in data-[state=open]:slide-in-from-left data-[state=open]:duration-300 sm:max-w-sm",
           side === "top" &&
-            "inset-x-0 top-0 h-auto border-b data-[state=open]:animate-in data-[state=open]:slide-in-from-top data-[state=open]:duration-300",
+            "inset-x-0 top-0 h-auto border-b border-(--overlay-border) data-[state=open]:animate-in data-[state=open]:slide-in-from-top data-[state=open]:duration-300",
           side === "bottom" &&
-            "inset-x-0 bottom-0 h-auto border-t data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300",
+            "inset-x-0 bottom-0 h-auto border-t border-(--overlay-border) data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300",
           className
         )}
         {...props}
       >
         {children}
         {showCloseButton && (
-          // 原型抽屉关闭钮（L2658）：30px 圆角方块（7px）+ ✕，无边框，text-3 色，hover 底 --bg
+          // 原型抽屉关闭钮（L2658）：30px 圆角方块（7px）+ ✕，无边框，走 overlay close token
           <SheetPrimitive.Close
             data-slot="sheet-close"
-            className="absolute right-6 top-[calc(22px*var(--app-scale))] flex size-[calc(30px*var(--app-scale))] cursor-pointer items-center justify-center rounded-7 text-(--button-icon-fg) outline-none transition-colors hover:bg-(--button-icon-bg-hover) hover:text-(--button-icon-fg-hover) focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--button-ring) disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none"
+            className="absolute right-6 top-[calc(22px*var(--app-scale))] flex size-[calc(30px*var(--app-scale))] cursor-pointer items-center justify-center rounded-7 text-(--overlay-close-fg) outline-none transition-colors hover:bg-(--overlay-close-bg-hover) hover:text-(--overlay-close-fg-hover) focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--button-ring) disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none"
           >
             <XIcon className="size-[calc(18px*var(--app-scale))]" />
             <span className="sr-only">Close</span>

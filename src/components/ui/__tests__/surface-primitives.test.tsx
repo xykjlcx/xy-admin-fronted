@@ -46,7 +46,7 @@ function DemoForm() {
   );
 }
 
-test('DialogContent 使用 surface 背景而不是页面背景', () => {
+test('DialogContent 使用 overlay token 而不是页面背景', () => {
   render(
     <Dialog open>
       <DialogContent>
@@ -57,7 +57,12 @@ test('DialogContent 使用 surface 背景而不是页面背景', () => {
   );
 
   const content = screen.getByText('Dialog body').closest('[data-slot="dialog-content"]');
-  expect(content).toHaveClass('bg-surface');
+  const overlay = document.querySelector('[data-slot="dialog-overlay"]');
+  expect(overlay).toHaveClass('bg-(--overlay-mask-bg)');
+  expect(overlay).toHaveClass('backdrop-blur-[var(--overlay-mask-blur)]');
+  expect(content).toHaveClass('bg-(--overlay-bg)');
+  expect(content).toHaveClass('border-(--overlay-border)');
+  expect(content).toHaveClass('shadow-(--overlay-shadow-modal)');
   expect(content).not.toHaveClass('bg-background');
 });
 
@@ -78,7 +83,7 @@ test('DialogContent 默认不会被外部点击关闭', async () => {
   expect(onOpenChange).not.toHaveBeenCalledWith(false);
 });
 
-test('SheetContent 使用 surface 背景而不是页面背景', () => {
+test('SheetContent 使用 overlay token 而不是页面背景', () => {
   render(
     <Sheet open>
       <SheetContent>
@@ -89,7 +94,12 @@ test('SheetContent 使用 surface 背景而不是页面背景', () => {
   );
 
   const content = screen.getByText('Sheet body').closest('[data-slot="sheet-content"]');
-  expect(content).toHaveClass('bg-surface');
+  const overlay = document.querySelector('[data-slot="sheet-overlay"]');
+  expect(overlay).toHaveClass('bg-(--overlay-mask-bg)');
+  expect(overlay).toHaveClass('backdrop-blur-[var(--overlay-mask-blur)]');
+  expect(content).toHaveClass('bg-(--overlay-bg)');
+  expect(content).toHaveClass('text-(--overlay-fg)');
+  expect(content).toHaveClass('shadow-(--overlay-shadow-modal)');
   expect(content).not.toHaveClass('bg-background');
 });
 
@@ -106,10 +116,10 @@ test('DialogContent 和 SheetContent 使用统一关闭按钮视觉', () => {
   const dialogClose = screen.getByRole('button', { name: 'Close' });
   expect(dialogClose).toHaveClass('size-[calc(30px*var(--app-scale))]');
   expect(dialogClose).toHaveClass('rounded-7');
-  expect(dialogClose).toHaveClass('text-(--button-icon-fg)');
+  expect(dialogClose).toHaveClass('text-(--overlay-close-fg)');
   expect(dialogClose).toHaveClass('transition-colors');
-  expect(dialogClose).toHaveClass('hover:bg-(--button-icon-bg-hover)');
-  expect(dialogClose).toHaveClass('hover:text-(--button-icon-fg-hover)');
+  expect(dialogClose).toHaveClass('hover:bg-(--overlay-close-bg-hover)');
+  expect(dialogClose).toHaveClass('hover:text-(--overlay-close-fg-hover)');
   expect(dialogClose).toHaveClass('focus-visible:ring-(--button-ring)');
   expect(dialogClose.querySelector('svg')).toHaveClass('size-[calc(18px*var(--app-scale))]');
 
@@ -127,10 +137,10 @@ test('DialogContent 和 SheetContent 使用统一关闭按钮视觉', () => {
   const sheetClose = screen.getByRole('button', { name: 'Close' });
   expect(sheetClose).toHaveClass('size-[calc(30px*var(--app-scale))]');
   expect(sheetClose).toHaveClass('rounded-7');
-  expect(sheetClose).toHaveClass('text-(--button-icon-fg)');
+  expect(sheetClose).toHaveClass('text-(--overlay-close-fg)');
   expect(sheetClose).toHaveClass('transition-colors');
-  expect(sheetClose).toHaveClass('hover:bg-(--button-icon-bg-hover)');
-  expect(sheetClose).toHaveClass('hover:text-(--button-icon-fg-hover)');
+  expect(sheetClose).toHaveClass('hover:bg-(--overlay-close-bg-hover)');
+  expect(sheetClose).toHaveClass('hover:text-(--overlay-close-fg-hover)');
   expect(sheetClose).toHaveClass('focus-visible:ring-(--button-ring)');
   expect(sheetClose.querySelector('svg')).toHaveClass('size-[calc(18px*var(--app-scale))]');
 });

@@ -99,6 +99,16 @@
   --button-icon-fg-hover: var(--text);
   --button-icon-bg-hover: var(--surface-2);
   --button-ring: var(--soft);
+  --overlay-mask-bg: rgba(0, 0, 0, 0.22);
+  --overlay-mask-blur: 6px;
+  --overlay-bg: var(--surface);
+  --overlay-fg: var(--text);
+  --overlay-border: var(--border);
+  --overlay-shadow-modal: var(--shadow-modal);
+  --overlay-shadow-popover: var(--shadow-popover);
+  --overlay-close-fg: var(--button-icon-fg);
+  --overlay-close-fg-hover: var(--button-icon-fg-hover);
+  --overlay-close-bg-hover: var(--button-icon-bg-hover);
   --focus-ring: calc(3px * var(--app-scale));
   --font-display: var(--font-sans);
   --field-bg: var(--surface-2);

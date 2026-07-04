@@ -4,6 +4,12 @@ import { readFileSync } from 'node:fs';
 const css = readFileSync('src/styles/tokens.css', 'utf8');
 const globalCss = readFileSync('src/styles/global.css', 'utf8');
 const buttonSource = readFileSync('src/components/ui/button.tsx', 'utf8');
+const dialogSource = readFileSync('src/components/ui/dialog.tsx', 'utf8');
+const sheetSource = readFileSync('src/components/ui/sheet.tsx', 'utf8');
+const popoverSource = readFileSync('src/components/ui/popover.tsx', 'utf8');
+const dropdownMenuSource = readFileSync('src/components/ui/dropdown-menu.tsx', 'utf8');
+const selectSource = readFileSync('src/components/ui/select.tsx', 'utf8');
+const tooltipSource = readFileSync('src/components/ui/tooltip.tsx', 'utf8');
 const loginSource = readFileSync('src/routes/login.tsx', 'utf8');
 
 // 权威值表：原型 L4796-4805 逐字对照，全表逐值断言（tokens.css 全部变量声明，无抽样遗漏）。
@@ -330,6 +336,54 @@ test('Button 族 token 与 Step 3 合同落地', () => {
   ]) {
     expect(buttonSource).not.toContain(primitiveClass);
   }
+});
+
+test('Overlay 族 token 与 Step 4 合同落地', () => {
+  const overlayTokens = [
+    '--overlay-mask-bg: rgba(0, 0, 0, 0.22);',
+    '--overlay-mask-blur: 6px;',
+    '--overlay-bg: var(--surface);',
+    '--overlay-fg: var(--text);',
+    '--overlay-border: var(--border);',
+    '--overlay-shadow-modal: var(--shadow-modal);',
+    '--overlay-shadow-popover: var(--shadow-popover);',
+    '--overlay-close-fg: var(--button-icon-fg);',
+    '--overlay-close-fg-hover: var(--button-icon-fg-hover);',
+    '--overlay-close-bg-hover: var(--button-icon-bg-hover);',
+  ];
+
+  for (const token of overlayTokens) {
+    expect(css).toContain(token);
+  }
+
+  expect(dialogSource).toContain('bg-(--overlay-mask-bg)');
+  expect(dialogSource).toContain('backdrop-blur-[var(--overlay-mask-blur)]');
+  expect(dialogSource).toContain('border-(--overlay-border)');
+  expect(dialogSource).toContain('bg-(--overlay-bg)');
+  expect(dialogSource).toContain('text-(--overlay-fg)');
+  expect(dialogSource).toContain('shadow-(--overlay-shadow-modal)');
+  expect(dialogSource).toContain('text-(--overlay-close-fg)');
+  expect(dialogSource).toContain('hover:bg-(--overlay-close-bg-hover)');
+
+  expect(sheetSource).toContain('bg-(--overlay-mask-bg)');
+  expect(sheetSource).toContain('backdrop-blur-[var(--overlay-mask-blur)]');
+  expect(sheetSource).toContain('border-(--overlay-border)');
+  expect(sheetSource).toContain('bg-(--overlay-bg)');
+  expect(sheetSource).toContain('text-(--overlay-fg)');
+  expect(sheetSource).toContain('shadow-(--overlay-shadow-modal)');
+  expect(sheetSource).not.toContain('shadow-drawer');
+  expect(sheetSource).toContain('text-(--overlay-close-fg)');
+
+  for (const source of [popoverSource, dropdownMenuSource, selectSource]) {
+    expect(source).toContain('border-(--overlay-border)');
+    expect(source).toContain('bg-(--overlay-bg)');
+    expect(source).toContain('text-(--overlay-fg)');
+    expect(source).toContain('shadow-(--overlay-shadow-popover)');
+  }
+  expect(dropdownMenuSource).toContain('max-h-(--radix-dropdown-menu-content-available-height)');
+  expect(selectSource).toContain('w-[var(--radix-select-trigger-width)]');
+  expect(tooltipSource).toContain('bg-tooltip');
+  expect(tooltipSource).not.toContain('bg-(--overlay-bg)');
 });
 
 test('claude display font 只进入页面标题层，不污染 Field label / 表头', () => {

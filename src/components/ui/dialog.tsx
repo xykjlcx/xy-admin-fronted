@@ -37,7 +37,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "anim-ovl-fade fixed inset-0 z-50 bg-[rgba(0,0,0,0.22)] backdrop-blur-[6px]",
+        "anim-ovl-fade fixed inset-0 z-50 bg-(--overlay-mask-bg) backdrop-blur-[var(--overlay-mask-blur)]",
         className
       )}
       {...props}
@@ -79,7 +79,7 @@ function DialogContent({
         {...props}
         data-slot="dialog-content"
         className={cn(
-          "anim-modal-in-lg fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-14 border border-border bg-surface p-6 shadow-modal outline-none sm:max-w-lg",
+          "anim-modal-in-lg fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-6 text-(--overlay-fg) shadow-(--overlay-shadow-modal) outline-none sm:max-w-lg",
           className
         )}
         onPointerDownOutside={handlePointerDownOutside}
@@ -89,7 +89,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="absolute right-6 top-[calc(22px*var(--app-scale))] flex size-[calc(30px*var(--app-scale))] cursor-pointer items-center justify-center rounded-7 text-(--button-icon-fg) outline-none transition-colors hover:bg-(--button-icon-bg-hover) hover:text-(--button-icon-fg-hover) focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--button-ring) disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none"
+            className="absolute right-6 top-[calc(22px*var(--app-scale))] flex size-[calc(30px*var(--app-scale))] cursor-pointer items-center justify-center rounded-7 text-(--overlay-close-fg) outline-none transition-colors hover:bg-(--overlay-close-bg-hover) hover:text-(--overlay-close-fg-hover) focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--button-ring) disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none"
           >
             <XIcon className="size-[calc(18px*var(--app-scale))]" />
             <span className="sr-only">Close</span>
