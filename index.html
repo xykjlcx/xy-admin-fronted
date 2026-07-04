@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>通用后台管理</title>
     <!-- 契约：localStorage key 'appearance'（zustand persist {state} 结构）+ 默认值 feishu/light，与 src/stores/appearance.ts 同步。
-         _priResolved/_priSoftResolved/_onPriResolved 由 store 在主题色变更时写入，此处直接注入 --pri/--pri-soft/--on-pri，防自选主题色首帧闪回默认值。 -->
+         _priResolved/_priActiveResolved/_priSoftResolved/_onPriResolved 由 store 在主题色变更时写入，此处直接注入 --pri/--pri-active/--pri-soft/--on-pri，防自选主题色首帧闪回默认值。 -->
     <script>
       (function () {
         try {
@@ -18,6 +18,7 @@
           if (s.radius && s.radius !== 'default') el.dataset.radius = s.radius;
           if (s.zoom && s.zoom !== 'md') el.dataset.zoom = s.zoom;
           if (s._priResolved) el.style.setProperty('--pri', s._priResolved);
+          if (s._priActiveResolved) el.style.setProperty('--pri-active', s._priActiveResolved);
           if (s._priSoftResolved) el.style.setProperty('--pri-soft', s._priSoftResolved);
           if (s._onPriResolved) el.style.setProperty('--on-pri', s._onPriResolved);
         } catch (e) {}

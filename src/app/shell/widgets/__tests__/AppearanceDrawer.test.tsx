@@ -18,7 +18,9 @@ const DEFAULTS = {
   pageAnim: 'fade',
   collapsed: {},
   _priResolved: '#3370ff',
+  _priActiveResolved: null,
   _priSoftResolved: '#eef3ff',
+  _onPriResolved: '#ffffff',
 } as const;
 
 beforeAll(async () => {

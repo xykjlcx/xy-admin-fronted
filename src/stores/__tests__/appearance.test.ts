@@ -10,6 +10,10 @@ const DEFAULTS = {
   layout: 'sidebar',
   pageAnim: 'fade',
   collapsed: {},
+  _priResolved: '#3370ff',
+  _priActiveResolved: null,
+  _priSoftResolved: '#eef3ff',
+  _onPriResolved: '#ffffff',
 } as const;
 
 beforeEach(() => {
@@ -52,9 +56,20 @@ test('set 持久化 --on-pri 派生值，供 FOUC 脚本首帧注入', () => {
   useAppearance.getState().set({ accent: 'custom', customAccent: '#f5c518' });
 
   expect(useAppearance.getState()._priResolved).toBe('#f5c518');
+  expect(useAppearance.getState()._priActiveResolved).toBeNull();
   expect(useAppearance.getState()._priSoftResolved).toBe('rgba(245,197,24,.12)');
   expect(useAppearance.getState()._onPriResolved).toBe('#18181b');
+  expect(document.documentElement.style.getPropertyValue('--pri-active')).toBe('');
   expect(document.documentElement.style.getPropertyValue('--on-pri')).toBe('#18181b');
+});
+
+test('set 持久化 claude 官方 active 色，供 FOUC 脚本首帧注入', () => {
+  useAppearance.getState().set({ flavor: 'claude', accent: 'claude' });
+
+  expect(useAppearance.getState()._priResolved).toBe('#cc785c');
+  expect(useAppearance.getState()._priActiveResolved).toBe('#a9583e');
+  expect(document.documentElement.style.getPropertyValue('--pri')).toBe('#cc785c');
+  expect(document.documentElement.style.getPropertyValue('--pri-active')).toBe('#a9583e');
 });
 
 // ⚠️ 本用例依赖 vi.resetModules() 产生独立 store 实例（重跑 rehydrate），
@@ -70,5 +85,6 @@ test('rehydrate 时重放 accent 注入（F5 后自选主题色不丢失）', as
 
   expect(mod.useAppearance.getState().accent).toBe('violet');
   expect(document.documentElement.style.getPropertyValue('--pri')).toBe('#7c3aed');
+  expect(document.documentElement.style.getPropertyValue('--pri-active')).toBe('');
   expect(mod.useAppearance.getState()._onPriResolved).toBe('#ffffff');
 });

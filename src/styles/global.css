@@ -119,11 +119,14 @@
 
 @layer utilities {
   /* 设计体系 Field 状态机。组件只挂 ui-field 和结构尺寸，base/hover/focus/open/invalid/disabled
-     全部从 --field-* token 读取，保证 flavor 可以独立换系。顺序即优先级：invalid > focus/open > hover > base。 */
+     全部从 --field-* token 读取，保证 flavor 可以独立换系。顺序即优先级：disabled > invalid > focus/open > hover > base。 */
   .ui-field {
-    background: var(--field-bg);
+    --_field-bg: var(--field-bg);
+    --_field-border: var(--field-border);
+    --_field-ring-color: transparent;
+    background: var(--_field-bg);
     color: var(--field-fg);
-    border-color: var(--field-border);
+    border-color: var(--_field-border);
     box-shadow: var(--field-shadow);
   }
 
@@ -154,30 +157,40 @@
   }
 
   .ui-field.ui-field:hover {
-    border-color: var(--field-border-hover);
+    --_field-border: var(--field-border-hover);
   }
 
   .ui-field.ui-field:focus-within,
   .ui-field.ui-field[data-state='open'] {
-    background: var(--field-bg-focus);
-    border-color: var(--field-border-focus);
-    box-shadow: 0 0 0 var(--focus-ring) var(--field-ring-focus), var(--field-shadow);
-  }
-
-  .ui-field.ui-field[disabled],
-  .ui-field.ui-field[data-disabled='true'],
-  .ui-field.ui-field[data-disabled=''] {
-    background: var(--field-bg-disabled);
+    --_field-bg: var(--field-bg-focus);
+    --_field-border: var(--field-border-focus);
+    --_field-ring-color: var(--field-ring-focus);
+    box-shadow: 0 0 0 var(--focus-ring) var(--_field-ring-color);
   }
 
   .ui-field.ui-field[readonly] {
-    background: var(--field-bg-readonly);
+    --_field-bg: var(--field-bg-readonly);
   }
 
   .ui-field.ui-field[aria-invalid='true'],
   .ui-field.ui-field[data-status='error'] {
-    border-color: var(--field-border-invalid);
-    box-shadow: 0 0 0 var(--focus-ring) var(--field-ring-invalid), var(--field-shadow);
+    --_field-border: var(--field-border-invalid);
+    --_field-ring-color: var(--field-ring-invalid);
+    box-shadow: 0 0 0 var(--focus-ring) var(--_field-ring-color);
+  }
+
+  .ui-field.ui-field:disabled,
+  .ui-field.ui-field[disabled],
+  .ui-field.ui-field[data-disabled='true'],
+  .ui-field.ui-field[data-disabled=''] {
+    --_field-bg: var(--field-bg-disabled);
+    --_field-border: var(--field-border);
+    --_field-ring-color: transparent;
+    box-shadow: var(--field-shadow);
+  }
+
+  .ui-page-title {
+    font-family: var(--font-display);
   }
 }
 

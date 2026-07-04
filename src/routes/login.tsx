@@ -78,7 +78,7 @@ function LoginPage() {
         </div>
 
         <form onSubmit={onSubmit} className="my-auto w-full max-w-[calc(420px*var(--app-scale))] self-center">
-          <h1 className="text-[calc(30px*var(--app-scale))] font-extrabold leading-tight text-text">
+          <h1 className="ui-page-title text-[calc(30px*var(--app-scale))] font-extrabold leading-tight text-text">
             {t('auth.welcome')}
           </h1>
           <p className="mt-2.5 text-sm text-text-3">{t('auth.welcomeDesc')}</p>
@@ -191,7 +191,7 @@ function HeroPanel() {
       </div>
 
       <div className="relative my-auto">
-        <div className="text-[calc(44px*var(--app-scale))] font-extrabold leading-[1.15] text-text">
+        <div className="ui-page-title text-[calc(44px*var(--app-scale))] font-extrabold leading-[1.15] text-text">
           {t('auth.hero.headline1')}
           <br />
           <span className="text-pri">{t('auth.hero.headline2')}</span>

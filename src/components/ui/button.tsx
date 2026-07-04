@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
   [
-    'inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap border border-transparent font-medium outline-none transition-[background,border-color,color,box-shadow,opacity]',
+    'inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap border border-transparent font-[var(--button-font-weight)] outline-none transition-[background,border-color,color,box-shadow,opacity]',
     'focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45 data-[loading=true]:pointer-events-none data-[loading=true]:cursor-wait data-[loading=true]:opacity-80',
     '[&_[data-icon]]:pointer-events-none [&_[data-icon]]:shrink-0 [&_[data-icon]]:size-[calc(15px*var(--app-scale))]',
@@ -27,12 +27,12 @@ const buttonVariants = cva(
         'danger-ghost': 'border-danger bg-danger-bg text-danger hover:bg-danger-bg focus-visible:ring-danger-bg',
       },
       size: {
-        default: 'h-[var(--control-md)] rounded-md px-[calc(18px*var(--app-scale))] text-sm',
-        md: 'h-[var(--control-md)] rounded-md px-[calc(18px*var(--app-scale))] text-sm',
+        default: 'h-[var(--control-btn-md)] rounded-md px-[calc(18px*var(--app-scale))] text-sm',
+        md: 'h-[var(--control-btn-md)] rounded-md px-[calc(18px*var(--app-scale))] text-sm',
         xs: 'h-[calc(24px*var(--app-scale))] gap-1 rounded-6 px-2 text-xs [&_[data-icon]]:size-[calc(13px*var(--app-scale))]',
         sm: 'h-[var(--control-sm)] gap-1.5 rounded-sm px-3 text-[calc(13px*var(--app-scale))]',
         lg: 'h-[var(--control-lg)] rounded-md px-[calc(22px*var(--app-scale))] text-[calc(15px*var(--app-scale))]',
-        icon: 'size-[var(--control-md)] rounded-9 px-0',
+        icon: 'size-[var(--control-btn-md)] rounded-9 px-0',
         'icon-xs': 'size-[calc(24px*var(--app-scale))] rounded-6 px-0 [&_[data-icon]]:size-[calc(13px*var(--app-scale))]',
         'icon-sm': 'size-[var(--control-sm)] rounded-sm px-0',
         'icon-lg': 'size-[var(--control-lg)] rounded-md px-0',

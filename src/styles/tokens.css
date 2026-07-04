@@ -1,5 +1,5 @@
-/* src/styles/tokens.css —— 权威源：原型 FLAVORS 对象（L4796-4805）。
-   耦合规则见 spec §8.1：暗色下 --pri-soft 与主题色无关。 */
+/* src/styles/tokens.css —— 权威源：spec v3.1 §10.2 + docs/design/*.design.md。
+   耦合规则见 spec §4.7：accent 运行时拥有 --pri / --pri-soft / --on-pri，CSS 只提供 flavor fallback。 */
 
 :root, [data-flavor='feishu'][data-mode='light'] {
   --pri: #3370ff; --pri-soft: #eef3ff;
@@ -14,11 +14,13 @@
   --text: #e7e9ec; --text-2: #a3aab3; --text-3: #7a818b; --border: #2c2f38;
 }
 [data-flavor='claude'][data-mode='light'] {
-  --bg: #f0eee6; --canvas: #e7e3d7; --surface: #fdfcf8; --chrome: #f4f1e8;
-  --surface-2: #efece1; --surface-blur: rgba(244, 241, 232, 0.78);
-  --text: #2a2521; --text-2: #6b6459; --text-3: #978f80; --border: #e5e0d3;
+  --pri: #cc785c; --pri-soft: #f8ede7;
+  --bg: #faf9f5; --canvas: #f8f8f6; --surface: #ffffff; --chrome: #faf9f5;
+  --surface-2: #f5f0e8; --surface-blur: rgba(250, 249, 245, 0.78);
+  --text: #141413; --text-2: #3d3d3a; --text-3: #6c6a64; --border: #e6dfd8;
 }
 [data-flavor='claude'][data-mode='dark'] {
+  --pri: #cc785c;
   --pri-soft: rgba(255, 255, 255, 0.09);
   --bg: #1c1917; --canvas: #161311; --surface: #262220; --chrome: #211d1a;
   --surface-2: #302b27; --surface-blur: rgba(33, 29, 26, 0.78);
@@ -61,18 +63,21 @@
   --line-strong: var(--control-border);
   --control-sm: calc(30px * var(--app-scale));
   --control-md: calc(36px * var(--app-scale));
+  --control-btn-md: calc(32px * var(--app-scale));
   --control-lg: calc(42px * var(--app-scale));
+  --button-font-weight: 400;
   --focus-ring: calc(3px * var(--app-scale));
-  --field-bg: var(--surface);
+  --font-display: var(--font-sans);
+  --field-bg: var(--surface-2);
   --field-fg: var(--text);
   --field-placeholder: var(--text-3);
   --field-icon: var(--text-3);
-  --field-border: var(--border);
-  --field-shadow: var(--shadow-card-sm);
+  --field-border: var(--surface-2);
+  --field-shadow: none;
   --field-border-hover: var(--control-border);
   --field-bg-focus: var(--surface);
   --field-border-focus: var(--pri);
-  --field-ring-focus: var(--soft);
+  --field-ring-focus: transparent;
   --field-border-invalid: var(--danger);
   --field-ring-invalid: var(--danger-bg);
   --field-bg-disabled: var(--surface-2);
@@ -121,14 +126,31 @@
   --pri-hover: color-mix(in srgb, var(--pri) 85%, white);
   --pri-active: color-mix(in srgb, var(--pri) 76%, white);
 }
-[data-flavor='claude'][data-mode='light'] {
-  --field-bg: #faf8f2;
-  --field-bg-focus: #ffffff;
+[data-flavor='claude'] {
+  --field-bg: var(--surface);
+  --field-bg-focus: var(--surface);
+  --field-border: var(--border);
+  --field-border-focus: var(--pri);
+  --field-ring-focus: color-mix(in srgb, var(--pri) 15%, transparent);
+  --field-shadow: none;
+  --control-btn-md: calc(36px * var(--app-scale));
+  --button-font-weight: 400;
+  --font-display: "Cormorant Garamond", Georgia, "Songti SC", serif;
 }
-[data-flavor='claude'],
 [data-flavor='shadcn'] {
-  --field-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  --field-bg: transparent;
+  --field-bg-focus: transparent;
+  --field-border: var(--border);
+  --field-border-focus: var(--control-border);
+  --field-ring-focus: color-mix(in srgb, var(--text-3) 50%, transparent);
+  --field-shadow: none;
+  --control-md: calc(32px * var(--app-scale));
+  --control-btn-md: calc(32px * var(--app-scale));
+  --button-font-weight: 500;
 }
+html:not([data-radius])[data-flavor='feishu'] { --radius-factor: 0.75; }
+html:not([data-radius])[data-flavor='claude'] { --radius-factor: 1; }
+html:not([data-radius])[data-flavor='shadcn'] { --radius-factor: 1.25; }
 [data-radius='sharp'] { --radius-factor: 0.28; }
 [data-radius='round'] { --radius-factor: 1.55; }
 

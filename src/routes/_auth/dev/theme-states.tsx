@@ -40,7 +40,7 @@ function ThemeStatesRoute() {
         <p className="text-xs font-semibold uppercase tracking-normal text-text-3">
           {t('dev.themeStates.eyebrow')}
         </p>
-        <h1 className="text-xl font-semibold text-text">{t('dev.themeStates.title')}</h1>
+        <h1 className="ui-page-title text-xl font-semibold text-text">{t('dev.themeStates.title')}</h1>
         <p className="max-w-[720px] text-sm text-text-2">
           {t('dev.themeStates.description')}
         </p>

@@ -16,6 +16,7 @@ interface AppearanceStore extends AppearanceState {
   collapsed: Record<string, boolean>; // per-layout（spec §8.2）
   // 派生并持久化的已解析主题色（index.html FOUC 脚本读取，防自选主题色首帧闪回蓝，见 appearance-dom 契约注释）
   _priResolved: string;
+  _priActiveResolved: string | null;
   _priSoftResolved: string | null;
   _onPriResolved: string;
   set: (patch: Partial<AppearanceStore>) => void;
@@ -39,6 +40,7 @@ export const useAppearance = create<AppearanceStore>()(
       pageAnim: appearanceConfig.defaults.pageAnim,
       collapsed: {},
       _priResolved: ACCENTS[0].pri,
+      _priActiveResolved: null,
       _priSoftResolved: ACCENTS[0].soft,
       _onPriResolved: '#ffffff',
       set: (patch) => {
@@ -46,8 +48,8 @@ export const useAppearance = create<AppearanceStore>()(
         const next = get(); // zustand set 同步生效，get() 已是合并后状态
         applyAppearance(next);
         // 同步刷新持久化的派生主题色，供下次加载的 FOUC 脚本直接注入
-        const { pri, soft, onPri } = resolveAccentVars(next);
-        set({ _priResolved: pri, _priSoftResolved: soft, _onPriResolved: onPri });
+        const { pri, priActive, soft, onPri } = resolveAccentVars(next);
+        set({ _priResolved: pri, _priActiveResolved: priActive, _priSoftResolved: soft, _onPriResolved: onPri });
       },
       setFlavor: (flavor) => get().set({ flavor, accent: flavorDefaultAccent(flavor) }), // 原型 L4951
       setCollapsed: (k, collapsed) =>
@@ -68,6 +70,7 @@ export const useAppearance = create<AppearanceStore>()(
         pageAnim: s.pageAnim,
         collapsed: s.collapsed,
         _priResolved: s._priResolved,
+        _priActiveResolved: s._priActiveResolved,
         _priSoftResolved: s._priSoftResolved,
         _onPriResolved: s._onPriResolved,
       }),
@@ -76,8 +79,9 @@ export const useAppearance = create<AppearanceStore>()(
       onRehydrateStorage: () => (state) => {
         if (!state) return;
         applyAppearance(state);
-        const { pri, soft, onPri } = resolveAccentVars(state);
+        const { pri, priActive, soft, onPri } = resolveAccentVars(state);
         state._priResolved = pri;
+        state._priActiveResolved = priActive;
         state._priSoftResolved = soft;
         state._onPriResolved = onPri;
       },

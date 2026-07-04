@@ -47,7 +47,7 @@ typography:
   button:
     fontFamily: "Inter, PingFang SC, sans-serif"
     fontSize: 14px
-    fontWeight: 500
+    fontWeight: 400
     lineHeight: 1
 rounded:
   xs: 4px
@@ -73,6 +73,22 @@ components:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
+  text-input-disabled:
+    backgroundColor: "{colors.surface-soft}"
+    textColor: "{colors.muted}"
+    rounded: "{rounded.md}"
+  text-input-placeholder:
+    textColor: "{colors.muted-soft}"
+  hairline-divider:
+    backgroundColor: "{colors.hairline}"
+    height: 1px
+  hairline-soft-divider:
+    backgroundColor: "{colors.hairline-soft}"
+    height: 1px
+  page-shell:
+    backgroundColor: "{colors.app-canvas}"
+  page-description:
+    textColor: "{colors.body}"
   button-primary:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
@@ -95,6 +111,14 @@ components:
     rounded: "{rounded.md}"
     height: 36px
     padding: 0 20px
+  status-success-dot:
+    backgroundColor: "{colors.success}"
+    rounded: "{rounded.pill}"
+    size: 8px
+  status-warning-dot:
+    backgroundColor: "{colors.warning}"
+    rounded: "{rounded.pill}"
+    size: 8px
   select-option-highlighted:
     backgroundColor: "{colors.primary-soft}"
     textColor: "{colors.primary-active}"

@@ -211,7 +211,7 @@ function CompanyBanner({ overview }: { overview: DashboardOverviewDto }) {
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-3">
-            <h1 className="truncate text-[calc(20px*var(--app-scale))] font-semibold text-text">{overview.company.name}</h1>
+            <h1 className="ui-page-title truncate text-[calc(20px*var(--app-scale))] font-semibold text-text">{overview.company.name}</h1>
             <span className="rounded-6 bg-surface-2 px-2 py-1 text-[calc(12px*var(--app-scale))] text-text-3">
               {overview.company.status}
             </span>

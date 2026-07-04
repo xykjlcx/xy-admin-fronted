@@ -5,6 +5,26 @@ Object.defineProperty(window, 'scrollTo', {
   writable: true,
 });
 
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+if (!('ResizeObserver' in window)) {
+  Object.defineProperty(window, 'ResizeObserver', {
+    value: ResizeObserverMock,
+    writable: true,
+  });
+}
+
+if (!('ResizeObserver' in globalThis)) {
+  Object.defineProperty(globalThis, 'ResizeObserver', {
+    value: ResizeObserverMock,
+    writable: true,
+  });
+}
+
 const domMethodMocks: Record<string, (...args: unknown[]) => unknown> = {
   hasPointerCapture: () => false,
   setPointerCapture: () => undefined,

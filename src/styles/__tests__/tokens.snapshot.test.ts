@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 
 const css = readFileSync('src/styles/tokens.css', 'utf8');
 const globalCss = readFileSync('src/styles/global.css', 'utf8');
+const buttonSource = readFileSync('src/components/ui/button.tsx', 'utf8');
+const loginSource = readFileSync('src/routes/login.tsx', 'utf8');
 
 // 权威值表：原型 L4796-4805 逐字对照，全表逐值断言（tokens.css 全部变量声明，无抽样遗漏）。
 // 静态硬编码，非运行时从 tokens.css 提取——否则文件怎么改断言都跟着变，失去守护意义。
@@ -34,16 +36,18 @@ const MUST_CONTAIN = [
   '--text-3: #7a818b;',
   '--border: #2c2f38;',
   // [data-flavor='claude'][data-mode='light']
-  '--bg: #f0eee6;',
-  '--canvas: #e7e3d7;',
-  '--surface: #fdfcf8;',
-  '--chrome: #f4f1e8;',
-  '--surface-2: #efece1;',
-  '--surface-blur: rgba(244, 241, 232, 0.78);',
-  '--text: #2a2521;',
-  '--text-2: #6b6459;',
-  '--text-3: #978f80;',
-  '--border: #e5e0d3;',
+  '--pri: #cc785c;',
+  '--pri-soft: #f8ede7;',
+  '--bg: #faf9f5;',
+  '--canvas: #f8f8f6;',
+  '--surface: #ffffff;',
+  '--chrome: #faf9f5;',
+  '--surface-2: #f5f0e8;',
+  '--surface-blur: rgba(250, 249, 245, 0.78);',
+  '--text: #141413;',
+  '--text-2: #3d3d3a;',
+  '--text-3: #6c6a64;',
+  '--border: #e6dfd8;',
   // [data-flavor='claude'][data-mode='dark']
   '--pri-soft: rgba(255, 255, 255, 0.09);',
   '--bg: #1c1917;',
@@ -67,6 +71,8 @@ const MUST_CONTAIN = [
   '--control-border: color-mix(in srgb, var(--border) 70%, var(--text-3));',
   '--focus-ring: calc(3px * var(--app-scale));',
   '--radius-factor: 1;',
+  '--control-btn-md: calc(32px * var(--app-scale));',
+  '--button-font-weight: 400;',
   '--radius-sm: calc(6px * var(--radius-factor) * var(--app-scale));',
   '--radius-md: calc(8px * var(--radius-factor) * var(--app-scale));',
   '--radius-lg: calc(12px * var(--radius-factor) * var(--app-scale));',
@@ -127,16 +133,16 @@ test('原生可点击元素有设计体系 pointer 光标兜底', () => {
 
 test('Field 族 token 与 flavor 覆盖按 Step 2 值表落地', () => {
   const fieldTokens = [
-    '--field-bg: var(--surface);',
+    '--field-bg: var(--surface-2);',
     '--field-fg: var(--text);',
     '--field-placeholder: var(--text-3);',
     '--field-icon: var(--text-3);',
-    '--field-border: var(--border);',
-    '--field-shadow: var(--shadow-card-sm);',
+    '--field-border: var(--surface-2);',
+    '--field-shadow: none;',
     '--field-border-hover: var(--control-border);',
     '--field-bg-focus: var(--surface);',
     '--field-border-focus: var(--pri);',
-    '--field-ring-focus: var(--soft);',
+    '--field-ring-focus: transparent;',
     '--field-border-invalid: var(--danger);',
     '--field-ring-invalid: var(--danger-bg);',
     '--field-bg-disabled: var(--surface-2);',
@@ -148,28 +154,43 @@ test('Field 族 token 与 flavor 覆盖按 Step 2 值表落地', () => {
   for (const token of fieldTokens) {
     expect(css).toContain(token);
   }
-  expect(css).toContain("[data-flavor='claude'][data-mode='light'] {\n  --field-bg: #faf8f2;");
-  expect(css).toContain('--field-bg-focus: #ffffff;');
-  expect(css).toContain("[data-flavor='claude'],\n[data-flavor='shadcn'] {\n  --field-shadow: 0 0 0 0 rgba(0, 0, 0, 0);");
+  expect(css).toContain("[data-flavor='claude'] {\n  --field-bg: var(--surface);");
+  expect(css).toContain('--field-border-focus: var(--pri);');
+  expect(css).toContain('--field-ring-focus: color-mix(in srgb, var(--pri) 15%, transparent);');
+  expect(css).toContain("[data-flavor='shadcn'] {\n  --field-bg: transparent;");
+  expect(css).toContain('--field-bg-focus: transparent;');
+  expect(css).toContain('--field-border-focus: var(--control-border);');
+  expect(css).toContain('--field-ring-focus: color-mix(in srgb, var(--text-3) 50%, transparent);');
 });
 
-test('ui-field 状态机消费 Field token，并保持 invalid > focus/open > hover 优先级', () => {
+test('ui-field 状态机消费中间态 token，并保持 disabled > invalid > focus/open > hover 优先级', () => {
   expect(globalCss).toContain('.ui-field {');
-  expect(globalCss).toContain('background: var(--field-bg);');
-  expect(globalCss).toContain('border-color: var(--field-border);');
+  expect(globalCss).toContain('--_field-bg: var(--field-bg);');
+  expect(globalCss).toContain('--_field-border: var(--field-border);');
+  expect(globalCss).toContain('--_field-ring-color: transparent;');
+  expect(globalCss).toContain('background: var(--_field-bg);');
+  expect(globalCss).toContain('border-color: var(--_field-border);');
   expect(globalCss).toContain('box-shadow: var(--field-shadow);');
   expect(globalCss).toContain('.ui-field.ui-field[data-placeholder] {');
   expect(globalCss).toContain('.ui-field.ui-field:hover {');
-  expect(globalCss).toContain('border-color: var(--field-border-hover);');
+  expect(globalCss).toContain('--_field-border: var(--field-border-hover);');
   expect(globalCss).toContain('.ui-field.ui-field:focus-within,');
   expect(globalCss).toContain(".ui-field.ui-field[data-state='open'] {");
-  expect(globalCss).toContain('background: var(--field-bg-focus);');
-  expect(globalCss).toContain('border-color: var(--field-border-focus);');
-  expect(globalCss).toContain('box-shadow: 0 0 0 var(--focus-ring) var(--field-ring-focus), var(--field-shadow);');
+  expect(globalCss).toContain('--_field-bg: var(--field-bg-focus);');
+  expect(globalCss).toContain('--_field-border: var(--field-border-focus);');
+  expect(globalCss).toContain('--_field-ring-color: var(--field-ring-focus);');
+  expect(globalCss).toContain('box-shadow: 0 0 0 var(--focus-ring) var(--_field-ring-color);');
   expect(globalCss).toContain(".ui-field.ui-field[aria-invalid='true'],");
   expect(globalCss).toContain(".ui-field.ui-field[data-status='error'] {");
-  expect(globalCss).toContain('border-color: var(--field-border-invalid);');
-  expect(globalCss).toContain('box-shadow: 0 0 0 var(--focus-ring) var(--field-ring-invalid), var(--field-shadow);');
+  expect(globalCss).toContain('--_field-border: var(--field-border-invalid);');
+  expect(globalCss).toContain('--_field-ring-color: var(--field-ring-invalid);');
+
+  const invalidIndex = globalCss.indexOf(".ui-field.ui-field[aria-invalid='true']");
+  const disabledIndex = globalCss.indexOf('.ui-field.ui-field:disabled');
+  expect(disabledIndex).toBeGreaterThan(invalidIndex);
+  expect(globalCss.slice(disabledIndex)).toContain('--_field-bg: var(--field-bg-disabled);');
+  expect(globalCss.slice(disabledIndex)).toContain('--_field-border: var(--field-border);');
+  expect(globalCss.slice(disabledIndex)).toContain('--_field-ring-color: transparent;');
 });
 
 test('shadcn flavor 提供官方中性基线 token', () => {
@@ -185,6 +206,9 @@ test('shadcn flavor 提供官方中性基线 token', () => {
 
 test('圆角因子三档 + 四条 calc 公式', () => {
   expect(css).toContain('--radius-factor: 1;'); // 默认档
+  expect(css).toContain("html:not([data-radius])[data-flavor='feishu'] { --radius-factor: 0.75; }");
+  expect(css).toContain("html:not([data-radius])[data-flavor='claude'] { --radius-factor: 1; }");
+  expect(css).toContain("html:not([data-radius])[data-flavor='shadcn'] { --radius-factor: 1.25; }");
   expect(css).toContain('--radius-factor: 0.28;'); // sharp
   expect(css).toContain('--radius-factor: 1.55;'); // round
   expect(css).toContain('--radius-xs: calc(2px * var(--radius-factor) * var(--app-scale));');
@@ -192,6 +216,26 @@ test('圆角因子三档 + 四条 calc 公式', () => {
   expect(css).toContain('--radius-md: calc(8px * var(--radius-factor) * var(--app-scale));');
   expect(css).toContain('--radius-lg: calc(12px * var(--radius-factor) * var(--app-scale));');
   expect(css).toContain('--radius-xl: calc(14px * var(--radius-factor) * var(--app-scale));');
+});
+
+test('形态轴控制按钮高度与字重，按钮消费独立 button token', () => {
+  expect(css).toContain("[data-flavor='claude'] {\n  --field-bg: var(--surface);");
+  expect(css).toContain('--control-btn-md: calc(36px * var(--app-scale));');
+  expect(css).toContain("[data-flavor='shadcn'] {\n  --field-bg: transparent;");
+  expect(css).toContain('--control-md: calc(32px * var(--app-scale));');
+  expect(css).toContain('--control-btn-md: calc(32px * var(--app-scale));');
+  expect(css).toContain('--button-font-weight: 500;');
+  expect(buttonSource).toContain('font-[var(--button-font-weight)]');
+  expect(buttonSource).toContain('h-[var(--control-btn-md)]');
+  expect(buttonSource).toContain('size-[var(--control-btn-md)]');
+});
+
+test('claude display font 只进入页面标题层，不污染 Field label / 表头', () => {
+  expect(css).toContain('--font-display: var(--font-sans);');
+  expect(css).toContain('--font-display: "Cormorant Garamond", Georgia, "Songti SC", serif;');
+  expect(globalCss).toContain('.ui-page-title {');
+  expect(globalCss).toContain('font-family: var(--font-display);');
+  expect(loginSource).toContain('ui-page-title');
 });
 
 // 圆角数字全档（原型精确 7/9/11 档，取最近 sm/md/lg/xl 会失真）。每条含完整 calc 串防前缀碰撞。
@@ -234,8 +278,10 @@ test('index.html FOUC 脚本契约不被静默删除（含 --pri 注入）', () 
   expect(html).toContain('dataset.flavor');
   expect(html).toContain('dataset.mode');
   expect(html).toContain('--pri');
+  expect(html).toContain('--pri-active');
   expect(html).toContain('--on-pri');
   expect(html).toContain('_priResolved');
+  expect(html).toContain('_priActiveResolved');
   expect(html).toContain('_onPriResolved');
 });
 

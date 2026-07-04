@@ -19,8 +19,15 @@ const base = {
 test('亮色注入预设 soft', () => {
   applyAppearance({ ...base });
   expect(document.documentElement.style.getPropertyValue('--pri')).toBe('#3370ff');
+  expect(document.documentElement.style.getPropertyValue('--pri-active')).toBe('');
   expect(document.documentElement.style.getPropertyValue('--pri-soft')).toBe('#eef3ff');
   expect(document.documentElement.style.getPropertyValue('--on-pri')).toBe('#ffffff');
+});
+test('claude 预设注入实测陶土主色和官方 active 色', () => {
+  applyAppearance({ ...base, flavor: 'claude', accent: 'claude' });
+  expect(document.documentElement.style.getPropertyValue('--pri')).toBe('#cc785c');
+  expect(document.documentElement.style.getPropertyValue('--pri-active')).toBe('#a9583e');
+  expect(document.documentElement.style.getPropertyValue('--pri-soft')).toBe('#f8ede7');
 });
 test('暗色不注入 soft（耦合规则：交还 CSS 的白 alpha）', () => {
   applyAppearance({ ...base, mode: 'dark' });
@@ -73,18 +80,38 @@ test('isValidHex 校验 #rgb / #rrggbb', () => {
 });
 
 test('resolveAccentVars：亮色含 soft，暗色 soft 交还 CSS（null）', () => {
-  expect(resolveAccentVars({ ...base })).toEqual({ pri: '#3370ff', soft: '#eef3ff', onPri: '#ffffff' });
-  expect(resolveAccentVars({ ...base, mode: 'dark' })).toEqual({ pri: '#3370ff', soft: null, onPri: '#ffffff' });
+  expect(resolveAccentVars({ ...base })).toEqual({
+    pri: '#3370ff',
+    priActive: null,
+    soft: '#eef3ff',
+    onPri: '#ffffff',
+  });
+  expect(resolveAccentVars({ ...base, mode: 'dark' })).toEqual({
+    pri: '#3370ff',
+    priActive: null,
+    soft: null,
+    onPri: '#ffffff',
+  });
+});
+
+test('resolveAccentVars：claude 预设来自实测值表', () => {
+  expect(resolveAccentVars({ ...base, flavor: 'claude', accent: 'claude' })).toEqual({
+    pri: '#cc785c',
+    priActive: '#a9583e',
+    soft: '#f8ede7',
+    onPri: '#18181b',
+  });
 });
 
 test('resolveAccentVars：非法自定义色回退经典蓝，不产 rgba(NaN)', () => {
   const r = resolveAccentVars({ ...base, accent: 'custom', customAccent: 'not-a-color' });
-  expect(r).toEqual({ pri: '#3370ff', soft: '#eef3ff', onPri: '#ffffff' });
+  expect(r).toEqual({ pri: '#3370ff', priActive: null, soft: '#eef3ff', onPri: '#ffffff' });
 });
 
 test('resolveAccentVars：合法自定义色走 soft 公式', () => {
   expect(resolveAccentVars({ ...base, accent: 'custom', customAccent: '#c96442' })).toEqual({
     pri: '#c96442',
+    priActive: null,
     soft: 'rgba(201,100,66,.12)',
     onPri: '#18181b',
   });
@@ -93,6 +120,7 @@ test('resolveAccentVars：合法自定义色走 soft 公式', () => {
 test('resolveAccentVars：shadcn dark 使用暗色主色并派生深色前景', () => {
   expect(resolveAccentVars({ ...base, flavor: 'shadcn', accent: 'shadcn', mode: 'dark' })).toEqual({
     pri: '#fafafa',
+    priActive: null,
     soft: null,
     onPri: '#18181b',
   });
@@ -101,6 +129,7 @@ test('resolveAccentVars：shadcn dark 使用暗色主色并派生深色前景', 
 test('resolveAccentVars：自定义亮色按 WCAG contrast 选择深色前景', () => {
   expect(resolveAccentVars({ ...base, accent: 'custom', customAccent: '#f5c518' })).toEqual({
     pri: '#f5c518',
+    priActive: null,
     soft: 'rgba(245,197,24,.12)',
     onPri: '#18181b',
   });
