@@ -84,6 +84,14 @@ Route 文件只做边界装配：
 
 ## 组件设计
 
+- `src/components/ui` 是基础 UI 体系入口，承接设计体系里的 token、尺寸、状态、无障碍和控件 API。普通页面不要自己实现 Button/Input/Select/Badge/Skeleton/Empty/Checkbox 这类原子控件。
+- 基础 UI 组件以 shadcn/Radix 源码模式维护在本项目内；从 `@/components/ui/*` 引入的是项目本地组件，不是运行时从 shadcn 包导出。
+- Button 标准变体使用 `primary`、`secondary`、`dashed`、`text`、`danger`、`danger-ghost`；`default`、`outline`、`ghost`、`link`、`destructive` 只作为兼容旧调用的别名逐步迁移。
+- Input 标准形态优先用 `Input`；有前缀、后缀、拼接前缀时用 `InputGroup`、`InputGroupInput`、`InputGroupPrefix`、`InputGroupSuffix`、`InputGroupAddon` 组合，错误态通过 `status="error"` 或 `aria-invalid` 表达。
+- Badge、Skeleton、Empty、Checkbox 属于基础展示/反馈原子件；`StatusBadge`、`SearchField`、`TableShell` 这类后台通用组合必须复用它们。
+- `src/components/pro` 只沉淀业务无关的后台模式组件，例如表格壳、分页、筛选、侧边列表、表单弹窗。Pro 组件可以组合 UI 组件，但不能引入模块 DTO、接口或权限逻辑。
+- 页面层只描述业务含义和编排，不直接写原生 `<button>`、`<input>`、`<select>`、`<textarea>`，除非该控件被封装为新的 UI/Pro 组件时作为实现细节出现。
+- 组件样式只消费语义 token、Tailwind 语义类和 `--app-scale` 尺寸体系；页面不得新增硬编码色值、任意圆角或脱离 token 的控件尺寸。
 - 新增、编辑、详情使用独立组件或显式变体，不用 `isCreate`、`isEdit`、`isDetail` 这种布尔组合堆复杂度。
 - 多个子组件共享同一块复杂状态时，优先把状态提升到页面或专用 Provider，再通过清晰的 props/context 下发。
 - 可复用组件优先接收 `children` 组合结构；只有列表渲染这类需要回传数据的场景才用 render prop。

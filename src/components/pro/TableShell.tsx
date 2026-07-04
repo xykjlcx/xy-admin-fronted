@@ -1,5 +1,6 @@
-import { Check } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 interface GridSlotProps {
@@ -104,9 +105,9 @@ export function TableShellLoadingRows({
         >
           {Array.from({ length: cells }).map((__, cellIndex) => (
             <div key={cellIndex} className="px-2">
-              <div
+              <Skeleton
                 className={cn(
-                  'h-3 animate-pulse rounded-4 bg-surface-2',
+                  'h-3',
                   cellIndex === 0 && 'mx-auto w-4',
                   cellIndex === cells - 1 && 'w-16',
                   cellIndex > 0 && cellIndex < cells - 1 && 'w-3/4',
@@ -134,29 +135,11 @@ export function TableTreeCell({ depth, step = 20, children, className }: TableTr
 
 export function TableCheckbox({ ariaLabel, checked, onCheckedChange, className }: TableCheckboxProps) {
   return (
-    <span className={cn('relative flex size-[calc(16px*var(--app-scale))] shrink-0 items-center justify-center', className)}>
-      <input
-        type="checkbox"
-        aria-label={ariaLabel}
-        checked={checked}
-        onChange={(event) => onCheckedChange(event.currentTarget.checked)}
-        className={cn(
-          'peer size-full appearance-none rounded-4 border-solid outline-none transition-colors',
-          'hover:border-pri focus-visible:ring-[calc(2px*var(--app-scale))] focus-visible:ring-ring/45',
-          className,
-        )}
-        style={{
-          backgroundColor: checked ? 'var(--pri)' : 'var(--surface)',
-          borderColor: checked ? 'var(--pri)' : 'var(--control-border)',
-          borderWidth: 'calc(1.5px * var(--app-scale))',
-        }}
-      />
-      {checked && (
-        <Check
-          data-testid="table-checkbox-check"
-          className="pointer-events-none absolute size-[calc(12px*var(--app-scale))] stroke-[3px] text-white"
-        />
-      )}
-    </span>
+    <Checkbox
+      aria-label={ariaLabel}
+      checked={checked}
+      onCheckedChange={onCheckedChange}
+      className={cn('size-[calc(16px*var(--app-scale))]', className)}
+    />
   );
 }

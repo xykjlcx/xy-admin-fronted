@@ -81,19 +81,15 @@ test('TableCheckbox 使用自定义视觉而不是原生 checkbox 外观', async
 
   const checkbox = screen.getByRole('checkbox', { name: '选择成员' });
   expect(checkbox).toHaveClass('appearance-none');
-  expect(checkbox.getAttribute('style')).toContain('background-color: var(--surface)');
-  expect(checkbox.getAttribute('style')).toContain('border-color: var(--control-border)');
-  expect(checkbox.getAttribute('style')).toContain('border-width: calc(1.5px * var(--app-scale))');
+  expect(checkbox.closest('[data-slot="checkbox"]')).toHaveClass('size-[calc(16px*var(--app-scale))]');
 
   await userEvent.click(checkbox);
   expect(onChange).toHaveBeenCalledWith(true);
 
   rerender(<TableCheckbox ariaLabel="选择成员" checked onCheckedChange={onChange} />);
-  expect(screen.getByRole('checkbox', { name: '选择成员' }).getAttribute('style')).toContain(
-    'background-color: var(--pri)',
+  expect(screen.getByRole('checkbox', { name: '选择成员' }).closest('[data-slot="checkbox"]')).toHaveAttribute(
+    'data-checked',
+    'true',
   );
-  expect(screen.getByRole('checkbox', { name: '选择成员' }).getAttribute('style')).toContain(
-    'border-color: var(--pri)',
-  );
-  expect(screen.getByTestId('table-checkbox-check')).toBeInTheDocument();
+  expect(screen.getByRole('checkbox', { name: '选择成员' }).parentElement?.querySelector('[data-slot="checkbox-indicator"]')).toBeInTheDocument();
 });

@@ -38,7 +38,7 @@ export function Pagination({
         <Button
           variant="outline"
           size="icon-sm"
-          className="border-pri text-pri hover:bg-pri-soft hover:text-pri"
+          className="border-pri bg-pri-soft text-pri hover:bg-pri-soft hover:text-pri"
           aria-label={currentLabel}
           aria-current="page"
         >

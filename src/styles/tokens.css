@@ -27,11 +27,27 @@
 
 :root {
   --pri-hover: color-mix(in srgb, var(--pri) 85%, black);
+  --pri-active: color-mix(in srgb, var(--pri) 76%, black);
+  --soft: var(--pri-soft);
+  --on-pri: #ffffff;
   --success: #16a34a; --success-soft: #e8f7ee;
   --warning: #ff8000; --warning-soft: #fff3e8;
   --danger: #f53f3f; --danger-soft: #feecec;
+  --info: var(--pri); --info-soft: var(--pri-soft);
+  --purple: #7f5bff; --purple-soft: color-mix(in srgb, var(--purple) 13%, var(--surface));
+  --teal: #00b3a4; --teal-soft: color-mix(in srgb, var(--teal) 13%, var(--surface));
+  --success-bg: var(--success-soft);
+  --warning-bg: var(--warning-soft);
+  --danger-bg: var(--danger-soft);
+  --info-bg: var(--info-soft);
+  --purple-bg: var(--purple-soft);
+  --teal-bg: var(--teal-soft);
   /* 表单/表格小控件边框。比普通分割线更清楚，接近原型 stdCheck 未选中边框。 */
   --control-border: color-mix(in srgb, var(--border) 70%, var(--text-3));
+  --line-strong: var(--control-border);
+  --control-sm: calc(30px * var(--app-scale));
+  --control-md: calc(36px * var(--app-scale));
+  --control-lg: calc(42px * var(--app-scale));
   /* Tooltip 恒深底白字（原型 .hicon-tip L32：background #1f2329，明暗两 flavor 都不反转）。
      走 token 供组件 bg-tooltip 消费，禁组件内写 hex（ESLint 拦）。 */
   --tooltip-bg: #1f2329;

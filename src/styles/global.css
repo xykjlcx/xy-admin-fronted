@@ -15,12 +15,26 @@
   --color-pri: var(--pri);
   --color-pri-soft: var(--pri-soft);
   --color-pri-hover: var(--pri-hover);
+  --color-pri-active: var(--pri-active);
+  --color-soft: var(--soft);
+  --color-on-pri: var(--on-pri);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
+  --color-success-bg: var(--success-bg);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-danger-bg: var(--danger-bg);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
+  --color-warning-bg: var(--warning-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-purple: var(--purple);
+  --color-purple-bg: var(--purple-bg);
+  --color-teal: var(--teal);
+  --color-teal-bg: var(--teal-bg);
+  --color-control-border: var(--control-border);
+  --color-line-strong: var(--line-strong);
   --color-surface-blur: var(--surface-blur);
   --color-tooltip: var(--tooltip-bg);
   /* shadcn/ui 词汇 → 本项目语义 token（组件用 bg-background/text-muted-foreground 等，
