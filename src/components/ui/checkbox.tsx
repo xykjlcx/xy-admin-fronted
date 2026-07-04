@@ -37,15 +37,15 @@ function Checkbox({
         disabled={disabled}
         onChange={(event) => onCheckedChange?.(event.currentTarget.checked)}
         className={cn(
-          'peer size-full cursor-pointer appearance-none rounded-5 border-[calc(1.5px*var(--app-scale))] border-control-border bg-surface outline-none transition-colors',
-          'hover:border-pri focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft',
-          'checked:border-pri checked:bg-pri disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-50',
-          indeterminate && 'border-pri bg-pri-soft',
+          'peer size-full cursor-pointer appearance-none rounded-5 border-[calc(1.5px*var(--app-scale))] border-(--choice-border) bg-(--choice-bg) outline-none transition-colors',
+          'hover:border-(--choice-border-hover) focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--choice-ring)',
+          'checked:border-(--choice-border-checked) checked:bg-(--choice-bg-checked) disabled:cursor-not-allowed disabled:bg-(--choice-bg-disabled) disabled:opacity-50',
+          indeterminate && 'border-(--choice-border-indeterminate) bg-(--choice-bg-indeterminate)',
         )}
         {...props}
       />
       {(checked || indeterminate) && (
-        <span className={cn('pointer-events-none absolute inline-flex peer-disabled:opacity-50', indeterminate ? 'text-pri' : 'text-on-pri')}>
+        <span className={cn('pointer-events-none absolute inline-flex peer-disabled:opacity-50', indeterminate ? 'text-(--choice-fg-indeterminate)' : 'text-(--choice-fg-checked)')}>
           {indeterminate ? (
             <Minus data-slot="checkbox-indicator" className="size-[calc(12px*var(--app-scale))] stroke-[3px]" />
           ) : (

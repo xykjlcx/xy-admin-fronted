@@ -25,15 +25,15 @@ function Tabs({
 
 const tabsListVariants = cva(
   [
-    'group/tabs-list inline-flex w-fit items-center justify-center rounded-8 p-[calc(3px*var(--app-scale))] text-text-3',
+    'group/tabs-list inline-flex w-fit items-center justify-center rounded-8 p-[calc(3px*var(--app-scale))] text-(--tabs-seg-trigger-fg)',
     'group-data-[orientation=horizontal]/tabs:h-[var(--control-md)] group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col',
     'data-[variant=line]:h-auto data-[variant=line]:rounded-none data-[variant=line]:p-0',
   ].join(' '),
   {
     variants: {
       variant: {
-        default: 'bg-surface-2',
-        line: 'gap-6 border-b border-border bg-transparent',
+        default: 'bg-(--tabs-seg-list-bg)',
+        line: 'gap-6 border-b border-(--tabs-line-border) bg-transparent',
       },
     },
     defaultVariants: {
@@ -67,13 +67,14 @@ function TabsTrigger({
       data-slot="tabs-trigger"
       className={cn(
         [
-          'relative inline-flex h-[calc(100%-1px)] flex-1 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-6 border border-transparent px-3 py-1 text-sm font-medium text-text-3 outline-none transition-[background,border-color,color,box-shadow]',
-          'hover:text-text focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft disabled:pointer-events-none disabled:opacity-50',
+          'relative inline-flex h-[calc(100%-1px)] flex-1 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-6 border border-transparent px-3 py-1 text-sm font-medium text-(--tabs-seg-trigger-fg) outline-none transition-[background,border-color,color,box-shadow]',
+          'hover:text-(--tabs-seg-trigger-fg-hover) focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--tabs-ring) disabled:pointer-events-none disabled:opacity-50',
           'group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start',
-          'data-[state=active]:bg-surface data-[state=active]:text-text data-[state=active]:shadow-card-sm',
+          'data-[state=active]:bg-(--tabs-seg-trigger-bg-active) data-[state=active]:text-(--tabs-seg-trigger-fg-active) data-[state=active]:shadow-(--tabs-seg-trigger-shadow-active)',
           'group-data-[variant=line]/tabs-list:rounded-none group-data-[variant=line]/tabs-list:border-0 group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:px-1 group-data-[variant=line]/tabs-list:pb-3',
-          'group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:text-pri group-data-[variant=line]/tabs-list:data-[state=active]:shadow-none',
-          'after:absolute after:bg-pri after:opacity-0 after:transition-[opacity,transform] after:duration-200 after:ease-out motion-reduce:after:transition-none',
+          'group-data-[variant=line]/tabs-list:text-(--tabs-line-trigger-fg) group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)',
+          'group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active) group-data-[variant=line]/tabs-list:data-[state=active]:shadow-none',
+          'after:absolute after:bg-(--tabs-line-indicator) after:opacity-0 after:transition-[opacity,transform] after:duration-200 after:ease-out motion-reduce:after:transition-none',
           'group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-1px] group-data-[orientation=horizontal]/tabs:after:h-[calc(2px*var(--app-scale))] group-data-[orientation=horizontal]/tabs:after:rounded-full',
           'group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-[calc(2px*var(--app-scale))]',
           'group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100',

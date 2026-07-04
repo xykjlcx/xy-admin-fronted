@@ -10,6 +10,13 @@ const popoverSource = readFileSync('src/components/ui/popover.tsx', 'utf8');
 const dropdownMenuSource = readFileSync('src/components/ui/dropdown-menu.tsx', 'utf8');
 const selectSource = readFileSync('src/components/ui/select.tsx', 'utf8');
 const tooltipSource = readFileSync('src/components/ui/tooltip.tsx', 'utf8');
+const tabsSource = readFileSync('src/components/ui/tabs.tsx', 'utf8');
+const animatedTabsSource = readFileSync('src/components/pro/AnimatedTabs.tsx', 'utf8');
+const checkboxSource = readFileSync('src/components/ui/checkbox.tsx', 'utf8');
+const radioGroupSource = readFileSync('src/components/ui/radio-group.tsx', 'utf8');
+const switchSource = readFileSync('src/components/ui/switch.tsx', 'utf8');
+const skeletonSource = readFileSync('src/components/ui/skeleton.tsx', 'utf8');
+const emptySource = readFileSync('src/components/ui/empty.tsx', 'utf8');
 const loginSource = readFileSync('src/routes/login.tsx', 'utf8');
 const languageMenuSource = readFileSync('src/app/shell/widgets/LanguageMenu.tsx', 'utf8');
 
@@ -433,6 +440,119 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
   expect(languageMenuSource).toContain('text-(--option-fg-selected)');
   expect(languageMenuSource).toContain('text-(--option-check)');
   expect(languageMenuSource).not.toContain('bg-pri-soft focus:bg-pri-soft');
+});
+
+test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () => {
+  const step6Tokens = [
+    '--tabs-seg-list-bg: var(--surface-2);',
+    '--tabs-seg-trigger-fg: var(--text-3);',
+    '--tabs-seg-trigger-fg-hover: var(--text);',
+    '--tabs-seg-trigger-bg-active: var(--surface);',
+    '--tabs-seg-trigger-fg-active: var(--text);',
+    '--tabs-seg-trigger-shadow-active: var(--shadow-card-sm);',
+    '--tabs-line-border: var(--border);',
+    '--tabs-line-trigger-fg: var(--text-2);',
+    '--tabs-line-trigger-fg-hover: var(--text);',
+    '--tabs-line-trigger-fg-active: var(--pri);',
+    '--tabs-line-indicator: var(--pri);',
+    '--tabs-ring: var(--soft);',
+    '--choice-bg: var(--surface);',
+    '--choice-border: var(--control-border);',
+    '--choice-border-hover: var(--pri);',
+    '--choice-bg-checked: var(--pri);',
+    '--choice-border-checked: var(--pri);',
+    '--choice-fg-checked: var(--on-pri);',
+    '--choice-bg-indeterminate: var(--pri-soft);',
+    '--choice-border-indeterminate: var(--pri);',
+    '--choice-fg-indeterminate: var(--pri);',
+    '--choice-bg-disabled: var(--surface-2);',
+    '--choice-ring: var(--soft);',
+    '--switch-bg: var(--control-border);',
+    '--switch-bg-checked: var(--pri);',
+    '--switch-thumb-bg: var(--surface);',
+    '--skeleton-bg: var(--surface-2);',
+    '--empty-fg: var(--text-3);',
+  ];
+
+  for (const token of step6Tokens) {
+    expect(css).toContain(token);
+  }
+
+  expect(tabsSource).toContain('bg-(--tabs-seg-list-bg)');
+  expect(tabsSource).toContain('text-(--tabs-seg-trigger-fg)');
+  expect(tabsSource).toContain('hover:text-(--tabs-seg-trigger-fg-hover)');
+  expect(tabsSource).toContain('data-[state=active]:bg-(--tabs-seg-trigger-bg-active)');
+  expect(tabsSource).toContain('data-[state=active]:text-(--tabs-seg-trigger-fg-active)');
+  expect(tabsSource).toContain('data-[state=active]:shadow-(--tabs-seg-trigger-shadow-active)');
+  expect(tabsSource).toContain('border-(--tabs-line-border)');
+  expect(tabsSource).toContain('group-data-[variant=line]/tabs-list:text-(--tabs-line-trigger-fg)');
+  expect(tabsSource).toContain('group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)');
+  expect(tabsSource).toContain('group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)');
+  expect(tabsSource).toContain('after:bg-(--tabs-line-indicator)');
+  expect(tabsSource).toContain('focus-visible:ring-(--tabs-ring)');
+
+  expect(animatedTabsSource).toContain('border-(--tabs-line-border)');
+  expect(animatedTabsSource).toContain('focus-visible:ring-(--tabs-ring)');
+  expect(animatedTabsSource).not.toContain('border-(--tabs-line-indicator)');
+  expect(animatedTabsSource).toContain('text-(--tabs-line-trigger-fg-active)');
+  expect(animatedTabsSource).toContain('text-(--tabs-line-trigger-fg)');
+  expect(animatedTabsSource).toContain('hover:text-(--tabs-line-trigger-fg-hover)');
+  expect(animatedTabsSource).toContain('bg-(--tabs-line-indicator)');
+
+  for (const source of [tabsSource, animatedTabsSource]) {
+    for (const primitiveClass of ['text-pri', 'border-pri', 'bg-pri', 'ring-soft', 'bg-surface-2', 'shadow-card-sm']) {
+      expect(source).not.toContain(primitiveClass);
+    }
+  }
+
+  expect(checkboxSource).toContain('border-(--choice-border)');
+  expect(checkboxSource).toContain('bg-(--choice-bg)');
+  expect(checkboxSource).toContain('hover:border-(--choice-border-hover)');
+  expect(checkboxSource).toContain('focus-visible:ring-(--choice-ring)');
+  expect(checkboxSource).toContain('checked:border-(--choice-border-checked)');
+  expect(checkboxSource).toContain('checked:bg-(--choice-bg-checked)');
+  expect(checkboxSource).toContain('disabled:bg-(--choice-bg-disabled)');
+  expect(checkboxSource).toContain('border-(--choice-border-indeterminate)');
+  expect(checkboxSource).toContain('bg-(--choice-bg-indeterminate)');
+  expect(checkboxSource).toContain('text-(--choice-fg-checked)');
+  expect(checkboxSource).toContain('text-(--choice-fg-indeterminate)');
+
+  expect(radioGroupSource).toContain('border-(--choice-border)');
+  expect(radioGroupSource).toContain('bg-(--choice-bg)');
+  expect(radioGroupSource).toContain('focus-visible:border-(--choice-border-hover)');
+  expect(radioGroupSource).toContain('focus-visible:ring-(--choice-ring)');
+  expect(radioGroupSource).toContain('data-[state=checked]:border-(--choice-border-checked)');
+  expect(radioGroupSource).toContain('aria-invalid:border-(--field-border-invalid)');
+  expect(radioGroupSource).toContain('data-[state=checked]:aria-invalid:border-(--field-border-invalid)');
+  expect(radioGroupSource).toContain('aria-invalid:ring-(--field-ring-invalid)');
+  expect(radioGroupSource).toContain('fill-(--choice-bg-checked)');
+
+  expect(switchSource).toContain('focus-visible:border-(--choice-border-hover)');
+  expect(switchSource).toContain('focus-visible:ring-(--choice-ring)');
+  expect(switchSource).toContain('data-[state=checked]:bg-(--switch-bg-checked)');
+  expect(switchSource).toContain('data-[state=unchecked]:bg-(--switch-bg)');
+  expect(switchSource).toContain('bg-(--switch-thumb-bg)');
+
+  for (const source of [checkboxSource, radioGroupSource, switchSource]) {
+    for (const primitiveClass of [
+      'border-pri',
+      'bg-pri',
+      'bg-pri-soft',
+      'text-pri',
+      'text-on-pri',
+      'fill-pri',
+      'ring-soft',
+      'border-control-border',
+      'bg-control-border',
+    ]) {
+      expect(source).not.toContain(primitiveClass);
+    }
+  }
+
+  expect(skeletonSource).toContain('bg-(--skeleton-bg)');
+  expect(skeletonSource).not.toContain('bg-surface-2');
+  expect(emptySource).toContain('text-(--empty-fg)');
+  expect(emptySource).not.toContain('text-text-3');
 });
 
 test('claude display font 只进入页面标题层，不污染 Field label / 表头', () => {

@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ACCENTS, type AccentKey } from '@/lib/appearance-dom';
 import { useAppearance } from '@/stores/appearance';
@@ -8,6 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import { SelectControl } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Switch } from '@/components/ui/switch';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Empty } from '@/components/ui/empty';
+import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
 
 export const Route = createFileRoute('/_auth/dev/theme-states')({
   component: ThemeStatesRoute,
@@ -54,10 +62,15 @@ const buttonVariantLabelKeys: Record<(typeof buttonVariantsForThemeStates)[numbe
 function ThemeStatesRoute() {
   const { t } = useTranslation();
   const { flavor, mode, accent, customAccent, set, setFlavor } = useAppearance();
+  const [animatedTabsValue, setAnimatedTabsValue] = useState<'members' | 'logs'>('members');
   const fieldSelectOptions = [
     { value: '', label: t('dev.themeStates.fieldSelectPlaceholder') },
     { value: 'rd', label: t('dev.themeStates.fieldResearch') },
     { value: 'ops', label: t('dev.themeStates.fieldOperations') },
+  ];
+  const animatedTabItems: AnimatedTabItem<'members' | 'logs'>[] = [
+    { value: 'members', label: t('dev.themeStates.animatedTabMembers') },
+    { value: 'logs', label: t('dev.themeStates.animatedTabLogs') },
   ];
 
   return (
@@ -221,6 +234,110 @@ function ThemeStatesRoute() {
             <Textarea id="theme-field-textarea" placeholder={t('dev.themeStates.fieldTextareaPlaceholder')} />
           </Field>
         </FieldGroup>
+      </section>
+
+      <section data-testid="step6Matrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.step6Matrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.step6MatrixDesc')}</p>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+          <div className="rounded-md border border-border bg-surface-2 p-4">
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.tabsMatrix')}</p>
+            <div className="grid gap-5 md:grid-cols-2">
+              <Tabs defaultValue="overview">
+                <TabsList>
+                  <TabsTrigger value="overview">{t('dev.themeStates.tabOverview')}</TabsTrigger>
+                  <TabsTrigger value="metrics">{t('dev.themeStates.tabMetrics')}</TabsTrigger>
+                </TabsList>
+                <TabsContent value="overview" className="pt-3 text-sm text-text-2">
+                  {t('dev.themeStates.tabOverviewContent')}
+                </TabsContent>
+              </Tabs>
+
+              <Tabs defaultValue="metrics">
+                <TabsList variant="line">
+                  <TabsTrigger value="overview">{t('dev.themeStates.tabOverview')}</TabsTrigger>
+                  <TabsTrigger value="metrics">{t('dev.themeStates.tabMetrics')}</TabsTrigger>
+                </TabsList>
+                <TabsContent value="metrics" className="pt-3 text-sm text-text-2">
+                  {t('dev.themeStates.tabMetricsContent')}
+                </TabsContent>
+              </Tabs>
+
+              <div className="md:col-span-2">
+                <AnimatedTabs
+                  value={animatedTabsValue}
+                  items={animatedTabItems}
+                  onValueChange={setAnimatedTabsValue}
+                  ariaLabel={t('dev.themeStates.animatedTabsAria')}
+                  variant="content"
+                />
+                <p className="pt-3 text-sm text-text-2">
+                  {animatedTabsValue === 'members'
+                    ? t('dev.themeStates.animatedTabMembersContent')
+                    : t('dev.themeStates.animatedTabLogsContent')}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-md border border-border bg-surface-2 p-4">
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.choiceMatrix')}</p>
+            <div className="grid gap-3 text-sm text-text-2">
+              <label className="flex cursor-pointer items-center gap-2">
+                <Checkbox aria-label={t('dev.themeStates.choiceChecked')} checked readOnly />
+                <span>{t('dev.themeStates.choiceChecked')}</span>
+              </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <Checkbox aria-label={t('dev.themeStates.choiceIndeterminate')} indeterminate readOnly />
+                <span>{t('dev.themeStates.choiceIndeterminate')}</span>
+              </label>
+              <label className="flex cursor-not-allowed items-center gap-2">
+                <Checkbox aria-label={t('dev.themeStates.choiceDisabled')} disabled />
+                <span>{t('dev.themeStates.choiceDisabled')}</span>
+              </label>
+              <RadioGroup defaultValue="invalid" className="grid grid-cols-2 gap-3">
+                <label className="flex cursor-pointer items-center gap-2">
+                  <RadioGroupItem value="enabled" aria-label={t('dev.themeStates.radioEnabled')} />
+                  <span>{t('dev.themeStates.radioEnabled')}</span>
+                </label>
+                <label className="flex cursor-pointer items-center gap-2">
+                  <RadioGroupItem value="invalid" aria-label={t('dev.themeStates.radioInvalid')} aria-invalid />
+                  <span>{t('dev.themeStates.radioInvalid')}</span>
+                </label>
+              </RadioGroup>
+              <label className="flex cursor-pointer items-center gap-2">
+                <Switch aria-label={t('dev.themeStates.switchEnabled')} defaultChecked />
+                <span>{t('dev.themeStates.switchEnabled')}</span>
+              </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <Switch aria-label={t('dev.themeStates.switchUnchecked')} />
+                <span>{t('dev.themeStates.switchUnchecked')}</span>
+              </label>
+              <label className="flex cursor-not-allowed items-center gap-2">
+                <Switch aria-label={t('dev.themeStates.switchDisabled')} disabled />
+                <span>{t('dev.themeStates.switchDisabled')}</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="grid gap-4 rounded-md border border-border bg-surface-2 p-4 xl:col-span-2 md:grid-cols-2">
+            <div>
+              <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.skeletonMatrix')}</p>
+              <div data-testid="skeletonPreview" className="grid gap-3 rounded-md border border-border bg-surface p-4">
+                <Skeleton className="h-[calc(18px*var(--app-scale))] w-2/5" />
+                <Skeleton className="h-[calc(14px*var(--app-scale))] w-full" />
+                <Skeleton className="h-[calc(14px*var(--app-scale))] w-4/5" />
+              </div>
+            </div>
+            <Empty
+              title={t('dev.themeStates.emptyTitle')}
+              description={t('dev.themeStates.emptyDesc')}
+              action={<Button variant="outline">{t('dev.themeStates.emptyAction')}</Button>}
+            />
+          </div>
+        </div>
       </section>
     </main>
   );

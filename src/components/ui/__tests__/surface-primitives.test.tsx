@@ -220,7 +220,9 @@ test('非 Field 交互组件统一使用设计体系 focus ring token', () => {
 
   expect(screen.getByRole('button', { name: '保存' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
   expect(screen.getByRole('radio', { name: '启用' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('radio', { name: '启用' })).toHaveClass('focus-visible:ring-(--choice-ring)');
   expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('focus-visible:ring-(--tabs-ring)');
 });
 
 test('交互型基础组件统一使用 pointer 光标', () => {
@@ -417,7 +419,9 @@ test('Badge、Skeleton、Empty 提供基础展示原子件', () => {
   expect(screen.getByText('正常')).toHaveClass('bg-success-bg');
   expect(screen.getByTestId('badge-dot')).toBeInTheDocument();
   expect(screen.getByTestId('skeleton')).toHaveAttribute('data-slot', 'skeleton');
+  expect(screen.getByTestId('skeleton')).toHaveClass('bg-(--skeleton-bg)');
   expect(screen.getByText('暂无数据')).toBeInTheDocument();
+  expect(screen.getByText('请调整筛选条件')).toHaveClass('text-(--empty-fg)');
 });
 
 test('Tabs、Table、Textarea、RadioGroup、Alert、Separator 走项目基础 UI token', () => {
@@ -462,12 +466,100 @@ test('Tabs、Table、Textarea、RadioGroup、Alert、Separator 走项目基础 U
     </>,
   );
 
-  expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('text-text-3');
+  expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('text-(--tabs-seg-trigger-fg)');
   expect(screen.getByRole('cell', { name: '张三' })).toHaveClass('whitespace-nowrap');
   expect(screen.getByRole('textbox', { name: '备注' })).toHaveAttribute('aria-invalid', 'true');
   expect(screen.getByRole('radio', { name: '启用' })).toHaveAttribute('data-state', 'checked');
   expect(screen.getByText('保存成功').closest('[data-slot="alert"]')).toHaveClass('bg-success-bg');
   expect(screen.getByRole('separator')).toHaveAttribute('data-slot', 'separator');
+});
+
+test('Tabs 分结构消费 Step 6 token 并保留 line 指示条动画', () => {
+  const { unmount } = render(
+    <Tabs defaultValue="overview">
+      <TabsList>
+        <TabsTrigger value="overview">概览</TabsTrigger>
+        <TabsTrigger value="logs">日志</TabsTrigger>
+      </TabsList>
+    </Tabs>,
+  );
+
+  const segmentedList = screen.getByRole('tablist');
+  const segmentedTrigger = screen.getByRole('tab', { name: '概览' });
+  expect(segmentedList).toHaveClass('bg-(--tabs-seg-list-bg)');
+  expect(segmentedTrigger).toHaveClass('text-(--tabs-seg-trigger-fg)');
+  expect(segmentedTrigger).toHaveClass('hover:text-(--tabs-seg-trigger-fg-hover)');
+  expect(segmentedTrigger).toHaveClass('data-[state=active]:bg-(--tabs-seg-trigger-bg-active)');
+  expect(segmentedTrigger).toHaveClass('data-[state=active]:text-(--tabs-seg-trigger-fg-active)');
+  expect(segmentedTrigger).toHaveClass('data-[state=active]:shadow-(--tabs-seg-trigger-shadow-active)');
+
+  unmount();
+
+  render(
+    <Tabs defaultValue="overview">
+      <TabsList variant="line">
+        <TabsTrigger value="overview">概览</TabsTrigger>
+        <TabsTrigger value="logs">日志</TabsTrigger>
+      </TabsList>
+    </Tabs>,
+  );
+
+  const lineList = screen.getByRole('tablist');
+  const lineTrigger = screen.getByRole('tab', { name: '概览' });
+  expect(lineList).toHaveClass('border-(--tabs-line-border)');
+  expect(lineTrigger).toHaveClass('group-data-[variant=line]/tabs-list:text-(--tabs-line-trigger-fg)');
+  expect(lineTrigger).toHaveClass('group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)');
+  expect(lineTrigger).toHaveClass('group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)');
+  expect(lineTrigger).toHaveClass('after:bg-(--tabs-line-indicator)');
+  expect(lineTrigger).toHaveClass('after:transition-[opacity,transform]');
+});
+
+test('Checkbox、RadioGroup、Switch 消费 Choice token 并保留三态区分', () => {
+  render(
+    <>
+      <Checkbox aria-label="选中" checked readOnly />
+      <Checkbox aria-label="半选" indeterminate readOnly />
+      <Checkbox aria-label="禁用" disabled />
+      <RadioGroup defaultValue="enabled">
+        <RadioGroupItem aria-label="启用" value="enabled" aria-invalid />
+      </RadioGroup>
+      <Switch aria-label="开启" defaultChecked />
+    </>,
+  );
+
+  const checked = screen.getByRole('checkbox', { name: '选中' });
+  const indeterminate = screen.getByRole('checkbox', { name: '半选' });
+  const disabled = screen.getByRole('checkbox', { name: '禁用' });
+  const radio = screen.getByRole('radio', { name: '启用' });
+  const switchControl = screen.getByRole('switch', { name: '开启' });
+
+  expect(checked).toHaveClass('border-(--choice-border)');
+  expect(checked).toHaveClass('bg-(--choice-bg)');
+  expect(checked).toHaveClass('hover:border-(--choice-border-hover)');
+  expect(checked).toHaveClass('checked:border-(--choice-border-checked)');
+  expect(checked).toHaveClass('checked:bg-(--choice-bg-checked)');
+  expect(checked.nextElementSibling).toHaveClass('text-(--choice-fg-checked)');
+
+  expect(indeterminate).toHaveClass('border-(--choice-border-indeterminate)');
+  expect(indeterminate).toHaveClass('bg-(--choice-bg-indeterminate)');
+  expect(indeterminate.nextElementSibling).toHaveClass('text-(--choice-fg-indeterminate)');
+
+  expect(disabled).toHaveClass('disabled:bg-(--choice-bg-disabled)');
+
+  expect(radio).toHaveClass('border-(--choice-border)');
+  expect(radio).toHaveClass('bg-(--choice-bg)');
+  expect(radio).toHaveClass('focus-visible:border-(--choice-border-hover)');
+  expect(radio).toHaveClass('focus-visible:ring-(--choice-ring)');
+  expect(radio).toHaveClass('data-[state=checked]:border-(--choice-border-checked)');
+  expect(radio).toHaveClass('aria-invalid:border-(--field-border-invalid)');
+  expect(radio).toHaveClass('data-[state=checked]:aria-invalid:border-(--field-border-invalid)');
+  expect(radio).toHaveClass('aria-invalid:ring-(--field-ring-invalid)');
+  expect(radio.querySelector('[data-icon="radio-indicator"]')).toHaveClass('fill-(--choice-bg-checked)');
+
+  expect(switchControl).toHaveClass('data-[state=checked]:bg-(--switch-bg-checked)');
+  expect(switchControl).toHaveClass('data-[state=unchecked]:bg-(--switch-bg)');
+  expect(switchControl).toHaveClass('focus-visible:ring-(--choice-ring)');
+  expect(switchControl.querySelector('[data-slot="switch-thumb"]')).toHaveClass('bg-(--switch-thumb-bg)');
 });
 
 test('Form 原语基于 react-hook-form 并保持 label/control 关联', () => {

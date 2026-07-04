@@ -89,6 +89,26 @@ test('theme states route exposes the Button family state matrix', () => {
   expect(source).toContain('disabled');
 });
 
+test('theme states route exposes the Step 6 interaction state matrix', () => {
+  const source = readProjectFile(themeStatesRoute);
+
+  expect(source).toContain('TabsList');
+  expect(source).toContain('AnimatedTabs');
+  expect(source).toContain('animatedTabsValue');
+  expect(source).toContain('Checkbox');
+  expect(source).toContain('RadioGroup');
+  expect(source).toContain('Switch');
+  expect(source).toContain('Skeleton');
+  expect(source).toContain('Empty');
+  expect(source).toContain('step6Matrix');
+  expect(source).toContain('skeletonPreview');
+  expect(source).toContain('bg-surface p-4');
+  expect(source).toContain('defaultValue="invalid"');
+  expect(source).toContain('aria-invalid');
+  expect(source).toContain('switchUnchecked');
+  expect(source).toContain('switchDisabled');
+});
+
 test('shell icon buttons do not override Button icon token colors', () => {
   const shellIconFiles = [
     'src/app/shell/widgets/LanguageMenu.tsx',

@@ -105,7 +105,7 @@ export function AnimatedTabs<TValue extends string>({
       data-slot="animated-tabs"
       data-variant={variant}
       className={cn(
-        'flex items-end border-b border-border',
+        'flex items-end border-b border-(--tabs-line-border)',
         variant === 'page' && 'px-6 pt-[calc(18px*var(--app-scale))]',
         variant === 'content' && 'px-0',
         className,
@@ -139,10 +139,12 @@ export function AnimatedTabs<TValue extends string>({
               disabled={item.disabled}
               data-state={active ? 'active' : 'inactive'}
               className={cn(
-                'relative z-10 cursor-pointer border-b-2 border-transparent outline-none transition-colors focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-soft disabled:cursor-not-allowed disabled:opacity-50',
+                'relative z-10 cursor-pointer border-b-2 border-transparent outline-none transition-colors focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--tabs-ring) disabled:cursor-not-allowed disabled:opacity-50',
                 variant === 'page' && 'px-1 pb-3 text-[calc(15px*var(--app-scale))]',
                 variant === 'content' && 'px-1 pb-2.5 text-sm',
-                active ? 'border-pri font-semibold text-pri' : 'border-transparent font-normal text-text-2 hover:text-text',
+                active
+                  ? 'font-semibold text-(--tabs-line-trigger-fg-active)'
+                  : 'border-transparent font-normal text-(--tabs-line-trigger-fg) hover:text-(--tabs-line-trigger-fg-hover)',
               )}
               onClick={() => onValueChange(item.value)}
               onKeyDown={(event) => onKeyDown(event, item)}
@@ -155,7 +157,7 @@ export function AnimatedTabs<TValue extends string>({
           data-slot="animated-tabs-indicator"
           aria-hidden="true"
           className={cn(
-            'absolute bottom-0 h-[calc(2px*var(--app-scale))] rounded-full bg-pri opacity-0 transition-[transform,width,opacity] duration-200 ease-out motion-reduce:transition-none',
+            'absolute bottom-0 h-[calc(2px*var(--app-scale))] rounded-full bg-(--tabs-line-indicator) opacity-0 transition-[transform,width,opacity] duration-200 ease-out motion-reduce:transition-none',
             indicator.ready && 'opacity-100',
           )}
           style={{
