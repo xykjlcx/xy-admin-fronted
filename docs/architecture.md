@@ -89,6 +89,18 @@ Route 文件只做边界装配：
 - 可复用组件优先接收 `children` 组合结构；只有列表渲染这类需要回传数据的场景才用 render prop。
 - 组件内部函数按意图命名：`openCreateDialog`、`confirmDeleteRole`、`patchSearch`，不要把业务动作藏在匿名大函数里。
 
+## 纵向样板线
+
+`users` 是当前脚手架的第一条纵向样板线。它不是只证明页面能用，而是证明“普通后台页面应该如何组合基础组件”。
+
+约束：
+
+- `src/modules/admin/pages/users` 页面层禁止直接写原生 `<button>`、`<input>`、`<select>`、`<textarea>`；交互控件必须从 `components/ui` 或 `components/pro` 组合。
+- `src/modules/admin/pages/users` 页面层禁止写 `style={{ ... }}`；树形缩进、页面 padding、表格 grid 等视觉策略下沉到基础组件或 Pro 组件。
+- 页面入口只保留业务状态编排、权限判断、query/mutation 调度和事件分发。
+- 搜索框、筛选下拉、分页、侧边列表、详情字段、表单弹窗等普通后台能力先沉到 `components/pro`，再由 roles/menus 等页面反向验证是否值得继续推广。
+- 基础 UI 组件优先承接控件级视觉和可访问性；业务页面只通过 props 表达业务含义。
+
 ## 新增页面清单
 
 1. 在 `src/modules/<key>/pages/<page>/index.tsx` 建页面入口。

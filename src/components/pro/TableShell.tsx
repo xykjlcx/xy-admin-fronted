@@ -32,6 +32,13 @@ export interface TableCheckboxProps {
   className?: string;
 }
 
+export interface TableTreeCellProps {
+  depth: number;
+  step?: number;
+  children: ReactNode;
+  className?: string;
+}
+
 function withGridTemplate(gridTemplateColumns: string, style?: CSSProperties): CSSProperties {
   return { ...style, gridTemplateColumns };
 }
@@ -110,6 +117,17 @@ export function TableShellLoadingRows({
         </div>
       ))}
       <span className="sr-only">{ariaLabel}</span>
+    </div>
+  );
+}
+
+export function TableTreeCell({ depth, step = 20, children, className }: TableTreeCellProps) {
+  return (
+    <div
+      className={cn('flex items-center gap-2', className)}
+      style={{ paddingLeft: `calc(${depth * step}px * var(--app-scale))` }}
+    >
+      {children}
     </div>
   );
 }

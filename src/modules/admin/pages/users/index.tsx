@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
+import { PageFrame, PageSurface, PageTabs } from '@/components/pro/PageScaffold';
 import { matchPermission } from '@/lib/permission';
-import { cn } from '@/lib/utils';
 import {
   deptsQuery,
   userApi,
@@ -99,6 +99,11 @@ export function UsersView({
   const resolvedUsersPage = usersPage ?? emptyUsersPage;
   const selectedDeptLabel = search.deptId ? deptById.get(search.deptId)?.name : t('users.allMembers');
   const activeTab: TabKey = search.status === 'left' ? 'left' : tab;
+  const tabItems = [
+    { value: 'members', label: t('users.tabs.members') },
+    { value: 'depts', label: t('users.tabs.depts') },
+    { value: 'left', label: t('users.tabs.left') },
+  ] satisfies { value: TabKey; label: string }[];
 
   const patchSearch = (patch: Partial<UsersQueryParams>) => {
     onSearchChange(patch);
@@ -116,38 +121,9 @@ export function UsersView({
   };
 
   return (
-    <section
-      className="flex min-h-0 flex-col text-text"
-      style={{ padding: 'calc(20px * var(--app-scale)) calc(28px * var(--app-scale))' }}
-    >
-      <div className="mb-4 flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
-        <span>{t('users.breadcrumbGroup')}</span>
-        <span>›</span>
-        <span className="text-text">{t('users.title')}</span>
-      </div>
-
-      <div className="flex min-h-[calc(640px*var(--app-scale))] flex-col overflow-hidden rounded-12 border border-border bg-surface shadow-xs">
-        <div className="flex items-end border-b border-border px-6 pt-[calc(18px*var(--app-scale))]" role="tablist">
-          {[
-            ['members', t('users.tabs.members')],
-            ['depts', t('users.tabs.depts')],
-            ['left', t('users.tabs.left')],
-          ].map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === key}
-              className={cn(
-                'mr-7 border-b-2 px-1 pb-3 text-[calc(15px*var(--app-scale))]',
-                activeTab === key ? 'border-pri font-semibold text-text' : 'border-transparent font-normal text-text-2',
-              )}
-              onClick={() => switchTab(key as TabKey)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+    <PageFrame breadcrumbs={[{ label: t('users.breadcrumbGroup') }, { label: t('users.title') }]}>
+      <PageSurface>
+        <PageTabs value={activeTab} items={tabItems} onValueChange={switchTab} />
 
         <div className="flex min-h-0 flex-1">
           <DeptSidebar
@@ -183,7 +159,7 @@ export function UsersView({
             )}
           </main>
         </div>
-      </div>
+      </PageSurface>
 
       <CreateUserDialog
         open={userFormState.kind === 'create'}
@@ -211,6 +187,6 @@ export function UsersView({
         deptById={deptById}
         onOpenChange={(open) => !open && setDetailUser(null)}
       />
-    </section>
+    </PageFrame>
   );
 }

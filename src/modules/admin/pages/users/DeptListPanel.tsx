@@ -1,6 +1,6 @@
 import { Folder } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
+import { TableShell, TableShellHeader, TableShellRow, TableTreeCell } from '@/components/pro/TableShell';
 import type { DeptDto } from '@/modules/admin/api/user.api';
 import { deptGridTemplate } from './model';
 
@@ -28,13 +28,10 @@ export function DeptListPanel({ depts, depthMap }: { depts: DeptDto[]; depthMap:
             gridTemplateColumns={deptGridTemplate}
             className="h-[calc(50px*var(--app-scale))] px-4"
           >
-            <div
-              className="flex items-center gap-2"
-              style={{ paddingLeft: `calc(${(depthMap.get(dept.id) ?? 0) * 20}px * var(--app-scale))` }}
-            >
+            <TableTreeCell depth={depthMap.get(dept.id) ?? 0}>
               <Folder className="size-4 text-text-3" />
               <span className="text-sm text-text">{dept.name}</span>
-            </div>
+            </TableTreeCell>
             <div className="text-[calc(13px*var(--app-scale))] text-text-2">
               {t('users.memberCount', { count: dept.memberCount })}
             </div>

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FormDialogContent } from '@/components/pro/FormDialog';
+import { Dialog } from '@/components/ui/dialog';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { NativeSelect } from '@/components/ui/native-select';
 import type { CreateUserInput, DeptDto, UserDto } from '@/modules/admin/api/user.api';
 import { emptyDraft } from './model';
 
@@ -94,18 +96,27 @@ function UserFormDialogContent({
   };
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>{title}</DialogTitle>
-      </DialogHeader>
-      <div className="grid gap-3">
+    <FormDialogContent
+      title={title}
+      cancelText={t('users.actions.cancel')}
+      submitText={t('users.actions.save')}
+      submitDisabled={!draft.name || !draft.role || !draft.phone || !draft.email}
+      onCancel={() => onOpenChange(false)}
+      onSubmit={submit}
+    >
+      <Field>
+        <FieldLabel htmlFor="user-name">{t('users.form.name')}</FieldLabel>
         <Input
+          id="user-name"
           placeholder={t('users.form.name')}
           value={draft.name}
           onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
         />
-        <select
-          className="h-9 rounded-md border border-border bg-surface px-3 text-sm outline-none"
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="user-dept">{t('users.form.dept')}</FieldLabel>
+        <NativeSelect
+          id="user-dept"
           value={draft.deptId}
           onChange={(event) => setDraft((current) => ({ ...current, deptId: event.target.value }))}
         >
@@ -115,31 +126,35 @@ function UserFormDialogContent({
               {dept.name}
             </option>
           ))}
-        </select>
+        </NativeSelect>
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="user-role">{t('users.form.role')}</FieldLabel>
         <Input
+          id="user-role"
           placeholder={t('users.form.role')}
           value={draft.role}
           onChange={(event) => setDraft((current) => ({ ...current, role: event.target.value }))}
         />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="user-phone">{t('users.form.phone')}</FieldLabel>
         <Input
+          id="user-phone"
           placeholder={t('users.form.phone')}
           value={draft.phone}
           onChange={(event) => setDraft((current) => ({ ...current, phone: event.target.value }))}
         />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="user-email">{t('users.form.email')}</FieldLabel>
         <Input
+          id="user-email"
           placeholder={t('users.form.email')}
           value={draft.email}
           onChange={(event) => setDraft((current) => ({ ...current, email: event.target.value }))}
         />
-      </div>
-      <DialogFooter>
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
-          {t('users.actions.cancel')}
-        </Button>
-        <Button onClick={submit} disabled={!draft.name || !draft.role || !draft.phone || !draft.email}>
-          {t('users.actions.save')}
-        </Button>
-      </DialogFooter>
-    </DialogContent>
+      </Field>
+    </FormDialogContent>
   );
 }

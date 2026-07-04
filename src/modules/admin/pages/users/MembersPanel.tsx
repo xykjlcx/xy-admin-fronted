@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { FilterSelect } from '@/components/pro/FilterSelect';
+import { Pagination } from '@/components/pro/Pagination';
 import { StatusBadge } from '@/components/pro/StatusBadge';
 import {
   TableCheckbox,
@@ -64,7 +66,6 @@ export function MembersPanel({
   onBatchDisable: (ids: string[]) => void | Promise<void>;
 }) {
   const { t } = useTranslation('admin');
-  const [statusOpen, setStatusOpen] = useState(false);
   const pageCount = Math.max(1, Math.ceil(usersPage.total / search.pageSize));
   const allPageIds = useMemo(() => usersPage.list.map((user) => user.id), [usersPage.list]);
   const selectionScope = [
@@ -110,6 +111,10 @@ export function MembersPanel({
     await onBatchDisable(selectedVisibleIds);
     setSelectionState({ scope: selectionScope, ids: [] });
   };
+  const statusFilterOptions = statusOptions.map((item) => ({
+    value: item.value,
+    label: t(`users.status.${item.value}`),
+  }));
 
   return (
     <>
@@ -123,65 +128,34 @@ export function MembersPanel({
       <div className="mb-4 flex items-center gap-3">
         {activeTab === 'members' && (
           <>
-            <div className="relative">
-              <button
-                type="button"
-                aria-haspopup="menu"
-                aria-expanded={statusOpen}
-                className="flex h-[calc(34px*var(--app-scale))] items-center gap-2 rounded-8 border border-border px-3 text-[calc(13px*var(--app-scale))] text-text-2 hover:border-pri"
-                onClick={() => setStatusOpen((open) => !open)}
-              >
-                <span className="text-text-3">{t('users.filters.accountStatus')}</span>
-                <span className="font-medium text-text">{t(`users.status.${search.status}`)}</span>
-                <span className="text-text-3">⌄</span>
-              </button>
-              {statusOpen && (
-                <div
-                  role="menu"
-                  className="absolute left-0 top-10 z-30 w-[calc(140px*var(--app-scale))] rounded-10 border border-border bg-surface p-1.5 shadow-popover"
-                >
-                  {statusOptions.map((item) => (
-                    <button
-                      key={item.value}
-                      type="button"
-                      role="menuitemradio"
-                      aria-checked={search.status === item.value}
-                      className="flex h-[calc(34px*var(--app-scale))] w-full items-center rounded-6 px-2.5 text-left text-[calc(13px*var(--app-scale))] text-text-2 hover:bg-bg"
-                      onClick={() => {
-                        setStatusOpen(false);
-                        patchSearch({ status: item.value, page: 1 });
-                      }}
-                    >
-                      {t(`users.status.${item.value}`)}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <button
+            <FilterSelect
+              label={t('users.filters.accountStatus')}
+              value={search.status}
+              options={statusFilterOptions}
+              onValueChange={(status) => patchSearch({ status, page: 1 })}
+            />
+            <Button
               type="button"
+              variant={search.directOnly ? 'secondary' : 'outline'}
+              size="sm"
               aria-pressed={!!search.directOnly}
               disabled={!search.deptId}
-              className={cn(
-                'flex h-[calc(34px*var(--app-scale))] items-center rounded-8 border px-3 text-[calc(13px*var(--app-scale))] hover:border-pri disabled:cursor-not-allowed disabled:opacity-50',
-                search.directOnly ? 'border-pri bg-pri-soft text-pri' : 'border-border text-text-2',
-              )}
               onClick={() => patchSearch({ directOnly: !search.directOnly, page: 1 })}
             >
               {t('users.filters.directOnly')}
-            </button>
+            </Button>
           </>
         )}
         <div className="flex-1" />
         {canCreate && activeTab === 'members' && (
-          <button
+          <Button
             type="button"
-            className="flex h-[calc(34px*var(--app-scale))] items-center gap-1.5 rounded-8 bg-pri px-4 text-[calc(13px*var(--app-scale))] text-white hover:bg-pri-hover"
+            size="sm"
             onClick={onCreateUser}
           >
-            <Plus className="size-3.5" />
+            <Plus data-icon="inline-start" />
             {t('users.actions.create')}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -216,37 +190,16 @@ export function MembersPanel({
           ) : null
         }
         pagination={
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-[calc(13px*var(--app-scale))] text-text-3">
-              {t('users.countMembers', { count: usersPage.total })}
-              {usersRefreshing && <span className="ml-3 text-pri">{t('users.refreshing')}</span>}
-            </span>
-            <div className="flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-2">
-              <button
-                className="flex size-[calc(30px*var(--app-scale))] items-center justify-center rounded-7 border border-border"
-                aria-label={t('users.pagination.prev')}
-                disabled={search.page <= 1}
-                onClick={() => patchSearch({ page: search.page - 1 })}
-              >
-                ‹
-              </button>
-              <button
-                className="flex size-[calc(30px*var(--app-scale))] items-center justify-center rounded-7 border border-pri text-pri"
-                aria-label={t('users.pagination.current', { page: search.page })}
-                aria-current="page"
-              >
-                {search.page}
-              </button>
-              <button
-                className="flex size-[calc(30px*var(--app-scale))] items-center justify-center rounded-7 border border-border"
-                aria-label={t('users.pagination.next')}
-                disabled={search.page >= pageCount}
-                onClick={() => patchSearch({ page: search.page + 1 })}
-              >
-                ›
-              </button>
-            </div>
-          </div>
+          <Pagination
+            page={search.page}
+            pageCount={pageCount}
+            totalLabel={t('users.countMembers', { count: usersPage.total })}
+            refreshingLabel={usersRefreshing ? t('users.refreshing') : undefined}
+            prevLabel={t('users.pagination.prev')}
+            nextLabel={t('users.pagination.next')}
+            currentLabel={t('users.pagination.current', { page: search.page })}
+            onPageChange={(page) => patchSearch({ page })}
+          />
         }
       >
         {usersLoading ? (
@@ -289,23 +242,24 @@ export function MembersPanel({
                   {deptById.get(user.deptId)?.name ?? '-'}
                 </div>
                 <div className="flex items-center gap-3.5 text-[calc(13px*var(--app-scale))]">
-                  <button type="button" className="text-pri" onClick={() => onViewUser(user)}>
+                  <Button type="button" variant="link" size="xs" onClick={() => onViewUser(user)}>
                     {t('users.actions.detail')}
-                  </button>
+                  </Button>
                   {canUpdate && (
-                    <button type="button" className="text-pri" onClick={() => onEditUser(user)}>
+                    <Button type="button" variant="link" size="xs" onClick={() => onEditUser(user)}>
                       {t('users.actions.edit')}
-                    </button>
+                    </Button>
                   )}
                   {canDelete && (
-                    <button
+                    <Button
                       type="button"
-                      className="font-bold leading-none text-text-3"
+                      variant="ghost"
+                      size="icon-xs"
                       onClick={() => onDeleteUser(user)}
                     >
-                      <MoreHorizontal className="size-4" />
+                      <MoreHorizontal />
                       <span className="sr-only">{t('users.actions.deleteName', { name: user.name })}</span>
-                    </button>
+                    </Button>
                   )}
                 </div>
               </TableShellRow>
