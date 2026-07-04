@@ -209,6 +209,8 @@ DESIGN.md（设计身份：值 + 为什么）
    `npx getdesign add <site>`（getdesign.md 目录 300+ 现成分析）作为起点，
    经"值表落定 → tokens.css flavor block → 浏览器矩阵验证"三步接入。
 5. 三份文档与 flavor 值表冲突时，以**实测/lint 证据**为准并回写两处（参照 [[review-report-sync]] 纪律）。
+6. **原始数据存档**：三体系的全部采集原始数据（官方规范全表、变量全量 dump、组件实测记录）无损存于
+   `docs/design/research/`（目录内 README 即索引）；值表与身份文档的任何值应可追溯到该目录。
 
 ## 5. 现状基线
 
