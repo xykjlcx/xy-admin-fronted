@@ -144,8 +144,8 @@ export function RolePermissionEditor({
   };
 
   return (
-    <div className="min-h-0">
-      <div className="mb-4 flex flex-wrap items-center gap-3.5">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div data-role-permission-action-bar className="mb-4 flex flex-wrap items-center gap-3.5">
         <div className="flex shrink-0 items-center gap-2">
           <KeyRound className="size-4 text-(--accent-emphasis)" />
           <span className="text-sm font-semibold text-text">
@@ -209,131 +209,137 @@ export function RolePermissionEditor({
                 <Check data-icon="inline-start" />
                 {t('roles.actions.grantAll')}
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => updateDraftPermissions(clonePermissions(rolePermissions))}
+              >
+                {t('roles.actions.reset')}
+              </Button>
+              <Button type="button" size="sm" onClick={() => onSave(roleId, cleanPermissions(draftPermissions))}>
+                {t('roles.actions.savePermissions')}
+              </Button>
             </>
           )}
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
-        {filteredPermissionTree.length > 0 ? (
-          filteredPermissionTree.map((group) => {
-            const collapsed = collapsedGroupIds.includes(group.id);
-            const groupGranted = group.resources.reduce(
-              (count, resource) =>
-                count + resource.actions.filter((action) => hasAction(resource.id, action.id)).length,
-              0,
-            );
-            const groupTotal = group.resources.reduce((count, resource) => count + resource.actions.length, 0);
+      <div
+        data-role-tab-content-scroll
+        data-role-permission-panel-scroll
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6 pr-1"
+      >
+        <div className="flex flex-col gap-3">
+          {filteredPermissionTree.length > 0 ? (
+            filteredPermissionTree.map((group) => {
+              const collapsed = collapsedGroupIds.includes(group.id);
+              const groupGranted = group.resources.reduce(
+                (count, resource) =>
+                  count + resource.actions.filter((action) => hasAction(resource.id, action.id)).length,
+                0,
+              );
+              const groupTotal = group.resources.reduce((count, resource) => count + resource.actions.length, 0);
 
-            return (
-              <div key={group.id} className="overflow-hidden rounded-12 border border-border">
-                <div className="flex h-[calc(52px*var(--app-scale))] items-center gap-3 bg-(--table-header-bg) px-4">
-                  <Button
-                    type="button"
-                    aria-label={t(collapsed ? 'roles.permission.expandGroup' : 'roles.permission.collapseGroup', {
-                      group: group.label,
-                    })}
-                    aria-expanded={!collapsed}
-                    variant="ghost"
-                    size="icon-xs"
-                    className="text-text-3"
-                    onClick={() => toggleGroupCollapsed(group.id)}
-                  >
-                    <ChevronRight
-                      data-icon="inline-start"
-                      className={cn(
-                        'transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
-                        !collapsed && 'rotate-90',
-                      )}
+              return (
+                <div key={group.id} className="overflow-hidden rounded-12 border border-border">
+                  <div className="flex h-[calc(52px*var(--app-scale))] items-center gap-3 bg-(--table-header-bg) px-4">
+                    <Button
+                      type="button"
+                      aria-label={t(collapsed ? 'roles.permission.expandGroup' : 'roles.permission.collapseGroup', {
+                        group: group.label,
+                      })}
+                      aria-expanded={!collapsed}
+                      variant="ghost"
+                      size="icon-xs"
+                      className="text-text-3"
+                      onClick={() => toggleGroupCollapsed(group.id)}
+                    >
+                      <ChevronRight
+                        data-icon="inline-start"
+                        className={cn(
+                          'transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
+                          !collapsed && 'rotate-90',
+                        )}
+                      />
+                    </Button>
+                    <PermissionGroupIcon id={group.id} />
+                    <span className="flex-1 text-sm font-semibold text-text">{group.label}</span>
+                    <span className="text-xs text-text-3">
+                      {t('roles.permission.groupCount', { granted: groupGranted, total: groupTotal })}
+                    </span>
+                    <TriStateButton
+                      state={groupState(group)}
+                      ariaLabel={t('roles.permission.toggleGroup', { group: group.label })}
+                      disabled={!canGrant}
+                      onClick={() => toggleGroup(group)}
                     />
-                  </Button>
-                  <PermissionGroupIcon id={group.id} />
-                  <span className="flex-1 text-sm font-semibold text-text">{group.label}</span>
-                  <span className="text-xs text-text-3">
-                    {t('roles.permission.groupCount', { granted: groupGranted, total: groupTotal })}
-                  </span>
-                  <TriStateButton
-                    state={groupState(group)}
-                    ariaLabel={t('roles.permission.toggleGroup', { group: group.label })}
-                    disabled={!canGrant}
-                    onClick={() => toggleGroup(group)}
-                  />
-                </div>
-                <div
-                  data-permission-group-panel
-                  aria-hidden={collapsed}
-                  inert={collapsed || undefined}
-                  className={cn(
-                    'grid transition-[grid-template-rows,opacity] duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
-                    collapsed ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100',
-                  )}
-                >
-                  <div className="min-h-0 overflow-hidden">
-                    {group.resources.map((resource) => (
-                      <div
-                        key={resource.id}
-                        className="flex items-start gap-3.5 border-t border-border px-[calc(18px*var(--app-scale))] py-3.5"
-                      >
-                        <TriStateButton
-                          state={resourceState(resource)}
-                          ariaLabel={t('roles.permission.toggleResource', { resource: resource.label })}
-                          disabled={!canGrant}
-                          className="mt-0.5"
-                          onClick={() => toggleResource(resource)}
-                        />
-                        <div className="w-[calc(150px*var(--app-scale))] shrink-0">
-                          <div className="text-sm font-medium text-text">{resource.label}</div>
-                          <div className="mt-0.5 text-xs tabular-nums text-text-3">{resource.code}</div>
+                  </div>
+                  <div
+                    data-permission-group-panel
+                    aria-hidden={collapsed}
+                    inert={collapsed || undefined}
+                    className={cn(
+                      'grid transition-[grid-template-rows,opacity] duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
+                      collapsed ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100',
+                    )}
+                  >
+                    <div className="min-h-0 overflow-hidden">
+                      {group.resources.map((resource) => (
+                        <div
+                          key={resource.id}
+                          className="flex items-start gap-3.5 border-t border-border px-[calc(18px*var(--app-scale))] py-3.5"
+                        >
+                          <TriStateButton
+                            state={resourceState(resource)}
+                            ariaLabel={t('roles.permission.toggleResource', { resource: resource.label })}
+                            disabled={!canGrant}
+                            className="mt-0.5"
+                            onClick={() => toggleResource(resource)}
+                          />
+                          <div className="w-[calc(150px*var(--app-scale))] shrink-0">
+                            <div className="text-sm font-medium text-text">{resource.label}</div>
+                            <div className="mt-0.5 text-xs tabular-nums text-text-3">{resource.code}</div>
+                          </div>
+                          <div className="flex flex-1 flex-wrap gap-2">
+                            {resource.actions.map((action) => {
+                              const on = hasAction(resource.id, action.id);
+                              return (
+                                <Button
+                                  key={action.id}
+                                  type="button"
+                                  aria-label={t('roles.permission.toggleAction', {
+                                    resource: resource.label,
+                                    action: action.label,
+                                  })}
+                                  disabled={!canGrant}
+                                  variant={on ? 'text' : 'outline'}
+                                  size="sm"
+                                  className={cn(
+                                    on
+                                      ? 'border border-(--accent-emphasis) bg-(--accent-emphasis-soft) text-(--accent-emphasis) hover:bg-(--accent-emphasis-soft)'
+                                      : 'border-(--table-border) bg-(--table-bg) text-text-2 hover:border-(--accent-emphasis) hover:text-(--accent-emphasis)',
+                                  )}
+                                  onClick={() => toggleAction(resource, action.id)}
+                                >
+                                  {on && <Check data-icon="inline-start" />}
+                                  {action.label}
+                                </Button>
+                              );
+                            })}
+                          </div>
                         </div>
-                        <div className="flex flex-1 flex-wrap gap-2">
-                          {resource.actions.map((action) => {
-                            const on = hasAction(resource.id, action.id);
-                            return (
-                              <Button
-                                key={action.id}
-                                type="button"
-                                aria-label={t('roles.permission.toggleAction', {
-                                  resource: resource.label,
-                                  action: action.label,
-                                })}
-                                disabled={!canGrant}
-                                variant={on ? 'text' : 'outline'}
-                                size="sm"
-                                className={cn(
-                                  on
-                                    ? 'border border-(--accent-emphasis) bg-(--accent-emphasis-soft) text-(--accent-emphasis) hover:bg-(--accent-emphasis-soft)'
-                                    : 'border-(--table-border) bg-(--table-bg) text-text-2 hover:border-(--accent-emphasis) hover:text-(--accent-emphasis)',
-                                )}
-                                onClick={() => toggleAction(resource, action.id)}
-                              >
-                                {on && <Check data-icon="inline-start" />}
-                                {action.label}
-                              </Button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })
-        ) : (
-          <Empty title={t('roles.noPermissionResult')} className="rounded-12 border border-border py-12" />
-        )}
-      </div>
-
-      {canGrant && (
-        <div className="mt-5 flex justify-end gap-3">
-          <Button variant="outline" onClick={() => updateDraftPermissions(clonePermissions(rolePermissions))}>
-            {t('roles.actions.reset')}
-          </Button>
-          <Button onClick={() => onSave(roleId, cleanPermissions(draftPermissions))}>
-            {t('roles.actions.savePermissions')}
-          </Button>
+              );
+            })
+          ) : (
+            <Empty title={t('roles.noPermissionResult')} className="rounded-12 border border-border py-12" />
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

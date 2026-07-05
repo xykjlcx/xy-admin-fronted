@@ -188,8 +188,8 @@ export function RolesView({
               onCreateRole={() => setRoleDialogOpen(true)}
             />
             <main
-              data-role-detail-scroll
-              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain px-7 py-[calc(22px*var(--app-scale))]"
+              data-role-detail-shell
+              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-7 py-[calc(22px*var(--app-scale))]"
             >
               <RoleDetailsPanel
                 activeRole={activeRole}

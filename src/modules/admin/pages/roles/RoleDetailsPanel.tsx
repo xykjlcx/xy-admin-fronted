@@ -60,7 +60,7 @@ export function RoleDetailsPanel({
   }
 
   return (
-    <>
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="mb-1 flex items-center gap-2.5">
         <h1 className="text-[calc(18px*var(--app-scale))] font-bold text-text">{activeRole.name}</h1>
         <RoleTypeChip type={activeRole.type} label={t(`roles.roleTypes.${activeRole.type}`)} />
@@ -96,7 +96,9 @@ export function RoleDetailsPanel({
       />
 
       {roleDetailLoading ? (
-        <RoleDetailLoadingState label={t('roles.refreshing')} />
+        <div data-role-tab-content-scroll className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6 pr-1">
+          <RoleDetailLoadingState label={t('roles.refreshing')} />
+        </div>
       ) : detailTab === 'permissions' ? (
         <RolePermissionEditor
           roleId={currentRoleId}
@@ -106,11 +108,15 @@ export function RoleDetailsPanel({
           onSave={onSaveRolePermissions}
         />
       ) : detailTab === 'members' ? (
-        <RoleMembersPanel members={roleMembers} />
+        <div data-role-tab-content-scroll className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6 pr-1">
+          <RoleMembersPanel members={roleMembers} />
+        </div>
       ) : (
-        <RoleLogsPanel logs={roleLogs} />
+        <div data-role-tab-content-scroll className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6 pr-1">
+          <RoleLogsPanel logs={roleLogs} />
+        </div>
       )}
-    </>
+    </div>
   );
 }
 

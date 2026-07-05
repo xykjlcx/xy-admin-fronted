@@ -111,13 +111,14 @@ test('viewer 能看角色详情但看不到写操作入口', () => {
   expect(screen.queryByRole('button', { name: '删除角色' })).not.toBeInTheDocument();
 });
 
-test('业务角色页固定页面高度，只让右侧详情区滚动', () => {
+test('业务角色页固定页面高度，只让 Tabs 下方内容区滚动', () => {
   const { container } = renderRolesView({ permissions: ['*:*:*'] });
 
   const frame = container.querySelector('[data-role-page-frame]');
   const surface = container.querySelector('[data-role-page-surface]');
   const workspace = container.querySelector('[data-role-workspace]');
-  const detailScroll = container.querySelector('[data-role-detail-scroll]');
+  const detailShell = container.querySelector('[data-role-detail-shell]');
+  const contentScroll = container.querySelector('[data-role-tab-content-scroll]');
 
   expect(frame).toBeInTheDocument();
   expect(frame).toHaveClass('h-[calc(100vh-3.5rem)]');
@@ -127,9 +128,28 @@ test('业务角色页固定页面高度，只让右侧详情区滚动', () => {
   expect(surface).toHaveClass('flex-1');
   expect(workspace).toBeInTheDocument();
   expect(workspace).toHaveClass('overflow-hidden');
-  expect(detailScroll).toBeInTheDocument();
-  expect(detailScroll).toHaveClass('min-h-0');
-  expect(detailScroll).toHaveClass('overflow-y-auto');
+  expect(detailShell).toBeInTheDocument();
+  expect(detailShell).toHaveClass('overflow-hidden');
+  expect(contentScroll).toBeInTheDocument();
+  expect(contentScroll).toHaveClass('min-h-0');
+  expect(contentScroll).toHaveClass('overflow-y-auto');
+  expect(contentScroll).toHaveClass('pb-6');
+});
+
+test('权限配置的操作按钮集中在 Action Bar', () => {
+  const { container } = renderRolesView({ permissions: ['*:*:*'] });
+
+  const actionBar = container.querySelector('[data-role-permission-action-bar]');
+  const panelScroll = container.querySelector('[data-role-permission-panel-scroll]');
+
+  expect(actionBar).toBeInTheDocument();
+  expect(panelScroll).toBeInTheDocument();
+  expect(panelScroll).toHaveClass('overflow-y-auto');
+  expect(panelScroll).toHaveClass('pb-6');
+  expect(actionBar).toContainElement(screen.getByRole('button', { name: '清空' }));
+  expect(actionBar).toContainElement(screen.getByRole('button', { name: '全部授权' }));
+  expect(actionBar).toContainElement(screen.getByRole('button', { name: '重置' }));
+  expect(actionBar).toContainElement(screen.getByRole('button', { name: '保存权限' }));
 });
 
 test('admin 可以新增业务角色', async () => {
