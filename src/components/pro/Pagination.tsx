@@ -72,7 +72,7 @@ export function Pagination({
         {refreshingLabel && <span className="ml-3 text-(--pagination-current-fg)">{refreshingLabel}</span>}
       </span>
       <nav aria-label={currentLabel}>
-        <ul className="flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-2">
+        <ul className="flex items-center gap-[calc(4px*var(--app-scale))] text-[calc(13px*var(--app-scale))] text-text-2">
           <li>
             <Button
               type="button"
