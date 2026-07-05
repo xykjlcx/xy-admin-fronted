@@ -11,7 +11,7 @@ export type Radius = 'sharp' | 'default' | 'round';
 // 不在此处硬编码中文——色名随语言切换，不能像 hex 值一样当常量数据处理。
 export const ACCENTS = [
   { key: 'blue', labelKey: 'accentBlue', pri: '#3370ff', soft: '#eef3ff' },
-  { key: 'claude', labelKey: 'accentClaude', pri: '#cc785c', active: '#a9583e', soft: '#f8ede7' },
+  { key: 'claude', labelKey: 'accentClaude', pri: '#d97757', active: '#c6613f', soft: 'rgba(217,119,87,.12)', onPri: '#ffffff' },
   { key: 'shadcn', labelKey: 'accentShadcn', pri: '#18181b', priDark: '#fafafa', soft: '#f4f4f5' },
   { key: 'green', labelKey: 'accentGreen', pri: '#16a34a', soft: '#e8f7ee' },
   { key: 'violet', labelKey: 'accentViolet', pri: '#7c3aed', soft: '#f3edff' },
@@ -119,7 +119,8 @@ export function resolveAccentVars(s: AppearanceState): {
   const acc = ACCENTS.find((a) => a.key === s.accent) ?? ACCENTS[0];
   const pri = s.mode === 'dark' && 'priDark' in acc ? acc.priDark : acc.pri;
   const priActive = s.mode === 'light' && 'active' in acc ? acc.active : null;
-  return { pri, priActive, soft: s.mode === 'light' ? acc.soft : null, onPri: foregroundForBackground(pri) };
+  const onPri = 'onPri' in acc ? acc.onPri : foregroundForBackground(pri);
+  return { pri, priActive, soft: s.mode === 'light' ? acc.soft : null, onPri };
 }
 
 export function applyAppearance(s: AppearanceState): void {

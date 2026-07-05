@@ -1,11 +1,12 @@
-/* src/styles/tokens.css —— 权威源：spec v3.1 §10.2 + docs/design/*.design.md。
+/* src/styles/tokens.css —— 权威源：spec v4.1 §10.2b + docs/design/*.design.md。
    耦合规则见 spec §4.7：accent 运行时拥有 --pri / --pri-soft / --on-pri，CSS 只提供 flavor fallback。 */
 
 :root, [data-flavor='feishu'][data-mode='light'] {
   --pri: #3370ff; --pri-soft: #eef3ff;
   --bg: #f5f6f7; --canvas: #eceef1; --surface: #ffffff; --chrome: #ffffff;
   --surface-2: #f2f3f5; --surface-blur: rgba(255, 255, 255, 0.72);
-  --text: #1f2329; --text-2: #4e5969; --text-3: #8f959e; --border: #e5e6eb;
+  --text: #1f2329; --text-2: #4e5969; --text-3: #8f959e; --border: #dee0e3;
+  --control-border: #d0d3d6; --divider: rgba(31, 35, 41, 0.15);
 }
 [data-flavor='feishu'][data-mode='dark'] {
   --pri-soft: rgba(255, 255, 255, 0.08);
@@ -14,17 +15,19 @@
   --text: #e7e9ec; --text-2: #a3aab3; --text-3: #7a818b; --border: #2c2f38;
 }
 [data-flavor='claude'][data-mode='light'] {
-  --pri: #cc785c; --pri-soft: #f8ede7;
-  --bg: #faf9f5; --canvas: #f8f8f6; --surface: #ffffff; --chrome: #faf9f5;
-  --surface-2: #f5f0e8; --surface-blur: rgba(250, 249, 245, 0.78);
-  --text: #141413; --text-2: #3d3d3a; --text-3: #6c6a64; --border: #e6dfd8;
+  --pri: #d97757; --pri-soft: rgba(217, 119, 87, 0.12);
+  --bg: #faf9f5; --canvas: #faf9f5; --surface: #ffffff; --chrome: #faf9f5;
+  --surface-2: #f5f4ed; --surface-blur: rgba(250, 249, 245, 0.78);
+  --text: #141413; --text-2: #3d3d3a; --text-3: #6c6a64; --border: rgba(31, 30, 29, 0.3);
+  --control-border: rgba(31, 30, 29, 0.4); --divider: rgba(31, 30, 29, 0.15);
 }
 [data-flavor='claude'][data-mode='dark'] {
-  --pri: #cc785c;
+  --pri: #d97757;
   --pri-soft: rgba(255, 255, 255, 0.09);
-  --bg: #1c1917; --canvas: #161311; --surface: #262220; --chrome: #211d1a;
-  --surface-2: #302b27; --surface-blur: rgba(33, 29, 26, 0.78);
-  --text: #ece6dd; --text-2: #a89f92; --text-3: #7d7568; --border: #3a342e;
+  --bg: #141413; --canvas: #141413; --surface: #30302e; --chrome: #262624;
+  --surface-2: #262624; --surface-blur: rgba(38, 38, 36, 0.78);
+  --text: #faf9f5; --text-2: #dedcd1; --text-3: #b8b5a8; --border: rgba(222, 220, 209, 0.3);
+  --control-border: rgba(222, 220, 209, 0.4); --divider: rgba(222, 220, 209, 0.15);
 }
 [data-flavor='shadcn'][data-mode='light'] {
   --pri: #18181b; --pri-soft: #f4f4f5;
@@ -36,11 +39,12 @@
   --pri-soft: rgba(255, 255, 255, 0.10);
   --bg: #09090b; --canvas: #09090b; --surface: #18181b; --chrome: #09090b;
   --surface-2: #27272a; --surface-blur: rgba(24, 24, 27, 0.78);
-  --text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: #27272a;
+  --text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: oklch(1 0 0 / 10%);
+  --control-border: oklch(1 0 0 / 10%); --divider: oklch(1 0 0 / 10%);
 }
 
 :root {
-  --pri-hover: color-mix(in srgb, var(--pri) 85%, black);
+  --pri-hover: color-mix(in srgb, var(--pri) 85%, white);
   --pri-active: color-mix(in srgb, var(--pri) 76%, black);
   --soft: var(--pri-soft);
   --on-pri: #ffffff;
@@ -58,6 +62,10 @@
   --info-bg: var(--info-soft);
   --purple-bg: var(--purple-soft);
   --teal-bg: var(--teal-soft);
+  --fill-hover: rgba(31, 35, 41, 0.08);
+  --fill-pressed: rgba(31, 35, 41, 0.12);
+  --fill-selected: color-mix(in srgb, var(--pri) 10%, transparent);
+  --divider: var(--border);
   /* 表单/表格小控件边框。比普通分割线更清楚，接近原型 stdCheck 未选中边框。 */
   --control-border: color-mix(in srgb, var(--border) 70%, var(--text-3));
   --line-strong: var(--control-border);
@@ -72,7 +80,7 @@
   --button-primary-fg: var(--on-pri);
   --button-secondary-bg: var(--surface);
   --button-secondary-bg-hover: var(--surface);
-  --button-secondary-bg-active: var(--surface-2);
+  --button-secondary-bg-active: var(--fill-pressed);
   --button-secondary-fg: var(--text);
   --button-secondary-fg-hover: var(--pri);
   --button-secondary-border: var(--border);
@@ -83,11 +91,11 @@
   --button-dashed-border: var(--line-strong);
   --button-dashed-border-hover: var(--pri);
   --button-text-fg: var(--pri);
-  --button-text-bg-hover: var(--pri-soft);
+  --button-text-bg-hover: var(--fill-selected);
   --button-link-fg: var(--pri);
   --button-ghost-fg: var(--text-2);
   --button-ghost-fg-hover: var(--text);
-  --button-ghost-bg-hover: var(--surface-2);
+  --button-ghost-bg-hover: var(--fill-hover);
   --button-danger-bg: var(--danger);
   --button-danger-bg-hover: var(--danger-hover);
   --button-danger-fg: var(--on-danger);
@@ -97,7 +105,7 @@
   --button-danger-ghost-border: var(--danger);
   --button-icon-fg: var(--text-3);
   --button-icon-fg-hover: var(--text);
-  --button-icon-bg-hover: var(--surface-2);
+  --button-icon-bg-hover: var(--fill-hover);
   --button-ring: var(--soft);
   --overlay-mask-bg: rgba(0, 0, 0, 0.22);
   --overlay-mask-blur: 6px;
@@ -111,13 +119,13 @@
   --overlay-close-bg-hover: var(--button-icon-bg-hover);
   --option-fg: var(--text);
   --option-fg-muted: var(--text-3);
-  --option-bg-highlighted: var(--pri-soft);
+  --option-bg-highlighted: var(--fill-hover);
   --option-fg-highlighted: var(--pri);
-  --option-bg-selected: var(--pri-soft);
+  --option-bg-selected: var(--fill-selected);
   --option-fg-selected: var(--pri);
   --option-check: var(--pri);
   --menu-item-fg: var(--text);
-  --menu-item-bg-highlighted: var(--surface-2);
+  --menu-item-bg-highlighted: var(--fill-hover);
   --menu-item-fg-highlighted: var(--text);
   --menu-item-fg-danger: var(--danger);
   --menu-item-bg-danger-highlighted: var(--danger-bg);
@@ -139,7 +147,7 @@
   --choice-bg-checked: var(--pri);
   --choice-border-checked: var(--pri);
   --choice-fg-checked: var(--on-pri);
-  --choice-bg-indeterminate: var(--pri-soft);
+  --choice-bg-indeterminate: var(--fill-selected);
   --choice-border-indeterminate: var(--pri);
   --choice-fg-indeterminate: var(--pri);
   --choice-bg-disabled: var(--surface-2);
@@ -154,9 +162,9 @@
   --table-header-bg: var(--surface-2);
   --table-header-fg: var(--text-3);
   --table-row-bg: var(--surface);
-  --table-row-bg-hover: var(--surface-2);
-  --table-row-bg-selected: var(--pri-soft);
-  --table-row-bg-expanded: var(--surface-2);
+  --table-row-bg-hover: var(--fill-hover);
+  --table-row-bg-selected: var(--fill-selected);
+  --table-row-bg-expanded: var(--fill-hover);
   --table-row-fg: var(--text);
   --table-action-fg: var(--pri);
   --pro-page-bg: var(--bg);
@@ -166,15 +174,15 @@
   --pro-filter-bg: var(--surface);
   --side-list-bg: var(--surface);
   --side-list-border: var(--border);
-  --side-list-item-bg-hover: var(--surface-2);
-  --side-list-item-bg-active: var(--pri-soft);
+  --side-list-item-bg-hover: var(--fill-hover);
+  --side-list-item-bg-active: var(--fill-selected);
   --side-list-item-fg-active: var(--pri);
   --side-list-item-meta-fg-active: var(--pri);
   --shell-header-bg: var(--chrome);
-  --nav-item-bg-hover: var(--surface-2);
-  --nav-item-bg-current: var(--pri-soft);
+  --nav-item-bg-hover: var(--fill-hover);
+  --nav-item-bg-current: var(--fill-selected);
   --nav-item-fg-current: var(--pri);
-  --pagination-current-bg: var(--pri-soft);
+  --pagination-current-bg: var(--fill-selected);
   --pagination-current-fg: var(--pri);
   --pagination-current-border: var(--pri);
   --focus-ring: calc(3px * var(--app-scale));
@@ -234,12 +242,18 @@
   --shadow-header: 0 1px 12px rgba(0, 0, 0, 0.06);
 }
 [data-mode='dark'] {
-  --pri-hover: color-mix(in srgb, var(--pri) 85%, white);
   --pri-active: color-mix(in srgb, var(--pri) 76%, white);
+  --fill-hover: rgba(255, 255, 255, 0.08);
+  --fill-pressed: rgba(255, 255, 255, 0.12);
   --field-ring-invalid: color-mix(in srgb, var(--danger) 24%, transparent);
   --menu-item-bg-danger-highlighted: color-mix(in srgb, var(--danger) 20%, transparent);
 }
 [data-flavor='claude'] {
+  --pri-hover: color-mix(in srgb, var(--pri) 92%, black);
+  --pri-active: #c6613f;
+  --fill-hover: rgba(31, 30, 29, 0.08);
+  --fill-pressed: rgba(31, 30, 29, 0.12);
+  --fill-selected: rgba(217, 119, 87, 0.12);
   --field-bg: var(--surface);
   --field-bg-focus: var(--surface);
   --field-border: var(--border);
@@ -253,24 +267,35 @@
   --option-check: var(--pri-active);
   --font-display: "Cormorant Garamond", Georgia, "Songti SC", serif;
 }
+[data-flavor='claude'][data-mode='dark'] {
+  --fill-hover: rgba(222, 220, 209, 0.08);
+  --fill-pressed: rgba(222, 220, 209, 0.12);
+  --fill-selected: color-mix(in srgb, var(--pri) 12%, transparent);
+}
 [data-flavor='shadcn'] {
+  --pri-hover: color-mix(in srgb, var(--pri) 90%, transparent);
+  --pri-active: color-mix(in srgb, var(--pri) 80%, transparent);
   --field-bg: transparent;
   --field-bg-focus: transparent;
   --field-border: var(--border);
   --field-border-focus: var(--control-border);
   --field-ring-focus: color-mix(in srgb, var(--text-3) 50%, transparent);
+  --field-ring-invalid: color-mix(in srgb, var(--danger) 20%, transparent);
   --field-shadow: none;
-  --control-md: calc(32px * var(--app-scale));
-  --control-btn-md: calc(32px * var(--app-scale));
   --button-font-weight: 500;
-  --button-secondary-bg-hover: var(--surface-2);
+  --button-secondary-bg-hover: var(--fill-hover);
   --button-secondary-border-hover: var(--border);
   --button-secondary-fg-hover: var(--text);
-  --option-bg-highlighted: var(--surface-2);
+  --option-bg-highlighted: var(--fill-hover);
   --option-fg-highlighted: var(--text);
-  --option-bg-selected: var(--surface-2);
+  --option-bg-selected: var(--fill-selected);
   --option-fg-selected: var(--text);
   --option-check: var(--text);
+}
+[data-flavor='shadcn'][data-mode='dark'] {
+  --field-bg: oklch(1 0 0 / 4.5%);
+  --field-bg-focus: oklch(1 0 0 / 4.5%);
+  --field-ring-invalid: color-mix(in srgb, var(--danger) 40%, transparent);
 }
 html:not([data-radius])[data-flavor='feishu'] { --radius-factor: 0.75; }
 html:not([data-radius])[data-flavor='claude'] { --radius-factor: 1; }

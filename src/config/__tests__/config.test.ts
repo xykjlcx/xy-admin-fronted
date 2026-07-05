@@ -87,7 +87,7 @@ test('app and appearance defaults are centralised without replacing runtime stor
     flavor: 'feishu',
     mode: 'light',
     accent: 'blue',
-    customAccent: '#c96442',
+    customAccent: '#d97757',
     zoom: 'md',
     radius: 'default',
     layout: 'sidebar',

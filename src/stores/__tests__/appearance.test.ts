@@ -4,7 +4,7 @@ const DEFAULTS = {
   flavor: 'feishu',
   mode: 'light',
   accent: 'blue',
-  customAccent: '#c96442',
+  customAccent: '#d97757',
   zoom: 'md',
   radius: 'default',
   layout: 'sidebar',
@@ -66,10 +66,12 @@ test('set 持久化 --on-pri 派生值，供 FOUC 脚本首帧注入', () => {
 test('set 持久化 claude 官方 active 色，供 FOUC 脚本首帧注入', () => {
   useAppearance.getState().set({ flavor: 'claude', accent: 'claude' });
 
-  expect(useAppearance.getState()._priResolved).toBe('#cc785c');
-  expect(useAppearance.getState()._priActiveResolved).toBe('#a9583e');
-  expect(document.documentElement.style.getPropertyValue('--pri')).toBe('#cc785c');
-  expect(document.documentElement.style.getPropertyValue('--pri-active')).toBe('#a9583e');
+  expect(useAppearance.getState()._priResolved).toBe('#d97757');
+  expect(useAppearance.getState()._priActiveResolved).toBe('#c6613f');
+  expect(useAppearance.getState()._onPriResolved).toBe('#ffffff');
+  expect(document.documentElement.style.getPropertyValue('--pri')).toBe('#d97757');
+  expect(document.documentElement.style.getPropertyValue('--pri-active')).toBe('#c6613f');
+  expect(document.documentElement.style.getPropertyValue('--on-pri')).toBe('#ffffff');
 });
 
 // ⚠️ 本用例依赖 vi.resetModules() 产生独立 store 实例（重跑 rehydrate），

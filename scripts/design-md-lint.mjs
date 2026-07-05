@@ -14,6 +14,10 @@ const allowedWarnings = new Map([
     '官方 Claude/Anthropic 主按钮取舍：白字 on coral 低于 AA 已记录，正文禁用该组合。',
   ],
   [
+    'docs/design/claude.design.md:components.button-primary-active',
+    '官方 Claude/Anthropic active clay 白字取舍：短生命周期按钮态，正文禁用该组合。',
+  ],
+  [
     'docs/design/claude.design.md:components.button-primary-disabled',
     'disabled 态不作为可操作文本，按 spec 白名单豁免。',
   ],

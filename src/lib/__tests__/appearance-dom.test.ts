@@ -25,9 +25,10 @@ test('亮色注入预设 soft', () => {
 });
 test('claude 预设注入实测陶土主色和官方 active 色', () => {
   applyAppearance({ ...base, flavor: 'claude', accent: 'claude' });
-  expect(document.documentElement.style.getPropertyValue('--pri')).toBe('#cc785c');
-  expect(document.documentElement.style.getPropertyValue('--pri-active')).toBe('#a9583e');
-  expect(document.documentElement.style.getPropertyValue('--pri-soft')).toBe('#f8ede7');
+  expect(document.documentElement.style.getPropertyValue('--pri')).toBe('#d97757');
+  expect(document.documentElement.style.getPropertyValue('--pri-active')).toBe('#c6613f');
+  expect(document.documentElement.style.getPropertyValue('--pri-soft')).toBe('rgba(217,119,87,.12)');
+  expect(document.documentElement.style.getPropertyValue('--on-pri')).toBe('#ffffff');
 });
 test('暗色不注入 soft（耦合规则：交还 CSS 的白 alpha）', () => {
   applyAppearance({ ...base, mode: 'dark' });
@@ -96,10 +97,10 @@ test('resolveAccentVars：亮色含 soft，暗色 soft 交还 CSS（null）', ()
 
 test('resolveAccentVars：claude 预设来自实测值表', () => {
   expect(resolveAccentVars({ ...base, flavor: 'claude', accent: 'claude' })).toEqual({
-    pri: '#cc785c',
-    priActive: '#a9583e',
-    soft: '#f8ede7',
-    onPri: '#18181b',
+    pri: '#d97757',
+    priActive: '#c6613f',
+    soft: 'rgba(217,119,87,.12)',
+    onPri: '#ffffff',
   });
 });
 

@@ -1,17 +1,17 @@
 ---
 version: alpha
 name: Claude-Admin
-description: Claude / Anthropic 设计体系的后台工具适配版。暖纸白画布 + 陶土珊瑚交互色 + 衬线展示标题。无硬边框文化：控件轮廓用 hairline 或极细描边阴影表达，浮起用大扩散低透明柔影。圆角比同类更大一档。整体气质：文质、温暖、编辑部感，是"看起来不像 SaaS 的 SaaS"。
+description: Claude / Anthropic 设计体系的后台工具适配版。暖纸画布 + 官方 clay 交互色 + 衬线展示标题。无硬边框文化：控件轮廓用墨色 alpha 边框或极细描边阴影表达，浮起用大扩散低透明柔影。圆角比同类更大一档。整体气质：文质、温暖、编辑部感，是"看起来不像 SaaS 的 SaaS"。
 colors:
-  primary: "#cc785c"
-  primary-active: "#a9583e"
+  primary: "#D97757"
+  primary-active: "#C6613F"
   primary-disabled: "#e6dfd8"
-  primary-soft: "#f8ede7"
+  primary-soft: "rgba(217, 119, 87, 0.12)"
   canvas: "#faf9f5"
-  app-canvas: "#f8f8f6"
+  app-canvas: "#faf9f5"
   surface: "#ffffff"
-  surface-card: "#efe9de"
-  surface-soft: "#f5f0e8"
+  surface-card: "#f5f4ed"
+  surface-soft: "#f5f4ed"
   ink: "#141413"
   body: "#3d3d3a"
   muted: "#6c6a64"
@@ -21,7 +21,7 @@ colors:
   border-soft: "rgba(31, 30, 29, 0.15)"
   hairline: "#e6dfd8"
   hairline-soft: "#ebe6df"
-  on-primary: "#ffffff"
+  on-primary: "#FFFFFF"
   success: "#5db872"
   warning: "#d4a017"
   error: "#c64545"
@@ -140,18 +140,18 @@ components:
 
 ## Overview
 
-Claude 风格是 AI 产品里最"编辑部"的一支：**暖纸白画布**（营销站 `{colors.canvas}` #FAF9F5、
-应用内 `{colors.app-canvas}` #F8F8F6）+ **陶土珊瑚**（`{colors.primary}` #CC785C）交互色 +
+Claude 风格是 AI 产品里最"编辑部"的一支：**暖纸画布**（`{colors.canvas}` #FAF9F5）+
+**官方 clay**（`{colors.primary}` #D97757）交互色 +
 **衬线展示标题**。刻意反行业惯例：别家用冷灰蓝，它用暖米陶土；别家全无衬线，它标题用衬线。
 
 数据来源三重互证（2026-07-04）：**Anthropic 官方 MCP Apps Design Token 规范**（全表存档
 `docs/design/research/claude-mcp-design-tokens.md`）+ claude.ai CDS 变量实测（`claude-ai-cds-tokens.json`，
 1308 个变量）+ getdesign 营销站分析（`claude-getdesign-analysis.md`）。dark mode 官方全表见 MCP 规范存档。
 
-当前实现基线（Step 3-8）：**clay 使用 getdesign 专业分析值 `#CC785C`**，active 使用 `#A9583E`，
-soft 使用 `#F8EDE7`；CDS 官方产品值 `#D97757 / #C6613F` 已存档在 research，属于后续 Step 9 精修候选，
-未进入当前实现值表。边框仍保留墨色 alpha 三级作为设计身份层参考（`#1F1E1D` @ 40/30/15%）；
-产品 UI 字体为系统栈（CDS `--cds-font-sans`），衬线仅页面标题层——与既有拍板一致。
+Step 9 精修后，clay 使用 claude.ai CDS 官方产品值：`#D97757` / `#C6613F`，
+soft 改为 `rgba(217, 119, 87, 0.12)`；主按钮跟随官方白字取舍。边框使用官方 MCP 规范的
+墨色 alpha 三级（`#1F1E1D` @ 40/30/15%，dark 反转 `#DEDCD1` 同档）；
+产品 UI 字体为系统栈（CDS `--cds-font-sans`），衬线仅页面标题层。
 
 **Key Characteristics:**
 
@@ -163,17 +163,17 @@ soft 使用 `#F8EDE7`；CDS 官方产品值 `#D97757 / #C6613F` 已存档在 res
 
 ## Colors
 
-- **Primary (`{colors.primary}` — #CC785C)**：Anthropic 签名陶土，采用 getdesign 专业分析值。
-  CDS 官方变量 `--cds-clay` 产品值 #D97757 已存档，后续若进入 Step 9 精修，需要同时改 DESIGN.md、值表和实现。
+- **Primary (`{colors.primary}` — #D97757)**：Anthropic / Claude 产品 UI clay，来自 CDS `--cds-clay`。
   主按钮、focus 边、链接、选中文字。已知事实：白字 on clay 对比度低于 WCAG AA，
   Anthropic 官方接受此取舍；本项目跟随，但大段文字禁止用 on-primary on primary。
-- **Primary Active (`{colors.primary-active}` — #A9583E)**：按下/加深态，也用作浅底上的选中文字（对比度更稳）。
-- **Primary Soft (`{colors.primary-soft}` — #F8EDE7)**：选中/高亮浅底。
-- **Canvas (`{colors.canvas}` — #FAF9F5)**：页面底。**纯白是破功点**——暖调是品牌本体。
+- **Primary Active (`{colors.primary-active}` — #C6613F)**：按下/强调态，也用作浅底上的选中文字（对比度更稳）。
+- **Primary Soft (`{colors.primary-soft}` — rgba(217, 119, 87, 0.12))**：选中/高亮浅底。
+- **Canvas (`{colors.canvas}` — #FAF9F5)**：页面底。**纯白画布是破功点**——暖调是品牌本体。
 - **Surface (`{colors.surface}` — #FFFFFF)**：输入框、卡片等工作面（在暖底上白面自然有层次）。
-- **Surface Card (`{colors.surface-card}` — #EFE9DE)**：强调卡片/标签底，比 canvas 深一步的奶油色。
+- **Surface Card (`{colors.surface-card}` — #F5F4ED)**：强调卡片/标签底，比 canvas 深一步的奶油色。
 - **Ink / Body / Muted**：#141413 / #3D3D3A / #6C6A64 暖黑文字梯队，永不使用冷灰。
-- **Hairline (`{colors.hairline}` — #E6DFD8)**：边框=一级表面台阶，不是墨线。
+- **Border ladder**：MCP 官方边框为 `#1F1E1D` alpha 三级（40/30/15%），dark 反转为 `#DEDCD1` 同档；
+  边框=一级表面台阶，不是冷灰硬线。
 
 ## Typography
 
@@ -206,7 +206,7 @@ soft 使用 `#F8EDE7`；CDS 官方产品值 `#D97757 / #C6613F` 已存档在 res
   禁用 `{colors.primary-disabled}`（奶油化脱饱和，不是灰化）。
 - **`button-secondary`**：canvas 底 + hairline 边 + ink 字。
 - **`select-option-highlighted` / `nav-item-current`**：`{colors.primary-soft}` 浅陶土底 +
-  `{colors.primary-active}` 深陶土字（不用 #CC785C 做小字号文字，对比度不够）。
+  `{colors.primary-active}` 深陶土字（不用 `{colors.primary}` 做小字号文字，对比度不够）。
 - **`badge-pill`**：`{colors.surface-card}` 奶油底 + pill 圆角。
 
 ## Do's and Don'ts

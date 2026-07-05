@@ -5,6 +5,7 @@ const css = readFileSync('src/styles/tokens.css', 'utf8');
 const globalCss = readFileSync('src/styles/global.css', 'utf8');
 const claudeDesignSource = readFileSync('docs/design/claude.design.md', 'utf8');
 const appearanceDomSource = readFileSync('src/lib/appearance-dom.ts', 'utf8');
+const appearanceConfigSource = readFileSync('src/config/appearance.ts', 'utf8');
 const buttonSource = readFileSync('src/components/ui/button.tsx', 'utf8');
 const dialogSource = readFileSync('src/components/ui/dialog.tsx', 'utf8');
 const sheetSource = readFileSync('src/components/ui/sheet.tsx', 'utf8');
@@ -55,7 +56,9 @@ const MUST_CONTAIN = [
   '--text: #1f2329;',
   '--text-2: #4e5969;',
   '--text-3: #8f959e;',
-  '--border: #e5e6eb;',
+  '--border: #dee0e3;',
+  '--control-border: #d0d3d6;',
+  '--divider: rgba(31, 35, 41, 0.15);',
   // [data-flavor='feishu'][data-mode='dark']
   '--pri-soft: rgba(255, 255, 255, 0.08);',
   '--bg: #111318;',
@@ -69,38 +72,41 @@ const MUST_CONTAIN = [
   '--text-3: #7a818b;',
   '--border: #2c2f38;',
   // [data-flavor='claude'][data-mode='light']
-  '--pri: #cc785c;',
-  '--pri-soft: #f8ede7;',
+  '--pri: #d97757;',
+  '--pri-soft: rgba(217, 119, 87, 0.12);',
   '--bg: #faf9f5;',
-  '--canvas: #f8f8f6;',
+  '--canvas: #faf9f5;',
   '--surface: #ffffff;',
   '--chrome: #faf9f5;',
-  '--surface-2: #f5f0e8;',
+  '--surface-2: #f5f4ed;',
   '--surface-blur: rgba(250, 249, 245, 0.78);',
   '--text: #141413;',
   '--text-2: #3d3d3a;',
   '--text-3: #6c6a64;',
-  '--border: #e6dfd8;',
+  '--border: rgba(31, 30, 29, 0.3);',
   // [data-flavor='claude'][data-mode='dark']
   '--pri-soft: rgba(255, 255, 255, 0.09);',
-  '--bg: #1c1917;',
-  '--canvas: #161311;',
-  '--surface: #262220;',
-  '--chrome: #211d1a;',
-  '--surface-2: #302b27;',
-  '--surface-blur: rgba(33, 29, 26, 0.78);',
-  '--text: #ece6dd;',
-  '--text-2: #a89f92;',
-  '--text-3: #7d7568;',
-  '--border: #3a342e;',
+  '--bg: #141413;',
+  '--canvas: #141413;',
+  '--surface: #30302e;',
+  '--chrome: #262624;',
+  '--surface-2: #262624;',
+  '--surface-blur: rgba(38, 38, 36, 0.78);',
+  '--text: #faf9f5;',
+  '--text-2: #dedcd1;',
+  '--text-3: #b8b5a8;',
+  '--border: rgba(222, 220, 209, 0.3);',
   // :root（语义色 / --pri-hover / 圆角公式）
-  '--pri-hover: color-mix(in srgb, var(--pri) 85%, black);',
+  '--pri-hover: color-mix(in srgb, var(--pri) 85%, white);',
   '--success: #16a34a;',
   '--success-soft: #e8f7ee;',
   '--warning: #ff8000;',
   '--warning-soft: #fff3e8;',
   '--danger: #f53f3f;',
   '--danger-soft: #feecec;',
+  '--fill-hover: rgba(31, 35, 41, 0.08);',
+  '--fill-pressed: rgba(31, 35, 41, 0.12);',
+  '--fill-selected: color-mix(in srgb, var(--pri) 10%, transparent);',
   '--control-border: color-mix(in srgb, var(--border) 70%, var(--text-3));',
   '--focus-ring: calc(3px * var(--app-scale));',
   '--radius-factor: 1;',
@@ -147,23 +153,30 @@ test('原生交互元素有设计体系 focus-visible 兜底', () => {
   expect(globalCss).toContain('box-shadow: 0 0 0 var(--focus-ring) var(--soft);');
 });
 
-test('shadcn semantic foreground 不再硬编码白色', () => {
+test('语义前景、alpha 交互底与主色派生按 v4.1 值表落地', () => {
   expect(css).toContain('--on-pri: #ffffff;');
   expect(css).toContain('--on-danger: #ffffff;');
   expect(css).toContain('--danger-hover: color-mix(in srgb, var(--danger) 90%, transparent);');
-  expect(css).toContain("[data-mode='dark'] {\n  --pri-hover: color-mix(in srgb, var(--pri) 85%, white);");
+  expect(css).toContain('--fill-hover: rgba(31, 35, 41, 0.08);');
+  expect(css).toContain('--fill-pressed: rgba(31, 35, 41, 0.12);');
+  expect(css).toContain('--fill-selected: color-mix(in srgb, var(--pri) 10%, transparent);');
+  expect(css).toContain("[data-mode='dark'] {");
+  expect(css).toContain('--fill-hover: rgba(255, 255, 255, 0.08);');
+  expect(css).toContain('--fill-pressed: rgba(255, 255, 255, 0.12);');
   expect(globalCss).toContain('--color-primary-foreground: var(--on-pri);');
   expect(globalCss).toContain('--color-destructive-foreground: var(--on-danger);');
 });
 
 test('Claude 设计身份文档、token fallback 与 accent runtime 主色保持一致', () => {
-  expect(claudeDesignSource).toContain('primary: "#cc785c"');
-  expect(claudeDesignSource).toContain('primary-active: "#a9583e"');
-  expect(claudeDesignSource).toContain('primary-soft: "#f8ede7"');
-  expect(claudeDesignSource).not.toContain('primary: "#d97757"');
-  expect(claudeDesignSource).not.toContain('primary-active: "#c6613f"');
-  expect(css).toContain("[data-flavor='claude'][data-mode='light'] {\n  --pri: #cc785c; --pri-soft: #f8ede7;");
-  expect(appearanceDomSource).toContain("{ key: 'claude', labelKey: 'accentClaude', pri: '#cc785c', active: '#a9583e', soft: '#f8ede7' }");
+  expect(claudeDesignSource).toContain('primary: "#D97757"');
+  expect(claudeDesignSource).toContain('primary-active: "#C6613F"');
+  expect(claudeDesignSource).toContain('primary-soft: "rgba(217, 119, 87, 0.12)"');
+  expect(claudeDesignSource).toContain('on-primary: "#FFFFFF"');
+  expect(claudeDesignSource).not.toContain('Step 9 精修候选');
+  expect(css).toContain("[data-flavor='claude'][data-mode='light'] {\n  --pri: #d97757; --pri-soft: rgba(217, 119, 87, 0.12);");
+  expect(css).toContain('--pri-active: #c6613f;');
+  expect(appearanceDomSource).toContain("{ key: 'claude', labelKey: 'accentClaude', pri: '#d97757', active: '#c6613f', soft: 'rgba(217,119,87,.12)', onPri: '#ffffff' }");
+  expect(appearanceConfigSource).toContain("customAccent: '#d97757'");
 });
 
 test('原生可点击元素有设计体系 pointer 光标兜底', () => {
@@ -197,10 +210,12 @@ test('Field 族 token 与 flavor 覆盖按 Step 2 值表落地', () => {
   for (const token of fieldTokens) {
     expect(css).toContain(token);
   }
-  expect(css).toContain("[data-flavor='claude'] {\n  --field-bg: var(--surface);");
+  expect(css).toContain("[data-flavor='claude'] {");
+  expect(css).toContain('--field-bg: var(--surface);');
   expect(css).toContain('--field-border-focus: var(--pri);');
   expect(css).toContain('--field-ring-focus: color-mix(in srgb, var(--pri) 15%, transparent);');
-  expect(css).toContain("[data-flavor='shadcn'] {\n  --field-bg: transparent;");
+  expect(css).toContain("[data-flavor='shadcn'] {");
+  expect(css).toContain('--field-bg: transparent;');
   expect(css).toContain('--field-bg-focus: transparent;');
   expect(css).toContain('--field-border-focus: var(--control-border);');
   expect(css).toContain('--field-ring-focus: color-mix(in srgb, var(--text-3) 50%, transparent);');
@@ -255,8 +270,11 @@ test('shadcn flavor 提供官方中性基线 token', () => {
   expect(css).toContain("[data-flavor='shadcn'][data-mode='dark']");
   expect(css).toContain('--bg: #09090b; --canvas: #09090b; --surface: #18181b; --chrome: #09090b;');
   expect(css).toContain('--surface-2: #27272a; --surface-blur: rgba(24, 24, 27, 0.78);');
-  expect(css).toContain('--text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: #27272a;');
-  expect(css).toContain('--field-ring-invalid: color-mix(in srgb, var(--danger) 24%, transparent);');
+  expect(css).toContain('--text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: oklch(1 0 0 / 10%);');
+  expect(css).toContain("--field-bg: oklch(1 0 0 / 4.5%);");
+  expect(css).toContain('--field-ring-invalid: color-mix(in srgb, var(--danger) 20%, transparent);');
+  expect(css).toContain('--field-ring-invalid: color-mix(in srgb, var(--danger) 40%, transparent);');
+  expect(css).toContain('--pri-hover: color-mix(in srgb, var(--pri) 90%, transparent);');
 });
 
 test('圆角因子三档 + 四条 calc 公式', () => {
@@ -274,11 +292,14 @@ test('圆角因子三档 + 四条 calc 公式', () => {
 });
 
 test('形态轴控制按钮高度与字重，按钮消费独立 button token', () => {
-  expect(css).toContain("[data-flavor='claude'] {\n  --field-bg: var(--surface);");
+  expect(css).toContain("[data-flavor='claude'] {");
+  expect(css).toContain('--field-bg: var(--surface);');
   expect(css).toContain('--control-btn-md: calc(36px * var(--app-scale));');
-  expect(css).toContain("[data-flavor='shadcn'] {\n  --field-bg: transparent;");
-  expect(css).toContain('--control-md: calc(32px * var(--app-scale));');
-  expect(css).toContain('--control-btn-md: calc(32px * var(--app-scale));');
+  expect(css).toContain("[data-flavor='shadcn'] {");
+  expect(css).toContain('--field-bg: transparent;');
+  const shadcnBlock = css.slice(css.indexOf("[data-flavor='shadcn'] {"), css.indexOf("[data-flavor='shadcn'][data-mode='dark']"));
+  expect(shadcnBlock).not.toContain('--control-md: calc(32px * var(--app-scale));');
+  expect(shadcnBlock).not.toContain('--control-btn-md: calc(32px * var(--app-scale));');
   expect(css).toContain('--button-font-weight: 500;');
   expect(buttonSource).toContain('font-[var(--button-font-weight)]');
   expect(buttonSource).toContain('h-[var(--control-btn-md)]');
@@ -293,7 +314,7 @@ test('Button 族 token 与 Step 3 合同落地', () => {
     '--button-primary-fg: var(--on-pri);',
     '--button-secondary-bg: var(--surface);',
     '--button-secondary-bg-hover: var(--surface);',
-    '--button-secondary-bg-active: var(--surface-2);',
+    '--button-secondary-bg-active: var(--fill-pressed);',
     '--button-secondary-fg: var(--text);',
     '--button-secondary-fg-hover: var(--pri);',
     '--button-secondary-border: var(--border);',
@@ -304,11 +325,11 @@ test('Button 族 token 与 Step 3 合同落地', () => {
     '--button-dashed-border: var(--line-strong);',
     '--button-dashed-border-hover: var(--pri);',
     '--button-text-fg: var(--pri);',
-    '--button-text-bg-hover: var(--pri-soft);',
+    '--button-text-bg-hover: var(--fill-selected);',
     '--button-link-fg: var(--pri);',
     '--button-ghost-fg: var(--text-2);',
     '--button-ghost-fg-hover: var(--text);',
-    '--button-ghost-bg-hover: var(--surface-2);',
+    '--button-ghost-bg-hover: var(--fill-hover);',
     '--button-danger-bg: var(--danger);',
     '--button-danger-bg-hover: var(--danger-hover);',
     '--button-danger-fg: var(--on-danger);',
@@ -318,7 +339,7 @@ test('Button 族 token 与 Step 3 合同落地', () => {
     '--button-danger-ghost-border: var(--danger);',
     '--button-icon-fg: var(--text-3);',
     '--button-icon-fg-hover: var(--text);',
-    '--button-icon-bg-hover: var(--surface-2);',
+    '--button-icon-bg-hover: var(--fill-hover);',
     '--button-ring: var(--soft);',
   ];
 
@@ -427,13 +448,13 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
   const optionMenuTokens = [
     '--option-fg: var(--text);',
     '--option-fg-muted: var(--text-3);',
-    '--option-bg-highlighted: var(--pri-soft);',
+    '--option-bg-highlighted: var(--fill-hover);',
     '--option-fg-highlighted: var(--pri);',
-    '--option-bg-selected: var(--pri-soft);',
+    '--option-bg-selected: var(--fill-selected);',
     '--option-fg-selected: var(--pri);',
     '--option-check: var(--pri);',
     '--menu-item-fg: var(--text);',
-    '--menu-item-bg-highlighted: var(--surface-2);',
+    '--menu-item-bg-highlighted: var(--fill-hover);',
     '--menu-item-fg-highlighted: var(--text);',
     '--menu-item-fg-danger: var(--danger);',
     '--menu-item-bg-danger-highlighted: var(--danger-bg);',
@@ -445,8 +466,8 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
 
   expect(css).toContain("--option-fg-highlighted: var(--pri-active);");
   expect(css).toContain("--option-fg-selected: var(--pri-active);");
-  expect(css).toContain("--option-bg-highlighted: var(--surface-2);");
-  expect(css).toContain("--option-bg-selected: var(--surface-2);");
+  expect(css).toContain("--option-bg-highlighted: var(--fill-hover);");
+  expect(css).toContain("--option-bg-selected: var(--fill-selected);");
 
   expect(selectSource).toContain('text-(--option-fg)');
   expect(selectSource).toContain('focus:bg-(--option-bg-highlighted)');
@@ -506,7 +527,7 @@ test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () =>
     '--choice-bg-checked: var(--pri);',
     '--choice-border-checked: var(--pri);',
     '--choice-fg-checked: var(--on-pri);',
-    '--choice-bg-indeterminate: var(--pri-soft);',
+    '--choice-bg-indeterminate: var(--fill-selected);',
     '--choice-border-indeterminate: var(--pri);',
     '--choice-fg-indeterminate: var(--pri);',
     '--choice-bg-disabled: var(--surface-2);',
@@ -606,9 +627,9 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
     '--table-header-bg: var(--surface-2);',
     '--table-header-fg: var(--text-3);',
     '--table-row-bg: var(--surface);',
-    '--table-row-bg-hover: var(--surface-2);',
-    '--table-row-bg-selected: var(--pri-soft);',
-    '--table-row-bg-expanded: var(--surface-2);',
+    '--table-row-bg-hover: var(--fill-hover);',
+    '--table-row-bg-selected: var(--fill-selected);',
+    '--table-row-bg-expanded: var(--fill-hover);',
     '--table-row-fg: var(--text);',
     '--table-action-fg: var(--pri);',
     '--pro-page-bg: var(--bg);',
@@ -618,15 +639,15 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
     '--pro-filter-bg: var(--surface);',
     '--side-list-bg: var(--surface);',
     '--side-list-border: var(--border);',
-    '--side-list-item-bg-hover: var(--surface-2);',
-    '--side-list-item-bg-active: var(--pri-soft);',
+    '--side-list-item-bg-hover: var(--fill-hover);',
+    '--side-list-item-bg-active: var(--fill-selected);',
     '--side-list-item-fg-active: var(--pri);',
     '--side-list-item-meta-fg-active: var(--pri);',
     '--shell-header-bg: var(--chrome);',
-    '--nav-item-bg-hover: var(--surface-2);',
-    '--nav-item-bg-current: var(--pri-soft);',
+    '--nav-item-bg-hover: var(--fill-hover);',
+    '--nav-item-bg-current: var(--fill-selected);',
     '--nav-item-fg-current: var(--pri);',
-    '--pagination-current-bg: var(--pri-soft);',
+    '--pagination-current-bg: var(--fill-selected);',
     '--pagination-current-fg: var(--pri);',
     '--pagination-current-border: var(--pri);',
   ];

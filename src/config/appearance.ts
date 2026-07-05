@@ -8,7 +8,7 @@ export const appearanceConfig = {
     flavor: 'feishu',
     mode: 'light',
     accent: 'blue',
-    customAccent: '#c96442',
+    customAccent: '#d97757',
     zoom: 'md',
     radius: 'default',
     layout: 'sidebar',
