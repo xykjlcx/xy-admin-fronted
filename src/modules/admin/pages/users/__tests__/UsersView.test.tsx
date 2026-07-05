@@ -94,6 +94,43 @@ test('直属成员筛选写入 URL 状态，不在按钮里做本地假过滤', 
   expect(onSearchChange).toHaveBeenCalledWith({ directOnly: true, page: 1 });
 });
 
+test('成员筛选控件使用统一灰底样式，激活后切换为白底', () => {
+  const { rerender } = renderUsersView({
+    permissions: ['*:*:*'],
+    search: { ...defaultSearch, deptId: 'rd' },
+  });
+
+  const statusFilter = screen.getByRole('button', { name: /账号状态/ });
+  const directOnlyFilter = screen.getByRole('button', { name: '仅展示部门直属成员' });
+
+  expect(statusFilter).toHaveAttribute('data-role-filter-control', 'select');
+  expect(directOnlyFilter).toHaveAttribute('data-role-filter-control', 'toggle');
+  for (const control of [statusFilter, directOnlyFilter]) {
+    expect(control).toHaveClass('border-(--field-border)');
+    expect(control).toHaveClass('bg-(--field-bg)');
+    expect(control).toHaveClass('hover:border-(--field-border-hover)');
+    expect(control).toHaveClass('hover:bg-(--field-bg)');
+    expect(control).toHaveClass('data-[state=open]:bg-(--field-bg-focus)');
+  }
+  expect(directOnlyFilter).toHaveAttribute('data-state', 'closed');
+
+  rerender(
+    <UsersView
+      permissions={['*:*:*']}
+      depts={deptFixtures}
+      usersPage={userPageFixture}
+      search={{ ...defaultSearch, deptId: 'rd', directOnly: true }}
+      onSearchChange={vi.fn()}
+      onCreateUser={vi.fn()}
+      onUpdateUser={vi.fn()}
+      onDeleteUser={vi.fn()}
+      onBatchDisable={vi.fn()}
+    />,
+  );
+
+  expect(screen.getByRole('button', { name: '仅展示部门直属成员' })).toHaveAttribute('data-state', 'open');
+});
+
 test('admin 可以编辑成员并提交更新回调', async () => {
   const onUpdateUser = vi.fn();
   renderUsersView({ permissions: ['*:*:*'], onUpdateUser });

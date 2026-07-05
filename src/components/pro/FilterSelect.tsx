@@ -19,6 +19,7 @@ export interface FilterSelectProps<TValue extends string> {
   label: ReactNode;
   value: TValue;
   options: FilterSelectOption<TValue>[];
+  triggerClassName?: string;
   onValueChange: (value: TValue) => void;
 }
 
@@ -26,6 +27,7 @@ export function FilterSelect<TValue extends string>({
   label,
   value,
   options,
+  triggerClassName,
   onValueChange,
 }: FilterSelectProps<TValue>) {
   const selected = options.find((option) => option.value === value);
@@ -33,7 +35,14 @@ export function FilterSelect<TValue extends string>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" aria-haspopup="menu" aria-label={`${label} ${selected?.label ?? ''}`}>
+        <Button
+          data-role-filter-control="select"
+          variant="ghost"
+          size="sm"
+          aria-haspopup="menu"
+          aria-label={`${label} ${selected?.label ?? ''}`}
+          className={triggerClassName}
+        >
           <span className="text-text-3">{label}</span>
           <span className="font-medium text-text">{selected?.label}</span>
           <ChevronDown data-icon="inline-end" />

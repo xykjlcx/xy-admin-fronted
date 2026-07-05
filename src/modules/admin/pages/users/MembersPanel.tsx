@@ -28,6 +28,13 @@ interface SelectionState {
   ids: string[];
 }
 
+const filterControlClassName = [
+  'border-(--field-border) bg-(--field-bg) text-text-2 shadow-none',
+  'hover:border-(--field-border-hover) hover:bg-(--field-bg) hover:text-text',
+  'data-[state=open]:border-(--field-border-hover) data-[state=open]:bg-(--field-bg-focus) data-[state=open]:text-text',
+  'disabled:border-(--field-border) disabled:bg-(--field-bg-disabled) disabled:text-text-3',
+].join(' ');
+
 export function MembersPanel({
   activeTab,
   selectedDeptLabel,
@@ -132,12 +139,16 @@ export function MembersPanel({
               label={t('users.filters.accountStatus')}
               value={search.status}
               options={statusFilterOptions}
+              triggerClassName={filterControlClassName}
               onValueChange={(status) => patchSearch({ status, page: 1 })}
             />
             <Button
+              data-role-filter-control="toggle"
+              data-state={search.directOnly ? 'open' : 'closed'}
               type="button"
-              variant={search.directOnly ? 'secondary' : 'outline'}
+              variant="ghost"
               size="sm"
+              className={filterControlClassName}
               aria-pressed={!!search.directOnly}
               disabled={!search.deptId}
               onClick={() => patchSearch({ directOnly: !search.directOnly, page: 1 })}
