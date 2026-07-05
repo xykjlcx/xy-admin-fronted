@@ -85,38 +85,34 @@ export function Pagination({
               ‹
             </Button>
           </li>
-          <li>
-            <ol className="flex items-center gap-[calc(2px*var(--app-scale))]">
-              {items.map((item) => (
-                <li key={item}>
-                  {typeof item === 'number' ? (
-                    <Button
-                      type="button"
-                      variant={item === currentPage ? 'outline' : 'ghost'}
-                      size="icon-sm"
-                      className={cn(
-                        'tabular-nums',
-                        item === currentPage &&
-                          'border-(--pagination-current-border) bg-(--pagination-current-bg) text-(--pagination-current-fg) hover:bg-(--pagination-current-bg) hover:text-(--pagination-current-fg)',
-                      )}
-                      aria-label={item === currentPage ? currentLabel : undefined}
-                      aria-current={item === currentPage ? 'page' : undefined}
-                      onClick={item === currentPage ? undefined : () => onPageChange(item)}
-                    >
-                      {item}
-                    </Button>
-                  ) : (
-                    <span
-                      aria-hidden="true"
-                      className="flex size-[var(--control-sm)] items-center justify-center text-(--table-header-fg)"
-                    >
-                      ...
-                    </span>
+          {items.map((item) => (
+            <li key={item}>
+              {typeof item === 'number' ? (
+                <Button
+                  type="button"
+                  variant={item === currentPage ? 'outline' : 'ghost'}
+                  size="icon-sm"
+                  className={cn(
+                    'tabular-nums',
+                    item === currentPage &&
+                      'border-(--pagination-current-border) bg-(--pagination-current-bg) text-(--pagination-current-fg) hover:bg-(--pagination-current-bg) hover:text-(--pagination-current-fg)',
                   )}
-                </li>
-              ))}
-            </ol>
-          </li>
+                  aria-label={item === currentPage ? currentLabel : undefined}
+                  aria-current={item === currentPage ? 'page' : undefined}
+                  onClick={item === currentPage ? undefined : () => onPageChange(item)}
+                >
+                  {item}
+                </Button>
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="flex size-[var(--control-sm)] items-center justify-center text-(--table-header-fg)"
+                >
+                  ...
+                </span>
+              )}
+            </li>
+          ))}
           <li>
             <Button
               type="button"

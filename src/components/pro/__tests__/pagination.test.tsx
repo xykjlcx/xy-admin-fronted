@@ -27,9 +27,7 @@ test('Pagination renders adjacent page numbers and navigates by page button', as
   const paginationGroup = screen.getByRole('button', { name: 'Previous page' }).closest('ul');
   if (!paginationGroup) throw new Error('pagination group not found');
   expect(paginationGroup).toHaveClass('gap-[calc(4px*var(--app-scale))]');
-  const pageGroup = screen.getByRole('button', { name: '2' }).closest('ol');
-  if (!pageGroup) throw new Error('page group not found');
-  expect(pageGroup).toHaveClass('gap-[calc(2px*var(--app-scale))]');
+  expect(paginationGroup.querySelector('ol')).toBeNull();
   await userEvent.click(screen.getByRole('button', { name: '2' }));
   expect(onPageChange).toHaveBeenCalledWith(2);
 });
