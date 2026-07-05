@@ -41,4 +41,5 @@ test('Tree stays business agnostic and delegates all copy through props', () => 
   expect(source).not.toContain('useTranslation');
   expect(source).not.toContain('TableShell');
   expect(source).not.toContain('TableTreeCell');
+  expect(source).not.toContain('transition-colors');
 });

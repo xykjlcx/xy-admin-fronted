@@ -55,7 +55,7 @@ export function Tree({ nodes, selectedId, onSelect, ariaLabel }: TreeProps): JSX
             aria-label={itemAriaLabel}
             aria-selected={selected}
             className={cn(
-              'flex min-h-[calc(36px*var(--app-scale))] w-full items-center gap-2 rounded-8 pr-3 text-left text-sm outline-none transition-colors',
+              'flex min-h-[calc(36px*var(--app-scale))] w-full items-center gap-2 rounded-8 pr-3 text-left text-sm outline-none',
               selected
                 ? 'bg-(--side-list-item-bg-active) font-semibold text-(--side-list-item-fg-active) hover:bg-(--side-list-item-bg-active)'
                 : 'text-text-2 hover:bg-(--side-list-item-bg-hover)',

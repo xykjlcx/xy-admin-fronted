@@ -89,7 +89,6 @@ test('DataTable owns selection, filters bulk ids to visible rows, and clears on 
   const [headerCheckbox, firstRowCheckbox] = screen.getAllByRole('checkbox');
   expect(headerCheckbox?.closest('[data-slot="checkbox"]')).toHaveClass(
     'size-[calc(16px*var(--app-scale))]',
-    'translate-x-2',
   );
   await userEvent.click(firstRowCheckbox!);
   expect(onSelectionChange).toHaveBeenLastCalledWith(['u1']);
@@ -178,6 +177,8 @@ test('DataTable uses ui table and checkbox primitives without module or i18n cou
   expect(source).not.toContain('上一页');
   expect(source).not.toContain('下一页');
   expect(source).not.toContain('当前第');
+  expect(source).toContain('transition-none');
+  expect(source).not.toContain('translate-x-2');
 });
 
 test('DataTable does not notify selection from inside a React state updater', () => {
