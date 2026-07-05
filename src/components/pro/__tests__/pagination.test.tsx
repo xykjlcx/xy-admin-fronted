@@ -24,6 +24,9 @@ test('Pagination renders adjacent page numbers and navigates by page button', as
   expect(screen.getByText('14 records')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Current page' })).toHaveAttribute('aria-current', 'page');
   expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument();
+  const pageGroup = screen.getByRole('button', { name: '2' }).closest('ol');
+  if (!pageGroup) throw new Error('page group not found');
+  expect(pageGroup).toHaveClass('gap-[calc(2px*var(--app-scale))]');
   await userEvent.click(screen.getByRole('button', { name: '2' }));
   expect(onPageChange).toHaveBeenCalledWith(2);
 });
