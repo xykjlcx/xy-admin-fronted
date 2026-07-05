@@ -71,6 +71,22 @@ test('members scene confirms delete through user mutations and refreshes list', 
   await waitFor(() => expect(screen.queryByText('李长昕')).not.toBeInTheDocument());
 });
 
+test('batch disable clears member table selection after mutation succeeds', async () => {
+  renderUsersPage();
+
+  await screen.findByText('李长昕');
+  const [, firstRowCheckbox] = screen.getAllByRole('checkbox');
+  if (!firstRowCheckbox) throw new Error('first row checkbox missing');
+
+  await userEvent.click(firstRowCheckbox);
+  expect(screen.getByText('已选 1 人')).toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: '批量禁用' }));
+
+  await waitFor(() => expect(screen.queryByText('已选 1 人')).not.toBeInTheDocument());
+  expect(screen.queryByRole('button', { name: '批量禁用' })).not.toBeInTheDocument();
+});
+
 test('left variant passes undefined write callbacks and keeps detail read entry only', async () => {
   renderUsersPage({ ...defaultSearch, status: 'left' });
 

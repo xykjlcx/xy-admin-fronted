@@ -1,4 +1,4 @@
-import { useMemo, type JSX } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { DataTable } from '@/components/pro/DataTable';
@@ -32,6 +32,7 @@ export function MembersTable({
   onBatchDisable,
 }: MembersTableProps): JSX.Element {
   const { t } = useTranslation('admin');
+  const [bulkResetVersion, setBulkResetVersion] = useState(0);
   const effectiveSearch: UsersQueryParams = {
     ...search,
     status: variant === 'left' ? 'left' : search.status === 'left' ? 'all' : search.status,
@@ -53,7 +54,14 @@ export function MembersTable({
     effectiveSearch.page,
     effectiveSearch.pageSize,
     currentPageIds,
+    bulkResetVersion,
   ].join('|');
+
+  const handleBatchDisable = async (ids: string[]) => {
+    if (!onBatchDisable) return;
+    await onBatchDisable(ids);
+    setBulkResetVersion((version) => version + 1);
+  };
 
   return (
     <>
@@ -80,7 +88,13 @@ export function MembersTable({
                 <span className="text-[calc(13px*var(--app-scale))] text-text-2">
                   {t('users.selectedCount', { count: selectedVisibleIds.length })}
                 </span>
-                <Button size="sm" variant="outline" onClick={() => onBatchDisable(selectedVisibleIds)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    void handleBatchDisable(selectedVisibleIds);
+                  }}
+                >
                   {t('users.actions.batchDisable')}
                 </Button>
               </div>
