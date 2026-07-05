@@ -60,6 +60,7 @@ export interface DataTableProps<T> {
 
 const selectionColumnWidth = 'calc(44px * var(--app-scale))';
 const bodyCellClassName = 'py-[calc(12.5px*var(--app-scale))]';
+const bodyCellWithSelectionClassName = 'h-14 py-0';
 const selectionCellClassName = 'h-14 p-0';
 const selectionSlotClassName = 'flex h-full items-center justify-center';
 const selectionCheckboxClassName = 'size-[calc(16px*var(--app-scale))]';
@@ -208,7 +209,7 @@ export function DataTable<T>({
                     {columns.map((column) => (
                       <TableCell
                         key={column.key}
-                        className={cn(alignClass(column.align), selectionEnabled ? selectionCellClassName : bodyCellClassName)}
+                        className={cn(alignClass(column.align), selectionEnabled ? bodyCellWithSelectionClassName : bodyCellClassName)}
                       >
                         {column.cell(row, index)}
                       </TableCell>
