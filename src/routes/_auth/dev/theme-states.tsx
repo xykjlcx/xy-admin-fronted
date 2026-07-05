@@ -417,7 +417,7 @@ function ThemeStatesRoute() {
                 selection={{
                   enabled: true,
                   renderBulkBar: (ids) => (
-                    <div className="mt-3 rounded-8 bg-(--table-row-bg-selected) px-3 py-2 text-sm text-text-2">
+                    <div className="mb-3 rounded-8 bg-(--table-row-bg-selected) px-3 py-2 text-sm text-text-2">
                       {ids.length}
                     </div>
                   ),

@@ -143,6 +143,7 @@ export function DataTable<T>({
 
   return (
     <>
+      {bulkBar}
       <div className="overflow-hidden rounded-10 border border-(--table-border) bg-(--table-bg)">
         <Table>
           <colgroup>
@@ -225,7 +226,6 @@ export function DataTable<T>({
           </TableBody>
         </Table>
       </div>
-      {bulkBar}
       {pagination && (
         <Pagination
           page={pagination.page}

@@ -64,6 +64,7 @@ test('DataTable renders semantic table, col widths, cells and pagination', async
   expect(screen.getByRole('cell', { name: '王思远' })).toBeInTheDocument();
 
   expect(screen.getByText('4 records')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Next' }));
   expect(onPageChange).toHaveBeenCalledWith(2);
 });
@@ -93,6 +94,9 @@ test('DataTable owns selection, filters bulk ids to visible rows, and clears on 
   await userEvent.click(firstRowCheckbox!);
   expect(onSelectionChange).toHaveBeenLastCalledWith(['u1']);
   expect(screen.getByText('当前页已选 u1')).toBeInTheDocument();
+  const bulkBar = screen.getByText('当前页已选 u1').closest('div');
+  if (!bulkBar) throw new Error('bulk bar not found');
+  expect(bulkBar.compareDocumentPosition(screen.getByRole('table')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
   rerender(
     <DataTable

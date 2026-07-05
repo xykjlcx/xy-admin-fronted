@@ -87,7 +87,7 @@ export function MembersTable({
           enabled: variant === 'members',
           renderBulkBar: (selectedVisibleIds) =>
             canDisable ? (
-              <div className="mt-4 flex items-center justify-between rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
+              <div className="mb-4 flex items-center justify-between rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
                 <span className="text-[calc(13px*var(--app-scale))] text-text-2">
                   {t('users.selectedCount', { count: selectedVisibleIds.length })}
                 </span>
