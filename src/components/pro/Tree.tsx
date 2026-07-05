@@ -16,6 +16,7 @@ export interface TreeProps {
 }
 
 const indentStep = 18;
+const baseIndent = 12;
 
 function textFromNode(node: ReactNode): string | undefined {
   if (typeof node === 'string' || typeof node === 'number' || typeof node === 'bigint') return String(node);
@@ -59,7 +60,7 @@ export function Tree({ nodes, selectedId, onSelect, ariaLabel }: TreeProps): JSX
                 ? 'bg-(--side-list-item-bg-active) font-semibold text-(--side-list-item-fg-active) hover:bg-(--side-list-item-bg-active)'
                 : 'text-text-2 hover:bg-(--side-list-item-bg-hover)',
             )}
-            style={{ paddingLeft: `calc(${node.depth * indentStep}px * var(--app-scale))` }}
+            style={{ paddingLeft: `calc(${baseIndent + node.depth * indentStep}px * var(--app-scale))` }}
             onClick={() => onSelect(node.id)}
           >
             <span className="min-w-0 flex-1 truncate">{node.label}</span>

@@ -60,6 +60,8 @@ export interface DataTableProps<T> {
 
 const selectionColumnWidth = 'calc(44px * var(--app-scale))';
 const bodyCellClassName = 'py-[calc(12.5px*var(--app-scale))]';
+const selectionCellClassName = 'h-14 py-0 [&>[role=checkbox]]:translate-y-0';
+const selectionCheckboxClassName = 'size-[calc(16px*var(--app-scale))] translate-x-2';
 
 function alignClass(align: DataTableColumn<unknown>['align']) {
   if (align === 'center') return 'text-center';
@@ -151,11 +153,15 @@ export function DataTable<T>({
           <TableHeader>
             <TableRow>
               {selectionEnabled && (
-                <TableHead className="text-center" onClick={(event) => event.stopPropagation()}>
+                <TableHead
+                  className="[&>[role=checkbox]]:translate-y-0 text-center"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   <Checkbox
                     checked={allVisibleSelected}
                     indeterminate={partiallySelected}
                     onCheckedChange={toggleVisibleRows}
+                    className={selectionCheckboxClassName}
                   />
                 </TableHead>
               )}
@@ -166,7 +172,7 @@ export function DataTable<T>({
               ))}
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="[&_tr:last-child]:border-t">
             {loading ? (
               <LoadingRows columns={columnCount} loadingText={loadingText} />
             ) : data.length > 0 ? (
@@ -178,22 +184,26 @@ export function DataTable<T>({
                   <TableRow
                     key={id}
                     data-state={state}
-                    className={cn(onRowClick && 'cursor-pointer')}
+                    className={cn('border-t border-b-0', onRowClick && 'cursor-pointer')}
                     onClick={onRowClick ? () => onRowClick(row) : undefined}
                   >
                     {selectionEnabled && (
                       <TableCell
-                        className={cn('text-center', bodyCellClassName)}
+                        className={cn('text-center', selectionCellClassName)}
                         onClick={(event) => event.stopPropagation()}
                       >
                         <Checkbox
                           checked={selectedIdSet.has(id)}
                           onCheckedChange={() => toggleRow(id)}
+                          className={selectionCheckboxClassName}
                         />
                       </TableCell>
                     )}
                     {columns.map((column) => (
-                      <TableCell key={column.key} className={cn(alignClass(column.align), bodyCellClassName)}>
+                      <TableCell
+                        key={column.key}
+                        className={cn(alignClass(column.align), selectionEnabled ? selectionCellClassName : bodyCellClassName)}
+                      >
                         {column.cell(row, index)}
                       </TableCell>
                     ))}

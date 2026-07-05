@@ -86,7 +86,11 @@ test('DataTable owns selection, filters bulk ids to visible rows, and clears on 
     />,
   );
 
-  const [, firstRowCheckbox] = screen.getAllByRole('checkbox');
+  const [headerCheckbox, firstRowCheckbox] = screen.getAllByRole('checkbox');
+  expect(headerCheckbox?.closest('[data-slot="checkbox"]')).toHaveClass(
+    'size-[calc(16px*var(--app-scale))]',
+    'translate-x-2',
+  );
   await userEvent.click(firstRowCheckbox!);
   expect(onSelectionChange).toHaveBeenLastCalledWith(['u1']);
   expect(screen.getByText('当前页已选 u1')).toBeInTheDocument();

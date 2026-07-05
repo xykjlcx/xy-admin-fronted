@@ -28,7 +28,7 @@ test('Tree renders a controlled hierarchical tree with selection and meta', asyn
   expect(screen.getByRole('treeitem', { name: '研发中心 18' })).toHaveAttribute('aria-selected', 'true');
 
   const nestedNode = screen.getByRole('treeitem', { name: '运营部' });
-  expect(nestedNode).toHaveStyle({ paddingLeft: 'calc(36px * var(--app-scale))' });
+  expect(nestedNode).toHaveStyle({ paddingLeft: 'calc(48px * var(--app-scale))' });
 
   await userEvent.click(screen.getByRole('treeitem', { name: '运营部' }));
   expect(onSelect).toHaveBeenCalledWith('ops');
