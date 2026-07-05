@@ -17,7 +17,7 @@ const tokenReferenceRoots = [
 const violationRoots = [
   'src/components/ui',
   'src/components/pro',
-  'src/app/shell/widgets',
+  'src/app',
   'src/modules/admin/pages',
   'src/routes',
 ];
@@ -104,6 +104,13 @@ const forbiddenFieldPrimitiveClasses = [
   'aria-invalid:ring-[var(--field-ring-invalid)]',
 ];
 
+const baselineNotes: Record<string, string> = {
+  'src/components/ui/badge.tsx': '§6.2 语义色直接消费，合法保留。',
+  'src/components/ui/progress.tsx': '§6.2 语义色直接消费，合法保留。',
+  'src/modules/admin/pages/dashboard/index.tsx': 'Step 3-8 范围外，待后续切片。',
+  'src/routes/login.tsx': 'Step 3-8 范围外，待后续切片。',
+};
+
 function readProjectFile(path: string) {
   return readFileSync(resolve(projectRoot, path), 'utf8');
 }
@@ -163,10 +170,13 @@ function tokenReferences(source: string) {
 function countForbiddenClasses(file: string) {
   const source = readProjectFile(file);
   return forbiddenClasses.reduce((sum, className) => {
-    const escaped = className.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(`(?<![\\w-])${escaped}(?![\\w-])`, 'g');
-    return sum + [...source.matchAll(re)].length;
+    return sum + [...source.matchAll(classNameBoundaryRe(className))].length;
   }, 0);
+}
+
+function classNameBoundaryRe(className: string) {
+  const escaped = className.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?<![\\w-])${escaped}(?![\\w-])`, 'g');
 }
 
 function fieldFamilySources() {
@@ -212,6 +222,7 @@ test('基础状态 class 命中数必须受 baseline 棘轮约束', () => {
   }
 
   expect(current).toEqual(baseline);
+  expect(Object.keys(baseline).sort()).toEqual(Object.keys(baselineNotes).sort());
 });
 
 test('已完成 token 化的 UI/Pro/Shell/样板页不得回退到 primitive 状态 class', () => {
@@ -221,7 +232,7 @@ test('已完成 token 化的 UI/Pro/Shell/样板页不得回退到 primitive 状
     const source = readProjectFile(file);
 
     for (const className of forbiddenTokenizedStateClasses) {
-      if (source.includes(className)) offenders.push(`${file}: ${className}`);
+      if (classNameBoundaryRe(className).test(source)) offenders.push(`${file}: ${className}`);
     }
   }
 

@@ -60,9 +60,9 @@ function SheetContent({
         data-slot="sheet-content"
         className={cn(
           "fixed z-50 flex flex-col gap-4 bg-(--overlay-bg) text-(--overlay-fg)",
-          // 抽屉阴影纳入 overlay 族，后续只调整 token，不在组件里散落阴影实现。
+          // 右抽屉使用方向性投影，保持从右侧覆盖的视觉来源。
           side === "right" &&
-            "anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-(--overlay-border) shadow-(--overlay-shadow-modal) sm:max-w-sm",
+            "anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-(--overlay-border) shadow-(--shadow-drawer) sm:max-w-sm",
           side === "left" &&
             "inset-y-0 left-0 h-full w-3/4 border-r border-(--overlay-border) data-[state=open]:animate-in data-[state=open]:slide-in-from-left data-[state=open]:duration-300 sm:max-w-sm",
           side === "top" &&

@@ -110,7 +110,7 @@ test('SheetContent 使用 overlay token 而不是页面背景', () => {
   expect(overlay).toHaveClass('backdrop-blur-[var(--overlay-mask-blur)]');
   expect(content).toHaveClass('bg-(--overlay-bg)');
   expect(content).toHaveClass('text-(--overlay-fg)');
-  expect(content).toHaveClass('shadow-(--overlay-shadow-modal)');
+  expect(content).toHaveClass('shadow-(--shadow-drawer)');
   expect(content).not.toHaveClass('bg-background');
 });
 

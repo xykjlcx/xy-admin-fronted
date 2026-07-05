@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { CheckIcon, ChevronDownIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ACCENTS, type AccentKey } from '@/lib/appearance-dom';
@@ -9,13 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Select,
-  SelectContent,
   SelectControl,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -23,14 +18,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 import { SideList, type SideListItem } from '@/components/pro/SideList';
@@ -435,60 +422,106 @@ function ThemeStatesRoute() {
         <div className="grid gap-4 xl:grid-cols-3">
           <div className="rounded-md border border-border bg-surface-2 p-4">
             <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.overlayPopover')}</p>
-            <Popover open>
-              <PopoverTrigger asChild>
-                <Button variant="outline">{t('dev.themeStates.overlayTrigger')}</Button>
-              </PopoverTrigger>
-              <PopoverContent
-                forceMount
-                align="start"
-                sideOffset={8}
-                className="w-[calc(220px*var(--app-scale))]"
+            <div className="grid justify-start gap-2">
+              <Button variant="outline">{t('dev.themeStates.overlayTrigger')}</Button>
+              <div
+                data-slot="popover-content"
+                className="anim-modal-in w-[calc(220px*var(--app-scale))] rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-4 text-(--overlay-fg) shadow-(--overlay-shadow-popover)"
               >
                 <div className="grid gap-1.5">
                   <p className="text-sm font-medium text-text">{t('dev.themeStates.overlayTitle')}</p>
                   <p className="text-xs text-text-2">{t('dev.themeStates.overlayDesc')}</p>
                 </div>
-              </PopoverContent>
-            </Popover>
+              </div>
+            </div>
           </div>
 
           <div className="rounded-md border border-border bg-surface-2 p-4">
             <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.optionSelect')}</p>
-            <Select open value="rd" onValueChange={() => undefined}>
-              <SelectTrigger aria-label={t('dev.themeStates.optionSelect')} className="group">
-                <SelectValue placeholder={t('dev.themeStates.fieldSelectPlaceholder')} />
-              </SelectTrigger>
-              <SelectContent forceMount>
-                <SelectGroup>
-                  <SelectItem value="rd">{t('dev.themeStates.fieldResearch')}</SelectItem>
-                  <SelectItem
-                    value="highlighted"
-                    className="bg-(--option-bg-highlighted) text-(--option-fg-highlighted)"
+            <div className="grid gap-2">
+              <button
+                type="button"
+                aria-expanded="true"
+                aria-haspopup="listbox"
+                className="ui-field flex h-[var(--control-md)] w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border px-3 text-sm outline-none"
+                data-state="open"
+              >
+                <span>{t('dev.themeStates.fieldResearch')}</span>
+                <ChevronDownIcon data-icon="inline-end" className="rotate-180" />
+              </button>
+              <div
+                data-slot="select-content"
+                role="listbox"
+                className="anim-modal-in overflow-hidden rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-1 text-(--overlay-fg) shadow-(--overlay-shadow-popover)"
+              >
+                <div
+                  data-slot="select-item"
+                  role="option"
+                  aria-selected="true"
+                  className="relative flex min-h-[calc(34px*var(--app-scale))] w-full items-center gap-2 rounded-8 bg-(--option-bg-selected) py-1.5 pr-8 pl-2 text-sm font-semibold text-(--option-fg-selected)"
+                >
+                  <span
+                    data-slot="select-item-indicator"
+                    className="absolute right-2 flex size-3.5 items-center justify-center text-(--option-check)"
                   >
-                    {t('dev.themeStates.optionHighlighted')}
-                  </SelectItem>
-                  <SelectItem value="disabled" disabled>{t('dev.themeStates.choiceDisabled')}</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+                    <CheckIcon data-icon="inline-start" className="size-[calc(15px*var(--app-scale))] stroke-[3px]" />
+                  </span>
+                  {t('dev.themeStates.fieldResearch')}
+                </div>
+                <div
+                  data-slot="select-item"
+                  role="option"
+                  className="relative flex min-h-[calc(34px*var(--app-scale))] w-full items-center gap-2 rounded-8 bg-(--option-bg-highlighted) py-1.5 pr-8 pl-2 text-sm text-(--option-fg-highlighted)"
+                >
+                  {t('dev.themeStates.optionHighlighted')}
+                </div>
+                <div
+                  data-slot="select-item"
+                  role="option"
+                  aria-disabled="true"
+                  data-disabled
+                  className="relative flex min-h-[calc(34px*var(--app-scale))] w-full items-center gap-2 rounded-8 py-1.5 pr-8 pl-2 text-sm text-(--option-fg) data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                >
+                  {t('dev.themeStates.choiceDisabled')}
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="rounded-md border border-border bg-surface-2 p-4">
             <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.menuMatrix')}</p>
-            <DropdownMenu open modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">{t('dev.themeStates.menuTrigger')}</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent forceMount align="start" sideOffset={8} className="w-[calc(220px*var(--app-scale))]">
-                <DropdownMenuItem>{t('dev.themeStates.menuNormal')}</DropdownMenuItem>
-                <DropdownMenuItem className="bg-(--menu-item-bg-highlighted) text-(--menu-item-fg-highlighted)">
+            <div className="grid justify-start gap-2">
+              <Button variant="outline">{t('dev.themeStates.menuTrigger')}</Button>
+              <div
+                data-slot="dropdown-menu-content"
+                role="menu"
+                className="anim-modal-in w-[calc(220px*var(--app-scale))] overflow-hidden rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-1 text-(--overlay-fg) shadow-(--overlay-shadow-popover)"
+              >
+                <div
+                  data-slot="dropdown-menu-item"
+                  role="menuitem"
+                  className="relative flex cursor-pointer items-center gap-2 rounded-8 px-2 py-1.5 text-sm text-(--menu-item-fg)"
+                >
+                  {t('dev.themeStates.menuNormal')}
+                </div>
+                <div
+                  data-slot="dropdown-menu-item"
+                  role="menuitem"
+                  className="relative flex cursor-pointer items-center gap-2 rounded-8 bg-(--menu-item-bg-highlighted) px-2 py-1.5 text-sm text-(--menu-item-fg-highlighted)"
+                >
                   {t('dev.themeStates.menuHighlighted')}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive">{t('dev.themeStates.menuDanger')}</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </div>
+                <div data-slot="dropdown-menu-separator" className="-mx-1 my-1 h-px bg-border" />
+                <div
+                  data-slot="dropdown-menu-item"
+                  role="menuitem"
+                  data-variant="destructive"
+                  className="relative flex cursor-pointer items-center gap-2 rounded-8 px-2 py-1.5 text-sm text-(--menu-item-fg-danger)"
+                >
+                  {t('dev.themeStates.menuDanger')}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

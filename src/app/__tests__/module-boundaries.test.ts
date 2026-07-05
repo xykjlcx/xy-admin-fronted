@@ -127,13 +127,14 @@ test('theme states route exposes the Step 8 overlay and option state matrix', ()
   const source = readProjectFile(themeStatesRoute);
 
   expect(source).toContain('step8OverlayOptionMatrix');
-  expect(source).toContain('Popover');
-  expect(source).toContain('PopoverContent');
-  expect(source).toContain('SelectContent');
-  expect(source).toContain('SelectItem');
-  expect(source).toContain('DropdownMenuContent');
-  expect(source).toContain('DropdownMenuItem');
-  expect(source).toContain('forceMount');
+  expect(source).toContain('data-slot="popover-content"');
+  expect(source).toContain('data-slot="select-content"');
+  expect(source).toContain('data-slot="select-item"');
+  expect(source).toContain('data-slot="dropdown-menu-content"');
+  expect(source).toContain('data-slot="dropdown-menu-item"');
+  expect(source).not.toContain('<Select open');
+  expect(source).not.toContain('<Popover open');
+  expect(source).not.toContain('<DropdownMenu open');
 });
 
 test('shell icon buttons do not override Button icon token colors', () => {

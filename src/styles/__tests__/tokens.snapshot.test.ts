@@ -431,8 +431,8 @@ test('Overlay 族 token 与 Step 4 合同落地', () => {
   expect(sheetSource).toContain('border-(--overlay-border)');
   expect(sheetSource).toContain('bg-(--overlay-bg)');
   expect(sheetSource).toContain('text-(--overlay-fg)');
-  expect(sheetSource).toContain('shadow-(--overlay-shadow-modal)');
-  expect(sheetSource).not.toContain('shadow-drawer');
+  expect(sheetSource).toContain('shadow-(--shadow-drawer)');
+  expect(sheetSource).not.toContain('shadow-(--overlay-shadow-modal)');
   expect(sheetSource).toContain('text-(--overlay-close-fg)');
 
   for (const source of [popoverSource, dropdownMenuSource, selectSource]) {
@@ -502,12 +502,16 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
 
 test('主题状态页暴露 Overlay / Option / Menu 可截图矩阵', () => {
   expect(themeStatesSource).toContain('step8OverlayOptionMatrix');
-  expect(themeStatesSource).toContain('PopoverContent');
-  expect(themeStatesSource).toContain('SelectContent');
-  expect(themeStatesSource).toContain('DropdownMenuContent');
+  expect(themeStatesSource).toContain('data-slot="popover-content"');
+  expect(themeStatesSource).toContain('data-slot="select-content"');
+  expect(themeStatesSource).toContain('data-slot="select-item"');
+  expect(themeStatesSource).toContain('data-slot="dropdown-menu-content"');
+  expect(themeStatesSource).toContain('data-slot="dropdown-menu-item"');
   expect(themeStatesSource).toContain('bg-(--option-bg-highlighted)');
   expect(themeStatesSource).toContain('bg-(--menu-item-bg-highlighted)');
-  expect(themeStatesSource).toContain('forceMount');
+  expect(themeStatesSource).not.toContain('<Select open');
+  expect(themeStatesSource).not.toContain('<Popover open');
+  expect(themeStatesSource).not.toContain('<DropdownMenu open');
 });
 
 test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () => {
