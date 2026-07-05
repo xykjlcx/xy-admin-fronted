@@ -1,15 +1,13 @@
 import { useMemo, useState } from 'react';
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
 import { PageFrame, PageSurface, PageTabs } from '@/components/pro/PageScaffold';
 import { matchPermission } from '@/lib/permission';
 import {
   deptsQuery,
-  userApi,
-  userKeys,
   usersQuery,
-  type UpdateUserInput,
+  useUserMutations,
   type UserDto,
   type UsersQueryParams,
 } from '@/modules/admin/api/user.api';
@@ -36,17 +34,9 @@ const emptyUsersPage = { list: [], total: 0 } satisfies NonNullable<UsersViewPro
 // Page 组件处理数据请求、mutation 和缓存失效；View 组件只处理页面状态和布局。
 // 这个分层是为了让后续新增/编辑/详情等子组件能独立演进，不把业务实现堆回路由文件。
 export function UsersPage({ permissions, search, onSearchChange }: UsersPageProps) {
-  const queryClient = useQueryClient();
   const { data: depts } = useSuspenseQuery(deptsQuery);
   const usersResult = useQuery(usersQuery(search));
-  const invalidateUsers = () => queryClient.invalidateQueries({ queryKey: userKeys.all });
-  const createUser = useMutation({ mutationFn: userApi.createUser, onSuccess: invalidateUsers });
-  const updateUser = useMutation({
-    mutationFn: ({ id, dto }: { id: string; dto: UpdateUserInput }) => userApi.updateUser(id, dto),
-    onSuccess: invalidateUsers,
-  });
-  const deleteUser = useMutation({ mutationFn: userApi.deleteUser, onSuccess: invalidateUsers });
-  const batchDisable = useMutation({ mutationFn: userApi.batchDisableUsers, onSuccess: invalidateUsers });
+  const { createUser, updateUser, deleteUser, batchDisable } = useUserMutations();
 
   return (
     <UsersView

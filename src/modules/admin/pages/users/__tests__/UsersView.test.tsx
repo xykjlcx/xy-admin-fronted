@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, vi } from 'vitest';
@@ -262,4 +263,14 @@ test('成员数据刷新时保留旧表格并显示表格级更新状态', () =>
 
   expect(screen.getByText('李长昕')).toBeInTheDocument();
   expect(screen.getByText('正在更新')).toBeInTheDocument();
+});
+
+test('UsersPage uses centralized user mutations so department counts invalidate with writes', () => {
+  const source = readFileSync('src/modules/admin/pages/users/index.tsx', 'utf8');
+  const usersPageSource = source.slice(source.indexOf('export function UsersPage'), source.indexOf('export function UsersView'));
+
+  expect(usersPageSource).toContain('useUserMutations');
+  expect(usersPageSource).not.toContain('useQueryClient');
+  expect(usersPageSource).not.toContain('useMutation');
+  expect(usersPageSource).not.toContain('userApi');
 });
