@@ -58,6 +58,10 @@ export function RolePermissionEditor({
     }
     return { total, granted, pct: total ? Math.round((granted / total) * 100) : 0 };
   }, [draftPermissions, permissionTree]);
+  const allGroupIds = useMemo(() => permissionTree.map((group) => group.id), [permissionTree]);
+  const allGroupsCollapsed =
+    allGroupIds.length > 0 && allGroupIds.every((groupId) => collapsedGroupIds.includes(groupId));
+  const allPermissionsGranted = permissionStats.total > 0 && permissionStats.granted === permissionStats.total;
   const filteredPermissionTree = useMemo(() => {
     const keyword = permissionKeyword.trim().toLowerCase();
     if (!keyword) return permissionTree;
@@ -142,84 +146,95 @@ export function RolePermissionEditor({
       current.includes(groupId) ? current.filter((id) => id !== groupId) : [...current, groupId],
     );
   };
+  const toggleAllGroupsCollapsed = () => {
+    setCollapsedGroupIds(allGroupsCollapsed ? [] : allGroupIds);
+  };
+  const toggleAllPermissions = () => {
+    setAllPermissions(!allPermissionsGranted);
+  };
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div data-role-permission-action-bar className="mb-4 flex flex-wrap items-center gap-3.5">
-        <div className="flex shrink-0 items-center gap-2">
-          <KeyRound className="size-4 text-(--accent-emphasis)" />
-          <span className="text-sm font-semibold text-text">
-            {t('roles.permission.granted', {
+      <div data-role-permission-action-bar className="mb-4 flex flex-wrap items-center justify-between gap-3.5">
+        <div
+          data-role-permission-progress
+          className="flex min-w-[calc(260px*var(--app-scale))] flex-1 items-center gap-3.5"
+        >
+          <div className="flex shrink-0 items-center gap-2">
+            <KeyRound className="size-4 text-(--accent-emphasis)" />
+            <span className="text-sm font-semibold text-text">
+              {t('roles.permission.granted', {
+                granted: permissionStats.granted,
+                total: permissionStats.total,
+              })}
+            </span>
+          </div>
+          <ProgressBar
+            value={permissionStats.pct}
+            aria-label={t('roles.permission.granted', {
               granted: permissionStats.granted,
               total: permissionStats.total,
             })}
-          </span>
+            className="min-w-[calc(100px*var(--app-scale))] max-w-[calc(180px*var(--app-scale))] flex-1"
+          />
         </div>
-        <ProgressBar
-          value={permissionStats.pct}
-          aria-label={t('roles.permission.granted', {
-            granted: permissionStats.granted,
-            total: permissionStats.total,
-          })}
-          className="min-w-[calc(100px*var(--app-scale))] max-w-[calc(180px*var(--app-scale))] flex-1"
-        />
-        <SearchField
-          containerClassName="w-[calc(200px*var(--app-scale))]"
-          value={permissionKeyword}
-          placeholder={t('roles.permissionSearchPlaceholder')}
-          onChange={(event) => setPermissionKeyword(event.target.value)}
-        />
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div
+          data-role-permission-action-controls
+          className="ml-auto flex flex-wrap items-center justify-end gap-1.5"
+        >
+          <SearchField
+            containerClassName="w-[calc(200px*var(--app-scale))]"
+            value={permissionKeyword}
+            placeholder={t('roles.permissionSearchPlaceholder')}
+            onChange={(event) => setPermissionKeyword(event.target.value)}
+          />
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => setCollapsedGroupIds([])}
+            onClick={toggleAllGroupsCollapsed}
           >
-            <ChevronsDown data-icon="inline-start" />
-            {t('roles.actions.expand')}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setCollapsedGroupIds(permissionTree.map((group) => group.id))}
-          >
-            <ChevronsUp data-icon="inline-start" />
-            {t('roles.actions.collapse')}
+            {allGroupsCollapsed ? (
+              <ChevronsDown data-icon="inline-start" />
+            ) : (
+              <ChevronsUp data-icon="inline-start" />
+            )}
+            {t(allGroupsCollapsed ? 'roles.actions.expand' : 'roles.actions.collapse')}
           </Button>
           {canGrant && (
             <>
               <Button
                 type="button"
-                variant="text"
+                variant={allPermissionsGranted ? 'text' : 'outline'}
                 size="sm"
-                className="text-danger hover:bg-danger-soft"
-                onClick={() => setAllPermissions(false)}
+                className={cn(
+                  allPermissionsGranted
+                    ? 'text-danger hover:bg-danger-soft'
+                    : 'border-(--accent-emphasis) text-(--accent-emphasis) hover:bg-(--accent-emphasis-soft) hover:text-(--accent-emphasis)',
+                )}
+                onClick={toggleAllPermissions}
               >
-                {t('roles.actions.clear')}
+                {!allPermissionsGranted && <Check data-icon="inline-start" />}
+                {t(allPermissionsGranted ? 'roles.actions.clear' : 'roles.actions.grantAll')}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="border-(--accent-emphasis) text-(--accent-emphasis) hover:bg-(--accent-emphasis-soft) hover:text-(--accent-emphasis)"
-                onClick={() => setAllPermissions(true)}
-              >
-                <Check data-icon="inline-start" />
-                {t('roles.actions.grantAll')}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => updateDraftPermissions(clonePermissions(rolePermissions))}
-              >
-                {t('roles.actions.reset')}
-              </Button>
-              <Button type="button" size="sm" onClick={() => onSave(roleId, cleanPermissions(draftPermissions))}>
-                {t('roles.actions.savePermissions')}
-              </Button>
+              <span
+                data-role-permission-action-separator
+                aria-hidden="true"
+                className="mx-1 h-6 w-px bg-border"
+              />
+              <div data-role-permission-save-actions className="flex items-center gap-1.5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => updateDraftPermissions(clonePermissions(rolePermissions))}
+                >
+                  {t('roles.actions.reset')}
+                </Button>
+                <Button type="button" size="sm" onClick={() => onSave(roleId, cleanPermissions(draftPermissions))}>
+                  {t('roles.actions.savePermissions')}
+                </Button>
+              </div>
             </>
           )}
         </div>

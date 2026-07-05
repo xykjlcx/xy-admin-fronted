@@ -136,20 +136,40 @@ test('业务角色页固定页面高度，只让 Tabs 下方内容区滚动', ()
   expect(contentScroll).toHaveClass('pb-6');
 });
 
-test('权限配置的操作按钮集中在 Action Bar', () => {
+test('权限配置的 Action Bar 左侧展示进度，右侧收拢操作按钮', async () => {
   const { container } = renderRolesView({ permissions: ['*:*:*'] });
 
   const actionBar = container.querySelector('[data-role-permission-action-bar]');
+  const progress = container.querySelector('[data-role-permission-progress]');
+  const controls = container.querySelector('[data-role-permission-action-controls]');
+  const separator = container.querySelector('[data-role-permission-action-separator]');
+  const saveActions = container.querySelector('[data-role-permission-save-actions]');
   const panelScroll = container.querySelector('[data-role-permission-panel-scroll]');
 
   expect(actionBar).toBeInTheDocument();
+  expect(actionBar).toHaveClass('justify-between');
+  expect(progress).toBeInTheDocument();
+  expect(progress).toHaveTextContent('已授权 2 / 4');
+  expect(controls).toBeInTheDocument();
+  expect(controls).toHaveClass('ml-auto');
   expect(panelScroll).toBeInTheDocument();
   expect(panelScroll).toHaveClass('overflow-y-auto');
   expect(panelScroll).toHaveClass('pb-6');
-  expect(actionBar).toContainElement(screen.getByRole('button', { name: '清空' }));
-  expect(actionBar).toContainElement(screen.getByRole('button', { name: '全部授权' }));
-  expect(actionBar).toContainElement(screen.getByRole('button', { name: '重置' }));
-  expect(actionBar).toContainElement(screen.getByRole('button', { name: '保存权限' }));
+  expect(controls).toContainElement(screen.getByRole('button', { name: '折叠' }));
+  expect(screen.queryByRole('button', { name: '展开' })).not.toBeInTheDocument();
+  expect(controls).toContainElement(screen.getByRole('button', { name: '全部授权' }));
+  expect(screen.queryByRole('button', { name: '清空' })).not.toBeInTheDocument();
+  expect(separator).toBeInTheDocument();
+  expect(saveActions).toContainElement(screen.getByRole('button', { name: '重置' }));
+  expect(saveActions).toContainElement(screen.getByRole('button', { name: '保存权限' }));
+
+  await userEvent.click(screen.getByRole('button', { name: '折叠' }));
+  expect(screen.getByRole('button', { name: '展开' })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '折叠' })).not.toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: '全部授权' }));
+  expect(screen.getByRole('button', { name: '清空' })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '全部授权' })).not.toBeInTheDocument();
 });
 
 test('admin 可以新增业务角色', async () => {
@@ -209,6 +229,7 @@ test('权限树支持动作切换、全部授权、清空、重置与保存', as
     'notice:msg': ['view', 'publish'],
   });
 
+  await userEvent.click(screen.getByRole('button', { name: '全部授权' }));
   await userEvent.click(screen.getByRole('button', { name: '清空' }));
   await userEvent.click(screen.getByRole('button', { name: '保存权限' }));
   expect(onSaveRolePermissions).toHaveBeenLastCalledWith('hr', {});
