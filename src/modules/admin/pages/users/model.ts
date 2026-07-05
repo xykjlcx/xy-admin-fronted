@@ -17,11 +17,11 @@ export const emptyDraft: CreateUserInput = {
 };
 
 export const avatarClasses = [
-  'bg-(--nav-item-fg-current)',
+  'bg-(--accent-emphasis)',
   'bg-warning',
   'bg-success',
   'bg-danger',
-  'bg-(--nav-item-fg-current) text-white',
+  'bg-(--accent-emphasis) text-white',
   'bg-warning text-white',
 ];
 

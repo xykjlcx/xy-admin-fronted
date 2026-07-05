@@ -167,6 +167,8 @@
   --table-row-bg-expanded: var(--fill-hover);
   --table-row-fg: var(--text);
   --table-action-fg: var(--pri);
+  --accent-emphasis: var(--pri);
+  --accent-emphasis-soft: var(--fill-selected);
   --pro-page-bg: var(--bg);
   --pro-panel-bg: var(--surface);
   --pro-panel-border: var(--border);

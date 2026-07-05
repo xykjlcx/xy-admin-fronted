@@ -195,6 +195,100 @@
     box-shadow: var(--field-shadow);
   }
 
+  /* Table 行状态机。顺序即优先级：selected/expanded > hover > base。 */
+  .ui-table-row {
+    --_table-row-bg: var(--table-row-bg);
+    background: var(--_table-row-bg);
+    color: var(--table-row-fg);
+  }
+
+  .ui-table-row.ui-table-row:hover {
+    --_table-row-bg: var(--table-row-bg-hover);
+  }
+
+  .ui-table-row.ui-table-row[aria-expanded='true'],
+  .ui-table-row.ui-table-row:has([aria-expanded='true']) {
+    --_table-row-bg: var(--table-row-bg-expanded);
+  }
+
+  .ui-table-row.ui-table-row[data-state='selected'] {
+    --_table-row-bg: var(--table-row-bg-selected);
+  }
+
+  /* Line Tabs 状态机。顺序即优先级：active > hover > base。 */
+  .ui-tabs-line-trigger {
+    --_tabs-line-trigger-fg: var(--tabs-line-trigger-fg);
+  }
+
+  [data-slot='tabs-list'][data-variant='line'] .ui-tabs-line-trigger,
+  [data-slot='animated-tabs'] .ui-tabs-line-trigger {
+    color: var(--_tabs-line-trigger-fg);
+  }
+
+  .ui-tabs-line-trigger.ui-tabs-line-trigger:hover {
+    --_tabs-line-trigger-fg: var(--tabs-line-trigger-fg-hover);
+  }
+
+  .ui-tabs-line-trigger.ui-tabs-line-trigger[data-state='active'] {
+    --_tabs-line-trigger-fg: var(--tabs-line-trigger-fg-active);
+  }
+
+  /* Choice 状态机。顺序即优先级：disabled > invalid > checked/indeterminate > focus > hover > base。 */
+  .ui-choice {
+    --_choice-bg: var(--choice-bg);
+    --_choice-border: var(--choice-border);
+    --_choice-ring-color: transparent;
+    background: var(--_choice-bg);
+    border-color: var(--_choice-border);
+  }
+
+  .ui-choice.ui-choice:hover {
+    --_choice-border: var(--choice-border-hover);
+  }
+
+  .ui-choice.ui-choice:focus-visible {
+    --_choice-border: var(--choice-border-hover);
+    --_choice-ring-color: var(--choice-ring);
+    box-shadow: 0 0 0 var(--focus-ring) var(--_choice-ring-color);
+  }
+
+  .ui-choice.ui-choice:checked,
+  .ui-choice.ui-choice[data-state='checked'] {
+    --_choice-border: var(--choice-border-checked);
+  }
+
+  .ui-choice.ui-choice:checked,
+  .ui-choice.ui-choice[data-state='checked'][role='checkbox'] {
+    --_choice-bg: var(--choice-bg-checked);
+  }
+
+  .ui-choice.ui-choice:indeterminate,
+  .ui-choice.ui-choice[data-indeterminate='true'] {
+    --_choice-bg: var(--choice-bg-indeterminate);
+    --_choice-border: var(--choice-border-indeterminate);
+  }
+
+  .ui-choice.ui-choice[aria-invalid='true'],
+  .ui-choice.ui-choice[data-status='error'] {
+    --_choice-border: var(--field-border-invalid);
+  }
+
+  .ui-choice.ui-choice[aria-invalid='true']:focus-visible,
+  .ui-choice.ui-choice[data-status='error']:focus-visible {
+    --_choice-ring-color: var(--field-ring-invalid);
+    box-shadow: 0 0 0 var(--focus-ring) var(--_choice-ring-color);
+  }
+
+  .ui-choice.ui-choice:disabled,
+  .ui-choice.ui-choice[disabled],
+  .ui-choice.ui-choice[data-disabled='true'],
+  .ui-choice.ui-choice[data-disabled=''] {
+    --_choice-bg: var(--choice-bg-disabled);
+    --_choice-border: var(--choice-border);
+    --_choice-ring-color: transparent;
+    box-shadow: none;
+  }
+
   .ui-page-title {
     font-family: var(--font-display);
   }

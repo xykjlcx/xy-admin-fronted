@@ -27,7 +27,10 @@ const navMenuRailSource = readFileSync('src/app/shell/widgets/NavMenuRail.tsx', 
 const navMenuInsetSource = readFileSync('src/app/shell/widgets/NavMenuInset.tsx', 'utf8');
 const subsystemSwitcherSource = readFileSync('src/app/shell/widgets/SubsystemSwitcher.tsx', 'utf8');
 const membersPanelSource = readFileSync('src/modules/admin/pages/users/MembersPanel.tsx', 'utf8');
+const usersModelSource = readFileSync('src/modules/admin/pages/users/model.ts', 'utf8');
 const roleListPanelSource = readFileSync('src/modules/admin/pages/roles/RoleListPanel.tsx', 'utf8');
+const rolesModelSource = readFileSync('src/modules/admin/pages/roles/model.ts', 'utf8');
+const roleDetailsPanelSource = readFileSync('src/modules/admin/pages/roles/RoleDetailsPanel.tsx', 'utf8');
 const rolePermissionEditorSource = readFileSync('src/modules/admin/pages/roles/RolePermissionEditor.tsx', 'utf8');
 const menuTreeTableSource = readFileSync('src/modules/admin/pages/menus/MenuTreeTable.tsx', 'utf8');
 const menusPageSource = readFileSync('src/modules/admin/pages/menus/index.tsx', 'utf8');
@@ -550,19 +553,26 @@ test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () =>
   expect(tabsSource).toContain('data-[state=active]:text-(--tabs-seg-trigger-fg-active)');
   expect(tabsSource).toContain('data-[state=active]:shadow-(--tabs-seg-trigger-shadow-active)');
   expect(tabsSource).toContain('border-(--tabs-line-border)');
-  expect(tabsSource).toContain('group-data-[variant=line]/tabs-list:text-(--tabs-line-trigger-fg)');
-  expect(tabsSource).toContain('group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)');
-  expect(tabsSource).toContain('group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)');
+  expect(tabsSource).toContain('ui-tabs-line-trigger');
+  expect(tabsSource).not.toContain('group-data-[variant=line]/tabs-list:text-(--tabs-line-trigger-fg)');
+  expect(tabsSource).not.toContain('group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)');
+  expect(tabsSource).not.toContain('group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)');
   expect(tabsSource).toContain('after:bg-(--tabs-line-indicator)');
   expect(tabsSource).toContain('focus-visible:ring-(--tabs-ring)');
 
   expect(animatedTabsSource).toContain('border-(--tabs-line-border)');
   expect(animatedTabsSource).toContain('focus-visible:ring-(--tabs-ring)');
   expect(animatedTabsSource).not.toContain('border-(--tabs-line-indicator)');
-  expect(animatedTabsSource).toContain('text-(--tabs-line-trigger-fg-active)');
-  expect(animatedTabsSource).toContain('text-(--tabs-line-trigger-fg)');
-  expect(animatedTabsSource).toContain('hover:text-(--tabs-line-trigger-fg-hover)');
+  expect(animatedTabsSource).toContain('ui-tabs-line-trigger');
+  expect(animatedTabsSource).not.toContain('text-(--tabs-line-trigger-fg-active)');
+  expect(animatedTabsSource).not.toContain('text-(--tabs-line-trigger-fg)');
+  expect(animatedTabsSource).not.toContain('hover:text-(--tabs-line-trigger-fg-hover)');
   expect(animatedTabsSource).toContain('bg-(--tabs-line-indicator)');
+
+  expect(globalCss).toContain('.ui-tabs-line-trigger');
+  expect(globalCss).toContain('--_tabs-line-trigger-fg: var(--tabs-line-trigger-fg);');
+  expect(globalCss).toContain('--_tabs-line-trigger-fg: var(--tabs-line-trigger-fg-hover);');
+  expect(globalCss).toContain("--_tabs-line-trigger-fg: var(--tabs-line-trigger-fg-active);");
 
   for (const source of [tabsSource, animatedTabsSource]) {
     for (const primitiveClass of ['text-pri', 'border-pri', 'bg-pri', 'ring-soft', 'bg-surface-2', 'shadow-card-sm']) {
@@ -570,27 +580,39 @@ test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () =>
     }
   }
 
-  expect(checkboxSource).toContain('border-(--choice-border)');
-  expect(checkboxSource).toContain('bg-(--choice-bg)');
-  expect(checkboxSource).toContain('hover:border-(--choice-border-hover)');
-  expect(checkboxSource).toContain('focus-visible:ring-(--choice-ring)');
-  expect(checkboxSource).toContain('checked:border-(--choice-border-checked)');
-  expect(checkboxSource).toContain('checked:bg-(--choice-bg-checked)');
-  expect(checkboxSource).toContain('disabled:bg-(--choice-bg-disabled)');
-  expect(checkboxSource).toContain('border-(--choice-border-indeterminate)');
-  expect(checkboxSource).toContain('bg-(--choice-bg-indeterminate)');
+  expect(checkboxSource).toContain('ui-choice');
+  expect(checkboxSource).not.toContain('border-(--choice-border)');
+  expect(checkboxSource).not.toContain('bg-(--choice-bg)');
+  expect(checkboxSource).not.toContain('hover:border-(--choice-border-hover)');
+  expect(checkboxSource).not.toContain('focus-visible:ring-(--choice-ring)');
+  expect(checkboxSource).not.toContain('checked:border-(--choice-border-checked)');
+  expect(checkboxSource).not.toContain('checked:bg-(--choice-bg-checked)');
+  expect(checkboxSource).not.toContain('disabled:bg-(--choice-bg-disabled)');
+  expect(checkboxSource).not.toContain('border-(--choice-border-indeterminate)');
+  expect(checkboxSource).not.toContain('bg-(--choice-bg-indeterminate)');
   expect(checkboxSource).toContain('text-(--choice-fg-checked)');
   expect(checkboxSource).toContain('text-(--choice-fg-indeterminate)');
 
-  expect(radioGroupSource).toContain('border-(--choice-border)');
-  expect(radioGroupSource).toContain('bg-(--choice-bg)');
-  expect(radioGroupSource).toContain('focus-visible:border-(--choice-border-hover)');
-  expect(radioGroupSource).toContain('focus-visible:ring-(--choice-ring)');
-  expect(radioGroupSource).toContain('data-[state=checked]:border-(--choice-border-checked)');
-  expect(radioGroupSource).toContain('aria-invalid:border-(--field-border-invalid)');
-  expect(radioGroupSource).toContain('data-[state=checked]:aria-invalid:border-(--field-border-invalid)');
-  expect(radioGroupSource).toContain('aria-invalid:ring-(--field-ring-invalid)');
+  expect(radioGroupSource).toContain('ui-choice');
+  expect(radioGroupSource).not.toContain('border-(--choice-border)');
+  expect(radioGroupSource).not.toContain('bg-(--choice-bg)');
+  expect(radioGroupSource).not.toContain('focus-visible:border-(--choice-border-hover)');
+  expect(radioGroupSource).not.toContain('focus-visible:ring-(--choice-ring)');
+  expect(radioGroupSource).not.toContain('data-[state=checked]:border-(--choice-border-checked)');
+  expect(radioGroupSource).not.toContain('aria-invalid:border-(--field-border-invalid)');
+  expect(radioGroupSource).not.toContain('data-[state=checked]:aria-invalid:border-(--field-border-invalid)');
+  expect(radioGroupSource).not.toContain('aria-invalid:ring-(--field-ring-invalid)');
+  expect(radioGroupSource).not.toContain('shadow-card-sm');
   expect(radioGroupSource).toContain('fill-(--choice-bg-checked)');
+
+  expect(globalCss).toContain('.ui-choice');
+  expect(globalCss).toContain('--_choice-bg: var(--choice-bg);');
+  expect(globalCss).toContain('--_choice-border: var(--choice-border);');
+  expect(globalCss).toContain('--_choice-ring-color: transparent;');
+  expect(globalCss).toContain('--_choice-border: var(--choice-border-hover);');
+  expect(globalCss).toContain('--_choice-border: var(--choice-border-checked);');
+  expect(globalCss).toContain('--_choice-bg: var(--choice-bg-disabled);');
+  expect(globalCss).toContain('--_choice-ring-color: var(--field-ring-invalid);');
 
   expect(switchSource).toContain('focus-visible:border-(--choice-border-hover)');
   expect(switchSource).toContain('focus-visible:ring-(--choice-ring)');
@@ -632,6 +654,8 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
     '--table-row-bg-expanded: var(--fill-hover);',
     '--table-row-fg: var(--text);',
     '--table-action-fg: var(--pri);',
+    '--accent-emphasis: var(--pri);',
+    '--accent-emphasis-soft: var(--fill-selected);',
     '--pro-page-bg: var(--bg);',
     '--pro-panel-bg: var(--surface);',
     '--pro-panel-border: var(--border);',
@@ -660,19 +684,27 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(tableSource).toContain('text-(--table-row-fg)');
   expect(tableSource).toContain('[&_tr]:bg-(--table-header-bg)');
   expect(tableSource).toContain('text-(--table-header-fg)');
-  expect(tableSource).toContain('hover:bg-(--table-row-bg-hover)');
-  expect(tableSource).toContain('aria-expanded:bg-(--table-row-bg-expanded)');
-  expect(tableSource).toContain('data-[state=selected]:bg-(--table-row-bg-selected)');
-  expect(tableSource).toContain('has-aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(tableSource).toContain('ui-table-row');
+  expect(tableSource).not.toContain('hover:bg-(--table-row-bg-hover)');
+  expect(tableSource).not.toContain('aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(tableSource).not.toContain('data-[state=selected]:bg-(--table-row-bg-selected)');
+  expect(tableSource).not.toContain('has-aria-expanded:bg-(--table-row-bg-expanded)');
 
   expect(tableShellSource).toContain('border-(--table-border)');
   expect(tableShellSource).toContain('bg-(--table-bg)');
   expect(tableShellSource).toContain('bg-(--table-header-bg)');
   expect(tableShellSource).toContain('text-(--table-header-fg)');
-  expect(tableShellSource).toContain('hover:bg-(--table-row-bg-hover)');
-  expect(tableShellSource).toContain('aria-expanded:bg-(--table-row-bg-expanded)');
-  expect(tableShellSource).toContain('has-aria-expanded:bg-(--table-row-bg-expanded)');
-  expect(tableShellSource).toContain('data-[state=selected]:bg-(--table-row-bg-selected)');
+  expect(tableShellSource).toContain('ui-table-row');
+  expect(tableShellSource).not.toContain('hover:bg-(--table-row-bg-hover)');
+  expect(tableShellSource).not.toContain('aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(tableShellSource).not.toContain('has-aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(tableShellSource).not.toContain('data-[state=selected]:bg-(--table-row-bg-selected)');
+
+  expect(globalCss).toContain('.ui-table-row');
+  expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg);');
+  expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-hover);');
+  expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-expanded);');
+  expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-selected);');
 
   expect(pageScaffoldSource).toContain('bg-(--pro-page-bg)');
   expect(pageScaffoldSource).toContain('border-(--pro-panel-border)');
@@ -700,6 +732,22 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(membersPanelSource).toContain('bg-(--table-row-bg-selected)');
   expect(roleListPanelSource).toContain('bg-(--side-list-item-bg-active)');
   expect(rolePermissionEditorSource).toContain('bg-(--table-header-bg)');
+  expect(usersModelSource).toContain('--accent-emphasis');
+  expect(usersModelSource).not.toContain('--nav-item');
+  expect(rolesModelSource).toContain('--accent-emphasis');
+  expect(rolesModelSource).toContain("add: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)'");
+  expect(rolesModelSource).toContain("create: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)'");
+  expect(rolesModelSource).not.toContain('--nav-item');
+  expect(rolesModelSource).not.toContain('bg-info-soft text-info');
+  expect(menuTreeTableSource).toContain('bg-(--accent-emphasis-soft) text-(--accent-emphasis)');
+  expect(menuTreeTableSource).toContain('bg-(--accent-emphasis-soft) text-(--accent-emphasis)');
+  expect(menuTreeTableSource).not.toContain('bg-(--nav-item-bg-current) text-(--nav-item-fg-current)');
+  expect(subsystemSwitcherSource).toContain("var(--accent-emphasis)' :");
+  expect(roleDetailsPanelSource).toContain('text-(--accent-emphasis)');
+  expect(rolePermissionEditorSource).toContain('text-(--accent-emphasis)');
+  expect(rolePermissionEditorSource).toContain('bg-(--accent-emphasis-soft)');
+  expect(rolePermissionEditorSource).not.toContain('--nav-item');
+  expect(rolePermissionEditorSource).not.toContain('--table-action-fg');
   expect(menuTreeTableSource).toContain('text-(--table-action-fg)');
   expect(menusPageSource).toContain('PageFrame');
   expect(menusPageSource).toContain('PageSurface');

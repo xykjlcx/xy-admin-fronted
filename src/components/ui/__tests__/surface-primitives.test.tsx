@@ -219,8 +219,8 @@ test('非 Field 交互组件统一使用设计体系 focus ring token', () => {
   );
 
   expect(screen.getByRole('button', { name: '保存' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
-  expect(screen.getByRole('radio', { name: '启用' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
-  expect(screen.getByRole('radio', { name: '启用' })).toHaveClass('focus-visible:ring-(--choice-ring)');
+  expect(screen.getByRole('radio', { name: '启用' })).toHaveClass('ui-choice');
+  expect(screen.getByRole('radio', { name: '启用' })).not.toHaveClass('focus-visible:ring-(--choice-ring)');
   expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
   expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('focus-visible:ring-(--tabs-ring)');
 });
@@ -516,9 +516,10 @@ test('Tabs 分结构消费 Step 6 token 并保留 line 指示条动画', () => {
   const lineList = screen.getByRole('tablist');
   const lineTrigger = screen.getByRole('tab', { name: '概览' });
   expect(lineList).toHaveClass('border-(--tabs-line-border)');
-  expect(lineTrigger).toHaveClass('group-data-[variant=line]/tabs-list:text-(--tabs-line-trigger-fg)');
-  expect(lineTrigger).toHaveClass('group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)');
-  expect(lineTrigger).toHaveClass('group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)');
+  expect(lineTrigger).toHaveClass('ui-tabs-line-trigger');
+  expect(lineTrigger).not.toHaveClass('group-data-[variant=line]/tabs-list:text-(--tabs-line-trigger-fg)');
+  expect(lineTrigger).not.toHaveClass('group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)');
+  expect(lineTrigger).not.toHaveClass('group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)');
   expect(lineTrigger).toHaveClass('after:bg-(--tabs-line-indicator)');
   expect(lineTrigger).toHaveClass('after:transition-[opacity,transform]');
 });
@@ -542,27 +543,31 @@ test('Checkbox、RadioGroup、Switch 消费 Choice token 并保留三态区分',
   const radio = screen.getByRole('radio', { name: '启用' });
   const switchControl = screen.getByRole('switch', { name: '开启' });
 
-  expect(checked).toHaveClass('border-(--choice-border)');
-  expect(checked).toHaveClass('bg-(--choice-bg)');
-  expect(checked).toHaveClass('hover:border-(--choice-border-hover)');
-  expect(checked).toHaveClass('checked:border-(--choice-border-checked)');
-  expect(checked).toHaveClass('checked:bg-(--choice-bg-checked)');
+  expect(checked).toHaveClass('ui-choice');
+  expect(checked).not.toHaveClass('border-(--choice-border)');
+  expect(checked).not.toHaveClass('bg-(--choice-bg)');
+  expect(checked).not.toHaveClass('hover:border-(--choice-border-hover)');
+  expect(checked).not.toHaveClass('checked:border-(--choice-border-checked)');
+  expect(checked).not.toHaveClass('checked:bg-(--choice-bg-checked)');
   expect(checked.nextElementSibling).toHaveClass('text-(--choice-fg-checked)');
 
-  expect(indeterminate).toHaveClass('border-(--choice-border-indeterminate)');
-  expect(indeterminate).toHaveClass('bg-(--choice-bg-indeterminate)');
+  expect(indeterminate).toHaveClass('ui-choice');
+  expect(indeterminate).not.toHaveClass('border-(--choice-border-indeterminate)');
+  expect(indeterminate).not.toHaveClass('bg-(--choice-bg-indeterminate)');
   expect(indeterminate.nextElementSibling).toHaveClass('text-(--choice-fg-indeterminate)');
 
-  expect(disabled).toHaveClass('disabled:bg-(--choice-bg-disabled)');
+  expect(disabled).toHaveClass('ui-choice');
+  expect(disabled).not.toHaveClass('disabled:bg-(--choice-bg-disabled)');
 
-  expect(radio).toHaveClass('border-(--choice-border)');
-  expect(radio).toHaveClass('bg-(--choice-bg)');
-  expect(radio).toHaveClass('focus-visible:border-(--choice-border-hover)');
-  expect(radio).toHaveClass('focus-visible:ring-(--choice-ring)');
-  expect(radio).toHaveClass('data-[state=checked]:border-(--choice-border-checked)');
-  expect(radio).toHaveClass('aria-invalid:border-(--field-border-invalid)');
-  expect(radio).toHaveClass('data-[state=checked]:aria-invalid:border-(--field-border-invalid)');
-  expect(radio).toHaveClass('aria-invalid:ring-(--field-ring-invalid)');
+  expect(radio).toHaveClass('ui-choice');
+  expect(radio).not.toHaveClass('border-(--choice-border)');
+  expect(radio).not.toHaveClass('bg-(--choice-bg)');
+  expect(radio).not.toHaveClass('focus-visible:border-(--choice-border-hover)');
+  expect(radio).not.toHaveClass('focus-visible:ring-(--choice-ring)');
+  expect(radio).not.toHaveClass('data-[state=checked]:border-(--choice-border-checked)');
+  expect(radio).not.toHaveClass('aria-invalid:border-(--field-border-invalid)');
+  expect(radio).not.toHaveClass('data-[state=checked]:aria-invalid:border-(--field-border-invalid)');
+  expect(radio).not.toHaveClass('aria-invalid:ring-(--field-ring-invalid)');
   expect(radio.querySelector('[data-icon="radio-indicator"]')).toHaveClass('fill-(--choice-bg-checked)');
 
   expect(switchControl).toHaveClass('data-[state=checked]:bg-(--switch-bg-checked)');

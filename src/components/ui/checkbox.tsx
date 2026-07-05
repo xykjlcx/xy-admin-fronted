@@ -35,12 +35,10 @@ function Checkbox({
         type="checkbox"
         checked={checked}
         disabled={disabled}
+        data-indeterminate={indeterminate || undefined}
         onChange={(event) => onCheckedChange?.(event.currentTarget.checked)}
         className={cn(
-          'peer size-full cursor-pointer appearance-none rounded-5 border-[calc(1.5px*var(--app-scale))] border-(--choice-border) bg-(--choice-bg) outline-none transition-colors',
-          'hover:border-(--choice-border-hover) focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--choice-ring)',
-          'checked:border-(--choice-border-checked) checked:bg-(--choice-bg-checked) disabled:cursor-not-allowed disabled:bg-(--choice-bg-disabled) disabled:opacity-50',
-          indeterminate && 'border-(--choice-border-indeterminate) bg-(--choice-bg-indeterminate)',
+          'peer ui-choice size-full cursor-pointer appearance-none rounded-5 border-[calc(1.5px*var(--app-scale))] outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-50',
         )}
         {...props}
       />

@@ -47,7 +47,7 @@ export function SubsystemSwitcher({
           >
             <span
               className="flex size-8 shrink-0 items-center justify-center rounded-8 text-white"
-              style={{ background: active?.builtin ? 'var(--pri)' : active?.color }}
+              style={{ background: active?.builtin ? 'var(--accent-emphasis)' : active?.color }}
             >
               <Icon name={active?.icon} className="size-[calc(18px*var(--app-scale))]" />
             </span>
@@ -69,7 +69,7 @@ export function SubsystemSwitcher({
           <button className="flex h-9 items-center gap-[calc(9px*var(--app-scale))] rounded-7 pl-2.5 pr-3 hover:bg-(--nav-item-bg-hover)">
             <span
               className="flex size-6 shrink-0 items-center justify-center rounded-6 text-white"
-              style={{ background: active?.builtin ? 'var(--pri)' : active?.color }}
+              style={{ background: active?.builtin ? 'var(--accent-emphasis)' : active?.color }}
             >
               <Icon name={active?.icon} className="size-[calc(15px*var(--app-scale))]" />
             </span>
@@ -109,7 +109,7 @@ export function SubsystemSwitcher({
               >
                 <span
                   className="flex size-10 shrink-0 items-center justify-center rounded-10 text-white"
-                  style={{ background: s.builtin ? 'var(--pri)' : s.color }}
+                  style={{ background: s.builtin ? 'var(--accent-emphasis)' : s.color }}
                 >
                   <Icon name={s.icon} className="size-5" />
                 </span>

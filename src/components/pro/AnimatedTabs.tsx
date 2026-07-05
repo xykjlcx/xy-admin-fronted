@@ -139,12 +139,12 @@ export function AnimatedTabs<TValue extends string>({
               disabled={item.disabled}
               data-state={active ? 'active' : 'inactive'}
               className={cn(
-                'relative z-10 cursor-pointer border-b-2 border-transparent outline-none transition-colors focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--tabs-ring) disabled:cursor-not-allowed disabled:opacity-50',
+                'ui-tabs-line-trigger relative z-10 cursor-pointer border-b-2 border-transparent outline-none transition-colors focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--tabs-ring) disabled:cursor-not-allowed disabled:opacity-50',
                 variant === 'page' && 'px-1 pb-3 text-[calc(15px*var(--app-scale))]',
                 variant === 'content' && 'px-1 pb-2.5 text-sm',
                 active
-                  ? 'font-semibold text-(--tabs-line-trigger-fg-active)'
-                  : 'border-transparent font-normal text-(--tabs-line-trigger-fg) hover:text-(--tabs-line-trigger-fg-hover)',
+                  ? 'font-semibold'
+                  : 'border-transparent font-normal',
               )}
               onClick={() => onValueChange(item.value)}
               onKeyDown={(event) => onKeyDown(event, item)}

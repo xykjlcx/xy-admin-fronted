@@ -81,7 +81,7 @@ export function TableShellRow({ gridTemplateColumns, children, className, style,
   return (
     <div
       className={cn(
-        'grid h-14 items-center border-t border-(--table-border) bg-(--table-row-bg) px-2 hover:bg-(--table-row-bg-hover) aria-expanded:bg-(--table-row-bg-expanded) has-aria-expanded:bg-(--table-row-bg-expanded) data-[state=selected]:bg-(--table-row-bg-selected)',
+        'ui-table-row grid h-14 items-center border-t border-(--table-border) px-2',
         className,
       )}
       style={withGridTemplate(gridTemplateColumns, style)}

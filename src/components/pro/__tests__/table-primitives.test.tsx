@@ -69,10 +69,12 @@ test('TableShell 消费 Table token 而不是页面 primitive 状态类', () => 
   expect(shell).toHaveClass('bg-(--table-bg)');
   expect(header).toHaveClass('bg-(--table-header-bg)');
   expect(header).toHaveClass('text-(--table-header-fg)');
-  expect(row).toHaveClass('hover:bg-(--table-row-bg-hover)');
-  expect(row).toHaveClass('data-[state=selected]:bg-(--table-row-bg-selected)');
-  expect(expandedRow).toHaveClass('aria-expanded:bg-(--table-row-bg-expanded)');
-  expect(expandedRow).toHaveClass('has-aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(row).toHaveClass('ui-table-row');
+  expect(row).not.toHaveClass('hover:bg-(--table-row-bg-hover)');
+  expect(row).not.toHaveClass('data-[state=selected]:bg-(--table-row-bg-selected)');
+  expect(expandedRow).toHaveClass('ui-table-row');
+  expect(expandedRow).not.toHaveClass('aria-expanded:bg-(--table-row-bg-expanded)');
+  expect(expandedRow).not.toHaveClass('has-aria-expanded:bg-(--table-row-bg-expanded)');
   expect(header).not.toHaveClass('bg-surface-2');
   expect(row).not.toHaveClass('hover:bg-surface-2');
 });

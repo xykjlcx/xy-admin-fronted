@@ -147,7 +147,7 @@ export function RolePermissionEditor({
     <div className="min-h-0">
       <div className="mb-4 flex flex-wrap items-center gap-3.5">
         <div className="flex shrink-0 items-center gap-2">
-          <KeyRound className="size-4 text-(--nav-item-fg-current)" />
+          <KeyRound className="size-4 text-(--accent-emphasis)" />
           <span className="text-sm font-semibold text-text">
             {t('roles.permission.granted', {
               granted: permissionStats.granted,
@@ -203,7 +203,7 @@ export function RolePermissionEditor({
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-(--table-action-fg) text-(--table-action-fg) hover:bg-(--nav-item-bg-current) hover:text-(--table-action-fg)"
+                className="border-(--accent-emphasis) text-(--accent-emphasis) hover:bg-(--accent-emphasis-soft) hover:text-(--accent-emphasis)"
                 onClick={() => setAllPermissions(true)}
               >
                 <Check data-icon="inline-start" />
@@ -287,8 +287,8 @@ export function RolePermissionEditor({
                                 size="sm"
                                 className={cn(
                                   on
-                                    ? 'border border-(--table-action-fg) bg-(--nav-item-bg-current) text-(--table-action-fg) hover:bg-(--nav-item-bg-current)'
-                                    : 'border-(--table-border) bg-(--table-bg) text-text-2 hover:border-(--table-action-fg) hover:text-(--table-action-fg)',
+                                    ? 'border border-(--accent-emphasis) bg-(--accent-emphasis-soft) text-(--accent-emphasis) hover:bg-(--accent-emphasis-soft)'
+                                    : 'border-(--table-border) bg-(--table-bg) text-text-2 hover:border-(--accent-emphasis) hover:text-(--accent-emphasis)',
                                 )}
                                 onClick={() => toggleAction(resource, action.id)}
                               >
