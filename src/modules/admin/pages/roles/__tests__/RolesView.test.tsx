@@ -184,6 +184,23 @@ test('权限树支持动作切换、全部授权、清空、重置与保存', as
   expect(onSaveRolePermissions).toHaveBeenLastCalledWith('hr', defaultRolePermissions);
 });
 
+test('权限分组折叠用动画容器隐藏内容', async () => {
+  renderRolesView({ permissions: ['*:*:*'] });
+
+  const panel = document.querySelector('[data-permission-group-panel]');
+  expect(panel).toBeInTheDocument();
+  expect(panel?.className).toContain('grid-rows-[1fr]');
+  expect(panel?.className).toContain('opacity-100');
+  expect(screen.getByRole('button', { name: '切换成员与部门查看' })).toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: '折叠组织与权限权限分组' }));
+
+  expect(panel?.className).toContain('grid-rows-[0fr]');
+  expect(panel?.className).toContain('opacity-0');
+  expect(panel).toHaveAttribute('aria-hidden', 'true');
+  expect(screen.queryByRole('button', { name: '切换成员与部门查看' })).not.toBeInTheDocument();
+});
+
 test('角色成员和操作日志 tab 展示对应数据', async () => {
   renderRolesView();
 

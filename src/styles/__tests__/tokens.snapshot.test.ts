@@ -33,6 +33,7 @@ const rolesModelSource = readFileSync('src/modules/admin/pages/roles/model.ts', 
 const roleDetailsPanelSource = readFileSync('src/modules/admin/pages/roles/RoleDetailsPanel.tsx', 'utf8');
 const rolePermissionEditorSource = readFileSync('src/modules/admin/pages/roles/RolePermissionEditor.tsx', 'utf8');
 const menuTreeTableSource = readFileSync('src/modules/admin/pages/menus/MenuTreeTable.tsx', 'utf8');
+const menuFormDialogSource = readFileSync('src/modules/admin/pages/menus/MenuFormDialog.tsx', 'utf8');
 const menusPageSource = readFileSync('src/modules/admin/pages/menus/index.tsx', 'utf8');
 const checkboxSource = readFileSync('src/components/ui/checkbox.tsx', 'utf8');
 const radioGroupSource = readFileSync('src/components/ui/radio-group.tsx', 'utf8');
@@ -750,8 +751,17 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(roleDetailsPanelSource).toContain('text-(--accent-emphasis)');
   expect(rolePermissionEditorSource).toContain('text-(--accent-emphasis)');
   expect(rolePermissionEditorSource).toContain('bg-(--accent-emphasis-soft)');
+  expect(rolePermissionEditorSource).toContain('transition-[grid-template-rows,opacity]');
+  expect(rolePermissionEditorSource).toContain('grid-rows-[0fr] opacity-0');
+  expect(rolePermissionEditorSource).toContain('grid-rows-[1fr] opacity-100');
   expect(rolePermissionEditorSource).not.toContain('--nav-item');
   expect(rolePermissionEditorSource).not.toContain('--table-action-fg');
+  expect(menuTreeTableSource).toContain('data-menu-tree-row');
+  expect(menuTreeTableSource).toContain('transition-[grid-template-rows,opacity]');
+  expect(menuTreeTableSource).toContain('grid-rows-[0fr] opacity-0');
+  expect(menuTreeTableSource).toContain('grid-rows-[1fr] opacity-100');
+  expect(menuTreeTableSource).not.toContain('data-[state=checked]:bg-success');
+  expect(menuFormDialogSource).not.toContain('data-[state=checked]:bg-success');
   expect(menuTreeTableSource).toContain('text-(--table-action-fg)');
   expect(menusPageSource).toContain('PageFrame');
   expect(menusPageSource).toContain('PageSurface');

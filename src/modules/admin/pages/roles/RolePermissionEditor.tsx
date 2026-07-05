@@ -239,7 +239,13 @@ export function RolePermissionEditor({
                     className="text-text-3"
                     onClick={() => toggleGroupCollapsed(group.id)}
                   >
-                    <ChevronRight data-icon="inline-start" className={cn('transition-transform', collapsed && '-rotate-90')} />
+                    <ChevronRight
+                      data-icon="inline-start"
+                      className={cn(
+                        'transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
+                        !collapsed && 'rotate-90',
+                      )}
+                    />
                   </Button>
                   <PermissionGroupIcon id={group.id} />
                   <span className="flex-1 text-sm font-semibold text-text">{group.label}</span>
@@ -253,8 +259,16 @@ export function RolePermissionEditor({
                     onClick={() => toggleGroup(group)}
                   />
                 </div>
-                {!collapsed && (
-                  <div>
+                <div
+                  data-permission-group-panel
+                  aria-hidden={collapsed}
+                  inert={collapsed || undefined}
+                  className={cn(
+                    'grid transition-[grid-template-rows,opacity] duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
+                    collapsed ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100',
+                  )}
+                >
+                  <div className="min-h-0 overflow-hidden">
                     {group.resources.map((resource) => (
                       <div
                         key={resource.id}
@@ -301,7 +315,7 @@ export function RolePermissionEditor({
                       </div>
                     ))}
                   </div>
-                )}
+                </div>
               </div>
             );
           })

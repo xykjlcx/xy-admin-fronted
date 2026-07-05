@@ -364,7 +364,6 @@ export function MenuFormDialog({
             <Switch
               aria-label={t('menus.form.visible')}
               checked={draft.visible}
-              className="data-[state=checked]:bg-success"
               onCheckedChange={(visible) => patchDraft({ visible })}
             />
           </div>

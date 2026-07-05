@@ -1,5 +1,4 @@
 import {
-  ChevronDown,
   ChevronRight,
   Edit3,
   Eye,
@@ -98,98 +97,121 @@ export function MenuTreeTable({
       }
     >
       {rows.length > 0
-        ? rows.map(({ menu, depth, hasChildren }) => {
+        ? rows.map(({ menu, depth, hasChildren, hiddenByCollapse }) => {
             const name = menuName(menu, locale);
+            const rowCollapsed = collapsed.has(menu.id);
             return (
-              <TableShellRow key={menu.id} gridTemplateColumns={gridTemplate}>
-                <div
-                  className="flex min-w-0 items-center gap-2"
-                  style={{ paddingLeft: `calc(${depth * 24}px * var(--app-scale))` }}
-                >
-                  {hasChildren ? (
-                    <button
-                      type="button"
-                      className="flex size-6 shrink-0 items-center justify-center rounded-6 text-text-3 hover:bg-(--fill-hover) hover:text-text"
-                      aria-label={t('menus.actions.toggleNode', { name })}
-                      onClick={() => onToggleCollapse(menu.id)}
+              <div
+                key={menu.id}
+                data-menu-tree-row
+                data-collapsed-hidden={hiddenByCollapse || undefined}
+                className={cn(
+                  'grid transition-[grid-template-rows,opacity] duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
+                  hiddenByCollapse ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100',
+                )}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <TableShellRow
+                    gridTemplateColumns={gridTemplate}
+                    aria-hidden={hiddenByCollapse}
+                    inert={hiddenByCollapse || undefined}
+                    className={cn(hiddenByCollapse && 'pointer-events-none')}
+                  >
+                    <div
+                      className="flex min-w-0 items-center gap-2"
+                      style={{ paddingLeft: `calc(${depth * 24}px * var(--app-scale))` }}
                     >
-                      {collapsed.has(menu.id) ? <ChevronRight className="size-4" /> : <ChevronDown className="size-4" />}
-                    </button>
-                  ) : (
-                    <span className="flex size-6 shrink-0 items-center justify-center text-text-3">
-                      <ChevronRight className="size-3 opacity-30" />
-                    </span>
-                  )}
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-8 bg-(--accent-emphasis-soft) text-(--accent-emphasis)">
-                    <Icon name={menu.icon} className="size-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-text">{name}</div>
-                    <div className="truncate text-xs text-text-3">{menu.id}</div>
-                  </div>
+                      {hasChildren ? (
+                        <button
+                          type="button"
+                          className="flex size-6 shrink-0 items-center justify-center rounded-6 text-text-3 hover:bg-(--fill-hover) hover:text-text"
+                          aria-label={t('menus.actions.toggleNode', { name })}
+                          aria-expanded={!rowCollapsed}
+                          onClick={() => onToggleCollapse(menu.id)}
+                        >
+                          <ChevronRight
+                            className={cn(
+                              'size-4 transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
+                              !rowCollapsed && 'rotate-90',
+                            )}
+                          />
+                        </button>
+                      ) : (
+                        <span className="flex size-6 shrink-0 items-center justify-center text-text-3">
+                          <ChevronRight className="size-3 opacity-30" />
+                        </span>
+                      )}
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-8 bg-(--accent-emphasis-soft) text-(--accent-emphasis)">
+                        <Icon name={menu.icon} className="size-4" />
+                      </span>
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-text">{name}</div>
+                        <div className="truncate text-xs text-text-3">{menu.id}</div>
+                      </div>
+                    </div>
+                    <div className="truncate text-sm text-text-2">{menu.path ?? '-'}</div>
+                    <div>
+                      <span className={cn('inline-flex rounded-5 px-2 py-0.5 text-xs', typeClass[menu.type])}>
+                        {t(`menus.types.${menu.type}`)}
+                      </span>
+                    </div>
+                    <div className="truncate text-sm text-text-2">{menu.permission ?? '-'}</div>
+                    <div>
+                      {canToggle ? (
+                        <Switch
+                          aria-label={t('menus.actions.toggleVisible', { name })}
+                          checked={menu.visible}
+                          size="sm"
+                          onCheckedChange={(checked) => onSetVisibility(menu.id, checked)}
+                        />
+                      ) : (
+                        <VisibilityStatus menu={menu} />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {canCreate && menu.type !== 'action' && (
+                        <Button
+                          type="button"
+                          size="icon-xs"
+                          variant="ghost"
+                          className="text-(--table-action-fg)"
+                          title={t('menus.actions.addChild')}
+                          aria-label={t('menus.actions.addChildName', { name })}
+                          onClick={() => onAddChild(menu)}
+                        >
+                          <Plus className="size-3.5" />
+                        </Button>
+                      )}
+                      {canUpdate && (
+                        <Button
+                          type="button"
+                          size="icon-xs"
+                          variant="ghost"
+                          className="text-(--table-action-fg)"
+                          title={t('menus.actions.edit')}
+                          aria-label={t('menus.actions.editName', { name })}
+                          onClick={() => onEdit(menu)}
+                        >
+                          <Edit3 className="size-3.5" />
+                        </Button>
+                      )}
+                      {canDelete && !hasChildren && (
+                        <Button
+                          type="button"
+                          size="icon-xs"
+                          variant="ghost"
+                          className="text-(--table-action-fg)"
+                          title={t('menus.actions.delete')}
+                          aria-label={t('menus.actions.deleteName', { name })}
+                          onClick={() => onDelete(menu)}
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableShellRow>
                 </div>
-                <div className="truncate text-sm text-text-2">{menu.path ?? '-'}</div>
-                <div>
-                  <span className={cn('inline-flex rounded-5 px-2 py-0.5 text-xs', typeClass[menu.type])}>
-                    {t(`menus.types.${menu.type}`)}
-                  </span>
-                </div>
-                <div className="truncate text-sm text-text-2">{menu.permission ?? '-'}</div>
-                <div>
-                  {canToggle ? (
-                    <Switch
-                      aria-label={t('menus.actions.toggleVisible', { name })}
-                      checked={menu.visible}
-                      className="data-[state=checked]:bg-success"
-                      size="sm"
-                      onCheckedChange={(checked) => onSetVisibility(menu.id, checked)}
-                    />
-                  ) : (
-                    <VisibilityStatus menu={menu} />
-                  )}
-                </div>
-                <div className="flex items-center gap-1">
-                  {canCreate && menu.type !== 'action' && (
-                    <Button
-                      type="button"
-                      size="icon-xs"
-                      variant="ghost"
-                      className="text-(--table-action-fg)"
-                      title={t('menus.actions.addChild')}
-                      aria-label={t('menus.actions.addChildName', { name })}
-                      onClick={() => onAddChild(menu)}
-                    >
-                      <Plus className="size-3.5" />
-                    </Button>
-                  )}
-                  {canUpdate && (
-                    <Button
-                      type="button"
-                      size="icon-xs"
-                      variant="ghost"
-                      className="text-(--table-action-fg)"
-                      title={t('menus.actions.edit')}
-                      aria-label={t('menus.actions.editName', { name })}
-                      onClick={() => onEdit(menu)}
-                    >
-                      <Edit3 className="size-3.5" />
-                    </Button>
-                  )}
-                  {canDelete && !hasChildren && (
-                    <Button
-                      type="button"
-                      size="icon-xs"
-                      variant="ghost"
-                      className="text-(--table-action-fg)"
-                      title={t('menus.actions.delete')}
-                      aria-label={t('menus.actions.deleteName', { name })}
-                      onClick={() => onDelete(menu)}
-                    >
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  )}
-                </div>
-              </TableShellRow>
+              </div>
             );
           })
         : null}

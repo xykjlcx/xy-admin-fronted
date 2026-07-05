@@ -5,6 +5,7 @@ export interface ManagedMenuRow {
   menu: MenuRecord;
   depth: number;
   hasChildren: boolean;
+  hiddenByCollapse: boolean;
 }
 
 export interface MenuStats {
@@ -76,7 +77,7 @@ export function buildManagedMenuRows(
     );
 
   const rows: ManagedMenuRow[] = [];
-  const walk = (parentId: string | null, depth: number) => {
+  const walk = (parentId: string | null, depth: number, hiddenByCollapse = false) => {
     for (const menu of byParent.get(parentId) ?? []) {
       const children = byParent.get(menu.id) ?? [];
       const hasChildren = children.length > 0;
@@ -86,8 +87,8 @@ export function buildManagedMenuRows(
         hasMatchingDescendant(menu.id);
       if (!shouldInclude) continue;
 
-      rows.push({ menu, depth, hasChildren });
-      if (!collapsed.has(menu.id)) walk(menu.id, depth + 1);
+      rows.push({ menu, depth, hasChildren, hiddenByCollapse });
+      walk(menu.id, depth + 1, hiddenByCollapse || collapsed.has(menu.id));
     }
   };
 

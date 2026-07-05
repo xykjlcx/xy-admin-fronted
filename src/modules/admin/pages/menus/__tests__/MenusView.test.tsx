@@ -223,9 +223,31 @@ test('admin 可以切换菜单显示状态', async () => {
   const onSetMenuVisibility = vi.fn();
   renderMenusView({ permissions: ['*:*:*'], onSetMenuVisibility });
 
-  await userEvent.click(screen.getByRole('switch', { name: '切换企业概览显示状态' }));
+  const visibilitySwitch = screen.getByRole('switch', { name: '切换企业概览显示状态' });
+
+  expect(visibilitySwitch).toHaveClass('data-[state=checked]:bg-(--switch-bg-checked)');
+  expect(visibilitySwitch.className).not.toContain('bg-success');
+
+  await userEvent.click(visibilitySwitch);
 
   expect(onSetMenuVisibility).toHaveBeenCalledWith('m-dashboard', false);
+});
+
+test('菜单树折叠用动画容器隐藏子节点', async () => {
+  renderMenusView({ permissions: ['*:*:*'] });
+
+  const childRow = screen.getByText('成员与部门').closest('[data-menu-tree-row]');
+  expect(childRow).toBeInTheDocument();
+  expect(childRow?.className).toContain('grid-rows-[1fr]');
+  expect(childRow?.className).toContain('opacity-100');
+  expect(screen.getByRole('button', { name: '编辑成员与部门' })).toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: '展开或折叠组织与权限' }));
+
+  expect(childRow?.className).toContain('grid-rows-[0fr]');
+  expect(childRow?.className).toContain('opacity-0');
+  expect(childRow?.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '编辑成员与部门' })).not.toBeInTheDocument();
 });
 
 test('admin 可以删除叶子菜单，非叶子目录不显示删除入口', async () => {
