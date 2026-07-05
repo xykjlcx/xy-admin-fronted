@@ -3,6 +3,12 @@ import { authHandlers } from '@/modules/admin/mocks/auth.handlers';
 import { dashboardHandlers } from '@/modules/admin/mocks/dashboard.handlers';
 import { menuHandlers } from '@/modules/admin/mocks/menu.handlers';
 import { roleHandlers } from '@/modules/admin/mocks/role.handlers';
-import { userHandlers } from '@/modules/admin/mocks/user.handlers';
+import { usersModuleHandlers } from '@/modules/admin/users/mocks';
 
-export const allHandlers = [...authHandlers, ...dashboardHandlers, ...menuHandlers, ...userHandlers, ...roleHandlers];
+export const allHandlers = [
+  ...authHandlers,
+  ...dashboardHandlers,
+  ...menuHandlers,
+  ...usersModuleHandlers,
+  ...roleHandlers,
+];

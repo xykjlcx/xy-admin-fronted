@@ -7,6 +7,7 @@ import { matchPermission } from '@/lib/permission';
 import {
   deptsQuery,
   userApi,
+  userKeys,
   usersQuery,
   type UpdateUserInput,
   type UserDto,
@@ -38,7 +39,7 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
   const queryClient = useQueryClient();
   const { data: depts } = useSuspenseQuery(deptsQuery);
   const usersResult = useQuery(usersQuery(search));
-  const invalidateUsers = () => queryClient.invalidateQueries({ queryKey: ['iam', 'users'] });
+  const invalidateUsers = () => queryClient.invalidateQueries({ queryKey: userKeys.all });
   const createUser = useMutation({ mutationFn: userApi.createUser, onSuccess: invalidateUsers });
   const updateUser = useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateUserInput }) => userApi.updateUser(id, dto),

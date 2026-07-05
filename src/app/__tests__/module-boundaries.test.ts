@@ -5,6 +5,7 @@ import { parseConfigFileTextToJson } from 'typescript';
 const projectRoot = resolve(__dirname, '../../..');
 const adminRoutesDir = resolve(projectRoot, 'src/routes/_auth/admin');
 const adminApiDir = resolve(projectRoot, 'src/modules/admin/api');
+const adminUsersApiDir = resolve(projectRoot, 'src/modules/admin/users/api');
 const sourceRoot = resolve(projectRoot, 'src');
 const themeStatesRoute = 'src/routes/_auth/dev/theme-states.tsx';
 
@@ -276,6 +277,14 @@ test('mock-only packages stay out of production dependencies', () => {
   expect(pkg.devDependencies?.msw).toBeDefined();
 });
 
+test('global mock aggregation imports users handlers from the vertical module', () => {
+  const source = readProjectFile('src/mocks/handlers.ts');
+
+  expect(source).toContain('@/modules/admin/users/mocks');
+  expect(source).toContain('usersModuleHandlers');
+  expect(source).not.toContain('@/modules/admin/mocks/user.handlers');
+});
+
 test('runtime env reads stay behind the config layer', () => {
   const allowed = new Set(['src/config/env.ts']);
   const sourceFiles = collectFiles(sourceRoot)
@@ -292,9 +301,14 @@ test('runtime env reads stay behind the config layer', () => {
 });
 
 test('admin api modules use runtime response contracts instead of ts-only http generics', () => {
-  const apiFiles = readdirSync(adminApiDir)
+  const legacyApiFiles = readdirSync(adminApiDir)
     .filter((file) => file.endsWith('.api.ts'))
     .map((file) => `src/modules/admin/api/${file}`);
+  const usersApiFiles = collectFiles(adminUsersApiDir)
+    .filter((file) => file.endsWith('.ts'))
+    .filter((file) => !file.includes('/__tests__/'))
+    .map((file) => file.replace(`${projectRoot}/`, ''));
+  const apiFiles = [...legacyApiFiles, ...usersApiFiles];
 
   for (const file of apiFiles) {
     const source = readProjectFile(file);
