@@ -50,8 +50,8 @@ export function DeptScene(): JSX.Element {
         data={depts}
         rowKey={(dept) => dept.id}
         loading={isPending}
-        emptyText={t('users.empty')}
-        loadingText={t('users.loading')}
+        emptyText={t('users.deptList.empty')}
+        loadingText={t('users.deptList.loading')}
       />
     </main>
   );

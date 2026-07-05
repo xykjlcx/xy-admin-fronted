@@ -141,7 +141,9 @@
     },
     "deptList": {
       "title": "组织架构",
-      "subtitle": "管理企业部门层级"
+      "subtitle": "管理企业部门层级",
+      "empty": "暂无部门",
+      "loading": "正在加载部门"
     },
     "detail": {
       "dept": "部门",

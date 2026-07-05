@@ -1,4 +1,4 @@
-import type { JSX, ReactNode } from 'react';
+import { isValidElement, type JSX, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface TreeNode {
@@ -19,6 +19,11 @@ const indentStep = 18;
 
 function textFromNode(node: ReactNode): string | undefined {
   if (typeof node === 'string' || typeof node === 'number' || typeof node === 'bigint') return String(node);
+  if (Array.isArray(node)) {
+    const parts = node.map(textFromNode).filter((part): part is string => !!part);
+    return parts.length > 0 ? parts.join('') : undefined;
+  }
+  if (isValidElement<{ children?: ReactNode }>(node)) return textFromNode(node.props.children);
   return undefined;
 }
 

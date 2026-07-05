@@ -50,6 +50,8 @@ export function MembersTable({
     effectiveSearch.deptId ?? '',
     effectiveSearch.directOnly ? 'direct' : 'all',
     effectiveSearch.keyword ?? '',
+    effectiveSearch.page,
+    effectiveSearch.pageSize,
     currentPageIds,
   ].join('|');
 

@@ -141,7 +141,9 @@
     },
     "deptList": {
       "title": "Organization",
-      "subtitle": "Manage department hierarchy"
+      "subtitle": "Manage department hierarchy",
+      "empty": "No departments",
+      "loading": "Loading departments"
     },
     "detail": {
       "dept": "Department",

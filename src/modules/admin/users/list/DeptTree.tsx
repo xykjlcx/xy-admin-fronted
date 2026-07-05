@@ -34,7 +34,7 @@ export function DeptTree({ selectedId, onSelect }: DeptTreeProps): JSX.Element {
           <span className="truncate">{t('users.allMembers')}</span>
         </span>
       ),
-      meta: t('users.memberCount', { count: allMemberCount }),
+      meta: allMemberCount,
       depth: 0,
     },
     ...visibleDepts.map((dept) => ({
@@ -45,7 +45,7 @@ export function DeptTree({ selectedId, onSelect }: DeptTreeProps): JSX.Element {
           <span className="truncate">{dept.name}</span>
         </span>
       ),
-      meta: t('users.memberCount', { count: dept.memberCount }),
+      meta: dept.memberCount,
       depth: depthMap.get(dept.id) ?? 0,
     })),
   ] satisfies TreeNode[];
