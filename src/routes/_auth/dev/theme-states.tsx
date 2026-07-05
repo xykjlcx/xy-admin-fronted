@@ -19,6 +19,7 @@ import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
+import { DataTable, type DataTableColumn } from '@/components/pro/DataTable';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 import { SideList, type SideListItem } from '@/components/pro/SideList';
 import { Pagination } from '@/components/pro/Pagination';
@@ -68,6 +69,18 @@ const step7GridTemplate = '1.2fr 1fr calc(120px * var(--app-scale))';
 const tableTokenRows = ['selected', 'normal', 'expanded'] as const;
 const shellTokenItems = ['members', 'roles', 'menus'] as const;
 
+interface DataTableThemeRow {
+  id: string;
+  nameKey: string;
+  statusKey: string;
+}
+
+const dataTableRows: DataTableThemeRow[] = [
+  { id: 'selected', nameKey: 'dev.themeStates.dataTableSelected', statusKey: 'dev.themeStates.tableStatusEnabled' },
+  { id: 'normal', nameKey: 'dev.themeStates.dataTableNormal', statusKey: 'dev.themeStates.tableStatusEnabled' },
+  { id: 'disabled', nameKey: 'dev.themeStates.dataTableDisabled', statusKey: 'dev.themeStates.fieldInactive' },
+];
+
 function ThemeStatesRoute() {
   const { t } = useTranslation();
   const { flavor, mode, accent, customAccent, set, setFlavor } = useAppearance();
@@ -87,6 +100,17 @@ function ThemeStatesRoute() {
     label: t(`dev.themeStates.sideList.${id}`),
     meta: id === 'members' ? '14' : undefined,
   }));
+  const dataTableColumns: DataTableColumn<DataTableThemeRow>[] = [
+    { key: 'name', header: t('dev.themeStates.tableName'), width: '45%', cell: (row) => t(row.nameKey) },
+    { key: 'status', header: t('dev.themeStates.tableStatus'), width: '35%', cell: (row) => t(row.statusKey) },
+    {
+      key: 'action',
+      header: t('dev.themeStates.tableAction'),
+      width: '20%',
+      align: 'end',
+      cell: () => <Button variant="link" size="xs">{t('dev.themeStates.tableActionView')}</Button>,
+    },
+  ];
 
   return (
     <main className="flex min-h-full flex-col gap-4 bg-page p-6 text-text">
@@ -362,6 +386,50 @@ function ThemeStatesRoute() {
         </div>
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(280px,0.5fr)]">
           <div>
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.dataTableMatrix')}</p>
+            <div className="grid gap-4">
+              <DataTable
+                columns={dataTableColumns}
+                data={dataTableRows}
+                rowKey={(row) => row.id}
+                emptyText={t('dev.themeStates.dataTableEmpty')}
+                loadingText={t('dev.themeStates.dataTableLoading')}
+                rowState={(row) => (row.id === 'selected' ? 'selected' : undefined)}
+                selection={{
+                  enabled: true,
+                  renderBulkBar: (ids) => (
+                    <div className="mt-3 rounded-8 bg-(--table-row-bg-selected) px-3 py-2 text-sm text-text-2">
+                      {ids.length}
+                    </div>
+                  ),
+                }}
+                pagination={{
+                  page: 2,
+                  pageCount: 4,
+                  total: 42,
+                  refreshing: true,
+                  onPageChange: () => undefined,
+                }}
+              />
+              <DataTable
+                columns={dataTableColumns}
+                data={[]}
+                rowKey={(row) => row.id}
+                loading
+                emptyText={t('dev.themeStates.dataTableEmpty')}
+                loadingText={t('dev.themeStates.dataTableLoading')}
+              />
+              <DataTable
+                columns={dataTableColumns}
+                data={[]}
+                rowKey={(row) => row.id}
+                emptyText={t('dev.themeStates.dataTableEmpty')}
+                loadingText={t('dev.themeStates.dataTableLoading')}
+              />
+            </div>
+          </div>
+
+          <div>
             <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.tableShellMatrix')}</p>
             <TableShell
               header={
@@ -391,7 +459,7 @@ function ThemeStatesRoute() {
             </TableShell>
           </div>
 
-          <div>
+          <div className="xl:col-start-2">
             <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.shellStateMatrix')}</p>
             <div className="overflow-hidden rounded-10 border border-(--side-list-border)">
               <SideList

@@ -113,6 +113,12 @@ test('theme states route exposes the Step 7 table and shell state matrix', () =>
   const source = readProjectFile(themeStatesRoute);
 
   expect(source).toContain('step7Matrix');
+  expect(source).toContain('dataTableMatrix');
+  expect(source).toContain('DataTable');
+  expect(source).toContain('dataTableColumns');
+  expect(source).toContain('dataTableRows');
+  expect(source).toContain('dataTableLoading');
+  expect(source).toContain('dataTableEmpty');
   expect(source).toContain('TableShell');
   expect(source).toContain('TableShellHeader');
   expect(source).toContain('TableShellRow');
