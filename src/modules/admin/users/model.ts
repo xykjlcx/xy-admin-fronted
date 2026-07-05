@@ -17,6 +17,25 @@ export const avatarClasses = [
   'bg-warning text-white',
 ];
 
+const defaultDeptIndentClass = 'pl-0';
+const maxDeptIndentDepth = 8;
+const deptIndentClasses: Record<number, string> = {
+  0: defaultDeptIndentClass,
+  1: 'pl-[calc(18px*var(--app-scale))]',
+  2: 'pl-[calc(36px*var(--app-scale))]',
+  3: 'pl-[calc(54px*var(--app-scale))]',
+  4: 'pl-[calc(72px*var(--app-scale))]',
+  5: 'pl-[calc(90px*var(--app-scale))]',
+  6: 'pl-[calc(108px*var(--app-scale))]',
+  7: 'pl-[calc(126px*var(--app-scale))]',
+  8: 'pl-[calc(144px*var(--app-scale))]',
+};
+
+export function deptIndentClass(depth: number) {
+  const normalizedDepth = Math.max(0, Math.min(Math.trunc(depth), maxDeptIndentDepth));
+  return deptIndentClasses[normalizedDepth] ?? defaultDeptIndentClass;
+}
+
 export function buildDepthMap(depts: DeptDto[]) {
   const byId = new Map(depts.map((dept) => [dept.id, dept]));
   const getDepth = (dept: DeptDto): number => {

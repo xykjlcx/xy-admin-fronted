@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const projectRoot = resolve(__dirname, '../../..');
-const usersPageDir = resolve(projectRoot, 'src/modules/admin/pages/users');
+const usersPageDir = resolve(projectRoot, 'src/modules/admin/users');
 
 function collectSourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

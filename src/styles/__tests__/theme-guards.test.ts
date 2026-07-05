@@ -11,6 +11,7 @@ const tokenReferenceRoots = [
   'src/components/pro',
   'src/app',
   'src/modules/admin/pages',
+  'src/modules/admin/users',
   'src/routes',
   'index.html',
 ];
@@ -19,6 +20,7 @@ const violationRoots = [
   'src/components/pro',
   'src/app',
   'src/modules/admin/pages',
+  'src/modules/admin/users',
   'src/routes',
 ];
 const tokenizedStateFiles = [
@@ -26,6 +28,7 @@ const tokenizedStateFiles = [
   'src/components/pro/PageScaffold.tsx',
   'src/components/pro/Pagination.tsx',
   'src/components/pro/SideList.tsx',
+  'src/components/pro/DataTable.tsx',
   'src/components/pro/TableShell.tsx',
   'src/components/pro/Tree.tsx',
   'src/app/shell/widgets/AppearanceDrawer.tsx',
@@ -33,7 +36,7 @@ const tokenizedStateFiles = [
   'src/app/shell/widgets/NavMenuRail.tsx',
   'src/app/shell/widgets/NavMenuSidebar.tsx',
   'src/app/shell/widgets/SubsystemSwitcher.tsx',
-  'src/modules/admin/pages/users/MembersPanel.tsx',
+  'src/modules/admin/users/list/MembersTable.tsx',
   'src/modules/admin/pages/roles/RoleListPanel.tsx',
   'src/modules/admin/pages/roles/RolePermissionEditor.tsx',
   'src/modules/admin/pages/menus/MenuTreeTable.tsx',

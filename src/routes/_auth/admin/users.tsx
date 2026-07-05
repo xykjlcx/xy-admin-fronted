@@ -1,14 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { UsersPage } from '@/modules/admin/pages/users';
+import { UsersPage } from '@/modules/admin/users';
 import {
   deptsQuery,
   usersQuery,
   type UsersQueryParams,
-} from '@/modules/admin/api/user.api';
+} from '@/modules/admin/users/api';
+import type { UsersSearch } from '@/modules/admin/users/types';
 
 // 路由文件保持“薄”：只负责 URL search、loader 预热、staticData 和权限上下文转发。
-// 具体页面交互放到 modules/admin/pages/users，避免 TanStack Router 文件变成大组件。
+// 具体页面交互放到 modules/admin/users，避免 TanStack Router 文件变成大组件。
 const booleanSearchParam = z
   .preprocess((value) => {
     if (value === true || value === 'true') return true;
@@ -27,8 +28,6 @@ const searchSchema = z.object({
   keyword: z.string().catch(''),
 });
 
-type UsersSearch = UsersQueryParams & { keyword: string };
-
 export const Route = createFileRoute('/_auth/admin/users')({
   validateSearch: searchSchema,
   loaderDeps: ({ search }) => search,
@@ -36,7 +35,7 @@ export const Route = createFileRoute('/_auth/admin/users')({
   loader: ({ context, deps }) =>
     Promise.all([
       context.queryClient.ensureQueryData(deptsQuery),
-      context.queryClient.ensureQueryData(usersQuery(deps as UsersSearch)),
+      context.queryClient.ensureQueryData(usersQuery(deps)),
     ]),
   staticData: {
     labelKey: 'users.title',
@@ -54,7 +53,7 @@ export const Route = createFileRoute('/_auth/admin/users')({
 });
 
 function UsersRoute() {
-  const search = Route.useSearch() as UsersSearch;
+  const search: UsersSearch = Route.useSearch();
   const navigate = Route.useNavigate();
   const { me } = Route.useRouteContext();
 

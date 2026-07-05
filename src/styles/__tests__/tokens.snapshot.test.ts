@@ -16,6 +16,7 @@ const tooltipSource = readFileSync('src/components/ui/tooltip.tsx', 'utf8');
 const tabsSource = readFileSync('src/components/ui/tabs.tsx', 'utf8');
 const tableSource = readFileSync('src/components/ui/table.tsx', 'utf8');
 const animatedTabsSource = readFileSync('src/components/pro/AnimatedTabs.tsx', 'utf8');
+const dataTableSource = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
 const tableShellSource = readFileSync('src/components/pro/TableShell.tsx', 'utf8');
 const pageScaffoldSource = readFileSync('src/components/pro/PageScaffold.tsx', 'utf8');
 const sideListSource = readFileSync('src/components/pro/SideList.tsx', 'utf8');
@@ -26,8 +27,8 @@ const navMenuSidebarSource = readFileSync('src/app/shell/widgets/NavMenuSidebar.
 const navMenuRailSource = readFileSync('src/app/shell/widgets/NavMenuRail.tsx', 'utf8');
 const navMenuInsetSource = readFileSync('src/app/shell/widgets/NavMenuInset.tsx', 'utf8');
 const subsystemSwitcherSource = readFileSync('src/app/shell/widgets/SubsystemSwitcher.tsx', 'utf8');
-const membersPanelSource = readFileSync('src/modules/admin/pages/users/MembersPanel.tsx', 'utf8');
-const usersModelSource = readFileSync('src/modules/admin/pages/users/model.ts', 'utf8');
+const membersTableSource = readFileSync('src/modules/admin/users/list/MembersTable.tsx', 'utf8');
+const usersModelSource = readFileSync('src/modules/admin/users/model.ts', 'utf8');
 const roleListPanelSource = readFileSync('src/modules/admin/pages/roles/RoleListPanel.tsx', 'utf8');
 const rolesModelSource = readFileSync('src/modules/admin/pages/roles/model.ts', 'utf8');
 const roleDetailsPanelSource = readFileSync('src/modules/admin/pages/roles/RoleDetailsPanel.tsx', 'utf8');
@@ -733,8 +734,9 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(appearanceDrawerSource).toContain('bg-(--nav-item-bg-current)');
   expect(appearanceDrawerSource).toContain('text-(--nav-item-fg-current)');
 
-  expect(membersPanelSource).toContain('data-state={selectedIdSet.has(user.id) ?');
-  expect(membersPanelSource).toContain('bg-(--table-row-bg-selected)');
+  expect(dataTableSource).toContain("const state = selectedIdSet.has(id) ? 'selected' : rowState?.(row);");
+  expect(dataTableSource).toContain('data-state={state}');
+  expect(membersTableSource).toContain('bg-(--table-row-bg-selected)');
   expect(roleListPanelSource).toContain('bg-(--side-list-item-bg-active)');
   expect(rolePermissionEditorSource).toContain('bg-(--table-header-bg)');
   expect(usersModelSource).toContain('--accent-emphasis');

@@ -4,7 +4,7 @@ import { Folder } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataTable, type DataTableColumn } from '@/components/pro/DataTable';
 import { deptsQuery, type DeptDto } from '../api';
-import { buildDepthMap } from '../model';
+import { buildDepthMap, deptIndentClass } from '../model';
 
 export function DeptScene(): JSX.Element {
   const { t } = useTranslation('admin');
@@ -16,10 +16,7 @@ export function DeptScene(): JSX.Element {
       header: t('users.columns.dept'),
       width: '80%',
       cell: (dept) => (
-        <div
-          className="flex min-w-0 items-center gap-2"
-          style={{ paddingLeft: `calc(${(depthMap.get(dept.id) ?? 0) * 18}px * var(--app-scale))` }}
-        >
+        <div className={`flex min-w-0 items-center gap-2 ${deptIndentClass(depthMap.get(dept.id) ?? 0)}`}>
           <Folder className="size-4 shrink-0 text-text-3" />
           <span className="truncate text-sm text-text">{dept.name}</span>
         </div>

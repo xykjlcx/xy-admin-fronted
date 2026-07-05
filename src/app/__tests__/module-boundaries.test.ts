@@ -25,26 +25,39 @@ function readTsConfig(path: string) {
   };
 }
 
-test('admin routes import page entries from module pages', () => {
-  const routeEntries = readdirSync(adminRoutesDir)
+function getAdminRouteEntries() {
+  return readdirSync(adminRoutesDir)
     .filter((file) => file.endsWith('.tsx'))
     .map((file) => ({
       route: `src/routes/_auth/admin/${file}`,
       page: file.replace(/\.tsx$/, ''),
     }));
+}
+
+function getAdminPageImport(page: string) {
+  return page === 'users' ? '@/modules/admin/users' : `@/modules/admin/pages/${page}`;
+}
+
+function getAdminPageEntry(page: string) {
+  return page === 'users' ? 'src/modules/admin/users/index.tsx' : `src/modules/admin/pages/${page}/index.tsx`;
+}
+
+test('admin routes import page entries from module pages or vertical packages', () => {
+  const routeEntries = getAdminRouteEntries();
 
   for (const entry of routeEntries) {
     const source = readProjectFile(entry.route);
 
-    expect(source).toContain(`@/modules/admin/pages/${entry.page}`);
+    expect(source).toContain(getAdminPageImport(entry.page));
     expect(source).not.toContain('@/modules/admin/components');
+    if (entry.page === 'users') {
+      expect(source).not.toContain('@/modules/admin/pages/users');
+    }
   }
 });
 
 test('admin business pages expose an index entry', () => {
-  const pageEntries = readdirSync(adminRoutesDir)
-    .filter((file) => file.endsWith('.tsx'))
-    .map((file) => `src/modules/admin/pages/${file.replace(/\.tsx$/, '')}/index.tsx`);
+  const pageEntries = getAdminRouteEntries().map((entry) => getAdminPageEntry(entry.page));
 
   for (const entry of pageEntries) {
     expect(existsSync(resolve(projectRoot, entry))).toBe(true);
