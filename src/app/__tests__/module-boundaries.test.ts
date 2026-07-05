@@ -129,6 +129,16 @@ test('theme states route exposes the Step 7 table and shell state matrix', () =>
   expect(source).toContain('shellTokenItems');
 });
 
+test('theme states route exposes the Tree state matrix', () => {
+  const source = readProjectFile(themeStatesRoute);
+
+  expect(source).toContain('Tree');
+  expect(source).toContain('treeStateMatrix');
+  expect(source).toContain('treeThemeNodes');
+  expect(source).toContain('selectedId="rd"');
+  expect(source).toContain('treeAriaLabel');
+});
+
 test('theme states route exposes the Step 8 overlay and option state matrix', () => {
   const source = readProjectFile(themeStatesRoute);
 

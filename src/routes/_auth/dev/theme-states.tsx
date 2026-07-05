@@ -20,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
 import { DataTable, type DataTableColumn } from '@/components/pro/DataTable';
+import { Tree, type TreeNode } from '@/components/pro/Tree';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 import { SideList, type SideListItem } from '@/components/pro/SideList';
 import { Pagination } from '@/components/pro/Pagination';
@@ -75,10 +76,22 @@ interface DataTableThemeRow {
   statusKey: string;
 }
 
+interface TreeThemeNode {
+  id: string;
+  labelKey: string;
+  depth: number;
+  meta?: string;
+}
+
 const dataTableRows: DataTableThemeRow[] = [
   { id: 'selected', nameKey: 'dev.themeStates.dataTableSelected', statusKey: 'dev.themeStates.tableStatusEnabled' },
   { id: 'normal', nameKey: 'dev.themeStates.dataTableNormal', statusKey: 'dev.themeStates.tableStatusEnabled' },
   { id: 'disabled', nameKey: 'dev.themeStates.dataTableDisabled', statusKey: 'dev.themeStates.fieldInactive' },
+];
+const treeThemeNodes: TreeThemeNode[] = [
+  { id: 'all', labelKey: 'dev.themeStates.treeNodes.all', depth: 0, meta: '42' },
+  { id: 'rd', labelKey: 'dev.themeStates.treeNodes.rd', depth: 1, meta: '18' },
+  { id: 'ops', labelKey: 'dev.themeStates.treeNodes.ops', depth: 2, meta: '8' },
 ];
 
 function ThemeStatesRoute() {
@@ -99,6 +112,12 @@ function ThemeStatesRoute() {
     id,
     label: t(`dev.themeStates.sideList.${id}`),
     meta: id === 'members' ? '14' : undefined,
+  }));
+  const treeNodes: TreeNode[] = treeThemeNodes.map((node) => ({
+    id: node.id,
+    label: t(node.labelKey),
+    depth: node.depth,
+    meta: node.meta,
   }));
   const dataTableColumns: DataTableColumn<DataTableThemeRow>[] = [
     { key: 'name', header: t('dev.themeStates.tableName'), width: '45%', cell: (row) => t(row.nameKey) },
@@ -462,6 +481,16 @@ function ThemeStatesRoute() {
                 </TableShellRow>
               ))}
             </TableShell>
+          </div>
+
+          <div>
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.treeStateMatrix')}</p>
+            <Tree
+              nodes={treeNodes}
+              selectedId="rd"
+              onSelect={() => undefined}
+              ariaLabel={t('dev.themeStates.treeAriaLabel')}
+            />
           </div>
 
           <div className="xl:col-start-2">

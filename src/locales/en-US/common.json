@@ -173,6 +173,13 @@
         "roles": "Role management",
         "menus": "Menu management"
       },
+      "treeStateMatrix": "Tree selected state",
+      "treeAriaLabel": "Department tree state matrix",
+      "treeNodes": {
+        "all": "All departments",
+        "rd": "R&D center",
+        "ops": "Operations"
+      },
       "paginationTotal": "42 records",
       "paginationRefreshing": "Refreshing",
       "paginationPrev": "Previous page",

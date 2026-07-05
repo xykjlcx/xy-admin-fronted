@@ -27,6 +27,7 @@ const tokenizedStateFiles = [
   'src/components/pro/Pagination.tsx',
   'src/components/pro/SideList.tsx',
   'src/components/pro/TableShell.tsx',
+  'src/components/pro/Tree.tsx',
   'src/app/shell/widgets/AppearanceDrawer.tsx',
   'src/app/shell/widgets/NavMenuInset.tsx',
   'src/app/shell/widgets/NavMenuRail.tsx',

@@ -173,6 +173,13 @@
         "roles": "角色管理",
         "menus": "菜单管理"
       },
+      "treeStateMatrix": "树组件选中态",
+      "treeAriaLabel": "部门树状态矩阵",
+      "treeNodes": {
+        "all": "全部部门",
+        "rd": "研发中心",
+        "ops": "运营部"
+      },
       "paginationTotal": "共 42 条",
       "paginationRefreshing": "刷新中",
       "paginationPrev": "上一页",
