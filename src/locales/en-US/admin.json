@@ -149,7 +149,10 @@
       "dept": "Department",
       "role": "Role",
       "contact": "Contact",
-      "status": "Status"
+      "status": "Status",
+      "profileTab": "Profile",
+      "permissionTab": "Permissions",
+      "permissionPending": "Permission data source pending"
     }
   },
   "roles": {

@@ -149,7 +149,10 @@
       "dept": "部门",
       "role": "角色",
       "contact": "联系方式",
-      "status": "状态"
+      "status": "状态",
+      "profileTab": "基础信息",
+      "permissionTab": "权限",
+      "permissionPending": "权限数据源待定"
     }
   },
   "roles": {

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
 import { matchPermission } from '@/lib/permission';
 import { CreateUserDialog, EditUserDialog } from '@/modules/admin/pages/users/UserFormDialog';
+import { UserDetailPage } from '../detail/UserDetailPage';
 import { UsersToolbar } from './UsersToolbar';
 import { DeptTree } from './DeptTree';
 import { MembersTable } from './MembersTable';
@@ -28,7 +29,7 @@ export function MembersScene({
   const { data: depts = [] } = useQuery(deptsQuery);
   const mutations = useUserMutations();
   const [formState, setFormState] = useState<UserFormState>({ kind: 'closed' });
-  const [, setDetailUserId] = useState<string | null>(null);
+  const [detailUserId, setDetailUserId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserDto | null>(null);
   const canCreate = matchPermission(permissions, 'iam:user:create');
   const writable = variant === 'members';
@@ -102,6 +103,7 @@ export function MembersScene({
         onOpenChange={(open) => !open && setDeleteTarget(null)}
         onConfirm={confirmDelete}
       />
+      <UserDetailPage userId={detailUserId} onClose={() => setDetailUserId(null)} />
     </>
   );
 }
