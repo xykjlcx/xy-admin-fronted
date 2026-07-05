@@ -49,18 +49,20 @@ export function MembersScene({
         />
 
         <main className="flex min-w-0 flex-1 flex-col px-6 py-[calc(18px*var(--app-scale))]">
-          <UsersToolbar
-            variant={variant}
-            search={search}
-            canCreate={canCreate}
-            onSearchChange={onSearchChange}
-            onCreate={writable ? () => setFormState({ kind: 'create' }) : undefined}
-          />
           <MembersTable
             variant={variant}
             permissions={permissions}
             search={search}
             onSearchChange={onSearchChange}
+            toolbar={
+              <UsersToolbar
+                variant={variant}
+                search={search}
+                canCreate={canCreate}
+                onSearchChange={onSearchChange}
+                onCreate={writable ? () => setFormState({ kind: 'create' }) : undefined}
+              />
+            }
             onView={(user) => setDetailUserId(user.id)}
             onEdit={writable ? (user) => setFormState({ kind: 'edit', user }) : undefined}
             onDelete={writable ? setDeleteTarget : undefined}

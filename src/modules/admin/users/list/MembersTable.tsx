@@ -1,4 +1,4 @@
-import { useMemo, useState, type JSX } from 'react';
+import { useMemo, useState, type JSX, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { DataTable } from '@/components/pro/DataTable';
@@ -17,6 +17,7 @@ interface MembersTableProps {
   onEdit?: (user: UserDto) => void;
   onDelete?: (user: UserDto) => void;
   onBatchDisable?: (ids: string[]) => void | Promise<void>;
+  toolbar?: ReactNode;
 }
 
 const emptyUsersPage = { list: [], total: 0 };
@@ -30,6 +31,7 @@ export function MembersTable({
   onEdit,
   onDelete,
   onBatchDisable,
+  toolbar,
 }: MembersTableProps): JSX.Element {
   const { t } = useTranslation('admin');
   const [bulkResetVersion, setBulkResetVersion] = useState(0);
@@ -71,6 +73,7 @@ export function MembersTable({
           {t('users.countPeople', { count: usersPage.total })}
         </span>
       </div>
+      {toolbar}
 
       <DataTable
         columns={userColumns({ t, permissions, deptById, onView, onEdit, onDelete })}

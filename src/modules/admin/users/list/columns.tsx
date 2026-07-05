@@ -32,7 +32,7 @@ export function userColumns({
     {
       key: 'name',
       header: t('users.columns.name'),
-      width: '32%',
+      width: '24%',
       cell: (user, index) => (
         <div className="flex min-w-0 items-center gap-2.5">
           <div
@@ -58,7 +58,7 @@ export function userColumns({
     {
       key: 'phone',
       header: t('users.columns.phone'),
-      width: '21%',
+      width: '24%',
       cell: (user) => (
         <span className="block truncate text-[calc(13px*var(--app-scale))] text-text-2">{user.phone}</span>
       ),
@@ -66,7 +66,7 @@ export function userColumns({
     {
       key: 'dept',
       header: t('users.columns.dept'),
-      width: '16%',
+      width: '17%',
       cell: (user) => (
         <span className="block truncate text-[calc(13px*var(--app-scale))] text-text-2">
           {deptById.get(user.deptId)?.name ?? '-'}

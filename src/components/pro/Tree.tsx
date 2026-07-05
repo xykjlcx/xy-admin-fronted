@@ -39,7 +39,7 @@ export function Tree({ nodes, selectedId, onSelect, ariaLabel }: TreeProps): JSX
     <div
       role="tree"
       aria-label={ariaLabel}
-      className="grid gap-1 rounded-10 border border-(--side-list-border) bg-(--side-list-bg) p-2"
+      className="grid gap-1"
     >
       {nodes.map((node) => {
         const selected = node.id === selectedId;

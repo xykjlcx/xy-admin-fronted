@@ -59,6 +59,7 @@ export interface DataTableProps<T> {
 }
 
 const selectionColumnWidth = 'calc(44px * var(--app-scale))';
+const bodyCellClassName = 'py-[calc(12.5px*var(--app-scale))]';
 
 function alignClass(align: DataTableColumn<unknown>['align']) {
   if (align === 'center') return 'text-center';
@@ -181,7 +182,10 @@ export function DataTable<T>({
                     onClick={onRowClick ? () => onRowClick(row) : undefined}
                   >
                     {selectionEnabled && (
-                      <TableCell className="text-center" onClick={(event) => event.stopPropagation()}>
+                      <TableCell
+                        className={cn('text-center', bodyCellClassName)}
+                        onClick={(event) => event.stopPropagation()}
+                      >
                         <Checkbox
                           checked={selectedIdSet.has(id)}
                           onCheckedChange={() => toggleRow(id)}
@@ -189,7 +193,7 @@ export function DataTable<T>({
                       </TableCell>
                     )}
                     {columns.map((column) => (
-                      <TableCell key={column.key} className={alignClass(column.align)}>
+                      <TableCell key={column.key} className={cn(alignClass(column.align), bodyCellClassName)}>
                         {column.cell(row, index)}
                       </TableCell>
                     ))}
