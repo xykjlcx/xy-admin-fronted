@@ -20,7 +20,7 @@ export function AdminRolesPanel({
   const { t } = useTranslation('admin');
 
   return (
-    <div className="px-7 py-[calc(22px*var(--app-scale))]">
+    <div className="min-h-0 flex-1 overflow-y-auto px-7 py-[calc(22px*var(--app-scale))]">
       <div className="mb-4 flex items-center justify-between">
         <span className="text-[calc(13px*var(--app-scale))] text-text-3">{t('roles.adminIntro')}</span>
         {canCreateAdmin && (

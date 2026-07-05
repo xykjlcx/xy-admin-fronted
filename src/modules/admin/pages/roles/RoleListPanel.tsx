@@ -30,7 +30,7 @@ export function RoleListPanel({
   }, [roleKeyword, roles]);
 
   return (
-    <aside className="flex w-[calc(280px*var(--app-scale))] shrink-0 flex-col border-r border-(--side-list-border) bg-(--side-list-bg) px-3 py-4">
+    <aside className="flex min-h-0 w-[calc(280px*var(--app-scale))] shrink-0 flex-col border-r border-(--side-list-border) bg-(--side-list-bg) px-3 py-4">
       <SearchField
         containerClassName="mb-3"
         placeholder={t('roles.searchPlaceholder')}

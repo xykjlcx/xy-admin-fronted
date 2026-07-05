@@ -170,12 +170,16 @@ export function RolesView({
   };
 
   return (
-    <PageFrame breadcrumbs={[{ label: t('roles.breadcrumbGroup') }, { label: t('roles.title') }]}>
-      <PageSurface>
+    <PageFrame
+      data-role-page-frame
+      breadcrumbs={[{ label: t('roles.breadcrumbGroup') }, { label: t('roles.title') }]}
+      className="h-[calc(100vh-3.5rem)] overflow-hidden"
+    >
+      <PageSurface data-role-page-surface className="min-h-0 flex-1">
         <PageTabs value={pageTab} items={pageTabItems} onValueChange={setPageTab} />
 
         {pageTab === 'roles' ? (
-          <div className="flex min-h-0 flex-1">
+          <div data-role-workspace className="flex min-h-0 flex-1 overflow-hidden">
             <RoleListPanel
               roles={roles}
               currentRoleId={currentRoleId}
@@ -183,7 +187,10 @@ export function RolesView({
               onActiveRoleChange={onActiveRoleChange}
               onCreateRole={() => setRoleDialogOpen(true)}
             />
-            <main className="flex min-w-0 flex-1 flex-col px-7 py-[calc(22px*var(--app-scale))]">
+            <main
+              data-role-detail-scroll
+              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain px-7 py-[calc(22px*var(--app-scale))]"
+            >
               <RoleDetailsPanel
                 activeRole={activeRole}
                 currentRoleId={currentRoleId}

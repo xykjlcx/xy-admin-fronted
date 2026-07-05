@@ -111,6 +111,27 @@ test('viewer 能看角色详情但看不到写操作入口', () => {
   expect(screen.queryByRole('button', { name: '删除角色' })).not.toBeInTheDocument();
 });
 
+test('业务角色页固定页面高度，只让右侧详情区滚动', () => {
+  const { container } = renderRolesView({ permissions: ['*:*:*'] });
+
+  const frame = container.querySelector('[data-role-page-frame]');
+  const surface = container.querySelector('[data-role-page-surface]');
+  const workspace = container.querySelector('[data-role-workspace]');
+  const detailScroll = container.querySelector('[data-role-detail-scroll]');
+
+  expect(frame).toBeInTheDocument();
+  expect(frame).toHaveClass('h-[calc(100vh-3.5rem)]');
+  expect(frame).toHaveClass('overflow-hidden');
+  expect(surface).toBeInTheDocument();
+  expect(surface).toHaveClass('min-h-0');
+  expect(surface).toHaveClass('flex-1');
+  expect(workspace).toBeInTheDocument();
+  expect(workspace).toHaveClass('overflow-hidden');
+  expect(detailScroll).toBeInTheDocument();
+  expect(detailScroll).toHaveClass('min-h-0');
+  expect(detailScroll).toHaveClass('overflow-y-auto');
+});
+
 test('admin 可以新增业务角色', async () => {
   const onCreateRole = vi.fn();
   renderRolesView({ permissions: ['*:*:*'], onCreateRole });

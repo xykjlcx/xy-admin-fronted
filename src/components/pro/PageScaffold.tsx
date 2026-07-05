@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from 'react';
+import { Fragment, type ComponentProps, type ReactNode } from 'react';
 import { AnimatedTabs } from '@/components/pro/AnimatedTabs';
 import { cn } from '@/lib/utils';
 
@@ -6,17 +6,23 @@ export interface PageBreadcrumbItem {
   label: ReactNode;
 }
 
+type PageFrameProps = Omit<ComponentProps<'section'>, 'children'> & {
+  breadcrumbs: PageBreadcrumbItem[];
+  children: ReactNode;
+};
+
 export function PageFrame({
   breadcrumbs,
   children,
-}: {
-  breadcrumbs: PageBreadcrumbItem[];
-  children: ReactNode;
-}) {
+  className,
+  style,
+  ...props
+}: PageFrameProps) {
   return (
     <section
-      className="flex min-h-0 flex-col bg-(--pro-page-bg) text-text"
-      style={{ padding: 'calc(20px * var(--app-scale)) calc(28px * var(--app-scale))' }}
+      {...props}
+      className={cn('flex min-h-0 flex-col bg-(--pro-page-bg) text-text', className)}
+      style={{ padding: 'calc(20px * var(--app-scale)) calc(28px * var(--app-scale))', ...style }}
     >
       <div className="mb-4 flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
         {breadcrumbs.map((item, index) => (
@@ -31,15 +37,18 @@ export function PageFrame({
   );
 }
 
+type PageSurfaceProps = Omit<ComponentProps<'div'>, 'children'> & {
+  children: ReactNode;
+};
+
 export function PageSurface({
   children,
   className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+  ...props
+}: PageSurfaceProps) {
   return (
     <div
+      {...props}
       className={cn(
         'flex min-h-[calc(640px*var(--app-scale))] flex-col overflow-hidden rounded-12 border border-(--pro-panel-border) bg-(--pro-panel-bg) shadow-xs',
         className,
