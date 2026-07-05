@@ -35,6 +35,11 @@ export interface DataTablePagination {
   pageCount: number;
   total: number;
   refreshing?: boolean;
+  totalLabel: string;
+  refreshingLabel?: string;
+  prevLabel: string;
+  nextLabel: string;
+  currentLabel: string;
   onPageChange: (page: number) => void;
 }
 
@@ -77,6 +82,8 @@ export function DataTable<T>({
   const selectionEnabled = !!selection?.enabled;
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const previousResetKey = useRef(resetSelectionKey);
+  const onSelectionChangeRef = useRef(selection?.onSelectionChange);
+  const selectionNotificationReady = useRef(false);
   const visibleIds = useMemo(() => data.map((row) => rowKey(row)), [data, rowKey]);
   const visibleIdSet = useMemo(() => new Set(visibleIds), [visibleIds]);
   const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
@@ -88,16 +95,27 @@ export function DataTable<T>({
   useEffect(() => {
     if (previousResetKey.current === resetSelectionKey) return;
     previousResetKey.current = resetSelectionKey;
-    setSelectedIds([]);
-    selection?.onSelectionChange?.([]);
-  }, [resetSelectionKey, selection]);
+    setSelectedIds((current) => (current.length > 0 ? [] : current));
+  }, [resetSelectionKey]);
+
+  useEffect(() => {
+    onSelectionChangeRef.current = selection?.onSelectionChange;
+  }, [selection?.onSelectionChange]);
+
+  useEffect(() => {
+    if (!selectionEnabled) {
+      selectionNotificationReady.current = false;
+      return;
+    }
+    if (!selectionNotificationReady.current) {
+      selectionNotificationReady.current = true;
+      return;
+    }
+    onSelectionChangeRef.current?.(selectedIds);
+  }, [selectedIds, selectionEnabled]);
 
   const updateSelectedIds = (updater: (current: string[]) => string[]) => {
-    setSelectedIds((current) => {
-      const next = updater(current);
-      selection?.onSelectionChange?.(next);
-      return next;
-    });
+    setSelectedIds((current) => updater(current));
   };
 
   const toggleRow = (id: string) => {
@@ -193,11 +211,11 @@ export function DataTable<T>({
         <Pagination
           page={pagination.page}
           pageCount={pagination.pageCount}
-          totalLabel={`共 ${pagination.total} 条`}
-          refreshingLabel={pagination.refreshing ? '正在更新' : undefined}
-          prevLabel="上一页"
-          nextLabel="下一页"
-          currentLabel={`当前第 ${pagination.page} 页`}
+          totalLabel={pagination.totalLabel}
+          refreshingLabel={pagination.refreshing ? pagination.refreshingLabel : undefined}
+          prevLabel={pagination.prevLabel}
+          nextLabel={pagination.nextLabel}
+          currentLabel={pagination.currentLabel}
           onPageChange={pagination.onPageChange}
         />
       )}

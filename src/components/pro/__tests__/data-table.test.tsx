@@ -45,6 +45,10 @@ test('DataTable renders semantic table, col widths, cells and pagination', async
         page: 1,
         pageCount: 2,
         total: 4,
+        totalLabel: '4 records',
+        prevLabel: 'Previous',
+        nextLabel: 'Next',
+        currentLabel: 'Page 1',
         onPageChange,
       }}
     />,
@@ -59,8 +63,8 @@ test('DataTable renders semantic table, col widths, cells and pagination', async
   expect(screen.getByRole('cell', { name: '李长昕' })).toBeInTheDocument();
   expect(screen.getByRole('cell', { name: '王思远' })).toBeInTheDocument();
 
-  expect(screen.getByText('共 4 条')).toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: '下一页' }));
+  expect(screen.getByText('4 records')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Next' }));
   expect(onPageChange).toHaveBeenCalledWith(2);
 });
 
@@ -165,4 +169,19 @@ test('DataTable uses ui table and checkbox primitives without module or i18n cou
   expect(source).not.toContain('TableShell');
   expect(source).not.toContain('@/modules/');
   expect(source).not.toContain('useTranslation');
+  expect(source).not.toContain('共 ');
+  expect(source).not.toContain('正在更新');
+  expect(source).not.toContain('上一页');
+  expect(source).not.toContain('下一页');
+  expect(source).not.toContain('当前第');
+});
+
+test('DataTable does not notify selection from inside a React state updater', () => {
+  const source = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
+  const updaterCalls = source.match(/setSelectedIds\(\s*\(current\)\s*=>[\s\S]*?\);/g) ?? [];
+
+  expect(updaterCalls.length).toBeGreaterThan(0);
+  updaterCalls.forEach((call) => {
+    expect(call).not.toContain('onSelectionChange');
+  });
 });

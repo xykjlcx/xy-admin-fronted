@@ -408,6 +408,11 @@ function ThemeStatesRoute() {
                   pageCount: 4,
                   total: 42,
                   refreshing: true,
+                  totalLabel: t('dev.themeStates.paginationTotal'),
+                  refreshingLabel: t('dev.themeStates.paginationRefreshing'),
+                  prevLabel: t('dev.themeStates.paginationPrev'),
+                  nextLabel: t('dev.themeStates.paginationNext'),
+                  currentLabel: t('dev.themeStates.paginationCurrent'),
                   onPageChange: () => undefined,
                 }}
               />
