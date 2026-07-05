@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
 import { matchPermission } from '@/lib/permission';
-import { CreateUserDialog, EditUserDialog } from '@/modules/admin/pages/users/UserFormDialog';
 import { UserDetailPage } from '../detail/UserDetailPage';
+import { UserFormDialog } from '../form/UserFormDialog';
 import { UsersToolbar } from './UsersToolbar';
 import { DeptTree } from './DeptTree';
 import { MembersTable } from './MembersTable';
@@ -75,19 +75,14 @@ export function MembersScene({
         </main>
       </div>
 
-      <CreateUserDialog
-        open={formState.kind === 'create'}
+      <UserFormDialog
+        state={formState}
         depts={depts}
         onOpenChange={(open) => !open && setFormState({ kind: 'closed' })}
         onCreateUser={async (dto) => {
           await mutations.createUser.mutateAsync(dto);
           setFormState({ kind: 'closed' });
         }}
-      />
-      <EditUserDialog
-        user={formState.kind === 'edit' ? formState.user : null}
-        depts={depts}
-        onOpenChange={(open) => !open && setFormState({ kind: 'closed' })}
         onUpdateUser={async (id, dto) => {
           await mutations.updateUser.mutateAsync({ id, dto });
           setFormState({ kind: 'closed' });
