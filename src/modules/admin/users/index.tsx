@@ -35,7 +35,7 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
         <PageTabs value={activeTab} items={tabItems} onValueChange={switchTab} />
 
         {activeTab === 'depts' ? (
-          <DeptScene />
+          <DeptScene search={search} onSearchChange={onSearchChange} />
         ) : (
           <MembersScene
             variant={activeTab}

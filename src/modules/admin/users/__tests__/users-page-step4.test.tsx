@@ -55,7 +55,9 @@ test('users page mounts members scene and department scene from vertical list co
 
   await userEvent.click(screen.getByRole('tab', { name: '部门' }));
   await waitFor(() => expect(screen.getByText('组织架构')).toBeInTheDocument());
-  expect(screen.getByText('产品研发中心')).toBeInTheDocument();
+  expect(screen.getByRole('tree', { name: '部门' })).toBeInTheDocument();
+  expect(screen.getByRole('treeitem', { name: '全部成员 14' })).toBeInTheDocument();
+  expect(screen.getAllByText('产品研发中心').length).toBeGreaterThanOrEqual(2);
 });
 
 test('members table selection reset scope includes pagination before new data arrives', () => {

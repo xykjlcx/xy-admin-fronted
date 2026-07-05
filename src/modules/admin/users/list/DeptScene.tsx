@@ -3,10 +3,18 @@ import { useQuery } from '@tanstack/react-query';
 import { Folder } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataTable, type DataTableColumn } from '@/components/pro/DataTable';
-import { deptsQuery, type DeptDto } from '../api';
+import { deptsQuery, type DeptDto, type UsersQueryParams } from '../api';
 import { buildDepthMap, deptIndentClass } from '../model';
+import { DeptTree } from './DeptTree';
+import type { UsersSearch } from '../types';
 
-export function DeptScene(): JSX.Element {
+export function DeptScene({
+  search,
+  onSearchChange,
+}: {
+  search: UsersSearch;
+  onSearchChange: (patch: Partial<UsersQueryParams>) => void;
+}): JSX.Element {
   const { t } = useTranslation('admin');
   const { data: depts = [], isPending } = useQuery(deptsQuery);
   const depthMap = useMemo(() => buildDepthMap(depts), [depts]);
@@ -35,21 +43,27 @@ export function DeptScene(): JSX.Element {
   ] satisfies DataTableColumn<DeptDto>[];
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col px-6 py-[calc(18px*var(--app-scale))]">
-      <div className="mb-4 flex items-center">
-        <span className="text-base font-bold">{t('users.deptList.title')}</span>
-        <span className="ml-3 text-[calc(13px*var(--app-scale))] text-text-3">
-          {t('users.deptList.subtitle')}
-        </span>
-      </div>
-      <DataTable
-        columns={columns}
-        data={depts}
-        rowKey={(dept) => dept.id}
-        loading={isPending}
-        emptyText={t('users.deptList.empty')}
-        loadingText={t('users.deptList.loading')}
+    <div className="flex min-h-0 flex-1">
+      <DeptTree
+        selectedId={search.deptId}
+        onSelect={(deptId) => onSearchChange({ deptId, page: 1 })}
       />
-    </main>
+      <main className="flex min-w-0 flex-1 flex-col px-6 py-[calc(18px*var(--app-scale))]">
+        <div className="mb-4 flex items-center">
+          <span className="text-base font-bold">{t('users.deptList.title')}</span>
+          <span className="ml-3 text-[calc(13px*var(--app-scale))] text-text-3">
+            {t('users.deptList.subtitle')}
+          </span>
+        </div>
+        <DataTable
+          columns={columns}
+          data={depts}
+          rowKey={(dept) => dept.id}
+          loading={isPending}
+          emptyText={t('users.deptList.empty')}
+          loadingText={t('users.deptList.loading')}
+        />
+      </main>
+    </div>
   );
 }
