@@ -1,0 +1,83 @@
+{
+  "generatedAt": "2026-07-05T17:35:00+08:00",
+  "tool": "Agent Browser CLI",
+  "baseUrl": "http://localhost:5173",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "scale": {
+    "sm": 0.9,
+    "md": 1,
+    "lg": 1.08
+  },
+  "scenarios": [
+    {
+      "key": "members-sm",
+      "tab": "members",
+      "zoom": "sm",
+      "url": "/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "file": "test-results/baseline-users/users-members-sm.png"
+    },
+    {
+      "key": "members-md",
+      "tab": "members",
+      "zoom": "md",
+      "url": "/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "file": "test-results/baseline-users/users-members-md.png"
+    },
+    {
+      "key": "members-lg",
+      "tab": "members",
+      "zoom": "lg",
+      "url": "/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "file": "test-results/baseline-users/users-members-lg.png"
+    },
+    {
+      "key": "depts-sm",
+      "tab": "depts",
+      "zoom": "sm",
+      "url": "/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "file": "test-results/baseline-users/users-depts-sm.png"
+    },
+    {
+      "key": "depts-md",
+      "tab": "depts",
+      "zoom": "md",
+      "url": "/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "file": "test-results/baseline-users/users-depts-md.png"
+    },
+    {
+      "key": "depts-lg",
+      "tab": "depts",
+      "zoom": "lg",
+      "url": "/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "file": "test-results/baseline-users/users-depts-lg.png"
+    },
+    {
+      "key": "left-sm",
+      "tab": "left",
+      "zoom": "sm",
+      "url": "/admin/users?page=1&pageSize=10&status=left&keyword=",
+      "file": "test-results/baseline-users/users-left-sm.png"
+    },
+    {
+      "key": "left-md",
+      "tab": "left",
+      "zoom": "md",
+      "url": "/admin/users?page=1&pageSize=10&status=left&keyword=",
+      "file": "test-results/baseline-users/users-left-md.png"
+    },
+    {
+      "key": "left-lg",
+      "tab": "left",
+      "zoom": "lg",
+      "url": "/admin/users?page=1&pageSize=10&status=left&keyword=",
+      "file": "test-results/baseline-users/users-left-lg.png"
+    }
+  ],
+  "notes": [
+    "pnpm visual failed during scale check with status popover not found; manual users baselines were captured with Agent Browser fallback.",
+    "Each screenshot was preceded by text assertions for the target tab and expected content."
+  ]
+}
