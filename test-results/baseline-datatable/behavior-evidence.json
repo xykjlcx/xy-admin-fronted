@@ -1,0 +1,251 @@
+{
+  "generatedAt": "2026-07-06T03:38:49.074Z",
+  "evidence": [
+    {
+      "label": "initial",
+      "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "checked": [
+        {
+          "index": 0,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 1,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 2,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 3,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 4,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 5,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 6,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 7,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 8,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 9,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 10,
+          "checked": false,
+          "indeterminate": false
+        }
+      ],
+      "bulkText": null,
+      "hasBatchDisable": false,
+      "activePage": "1",
+      "firstRows": [
+        "长昕\n李长昕\n\t\n正常\t\n+86 158 0611 9676\n\t\n产品研发中心\n\t\n详情\n编辑\n删除李长昕",
+        "思远\n王思远\n\t\n正常\t\n+86 139 2288 1043\n\t\n前端组\n\t\n详情\n编辑\n删除王思远",
+        "嘉怡\n陈嘉怡\n\t\n正常\t\n+86 137 5501 8829\n\t\n后端组\n\t\n详情\n编辑\n删除陈嘉怡"
+      ]
+    },
+    {
+      "label": "single row selected",
+      "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "checked": [
+        {
+          "index": 0,
+          "checked": false,
+          "indeterminate": true
+        },
+        {
+          "index": 1,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 2,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 3,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 4,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 5,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 6,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 7,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 8,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 9,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 10,
+          "checked": false,
+          "indeterminate": false
+        }
+      ],
+      "bulkText": null,
+      "hasBatchDisable": true,
+      "activePage": "1",
+      "firstRows": [
+        "长昕\n李长昕\n\t\n正常\t\n+86 158 0611 9676\n\t\n产品研发中心\n\t\n详情\n编辑\n删除李长昕",
+        "思远\n王思远\n\t\n正常\t\n+86 139 2288 1043\n\t\n前端组\n\t\n详情\n编辑\n删除王思远",
+        "嘉怡\n陈嘉怡\n\t\n正常\t\n+86 137 5501 8829\n\t\n后端组\n\t\n详情\n编辑\n删除陈嘉怡"
+      ]
+    },
+    {
+      "label": "select all visible rows",
+      "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "checked": [
+        {
+          "index": 0,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 1,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 2,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 3,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 4,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 5,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 6,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 7,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 8,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 9,
+          "checked": true,
+          "indeterminate": false
+        },
+        {
+          "index": 10,
+          "checked": true,
+          "indeterminate": false
+        }
+      ],
+      "bulkText": null,
+      "hasBatchDisable": true,
+      "activePage": "1",
+      "firstRows": [
+        "长昕\n李长昕\n\t\n正常\t\n+86 158 0611 9676\n\t\n产品研发中心\n\t\n详情\n编辑\n删除李长昕",
+        "思远\n王思远\n\t\n正常\t\n+86 139 2288 1043\n\t\n前端组\n\t\n详情\n编辑\n删除王思远",
+        "嘉怡\n陈嘉怡\n\t\n正常\t\n+86 137 5501 8829\n\t\n后端组\n\t\n详情\n编辑\n删除陈嘉怡"
+      ]
+    },
+    {
+      "label": "after next page",
+      "url": "http://localhost:5173/admin/users?page=2&pageSize=10&status=all&keyword=",
+      "checked": [
+        {
+          "index": 0,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 1,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 2,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 3,
+          "checked": false,
+          "indeterminate": false
+        },
+        {
+          "index": 4,
+          "checked": false,
+          "indeterminate": false
+        }
+      ],
+      "bulkText": null,
+      "hasBatchDisable": false,
+      "activePage": "2",
+      "firstRows": [
+        "晓东\n马晓东\n\t\n正常\t\n+86 136 5540 1198\n\t\n财务部\n\t\n详情\n编辑\n删除马晓东",
+        "佳慧\n林佳慧\n\t\n正常\t\n+86 189 3312 7745\n\t\n行政部\n\t\n详情\n编辑\n删除林佳慧",
+        "天翔\n高天翔\n\t\n未激活\t\n+86 132 8890 3324\n\t\n前端组\n\t\n详情\n编辑\n删除高天翔"
+      ]
+    }
+  ]
+}
