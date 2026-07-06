@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { routeTree } from '@/routeTree.gen';
 import { Providers } from './providers';
+import { RouteError } from './RouteError';
 import { queryClient } from './query';
 import { authEvents } from '@/lib/http/events';
 import { resetAuth } from '@/lib/reset-auth';
@@ -17,6 +18,8 @@ export const router = createRouter({
   routeTree,
   context: { queryClient },
   defaultPreload: 'intent',
+  // 全局错误兜底：无此项时渲染期错误的 CatchBoundary 退化为 SafeFragment，错误冒泡到 React 根导致白屏（诊断 F2）。
+  defaultErrorComponent: RouteError,
 });
 declare module '@tanstack/react-router' {
   interface Register {

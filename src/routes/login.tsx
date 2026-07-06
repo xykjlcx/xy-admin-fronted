@@ -18,6 +18,12 @@ import { cn } from '@/lib/utils';
 import { appConfig } from '@/config';
 
 const searchSchema = z.object({ redirect: z.string().optional() });
+
+// 同源校验：只接受站内绝对路径，挡掉 //evil.com、/\evil.com、http(s):// 等开放重定向注入
+function safeInternalPath(to: string | undefined): string {
+  if (to && to.startsWith('/') && !to.startsWith('//') && !to.startsWith('/\\')) return to;
+  return appConfig.routes.home;
+}
 export const Route = createFileRoute('/login')({
   validateSearch: searchSchema,
   component: LoginPage,
@@ -54,8 +60,8 @@ function LoginPage() {
       const { token } = await authApi.login(dto);
       resetAuth(token); // 清上个账号的 me 缓存 + 存新 token，防权限串号
       await router.invalidate(); // 关键：登录后 beforeLoad 不会自动重跑（spec §9）
-      // to 来自守卫写入的 location.href，可能带 ?query；用 href 而非 to，避免整串被当 pathname 解析导致 404
-      void nav({ href: to ?? appConfig.routes.home });
+      // to 来自守卫写入的 pathname+search，可能带 ?query；safeInternalPath 做同源校验防开放重定向
+      void nav({ href: safeInternalPath(to) });
     } catch (e) {
       setError('root', { message: (e as Error).message });
     }

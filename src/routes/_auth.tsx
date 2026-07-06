@@ -12,7 +12,7 @@ import { appConfig } from '@/config';
 export const Route = createFileRoute('/_auth')({
   beforeLoad: async ({ context, location, matches }) => {
     if (!useAuth.getState().token)
-      throw redirect({ to: appConfig.routes.login, search: { redirect: location.href } });
+      throw redirect({ to: appConfig.routes.login, search: { redirect: location.pathname + location.searchStr } });
     const me = await context.queryClient.ensureQueryData(meQuery);
     // 页面级守卫：取目标叶子路由 staticData.permission 校验（只 throw，禁 toast——preload=intent hover 即触发）
     const need = matches[matches.length - 1]?.staticData?.permission;

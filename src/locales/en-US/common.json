@@ -56,6 +56,12 @@
   "errors": {
     "403": "You do not have access",
     "404": "Page not found",
+    "500": "Something went wrong",
+    "network": "Network error, please try again",
+    "contract": "Unexpected data format, please contact your admin",
+    "authExpired": "Session expired, please sign in again",
+    "refetchFailed": "Failed to refresh, please try again",
+    "retry": "Retry",
     "backHome": "Back home"
   },
   "dev": {
