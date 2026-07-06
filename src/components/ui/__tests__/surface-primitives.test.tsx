@@ -257,6 +257,16 @@ test('交互型基础组件统一使用 pointer 光标', () => {
   expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('cursor-pointer');
 });
 
+test('Checkbox 保持内联原语契约并压低 baseline 漂移风险', () => {
+  render(<Checkbox aria-label="选择成员" />);
+
+  expect(screen.getByRole('checkbox', { name: '选择成员' }).closest('[data-slot="checkbox"]')).toHaveClass(
+    'inline-flex',
+    'align-middle',
+    'leading-none',
+  );
+});
+
 test('Input 支持前缀组合形态和错误态', () => {
   render(<Input aria-label="邮箱" prefix="@" status="error" defaultValue="demo" />);
 

@@ -12,6 +12,7 @@ import { resetDb } from '@/mocks/db';
 
 const server = setupServer(...usersModuleHandlers);
 const defaultSearch: UsersSearch = { page: 1, pageSize: 10, status: 'all', keyword: '' };
+const fullPermissions = ['*:*:*'];
 
 beforeAll(async () => {
   await i18nInit;
@@ -23,12 +24,12 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-function renderUsersPage(search: UsersSearch = defaultSearch) {
+function renderUsersPage(search: UsersSearch = defaultSearch, permissions = fullPermissions) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
   render(
     <QueryClientProvider client={queryClient}>
-      <UsersPage permissions={['*:*:*']} search={search} onSearchChange={() => undefined} />
+      <UsersPage permissions={permissions} search={search} onSearchChange={() => undefined} />
     </QueryClientProvider>,
   );
 }
@@ -84,6 +85,16 @@ test('batch disable clears member table selection after mutation succeeds', asyn
   await userEvent.click(screen.getByRole('button', { name: '批量禁用' }));
 
   await waitFor(() => expect(screen.queryByText('已选 1 人')).not.toBeInTheDocument());
+  expect(screen.queryByRole('button', { name: '批量禁用' })).not.toBeInTheDocument();
+});
+
+test('members table hides row selection when batch disable permission is absent', async () => {
+  renderUsersPage(defaultSearch, ['iam:user:view']);
+
+  await screen.findByText('李长昕');
+
+  expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+  expect(screen.queryByText(/已选 \d+ 人/)).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '批量禁用' })).not.toBeInTheDocument();
 });
 

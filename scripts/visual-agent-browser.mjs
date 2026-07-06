@@ -437,6 +437,16 @@ function assertStatusPopover(session) {
     `
     const button = [...document.querySelectorAll('button')].find((item) => item.textContent?.includes('账号状态'));
     if (!button) throw new Error('status filter button not found');
+    button.dispatchEvent(new PointerEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+      buttons: 1,
+    }));
+    button.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0, buttons: 1 }));
+    button.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, button: 0 }));
     button.click();
     true;
     `,
@@ -445,10 +455,8 @@ function assertStatusPopover(session) {
   evalIn(
     session,
     `
-    const candidates = [...document.querySelectorAll('div')].filter((el) => {
-      const style = getComputedStyle(el);
-      return style.position === 'absolute' && el.textContent?.includes('停用') && el.textContent?.includes('未激活');
-    });
+    const candidates = [...document.querySelectorAll('[data-slot="dropdown-menu-content"], [data-slot="select-content"], [data-radix-popper-content-wrapper]')]
+      .filter((el) => el.textContent?.includes('停用') && el.textContent?.includes('未激活'));
     const popover = candidates[0];
     if (!popover) throw new Error('status popover not found');
     const rect = popover.getBoundingClientRect();
@@ -461,11 +469,11 @@ function assertStatusPopover(session) {
 }
 
 function assertDetailSheet(session) {
+  agent(session, ['press', 'Escape'], { allowFailure: true });
+  agent(session, ['wait', '100']);
   evalIn(
     session,
     `
-    const statusButton = [...document.querySelectorAll('button')].find((item) => item.textContent?.includes('账号状态'));
-    if (statusButton) statusButton.click();
     const detailButton = [...document.querySelectorAll('button')].find((item) => item.textContent?.trim() === '详情');
     if (!detailButton) throw new Error('detail button not found');
     detailButton.click();

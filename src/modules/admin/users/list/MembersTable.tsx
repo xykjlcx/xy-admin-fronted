@@ -52,6 +52,7 @@ export function MembersTable({
   const deptById = useMemo(() => new Map(depts.map((dept) => [dept.id, dept])), [depts]);
   const selectedDeptLabel = search.deptId ? deptById.get(search.deptId)?.name : t('users.allMembers');
   const canDisable = !!onBatchDisable && matchPermission(permissions, 'iam:user:resign');
+  const selectionEnabled = variant === 'members' && canDisable;
 
   const handleBatchDisable = async (ids: string[]) => {
     if (!onBatchDisable) return;
@@ -77,26 +78,25 @@ export function MembersTable({
         emptyText={t('users.empty')}
         loadingText={t('users.loading')}
         selection={{
-          enabled: variant === 'members',
+          enabled: selectionEnabled,
           rowSelection,
           onRowSelectionChange,
-          renderBulkBar: (selectedVisibleIds) =>
-            canDisable ? (
-              <div className="mb-4 flex items-center justify-between rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
-                <span className="text-[calc(13px*var(--app-scale))] text-text-2">
-                  {t('users.selectedCount', { count: selectedVisibleIds.length })}
-                </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    void handleBatchDisable(selectedVisibleIds);
-                  }}
-                >
-                  {t('users.actions.batchDisable')}
-                </Button>
-              </div>
-            ) : null,
+          renderBulkBar: (selectedVisibleIds) => (
+            <div className="mb-4 flex items-center justify-between rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
+              <span className="text-[calc(13px*var(--app-scale))] text-text-2">
+                {t('users.selectedCount', { count: selectedVisibleIds.length })}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  void handleBatchDisable(selectedVisibleIds);
+                }}
+              >
+                {t('users.actions.batchDisable')}
+              </Button>
+            </div>
+          ),
         }}
         pagination={{
           page: search.page,

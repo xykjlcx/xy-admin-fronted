@@ -60,6 +60,7 @@ export interface DataTableProps<T> {
 
 const bodyCellClassName = 'py-[calc(12.5px*var(--app-scale))]';
 const emptyRowSelection: RowSelectionState = {};
+const selectionCellContentClassName = 'flex items-center justify-center leading-none';
 
 function alignClass(align: DataTableAlign | undefined) {
   if (align === 'center') return 'text-center';
@@ -80,8 +81,8 @@ export function DataTable<T>({
   rowState,
 }: DataTableProps<T>): JSX.Element {
   const selectionEnabled = !!selection?.enabled;
-  const rowSelection = selection?.rowSelection ?? emptyRowSelection;
-  const onRowSelectionChange = selection?.onRowSelectionChange;
+  const rowSelection = selectionEnabled ? selection.rowSelection : emptyRowSelection;
+  const onRowSelectionChange = selectionEnabled ? selection.onRowSelectionChange : undefined;
 
   const selectionColumn = useMemo<ColumnDef<T>>(
     () => ({
@@ -93,22 +94,26 @@ export function DataTable<T>({
         const someSelected = table.getIsSomePageRowsSelected();
 
         return (
-          <Checkbox
-            checked={allSelected}
-            indeterminate={someSelected && !allSelected}
-            onCheckedChange={(checked) => table.toggleAllPageRowsSelected(checked)}
-            aria-label={selection?.selectAllAriaLabel}
-            onClick={(event) => event.stopPropagation()}
-          />
+          <div className={selectionCellContentClassName}>
+            <Checkbox
+              checked={allSelected}
+              indeterminate={someSelected && !allSelected}
+              onCheckedChange={(checked) => table.toggleAllPageRowsSelected(checked)}
+              aria-label={selection?.selectAllAriaLabel}
+              onClick={(event) => event.stopPropagation()}
+            />
+          </div>
         );
       },
       cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(checked) => row.toggleSelected(checked)}
-          aria-label={selection?.rowSelectAriaLabel}
-          onClick={(event) => event.stopPropagation()}
-        />
+        <div className={selectionCellContentClassName}>
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(checked) => row.toggleSelected(checked)}
+            aria-label={selection?.rowSelectAriaLabel}
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
       ),
     }),
     [selection?.rowSelectAriaLabel, selection?.selectAllAriaLabel],
@@ -171,7 +176,7 @@ export function DataTable<T>({
               <LoadingRows columns={columnCount} loadingText={loadingText} />
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => {
-                const state = row.getIsSelected() ? 'selected' : rowState?.(row.original);
+                const state = selectionEnabled && row.getIsSelected() ? 'selected' : rowState?.(row.original);
 
                 return (
                   <TableRow

@@ -134,6 +134,28 @@ test('DataTable uses controlled TanStack row selection scoped to current page', 
   expect(screen.queryByText('当前页已选 u1')).not.toBeInTheDocument();
 });
 
+test('DataTable ignores external row selection state when selection is disabled', () => {
+  render(
+    <DataTable
+      columns={columns}
+      data={pageOneRows}
+      rowKey={(row) => row.id}
+      emptyText="暂无成员"
+      loadingText="正在加载成员"
+      selection={{
+        enabled: false,
+        rowSelection: { u1: true },
+        onRowSelectionChange: () => undefined,
+        renderBulkBar: (ids) => <div>当前页已选 {ids.join(',')}</div>,
+      }}
+    />,
+  );
+
+  expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+  expect(screen.queryByText(/当前页已选/)).not.toBeInTheDocument();
+  expect(screen.getByRole('cell', { name: '李长昕' }).closest('tr')).not.toHaveAttribute('data-state', 'selected');
+});
+
 test('DataTable selection column uses ordinary cells and does not trigger row click', async () => {
   const onRowClick = vi.fn();
   render(<ControlledSelectionTable data={pageOneRows} onRowClick={onRowClick} />);
