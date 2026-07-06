@@ -68,6 +68,25 @@ test('admin module does not keep legacy components page directories', () => {
   expect(existsSync(resolve(projectRoot, 'src/modules/admin/components'))).toBe(false);
 });
 
+test('no new business is added under the legacy horizontal pages/ dir', () => {
+  // 止血守卫：pages/ 是待迁移的横切遗留，只允许现存三页；新业务必须走纵切 modules/<key>/<business>/。
+  // 迁移完成后 pages/ 目录消失，本守卫自然放行。
+  const legacyPagesDir = resolve(projectRoot, 'src/modules/admin/pages');
+  if (!existsSync(legacyPagesDir)) return;
+
+  const allowed = new Set(['roles', 'menus', 'dashboard']);
+  const dirs = readdirSync(legacyPagesDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
+
+  for (const dir of dirs) {
+    expect(
+      allowed.has(dir),
+      `modules/admin/pages/${dir} 是横切遗留结构，新业务请用纵切 modules/<key>/<business>/`,
+    ).toBe(true);
+  }
+});
+
 test('source tree does not keep unused starter assets or generated caches', () => {
   expect(existsSync(resolve(projectRoot, 'src/assets'))).toBe(false);
   expect(existsSync(resolve(projectRoot, 'src/node_modules'))).toBe(false);
