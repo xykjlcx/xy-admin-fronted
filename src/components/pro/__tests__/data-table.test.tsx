@@ -1,8 +1,10 @@
 import { readFileSync } from 'node:fs';
+import { useState } from 'react';
+import type { ColumnDef, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import { DataTable, type DataTableColumn } from '@/components/pro/DataTable';
+import { DataTable } from '@/components/pro/DataTable';
 
 interface Row {
   id: string;
@@ -10,15 +12,27 @@ interface Row {
   status: string;
 }
 
-const columns: DataTableColumn<Row>[] = [
-  { key: 'name', header: '姓名', width: '45%', cell: (row) => row.name },
-  { key: 'status', header: '状态', width: '35%', cell: (row) => row.status },
+const columns: ColumnDef<Row>[] = [
   {
-    key: 'action',
+    id: 'name',
+    header: '姓名',
+    meta: { width: '45%' },
+    enableSorting: false,
+    cell: ({ row }) => row.original.name,
+  },
+  {
+    id: 'status',
+    header: '状态',
+    meta: { width: '35%' },
+    enableSorting: false,
+    cell: ({ row }) => row.original.status,
+  },
+  {
+    id: 'action',
     header: '操作',
-    width: '20%',
-    align: 'end',
-    cell: (row) => <button type="button">查看{row.name}</button>,
+    meta: { width: '20%', align: 'end' },
+    enableSorting: false,
+    cell: ({ row }) => <button type="button">查看{row.original.name}</button>,
   },
 ];
 
@@ -31,6 +45,36 @@ const pageTwoRows: Row[] = [
   { id: 'u3', name: '陈嘉怡', status: '正常' },
   { id: 'u4', name: '赵敏杰', status: '正常' },
 ];
+
+function ControlledSelectionTable({
+  data,
+  onRowClick,
+}: {
+  data: Row[];
+  onRowClick?: (row: Row) => void;
+}) {
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const handleRowSelectionChange: OnChangeFn<RowSelectionState> = (updater) => {
+    setRowSelection((current) => (typeof updater === 'function' ? updater(current) : updater));
+  };
+
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      rowKey={(row) => row.id}
+      emptyText="暂无成员"
+      loadingText="正在加载成员"
+      onRowClick={onRowClick}
+      selection={{
+        enabled: true,
+        rowSelection,
+        onRowSelectionChange: handleRowSelectionChange,
+        renderBulkBar: (ids) => <div>当前页已选 {ids.join(',')}</div>,
+      }}
+    />
+  );
+}
 
 test('DataTable renders semantic table, col widths, cells and pagination', async () => {
   const onPageChange = vi.fn();
@@ -69,77 +113,52 @@ test('DataTable renders semantic table, col widths, cells and pagination', async
   expect(onPageChange).toHaveBeenCalledWith(2);
 });
 
-test('DataTable owns selection, filters bulk ids to visible rows, and clears on reset scope change', async () => {
-  const onSelectionChange = vi.fn();
-  const { rerender } = render(
-    <DataTable
-      columns={columns}
-      data={pageOneRows}
-      rowKey={(row) => row.id}
-      emptyText="暂无成员"
-      loadingText="正在加载成员"
-      resetSelectionKey="members"
-      selection={{
-        enabled: true,
-        onSelectionChange,
-        renderBulkBar: (ids) => <div>当前页已选 {ids.join(',')}</div>,
-      }}
-    />,
-  );
-
+test('DataTable uses controlled TanStack row selection scoped to current page', async () => {
+  const { rerender } = render(<ControlledSelectionTable data={pageOneRows} />);
   const [headerCheckbox, firstRowCheckbox] = screen.getAllByRole('checkbox');
-  expect(headerCheckbox?.closest('[data-slot="checkbox"]')).toHaveClass(
-    'size-[calc(16px*var(--app-scale))]',
-  );
+
+  await userEvent.click(firstRowCheckbox!);
+  expect(screen.getByText('当前页已选 u1')).toBeInTheDocument();
+  expect(headerCheckbox).toHaveAttribute('data-indeterminate', 'true');
+
+  await userEvent.click(headerCheckbox!);
+  expect(screen.getByText('当前页已选 u1,u2')).toBeInTheDocument();
+
+  await userEvent.click(headerCheckbox!);
+  expect(screen.queryByText(/当前页已选/)).not.toBeInTheDocument();
+
+  await userEvent.click(firstRowCheckbox!);
+  expect(screen.getByText('当前页已选 u1')).toBeInTheDocument();
+
+  rerender(<ControlledSelectionTable data={pageTwoRows} />);
+  expect(screen.queryByText('当前页已选 u1')).not.toBeInTheDocument();
+});
+
+test('DataTable selection column uses ordinary cells and does not trigger row click', async () => {
+  const onRowClick = vi.fn();
+  render(<ControlledSelectionTable data={pageOneRows} onRowClick={onRowClick} />);
+
+  const [, firstRowCheckbox] = screen.getAllByRole('checkbox');
   const firstNameCell = screen.getByRole('cell', { name: '李长昕' });
+
+  expect(firstRowCheckbox?.closest('[data-slot="checkbox"]')).toHaveClass(
+    'size-[calc(18px*var(--app-scale))]',
+  );
   expect(firstNameCell).toHaveClass('px-3');
   expect(firstNameCell).not.toHaveClass('p-0');
+
   await userEvent.click(firstRowCheckbox!);
-  expect(onSelectionChange).toHaveBeenLastCalledWith(['u1']);
-  expect(screen.getByText('当前页已选 u1')).toBeInTheDocument();
+  expect(onRowClick).not.toHaveBeenCalled();
+  const selectionCell = firstRowCheckbox?.closest('td');
+  if (!selectionCell) throw new Error('selection cell not found');
+  await userEvent.click(selectionCell);
+  expect(onRowClick).not.toHaveBeenCalled();
   const bulkBar = screen.getByText('当前页已选 u1').closest('div');
   if (!bulkBar) throw new Error('bulk bar not found');
   expect(bulkBar.compareDocumentPosition(screen.getByRole('table')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
-  rerender(
-    <DataTable
-      columns={columns}
-      data={pageTwoRows}
-      rowKey={(row) => row.id}
-      emptyText="暂无成员"
-      loadingText="正在加载成员"
-      resetSelectionKey="members"
-      selection={{
-        enabled: true,
-        onSelectionChange,
-        renderBulkBar: (ids) => <div>当前页已选 {ids.join(',')}</div>,
-      }}
-    />,
-  );
-  expect(screen.queryByText('当前页已选 u1')).not.toBeInTheDocument();
-
-  const [, pageTwoFirstCheckbox] = screen.getAllByRole('checkbox');
-  await userEvent.click(pageTwoFirstCheckbox!);
-  expect(onSelectionChange).toHaveBeenLastCalledWith(['u1', 'u3']);
-  expect(screen.getByText('当前页已选 u3')).toBeInTheDocument();
-
-  rerender(
-    <DataTable
-      columns={columns}
-      data={pageTwoRows}
-      rowKey={(row) => row.id}
-      emptyText="暂无成员"
-      loadingText="正在加载成员"
-      resetSelectionKey="members|disabled"
-      selection={{
-        enabled: true,
-        onSelectionChange,
-        renderBulkBar: (ids) => <div>当前页已选 {ids.join(',')}</div>,
-      }}
-    />,
-  );
-  expect(screen.queryByText(/当前页已选/)).not.toBeInTheDocument();
-  expect(onSelectionChange).toHaveBeenLastCalledWith([]);
+  await userEvent.click(firstNameCell);
+  expect(onRowClick).toHaveBeenCalledWith(pageOneRows[0]);
 });
 
 test('DataTable handles loading and empty states inside tbody', () => {
@@ -174,11 +193,28 @@ test('DataTable handles loading and empty states inside tbody', () => {
 test('DataTable uses ui table and checkbox primitives without module or i18n coupling', () => {
   const source = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
 
+  expect(source).toContain('useReactTable');
+  expect(source).toContain('getCoreRowModel');
+  expect(source).toContain('flexRender');
   expect(source).toContain("@/components/ui/table");
   expect(source).toContain("@/components/ui/checkbox");
   expect(source).not.toContain('TableShell');
   expect(source).not.toContain('@/modules/');
   expect(source).not.toContain('useTranslation');
+  expect(source).not.toContain('getSortedRowModel');
+  expect(source).not.toContain('getFilteredRowModel');
+  expect(source).not.toContain('getGroupedRowModel');
+  expect(source).not.toContain('getFacetedRowModel');
+  expect(source).not.toContain('useVirtualizer');
+  expect(source).not.toContain('selectedIds');
+  expect(source).not.toContain('toggleVisibleRows');
+  expect(source).not.toContain('selectionColumnWidth');
+  expect(source).not.toContain('selectionCellClassName');
+  expect(source).not.toContain('bodyCellWithSelectionClassName');
+  expect(source).not.toContain('selectionSlotClassName');
+  expect(source).not.toContain('selectionCheckboxClassName');
+  expect(source).not.toContain('[role=checkbox]');
+  expect(source).not.toContain('translate-y');
   expect(source).not.toContain('共 ');
   expect(source).not.toContain('正在更新');
   expect(source).not.toContain('上一页');
@@ -188,12 +224,11 @@ test('DataTable uses ui table and checkbox primitives without module or i18n cou
   expect(source).not.toContain('translate-x-2');
 });
 
-test('DataTable does not notify selection from inside a React state updater', () => {
+test('DataTable injects selection as a ColumnDef instead of rendering special selection cells', () => {
   const source = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
-  const updaterCalls = source.match(/setSelectedIds\(\s*\(current\)\s*=>[\s\S]*?\);/g) ?? [];
 
-  expect(updaterCalls.length).toBeGreaterThan(0);
-  updaterCalls.forEach((call) => {
-    expect(call).not.toContain('onSelectionChange');
-  });
+  expect(source).toContain('selectionColumn');
+  expect(source).toContain('[selectionColumn, ...normalizedColumns]');
+  expect(source).not.toContain('selectionEnabled && (');
+  expect(source).not.toContain('selectionEnabled && <');
 });

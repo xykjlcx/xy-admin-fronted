@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type JSX, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+  type OnChangeFn,
+  type RowSelectionState,
+} from '@tanstack/react-table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -12,6 +20,8 @@ import {
 import { cn } from '@/lib/utils';
 import { Pagination } from './Pagination';
 
+type DataTableAlign = 'start' | 'center' | 'end';
+
 export interface DataTableColumn<T> {
   key: string;
   header: ReactNode;
@@ -19,16 +29,30 @@ export interface DataTableColumn<T> {
   cell: (row: T, index: number) => ReactNode;
   /** table 列宽，如 '45%' / 'calc(120px * var(--app-scale))' */
   width: string;
-  align?: 'start' | 'center' | 'end';
+  align?: DataTableAlign;
 }
 
-export interface DataTableSelection {
+export interface DataTableControlledSelection {
   enabled: boolean;
-  /** 选中项变化回调；DataTable 内部持有 selectedIds，外部只在需要时（批量操作）读取 */
-  onSelectionChange?: (ids: string[]) => void;
-  /** 批量操作条渲染：传入当前可见选中 id，返回操作区 ReactNode；无选中时不渲染 */
+  rowSelection: RowSelectionState;
+  onRowSelectionChange: OnChangeFn<RowSelectionState>;
+  /** 批量操作条渲染：传入当前页选中 id，返回操作区 ReactNode；无选中时不渲染 */
   renderBulkBar?: (selectedVisibleIds: string[]) => ReactNode;
+  selectAllAriaLabel?: string;
+  rowSelectAriaLabel?: string;
 }
+
+export interface DataTableLegacySelection {
+  enabled: boolean;
+  /** Step 3 临时兼容旧调用方；Step 4 切到受控选择后删除 */
+  onSelectionChange?: (ids: string[]) => void;
+  /** 批量操作条渲染：传入当前页选中 id，返回操作区 ReactNode；无选中时不渲染 */
+  renderBulkBar?: (selectedVisibleIds: string[]) => ReactNode;
+  selectAllAriaLabel?: string;
+  rowSelectAriaLabel?: string;
+}
+
+export type DataTableSelection = DataTableControlledSelection | DataTableLegacySelection;
 
 export interface DataTablePagination {
   page: number;
@@ -43,12 +67,14 @@ export interface DataTablePagination {
   onPageChange: (page: number) => void;
 }
 
+type DataTableColumnInput<T> = ColumnDef<T> | DataTableColumn<T>;
+
 export interface DataTableProps<T> {
-  columns: DataTableColumn<T>[];
+  columns: DataTableColumnInput<T>[];
   data: T[];
   rowKey: (row: T) => string;
   loading?: boolean;
-  /** 传入后，data/筛选变化时行选择自动清空（作为 scope）。通常传当前页 id 列表的稳定标识 */
+  /** Step 3 临时兼容旧调用方；Step 4 切到受控选择后删除 */
   resetSelectionKey?: string;
   selection?: DataTableSelection;
   pagination?: DataTablePagination;
@@ -58,17 +84,40 @@ export interface DataTableProps<T> {
   rowState?: (row: T) => 'selected' | undefined;
 }
 
-const selectionColumnWidth = 'calc(44px * var(--app-scale))';
 const bodyCellClassName = 'py-[calc(12.5px*var(--app-scale))]';
-const bodyCellWithSelectionClassName = 'h-14 py-0';
-const selectionCellClassName = 'h-14 p-0';
-const selectionSlotClassName = 'flex h-full items-center justify-center';
-const selectionCheckboxClassName = 'size-[calc(16px*var(--app-scale))]';
 
-function alignClass(align: DataTableColumn<unknown>['align']) {
+function alignClass(align: DataTableAlign | undefined) {
   if (align === 'center') return 'text-center';
   if (align === 'end') return 'text-right';
   return 'text-left';
+}
+
+function isLegacyColumn<T>(column: DataTableColumnInput<T>): column is DataTableColumn<T> {
+  return 'key' in column && 'width' in column;
+}
+
+function normalizeColumn<T>(column: DataTableColumnInput<T>): ColumnDef<T> {
+  if (!isLegacyColumn(column)) return column;
+
+  return {
+    id: column.key,
+    header: () => column.header,
+    meta: { width: column.width, align: column.align },
+    enableSorting: false,
+    cell: ({ row }) => column.cell(row.original, row.index),
+  };
+}
+
+function isControlledSelection(
+  selection: DataTableSelection | undefined,
+): selection is DataTableControlledSelection {
+  return !!selection && 'rowSelection' in selection && 'onRowSelectionChange' in selection;
+}
+
+function isLegacySelection(
+  selection: DataTableSelection | undefined,
+): selection is DataTableLegacySelection {
+  return !!selection && !isControlledSelection(selection);
 }
 
 export function DataTable<T>({
@@ -85,62 +134,82 @@ export function DataTable<T>({
   rowState,
 }: DataTableProps<T>): JSX.Element {
   const selectionEnabled = !!selection?.enabled;
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const previousResetKey = useRef(resetSelectionKey);
-  const onSelectionChangeRef = useRef(selection?.onSelectionChange);
-  const selectionNotificationReady = useRef(false);
-  const visibleIds = useMemo(() => data.map((row) => rowKey(row)), [data, rowKey]);
-  const visibleIdSet = useMemo(() => new Set(visibleIds), [visibleIds]);
-  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
-  const selectedVisibleIds = selectedIds.filter((id) => visibleIdSet.has(id));
-  const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIdSet.has(id));
-  const partiallySelected = selectedVisibleIds.length > 0 && !allVisibleSelected;
-  const columnCount = columns.length + (selectionEnabled ? 1 : 0);
+  const controlledSelection = isControlledSelection(selection) ? selection : undefined;
+  const legacySelection = isLegacySelection(selection) ? selection : undefined;
+  const [legacyRowSelection, setLegacyRowSelection] = useState<RowSelectionState>({});
+  const rowSelection = controlledSelection?.rowSelection ?? legacyRowSelection;
+  const onRowSelectionChange = controlledSelection?.onRowSelectionChange ?? setLegacyRowSelection;
 
   useEffect(() => {
-    if (previousResetKey.current === resetSelectionKey) return;
-    previousResetKey.current = resetSelectionKey;
-    setSelectedIds((current) => (current.length > 0 ? [] : current));
-  }, [resetSelectionKey]);
+    if (controlledSelection) return;
+    setLegacyRowSelection({});
+  }, [controlledSelection, resetSelectionKey]);
+
+  const normalizedColumns = useMemo<ColumnDef<T>[]>(
+    () => columns.map((column) => normalizeColumn(column)),
+    [columns],
+  );
+
+  const selectionColumn = useMemo<ColumnDef<T>>(
+    () => ({
+      id: 'select',
+      enableSorting: false,
+      meta: { width: 'calc(44px * var(--app-scale))', align: 'center' },
+      header: ({ table }) => {
+        const allSelected = table.getIsAllPageRowsSelected();
+        const someSelected = table.getIsSomePageRowsSelected();
+
+        return (
+          <Checkbox
+            checked={allSelected}
+            indeterminate={someSelected && !allSelected}
+            onCheckedChange={(checked) => table.toggleAllPageRowsSelected(checked)}
+            aria-label={selection?.selectAllAriaLabel}
+            onClick={(event) => event.stopPropagation()}
+          />
+        );
+      },
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(checked) => row.toggleSelected(checked)}
+          aria-label={selection?.rowSelectAriaLabel}
+          onClick={(event) => event.stopPropagation()}
+        />
+      ),
+    }),
+    [selection?.rowSelectAriaLabel, selection?.selectAllAriaLabel],
+  );
+
+  const tableColumns = useMemo(
+    () => (selectionEnabled ? [selectionColumn, ...normalizedColumns] : normalizedColumns),
+    [normalizedColumns, selectionColumn, selectionEnabled],
+  );
+
+  const table = useReactTable({
+    data,
+    columns: tableColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: rowKey,
+    manualPagination: true,
+    enableRowSelection: selectionEnabled,
+    state: { rowSelection },
+    onRowSelectionChange,
+  });
+
+  const selectedVisibleIds = table.getSelectedRowModel().rows.map((row) => row.id);
+  const selectedVisibleKey = selectedVisibleIds.join('\u0000');
 
   useEffect(() => {
-    onSelectionChangeRef.current = selection?.onSelectionChange;
-  }, [selection?.onSelectionChange]);
-
-  useEffect(() => {
-    if (!selectionEnabled) {
-      selectionNotificationReady.current = false;
-      return;
-    }
-    if (!selectionNotificationReady.current) {
-      selectionNotificationReady.current = true;
-      return;
-    }
-    onSelectionChangeRef.current?.(selectedIds);
-  }, [selectedIds, selectionEnabled]);
-
-  const updateSelectedIds = (updater: (current: string[]) => string[]) => {
-    setSelectedIds((current) => updater(current));
-  };
-
-  const toggleRow = (id: string) => {
-    updateSelectedIds((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
-    );
-  };
-
-  const toggleVisibleRows = () => {
-    updateSelectedIds((current) =>
-      allVisibleSelected
-        ? current.filter((id) => !visibleIdSet.has(id))
-        : [...new Set([...current, ...visibleIds])],
-    );
-  };
+    if (controlledSelection || !selectionEnabled) return;
+    legacySelection?.onSelectionChange?.(selectedVisibleKey ? selectedVisibleIds : []);
+  }, [controlledSelection, legacySelection, selectedVisibleIds, selectedVisibleKey, selectionEnabled]);
 
   const bulkBar =
     selectionEnabled && selectedVisibleIds.length > 0
       ? selection?.renderBulkBar?.(selectedVisibleIds)
       : null;
+  const columnCount = table.getVisibleLeafColumns().length;
 
   return (
     <>
@@ -148,72 +217,56 @@ export function DataTable<T>({
       <div className="overflow-hidden rounded-10 border border-(--table-border) bg-(--table-bg)">
         <Table>
           <colgroup>
-            {selectionEnabled && <col style={{ width: selectionColumnWidth }} />}
-            {columns.map((column) => (
-              <col key={column.key} style={{ width: column.width }} />
+            {table.getVisibleLeafColumns().map((column) => (
+              <col
+                key={column.id}
+                style={column.columnDef.meta?.width ? { width: column.columnDef.meta.width } : undefined}
+              />
             ))}
           </colgroup>
           <TableHeader>
-            <TableRow>
-              {selectionEnabled && (
-                <TableHead
-                  className="p-0 text-center"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <div className={selectionSlotClassName}>
-                    <Checkbox
-                      checked={allVisibleSelected}
-                      indeterminate={partiallySelected}
-                      onCheckedChange={toggleVisibleRows}
-                      className={selectionCheckboxClassName}
-                    />
-                  </div>
-                </TableHead>
-              )}
-              {columns.map((column) => (
-                <TableHead key={column.key} className={alignClass(column.align)}>
-                  {column.header}
-                </TableHead>
-              ))}
-            </TableRow>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className={alignClass(header.column.columnDef.meta?.align)}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody className="[&_tr:last-child]:border-t">
             {loading ? (
               <LoadingRows columns={columnCount} loadingText={loadingText} />
-            ) : data.length > 0 ? (
-              data.map((row, index) => {
-                const id = rowKey(row);
-                const state = selectedIdSet.has(id) ? 'selected' : rowState?.(row);
+            ) : table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map((row) => {
+                const state = row.getIsSelected() ? 'selected' : rowState?.(row.original);
 
                 return (
                   <TableRow
-                    key={id}
+                    key={row.id}
                     data-state={state}
                     className={cn('border-t border-b-0 transition-none', onRowClick && 'cursor-pointer')}
-                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                    onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                   >
-                    {selectionEnabled && (
-                      <TableCell
-                        className={cn('text-center', selectionCellClassName)}
-                        onClick={(event) => event.stopPropagation()}
-                      >
-                        <div className={selectionSlotClassName}>
-                          <Checkbox
-                            checked={selectedIdSet.has(id)}
-                            onCheckedChange={() => toggleRow(id)}
-                            className={selectionCheckboxClassName}
-                          />
-                        </div>
-                      </TableCell>
-                    )}
-                    {columns.map((column) => (
-                      <TableCell
-                        key={column.key}
-                        className={cn(alignClass(column.align), selectionEnabled ? bodyCellWithSelectionClassName : bodyCellClassName)}
-                      >
-                        {column.cell(row, index)}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      const stopRowClick = cell.column.id === 'select';
+
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          className={cn(alignClass(cell.column.columnDef.meta?.align), bodyCellClassName)}
+                          onClick={stopRowClick ? (event) => event.stopPropagation() : undefined}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 );
               })

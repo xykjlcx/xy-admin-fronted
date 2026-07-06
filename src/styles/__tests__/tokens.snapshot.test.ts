@@ -734,7 +734,7 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(appearanceDrawerSource).toContain('bg-(--nav-item-bg-current)');
   expect(appearanceDrawerSource).toContain('text-(--nav-item-fg-current)');
 
-  expect(dataTableSource).toContain("const state = selectedIdSet.has(id) ? 'selected' : rowState?.(row);");
+  expect(dataTableSource).toContain("const state = row.getIsSelected() ? 'selected' : rowState?.(row.original);");
   expect(dataTableSource).toContain('data-state={state}');
   expect(membersTableSource).toContain('bg-(--table-row-bg-selected)');
   expect(roleListPanelSource).toContain('bg-(--side-list-item-bg-active)');
