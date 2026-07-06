@@ -1,5 +1,6 @@
-import { useState, type JSX } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
 import { matchPermission } from '@/lib/permission';
@@ -31,8 +32,21 @@ export function MembersScene({
   const [formState, setFormState] = useState<UserFormState>({ kind: 'closed' });
   const [detailUserId, setDetailUserId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserDto | null>(null);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const canCreate = matchPermission(permissions, 'iam:user:create');
   const writable = variant === 'members';
+
+  const clearRowSelection = useCallback(() => setRowSelection({}), []);
+  const handleRowSelectionChange = useCallback<OnChangeFn<RowSelectionState>>((updater) => {
+    setRowSelection((current) => (typeof updater === 'function' ? updater(current) : updater));
+  }, []);
+  const handleSearchChange = useCallback(
+    (patch: Partial<UsersQueryParams>) => {
+      clearRowSelection();
+      onSearchChange(patch);
+    },
+    [clearRowSelection, onSearchChange],
+  );
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -45,7 +59,7 @@ export function MembersScene({
       <div className="flex min-h-0 flex-1">
         <DeptTree
           selectedId={search.deptId}
-          onSelect={(deptId) => onSearchChange({ deptId, page: 1 })}
+          onSelect={(deptId) => handleSearchChange({ deptId, page: 1 })}
         />
 
         <main className="flex min-w-0 flex-1 flex-col px-6 py-[calc(18px*var(--app-scale))]">
@@ -53,13 +67,16 @@ export function MembersScene({
             variant={variant}
             permissions={permissions}
             search={search}
-            onSearchChange={onSearchChange}
+            onSearchChange={handleSearchChange}
+            rowSelection={rowSelection}
+            onRowSelectionChange={handleRowSelectionChange}
+            onClearSelection={clearRowSelection}
             toolbar={
               <UsersToolbar
                 variant={variant}
                 search={search}
                 canCreate={canCreate}
-                onSearchChange={onSearchChange}
+                onSearchChange={handleSearchChange}
                 onCreate={writable ? () => setFormState({ kind: 'create' }) : undefined}
               />
             }

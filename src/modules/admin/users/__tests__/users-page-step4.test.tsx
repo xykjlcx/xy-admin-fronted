@@ -65,23 +65,38 @@ test('users page mounts members scene and department scene from vertical list co
   expect(screen.getAllByText('产品研发中心').length).toBeGreaterThanOrEqual(2);
 });
 
-test('members table selection reset scope includes pagination before new data arrives', () => {
-  const source = readFileSync('src/modules/admin/users/list/MembersTable.tsx', 'utf8');
-  const resetSelectionKeyBlock = source.slice(
-    source.indexOf('const resetSelectionKey = ['),
-    source.indexOf('].join', source.indexOf('const resetSelectionKey = [')),
-  );
+test('members scene owns controlled row selection and clears it with search changes', () => {
+  const sceneSource = readFileSync('src/modules/admin/users/list/MembersScene.tsx', 'utf8');
+  const tableSource = readFileSync('src/modules/admin/users/list/MembersTable.tsx', 'utf8');
 
-  expect(resetSelectionKeyBlock).toContain('effectiveSearch.page');
-  expect(resetSelectionKeyBlock).toContain('effectiveSearch.pageSize');
+  expect(sceneSource).toContain('useState<RowSelectionState>({})');
+  expect(sceneSource).toContain('handleRowSelectionChange');
+  expect(sceneSource).toContain(
+    'setRowSelection((current) => (typeof updater === \'function\' ? updater(current) : updater))',
+  );
+  expect(sceneSource).toContain('clearRowSelection()');
+  expect(sceneSource).toContain('onSearchChange(patch)');
+  expect(sceneSource).toContain('rowSelection={rowSelection}');
+  expect(sceneSource).toContain('onRowSelectionChange={handleRowSelectionChange}');
+  expect(sceneSource).not.toContain('resetSelectionKey');
+
+  expect(tableSource).toContain('rowSelection: RowSelectionState');
+  expect(tableSource).toContain('onRowSelectionChange: OnChangeFn<RowSelectionState>');
+  expect(tableSource).toContain('userColumnsV2');
+  expect(tableSource).toContain('onClearSelection');
+  expect(tableSource).not.toContain('resetSelectionKey');
+  expect(tableSource).not.toContain('bulkResetVersion');
+  expect(tableSource).not.toContain('currentPageIds');
 });
 
-test('member columns expose TanStack ColumnDef v2 while legacy columns remain for step 2 coexistence', () => {
+test('member columns expose TanStack ColumnDef without legacy DataTable column API', () => {
   const source = readFileSync('src/modules/admin/users/list/columns.tsx', 'utf8');
 
   expect(source).toContain("import type { ColumnDef } from '@tanstack/react-table'");
   expect(source).toContain('export function userColumnsV2');
   expect(source).toContain('): ColumnDef<UserDto>[]');
+  expect(source).not.toContain('DataTableColumn');
+  expect(source).not.toContain('export function userColumns({');
   expect(source).toContain('row.original');
   expect(source).toContain('row.index');
   expect(source.match(/enableSorting: false/g)).toHaveLength(5);

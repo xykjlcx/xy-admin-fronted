@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import type { ColumnDef, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import { CheckIcon, ChevronDownIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +20,7 @@ import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
-import { DataTable, type DataTableColumn } from '@/components/pro/DataTable';
+import { DataTable } from '@/components/pro/DataTable';
 import { Tree, type TreeNode } from '@/components/pro/Tree';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 import { SideList, type SideListItem } from '@/components/pro/SideList';
@@ -99,6 +100,10 @@ function ThemeStatesRoute() {
   const { flavor, mode, accent, customAccent, set, setFlavor } = useAppearance();
   const [animatedTabsValue, setAnimatedTabsValue] = useState<'members' | 'logs'>('members');
   const [sideListActive, setSideListActive] = useState<(typeof shellTokenItems)[number]>('members');
+  const [dataTableRowSelection, setDataTableRowSelection] = useState<RowSelectionState>({ selected: true });
+  const handleDataTableRowSelectionChange: OnChangeFn<RowSelectionState> = (updater) => {
+    setDataTableRowSelection((current) => (typeof updater === 'function' ? updater(current) : updater));
+  };
   const fieldSelectOptions = [
     { value: '', label: t('dev.themeStates.fieldSelectPlaceholder') },
     { value: 'rd', label: t('dev.themeStates.fieldResearch') },
@@ -119,14 +124,26 @@ function ThemeStatesRoute() {
     depth: node.depth,
     meta: node.meta,
   }));
-  const dataTableColumns: DataTableColumn<DataTableThemeRow>[] = [
-    { key: 'name', header: t('dev.themeStates.tableName'), width: '45%', cell: (row) => t(row.nameKey) },
-    { key: 'status', header: t('dev.themeStates.tableStatus'), width: '35%', cell: (row) => t(row.statusKey) },
+  const dataTableColumns: ColumnDef<DataTableThemeRow>[] = [
     {
-      key: 'action',
+      id: 'name',
+      header: t('dev.themeStates.tableName'),
+      meta: { width: '45%' },
+      enableSorting: false,
+      cell: ({ row }) => t(row.original.nameKey),
+    },
+    {
+      id: 'status',
+      header: t('dev.themeStates.tableStatus'),
+      meta: { width: '35%' },
+      enableSorting: false,
+      cell: ({ row }) => t(row.original.statusKey),
+    },
+    {
+      id: 'action',
       header: t('dev.themeStates.tableAction'),
-      width: '20%',
-      align: 'end',
+      meta: { width: '20%', align: 'end' },
+      enableSorting: false,
       cell: () => <Button variant="link" size="xs">{t('dev.themeStates.tableActionView')}</Button>,
     },
   ];
@@ -416,6 +433,8 @@ function ThemeStatesRoute() {
                 rowState={(row) => (row.id === 'selected' ? 'selected' : undefined)}
                 selection={{
                   enabled: true,
+                  rowSelection: dataTableRowSelection,
+                  onRowSelectionChange: handleDataTableRowSelectionChange,
                   renderBulkBar: (ids) => (
                     <div className="mb-3 rounded-8 bg-(--table-row-bg-selected) px-3 py-2 text-sm text-text-2">
                       {ids.length}

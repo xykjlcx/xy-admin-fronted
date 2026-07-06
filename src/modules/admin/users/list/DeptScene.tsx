@@ -1,8 +1,9 @@
 import { useMemo, type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import type { ColumnDef } from '@tanstack/react-table';
 import { Folder } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { DataTable, type DataTableColumn } from '@/components/pro/DataTable';
+import { DataTable } from '@/components/pro/DataTable';
 import { deptsQuery, type DeptDto, type UsersQueryParams } from '../api';
 import { buildDepthMap, deptIndentClass } from '../model';
 import { DeptTree } from './DeptTree';
@@ -18,29 +19,39 @@ export function DeptScene({
   const { t } = useTranslation('admin');
   const { data: depts = [], isPending } = useQuery(deptsQuery);
   const depthMap = useMemo(() => buildDepthMap(depts), [depts]);
-  const columns = [
+  const columns: ColumnDef<DeptDto>[] = [
     {
-      key: 'dept',
+      id: 'dept',
       header: t('users.columns.dept'),
-      width: '80%',
-      cell: (dept) => (
-        <div className={`flex min-w-0 items-center gap-2 ${deptIndentClass(depthMap.get(dept.id) ?? 0)}`}>
-          <Folder className="size-4 shrink-0 text-text-3" />
-          <span className="truncate text-sm text-text">{dept.name}</span>
-        </div>
-      ),
+      meta: { width: '80%' },
+      enableSorting: false,
+      cell: ({ row }) => {
+        const dept = row.original;
+
+        return (
+          <div className={`flex min-w-0 items-center gap-2 ${deptIndentClass(depthMap.get(dept.id) ?? 0)}`}>
+            <Folder className="size-4 shrink-0 text-text-3" />
+            <span className="truncate text-sm text-text">{dept.name}</span>
+          </div>
+        );
+      },
     },
     {
-      key: 'memberCount',
+      id: 'memberCount',
       header: t('users.columns.memberCount'),
-      width: 'calc(120px * var(--app-scale))',
-      cell: (dept) => (
-        <span className="text-[calc(13px*var(--app-scale))] text-text-2">
-          {t('users.memberCount', { count: dept.memberCount })}
-        </span>
-      ),
+      meta: { width: 'calc(120px * var(--app-scale))' },
+      enableSorting: false,
+      cell: ({ row }) => {
+        const dept = row.original;
+
+        return (
+          <span className="text-[calc(13px*var(--app-scale))] text-text-2">
+            {t('users.memberCount', { count: dept.memberCount })}
+          </span>
+        );
+      },
     },
-  ] satisfies DataTableColumn<DeptDto>[];
+  ];
 
   return (
     <div className="flex min-h-0 flex-1">

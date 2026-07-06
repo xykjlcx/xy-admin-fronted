@@ -38,6 +38,7 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
           <DeptScene search={search} onSearchChange={onSearchChange} />
         ) : (
           <MembersScene
+            key={activeTab}
             variant={activeTab}
             permissions={permissions}
             search={search}

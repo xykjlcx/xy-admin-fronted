@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
+import { useMemo, type JSX, type ReactNode } from 'react';
 import {
   flexRender,
   getCoreRowModel,
@@ -22,17 +22,7 @@ import { Pagination } from './Pagination';
 
 type DataTableAlign = 'start' | 'center' | 'end';
 
-export interface DataTableColumn<T> {
-  key: string;
-  header: ReactNode;
-  /** 单元格渲染；row 为整行数据，index 为页内序号 */
-  cell: (row: T, index: number) => ReactNode;
-  /** table 列宽，如 '45%' / 'calc(120px * var(--app-scale))' */
-  width: string;
-  align?: DataTableAlign;
-}
-
-export interface DataTableControlledSelection {
+export interface DataTableSelection {
   enabled: boolean;
   rowSelection: RowSelectionState;
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
@@ -41,18 +31,6 @@ export interface DataTableControlledSelection {
   selectAllAriaLabel?: string;
   rowSelectAriaLabel?: string;
 }
-
-export interface DataTableLegacySelection {
-  enabled: boolean;
-  /** Step 3 临时兼容旧调用方；Step 4 切到受控选择后删除 */
-  onSelectionChange?: (ids: string[]) => void;
-  /** 批量操作条渲染：传入当前页选中 id，返回操作区 ReactNode；无选中时不渲染 */
-  renderBulkBar?: (selectedVisibleIds: string[]) => ReactNode;
-  selectAllAriaLabel?: string;
-  rowSelectAriaLabel?: string;
-}
-
-export type DataTableSelection = DataTableControlledSelection | DataTableLegacySelection;
 
 export interface DataTablePagination {
   page: number;
@@ -67,15 +45,11 @@ export interface DataTablePagination {
   onPageChange: (page: number) => void;
 }
 
-type DataTableColumnInput<T> = ColumnDef<T> | DataTableColumn<T>;
-
 export interface DataTableProps<T> {
-  columns: DataTableColumnInput<T>[];
+  columns: ColumnDef<T>[];
   data: T[];
   rowKey: (row: T) => string;
   loading?: boolean;
-  /** Step 3 临时兼容旧调用方；Step 4 切到受控选择后删除 */
-  resetSelectionKey?: string;
   selection?: DataTableSelection;
   pagination?: DataTablePagination;
   onRowClick?: (row: T) => void;
@@ -85,6 +59,7 @@ export interface DataTableProps<T> {
 }
 
 const bodyCellClassName = 'py-[calc(12.5px*var(--app-scale))]';
+const emptyRowSelection: RowSelectionState = {};
 
 function alignClass(align: DataTableAlign | undefined) {
   if (align === 'center') return 'text-center';
@@ -92,40 +67,11 @@ function alignClass(align: DataTableAlign | undefined) {
   return 'text-left';
 }
 
-function isLegacyColumn<T>(column: DataTableColumnInput<T>): column is DataTableColumn<T> {
-  return 'key' in column && 'width' in column;
-}
-
-function normalizeColumn<T>(column: DataTableColumnInput<T>): ColumnDef<T> {
-  if (!isLegacyColumn(column)) return column;
-
-  return {
-    id: column.key,
-    header: () => column.header,
-    meta: { width: column.width, align: column.align },
-    enableSorting: false,
-    cell: ({ row }) => column.cell(row.original, row.index),
-  };
-}
-
-function isControlledSelection(
-  selection: DataTableSelection | undefined,
-): selection is DataTableControlledSelection {
-  return !!selection && 'rowSelection' in selection && 'onRowSelectionChange' in selection;
-}
-
-function isLegacySelection(
-  selection: DataTableSelection | undefined,
-): selection is DataTableLegacySelection {
-  return !!selection && !isControlledSelection(selection);
-}
-
 export function DataTable<T>({
   columns,
   data,
   rowKey,
   loading = false,
-  resetSelectionKey,
   selection,
   pagination,
   onRowClick,
@@ -134,21 +80,8 @@ export function DataTable<T>({
   rowState,
 }: DataTableProps<T>): JSX.Element {
   const selectionEnabled = !!selection?.enabled;
-  const controlledSelection = isControlledSelection(selection) ? selection : undefined;
-  const legacySelection = isLegacySelection(selection) ? selection : undefined;
-  const [legacyRowSelection, setLegacyRowSelection] = useState<RowSelectionState>({});
-  const rowSelection = controlledSelection?.rowSelection ?? legacyRowSelection;
-  const onRowSelectionChange = controlledSelection?.onRowSelectionChange ?? setLegacyRowSelection;
-
-  useEffect(() => {
-    if (controlledSelection) return;
-    setLegacyRowSelection({});
-  }, [controlledSelection, resetSelectionKey]);
-
-  const normalizedColumns = useMemo<ColumnDef<T>[]>(
-    () => columns.map((column) => normalizeColumn(column)),
-    [columns],
-  );
+  const rowSelection = selection?.rowSelection ?? emptyRowSelection;
+  const onRowSelectionChange = selection?.onRowSelectionChange;
 
   const selectionColumn = useMemo<ColumnDef<T>>(
     () => ({
@@ -182,8 +115,8 @@ export function DataTable<T>({
   );
 
   const tableColumns = useMemo(
-    () => (selectionEnabled ? [selectionColumn, ...normalizedColumns] : normalizedColumns),
-    [normalizedColumns, selectionColumn, selectionEnabled],
+    () => (selectionEnabled ? [selectionColumn, ...columns] : columns),
+    [columns, selectionColumn, selectionEnabled],
   );
 
   const table = useReactTable({
@@ -198,13 +131,6 @@ export function DataTable<T>({
   });
 
   const selectedVisibleIds = table.getSelectedRowModel().rows.map((row) => row.id);
-  const selectedVisibleKey = selectedVisibleIds.join('\u0000');
-
-  useEffect(() => {
-    if (controlledSelection || !selectionEnabled) return;
-    legacySelection?.onSelectionChange?.(selectedVisibleKey ? selectedVisibleIds : []);
-  }, [controlledSelection, legacySelection, selectedVisibleIds, selectedVisibleKey, selectionEnabled]);
-
   const bulkBar =
     selectionEnabled && selectedVisibleIds.length > 0
       ? selection?.renderBulkBar?.(selectedVisibleIds)

@@ -208,6 +208,11 @@ test('DataTable uses ui table and checkbox primitives without module or i18n cou
   expect(source).not.toContain('useVirtualizer');
   expect(source).not.toContain('selectedIds');
   expect(source).not.toContain('toggleVisibleRows');
+  expect(source).not.toContain('resetSelectionKey');
+  expect(source).not.toContain('DataTableColumn');
+  expect(source).not.toContain('DataTableLegacySelection');
+  expect(source).not.toContain('legacyRowSelection');
+  expect(source).not.toContain('onSelectionChange');
   expect(source).not.toContain('selectionColumnWidth');
   expect(source).not.toContain('selectionCellClassName');
   expect(source).not.toContain('bodyCellWithSelectionClassName');
@@ -228,7 +233,7 @@ test('DataTable injects selection as a ColumnDef instead of rendering special se
   const source = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
 
   expect(source).toContain('selectionColumn');
-  expect(source).toContain('[selectionColumn, ...normalizedColumns]');
+  expect(source).toContain('[selectionColumn, ...columns]');
   expect(source).not.toContain('selectionEnabled && (');
   expect(source).not.toContain('selectionEnabled && <');
 });
