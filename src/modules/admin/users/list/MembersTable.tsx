@@ -1,5 +1,6 @@
-import { useMemo, useState, type JSX, type ReactNode } from 'react';
+import { useMemo, type JSX, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTable } from '@/components/pro/DataTable';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,9 @@ interface MembersTableProps {
   permissions: string[];
   search: UsersSearch;
   onSearchChange: (patch: Partial<UsersQueryParams>) => void;
+  rowSelection: RowSelectionState;
+  onRowSelectionChange: OnChangeFn<RowSelectionState>;
+  onClearSelection: () => void;
   onView?: (user: UserDto) => void;
   onEdit?: (user: UserDto) => void;
   onDelete?: (user: UserDto) => void;
@@ -27,6 +31,9 @@ export function MembersTable({
   permissions,
   search,
   onSearchChange,
+  rowSelection,
+  onRowSelectionChange,
+  onClearSelection,
   onView,
   onEdit,
   onDelete,
@@ -34,7 +41,6 @@ export function MembersTable({
   toolbar,
 }: MembersTableProps): JSX.Element {
   const { t } = useTranslation('admin');
-  const [bulkResetVersion, setBulkResetVersion] = useState(0);
   const effectiveSearch: UsersQueryParams = {
     ...search,
     status: variant === 'left' ? 'left' : search.status === 'left' ? 'all' : search.status,
@@ -46,23 +52,12 @@ export function MembersTable({
   const deptById = useMemo(() => new Map(depts.map((dept) => [dept.id, dept])), [depts]);
   const selectedDeptLabel = search.deptId ? deptById.get(search.deptId)?.name : t('users.allMembers');
   const canDisable = !!onBatchDisable && matchPermission(permissions, 'iam:user:resign');
-  const currentPageIds = usersPage.list.map((user) => user.id).join(',');
-  const resetSelectionKey = [
-    variant,
-    effectiveSearch.status,
-    effectiveSearch.deptId ?? '',
-    effectiveSearch.directOnly ? 'direct' : 'all',
-    effectiveSearch.keyword ?? '',
-    effectiveSearch.page,
-    effectiveSearch.pageSize,
-    currentPageIds,
-    bulkResetVersion,
-  ].join('|');
+  const selectionEnabled = variant === 'members' && canDisable;
 
   const handleBatchDisable = async (ids: string[]) => {
     if (!onBatchDisable) return;
     await onBatchDisable(ids);
-    setBulkResetVersion((version) => version + 1);
+    onClearSelection();
   };
 
   return (
@@ -82,26 +77,26 @@ export function MembersTable({
         loading={usersResult.isPending}
         emptyText={t('users.empty')}
         loadingText={t('users.loading')}
-        resetSelectionKey={resetSelectionKey}
         selection={{
-          enabled: variant === 'members',
-          renderBulkBar: (selectedVisibleIds) =>
-            canDisable ? (
-              <div className="mb-4 flex items-center justify-between rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
-                <span className="text-[calc(13px*var(--app-scale))] text-text-2">
-                  {t('users.selectedCount', { count: selectedVisibleIds.length })}
-                </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    void handleBatchDisable(selectedVisibleIds);
-                  }}
-                >
-                  {t('users.actions.batchDisable')}
-                </Button>
-              </div>
-            ) : null,
+          enabled: selectionEnabled,
+          rowSelection,
+          onRowSelectionChange,
+          renderBulkBar: (selectedVisibleIds) => (
+            <div className="mb-4 flex items-center justify-between rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
+              <span className="text-[calc(13px*var(--app-scale))] text-text-2">
+                {t('users.selectedCount', { count: selectedVisibleIds.length })}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  void handleBatchDisable(selectedVisibleIds);
+                }}
+              >
+                {t('users.actions.batchDisable')}
+              </Button>
+            </div>
+          ),
         }}
         pagination={{
           page: search.page,

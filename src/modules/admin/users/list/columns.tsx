@@ -1,7 +1,7 @@
+import type { ColumnDef } from '@tanstack/react-table';
 import type { TFunction } from 'i18next';
 import { MoreHorizontal } from 'lucide-react';
 import { StatusBadge } from '@/components/pro/StatusBadge';
-import type { DataTableColumn } from '@/components/pro/DataTable';
 import { Button } from '@/components/ui/button';
 import { matchPermission } from '@/lib/permission';
 import { cn } from '@/lib/utils';
@@ -24,79 +24,103 @@ export function userColumns({
   onView,
   onEdit,
   onDelete,
-}: UserColumnsContext): DataTableColumn<UserDto>[] {
+}: UserColumnsContext): ColumnDef<UserDto>[] {
   const canUpdate = !!onEdit && matchPermission(permissions, 'iam:user:update');
   const canDelete = !!onDelete && matchPermission(permissions, 'iam:user:del');
 
   return [
     {
-      key: 'name',
+      id: 'name',
       header: t('users.columns.name'),
-      width: '24%',
-      cell: (user, index) => (
-        <div className="flex min-w-0 items-center gap-2.5">
-          <div
-            className={cn(
-              'flex size-[calc(30px*var(--app-scale))] shrink-0 items-center justify-center rounded-full text-[calc(13px*var(--app-scale))] font-semibold text-white',
-              avatarClasses[index % avatarClasses.length],
-            )}
-          >
-            {initials(user.name)}
+      meta: { width: '24%' },
+      enableSorting: false,
+      cell: ({ row }) => {
+        const user = row.original;
+        const index = row.index;
+
+        return (
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div
+              className={cn(
+                'flex size-[calc(30px*var(--app-scale))] shrink-0 items-center justify-center rounded-full text-[calc(13px*var(--app-scale))] font-semibold text-white',
+                avatarClasses[index % avatarClasses.length],
+              )}
+            >
+              {initials(user.name)}
+            </div>
+            <span className="truncate text-sm text-text">{user.name}</span>
           </div>
-          <span className="truncate text-sm text-text">{user.name}</span>
-        </div>
-      ),
+        );
+      },
     },
     {
-      key: 'status',
+      id: 'status',
       header: t('users.columns.status'),
-      width: '17%',
-      cell: (user) => (
-        <StatusBadge tone={statusTone(user.status)}>{t(`users.status.${user.status}`)}</StatusBadge>
-      ),
+      meta: { width: '17%' },
+      enableSorting: false,
+      cell: ({ row }) => {
+        const user = row.original;
+
+        return <StatusBadge tone={statusTone(user.status)}>{t(`users.status.${user.status}`)}</StatusBadge>;
+      },
     },
     {
-      key: 'phone',
+      id: 'phone',
       header: t('users.columns.phone'),
-      width: '24%',
-      cell: (user) => (
-        <span className="block truncate text-[calc(13px*var(--app-scale))] text-text-2">{user.phone}</span>
-      ),
+      meta: { width: '24%' },
+      enableSorting: false,
+      cell: ({ row }) => {
+        const user = row.original;
+
+        return (
+          <span className="block truncate text-[calc(13px*var(--app-scale))] text-text-2">{user.phone}</span>
+        );
+      },
     },
     {
-      key: 'dept',
+      id: 'dept',
       header: t('users.columns.dept'),
-      width: '17%',
-      cell: (user) => (
-        <span className="block truncate text-[calc(13px*var(--app-scale))] text-text-2">
-          {deptById.get(user.deptId)?.name ?? '-'}
-        </span>
-      ),
+      meta: { width: '17%' },
+      enableSorting: false,
+      cell: ({ row }) => {
+        const user = row.original;
+
+        return (
+          <span className="block truncate text-[calc(13px*var(--app-scale))] text-text-2">
+            {deptById.get(user.deptId)?.name ?? '-'}
+          </span>
+        );
+      },
     },
     {
-      key: 'actions',
+      id: 'actions',
       header: t('users.columns.actions'),
-      width: 'calc(120px * var(--app-scale))',
-      cell: (user) => (
-        <div className="flex items-center gap-3.5 text-[calc(13px*var(--app-scale))]">
-          {onView && (
-            <Button type="button" variant="link" size="xs" onClick={() => onView(user)}>
-              {t('users.actions.detail')}
-            </Button>
-          )}
-          {canUpdate && (
-            <Button type="button" variant="link" size="xs" onClick={() => onEdit(user)}>
-              {t('users.actions.edit')}
-            </Button>
-          )}
-          {canDelete && (
-            <Button type="button" variant="ghost" size="icon-xs" onClick={() => onDelete(user)}>
-              <MoreHorizontal />
-              <span className="sr-only">{t('users.actions.deleteName', { name: user.name })}</span>
-            </Button>
-          )}
-        </div>
-      ),
+      meta: { width: 'calc(120px * var(--app-scale))', align: 'end' },
+      enableSorting: false,
+      cell: ({ row }) => {
+        const user = row.original;
+
+        return (
+          <div className="flex items-center gap-3.5 text-[calc(13px*var(--app-scale))]">
+            {onView && (
+              <Button type="button" variant="link" size="xs" onClick={() => onView(user)}>
+                {t('users.actions.detail')}
+              </Button>
+            )}
+            {canUpdate && (
+              <Button type="button" variant="link" size="xs" onClick={() => onEdit(user)}>
+                {t('users.actions.edit')}
+              </Button>
+            )}
+            {canDelete && (
+              <Button type="button" variant="ghost" size="icon-xs" onClick={() => onDelete(user)}>
+                <MoreHorizontal />
+                <span className="sr-only">{t('users.actions.deleteName', { name: user.name })}</span>
+              </Button>
+            )}
+          </div>
+        );
+      },
     },
   ];
 }

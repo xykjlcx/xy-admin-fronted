@@ -1,0 +1,453 @@
+{
+  "generatedAt": "2026-07-06T03:37:55.393Z",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "results": [
+    {
+      "zoom": "sm",
+      "scale": "90%",
+      "file": "test-results/baseline-datatable/users-members-sm.png",
+      "metrics": {
+        "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+        "zoom": "sm",
+        "checkboxCount": 11,
+        "bodyTextSample": "Ship Any\n后台管理\n3\n李\n李长昕\n超级管理员\n工作台\n企业概览\n组织与权限\n成员与部门\n角色与权限\n菜单管理\n收起导航\n组织与权限\n›\n成员与部门\n成员\n部门\n已离职成员\n全部成员\n14\n产品研发中心\n6\n前端组\n2\n后端组\n2\n测试组\n1\n市场营销部\n2\n人力资源部\n2\n财务部\n2\n行政部\n2\n全部成员\n共",
+        "boxes": [
+          {
+            "index": 0,
+            "input": {
+              "top": 258.484375,
+              "height": 14.390625,
+              "centerY": 265.6796875
+            },
+            "wrapper": {
+              "top": 258.484375,
+              "height": 14.390625,
+              "centerY": 265.6796875
+            },
+            "cell": {
+              "top": 246.140625,
+              "height": 39.59375,
+              "centerY": 265.9375
+            },
+            "deltaToCellCenter": -0.2578125
+          },
+          {
+            "index": 1,
+            "input": {
+              "top": 303.734375,
+              "height": 14.390625,
+              "centerY": 310.9296875
+            },
+            "wrapper": {
+              "top": 303.734375,
+              "height": 14.390625,
+              "centerY": 310.9296875
+            },
+            "cell": {
+              "top": 285.734375,
+              "height": 50.390625,
+              "centerY": 310.9296875
+            },
+            "deltaToCellCenter": 0
+          },
+          {
+            "index": 2,
+            "input": {
+              "top": 354.125,
+              "height": 14.390625,
+              "centerY": 361.3203125
+            },
+            "wrapper": {
+              "top": 354.125,
+              "height": 14.390625,
+              "centerY": 361.3203125
+            },
+            "cell": {
+              "top": 336.125,
+              "height": 50.390625,
+              "centerY": 361.3203125
+            },
+            "deltaToCellCenter": 0
+          }
+        ]
+      },
+      "state": "unchecked"
+    },
+    {
+      "zoom": "md",
+      "scale": "100%",
+      "file": "test-results/baseline-datatable/users-members-md.png",
+      "metrics": {
+        "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+        "zoom": "md",
+        "checkboxCount": 11,
+        "bodyTextSample": "Ship Any\n后台管理\n3\n李\n李长昕\n超级管理员\n工作台\n企业概览\n组织与权限\n成员与部门\n角色与权限\n菜单管理\n收起导航\n组织与权限\n›\n成员与部门\n成员\n部门\n已离职成员\n全部成员\n14\n产品研发中心\n6\n前端组\n2\n后端组\n2\n测试组\n1\n市场营销部\n2\n人力资源部\n2\n财务部\n2\n行政部\n2\n全部成员\n共",
+        "boxes": [
+          {
+            "index": 0,
+            "input": {
+              "top": 286.75,
+              "height": 16,
+              "centerY": 294.75
+            },
+            "wrapper": {
+              "top": 286.75,
+              "height": 16,
+              "centerY": 294.75
+            },
+            "cell": {
+              "top": 273,
+              "height": 44,
+              "centerY": 295
+            },
+            "deltaToCellCenter": -0.25
+          },
+          {
+            "index": 1,
+            "input": {
+              "top": 337,
+              "height": 16,
+              "centerY": 345
+            },
+            "wrapper": {
+              "top": 337,
+              "height": 16,
+              "centerY": 345
+            },
+            "cell": {
+              "top": 317,
+              "height": 56,
+              "centerY": 345
+            },
+            "deltaToCellCenter": 0
+          },
+          {
+            "index": 2,
+            "input": {
+              "top": 393,
+              "height": 16,
+              "centerY": 401
+            },
+            "wrapper": {
+              "top": 393,
+              "height": 16,
+              "centerY": 401
+            },
+            "cell": {
+              "top": 373,
+              "height": 56,
+              "centerY": 401
+            },
+            "deltaToCellCenter": 0
+          }
+        ]
+      },
+      "state": "unchecked"
+    },
+    {
+      "zoom": "lg",
+      "scale": "108%",
+      "file": "test-results/baseline-datatable/users-members-lg.png",
+      "metrics": {
+        "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+        "zoom": "lg",
+        "checkboxCount": 11,
+        "bodyTextSample": "Ship Any\n后台管理\n3\n李\n李长昕\n超级管理员\n工作台\n企业概览\n组织与权限\n成员与部门\n角色与权限\n菜单管理\n收起导航\n组织与权限\n›\n成员与部门\n成员\n部门\n已离职成员\n全部成员\n14\n产品研发中心\n6\n前端组\n2\n后端组\n2\n测试组\n1\n市场营销部\n2\n人力资源部\n2\n财务部\n2\n行政部\n2\n全部成员\n共",
+        "boxes": [
+          {
+            "index": 0,
+            "input": {
+              "top": 309.234375,
+              "height": 17.265625,
+              "centerY": 317.8671875
+            },
+            "wrapper": {
+              "top": 309.234375,
+              "height": 17.265625,
+              "centerY": 317.8671875
+            },
+            "cell": {
+              "top": 294.359375,
+              "height": 47.515625,
+              "centerY": 318.1171875
+            },
+            "deltaToCellCenter": -0.25
+          },
+          {
+            "index": 1,
+            "input": {
+              "top": 363.46875,
+              "height": 17.265625,
+              "centerY": 372.1015625
+            },
+            "wrapper": {
+              "top": 363.46875,
+              "height": 17.265625,
+              "centerY": 372.1015625
+            },
+            "cell": {
+              "top": 341.875,
+              "height": 60.46875,
+              "centerY": 372.109375
+            },
+            "deltaToCellCenter": -0.0078125
+          },
+          {
+            "index": 2,
+            "input": {
+              "top": 423.9375,
+              "height": 17.265625,
+              "centerY": 432.5703125
+            },
+            "wrapper": {
+              "top": 423.9375,
+              "height": 17.265625,
+              "centerY": 432.5703125
+            },
+            "cell": {
+              "top": 402.34375,
+              "height": 60.46875,
+              "centerY": 432.578125
+            },
+            "deltaToCellCenter": -0.0078125
+          }
+        ]
+      },
+      "state": "unchecked"
+    },
+    {
+      "zoom": "sm",
+      "scale": "90%",
+      "file": "test-results/baseline-datatable/users-members-sm-half.png",
+      "state": "half-selected",
+      "metrics": {
+        "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+        "zoom": "sm",
+        "checkboxCount": 11,
+        "selectedCountText": true,
+        "boxes": [
+          {
+            "index": 0,
+            "checked": false,
+            "indeterminate": true,
+            "input": {
+              "top": 317.875,
+              "height": 14.390625,
+              "centerY": 325.0703125
+            },
+            "wrapper": {
+              "top": 317.875,
+              "height": 14.390625,
+              "centerY": 325.0703125
+            },
+            "cell": {
+              "top": 305.53125,
+              "height": 39.59375,
+              "centerY": 325.328125
+            },
+            "deltaToCellCenter": -0.2578
+          },
+          {
+            "index": 1,
+            "checked": true,
+            "indeterminate": false,
+            "input": {
+              "top": 363.125,
+              "height": 14.390625,
+              "centerY": 370.3203125
+            },
+            "wrapper": {
+              "top": 363.125,
+              "height": 14.390625,
+              "centerY": 370.3203125
+            },
+            "cell": {
+              "top": 345.125,
+              "height": 50.390625,
+              "centerY": 370.3203125
+            },
+            "deltaToCellCenter": 0
+          },
+          {
+            "index": 2,
+            "checked": false,
+            "indeterminate": false,
+            "input": {
+              "top": 413.515625,
+              "height": 14.390625,
+              "centerY": 420.7109375
+            },
+            "wrapper": {
+              "top": 413.515625,
+              "height": 14.390625,
+              "centerY": 420.7109375
+            },
+            "cell": {
+              "top": 395.515625,
+              "height": 50.390625,
+              "centerY": 420.7109375
+            },
+            "deltaToCellCenter": 0
+          }
+        ]
+      }
+    },
+    {
+      "zoom": "md",
+      "scale": "100%",
+      "file": "test-results/baseline-datatable/users-members-md-half.png",
+      "state": "half-selected",
+      "metrics": {
+        "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+        "zoom": "md",
+        "checkboxCount": 11,
+        "selectedCountText": true,
+        "boxes": [
+          {
+            "index": 0,
+            "checked": false,
+            "indeterminate": true,
+            "input": {
+              "top": 352.75,
+              "height": 16,
+              "centerY": 360.75
+            },
+            "wrapper": {
+              "top": 352.75,
+              "height": 16,
+              "centerY": 360.75
+            },
+            "cell": {
+              "top": 339,
+              "height": 44,
+              "centerY": 361
+            },
+            "deltaToCellCenter": -0.25
+          },
+          {
+            "index": 1,
+            "checked": true,
+            "indeterminate": false,
+            "input": {
+              "top": 403,
+              "height": 16,
+              "centerY": 411
+            },
+            "wrapper": {
+              "top": 403,
+              "height": 16,
+              "centerY": 411
+            },
+            "cell": {
+              "top": 383,
+              "height": 56,
+              "centerY": 411
+            },
+            "deltaToCellCenter": 0
+          },
+          {
+            "index": 2,
+            "checked": false,
+            "indeterminate": false,
+            "input": {
+              "top": 459,
+              "height": 16,
+              "centerY": 467
+            },
+            "wrapper": {
+              "top": 459,
+              "height": 16,
+              "centerY": 467
+            },
+            "cell": {
+              "top": 439,
+              "height": 56,
+              "centerY": 467
+            },
+            "deltaToCellCenter": 0
+          }
+        ]
+      }
+    },
+    {
+      "zoom": "lg",
+      "scale": "108%",
+      "file": "test-results/baseline-datatable/users-members-lg-half.png",
+      "state": "half-selected",
+      "metrics": {
+        "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+        "zoom": "lg",
+        "checkboxCount": 11,
+        "selectedCountText": true,
+        "boxes": [
+          {
+            "index": 0,
+            "checked": false,
+            "indeterminate": true,
+            "input": {
+              "top": 380.484375,
+              "height": 17.265625,
+              "centerY": 389.1171875
+            },
+            "wrapper": {
+              "top": 380.484375,
+              "height": 17.265625,
+              "centerY": 389.1171875
+            },
+            "cell": {
+              "top": 365.609375,
+              "height": 47.515625,
+              "centerY": 389.3671875
+            },
+            "deltaToCellCenter": -0.25
+          },
+          {
+            "index": 1,
+            "checked": true,
+            "indeterminate": false,
+            "input": {
+              "top": 434.71875,
+              "height": 17.265625,
+              "centerY": 443.3515625
+            },
+            "wrapper": {
+              "top": 434.71875,
+              "height": 17.265625,
+              "centerY": 443.3515625
+            },
+            "cell": {
+              "top": 413.125,
+              "height": 60.46875,
+              "centerY": 443.359375
+            },
+            "deltaToCellCenter": -0.0078
+          },
+          {
+            "index": 2,
+            "checked": false,
+            "indeterminate": false,
+            "input": {
+              "top": 495.1875,
+              "height": 17.265625,
+              "centerY": 503.8203125
+            },
+            "wrapper": {
+              "top": 495.1875,
+              "height": 17.265625,
+              "centerY": 503.8203125
+            },
+            "cell": {
+              "top": 473.59375,
+              "height": 60.46875,
+              "centerY": 503.828125
+            },
+            "deltaToCellCenter": -0.0078
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ColumnDef } from '@tanstack/react-table';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { setupServer } from 'msw/node';
@@ -23,6 +24,10 @@ afterEach(() => {
 afterAll(() => server.close());
 
 const defaultSearch: UsersSearch = { page: 1, pageSize: 10, status: 'all', keyword: '' };
+
+interface ColumnMetaProbeRow {
+  id: string;
+}
 
 function renderUsersPage(search: UsersSearch = defaultSearch) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -60,15 +65,61 @@ test('users page mounts members scene and department scene from vertical list co
   expect(screen.getAllByText('产品研发中心').length).toBeGreaterThanOrEqual(2);
 });
 
-test('members table selection reset scope includes pagination before new data arrives', () => {
-  const source = readFileSync('src/modules/admin/users/list/MembersTable.tsx', 'utf8');
-  const resetSelectionKeyBlock = source.slice(
-    source.indexOf('const resetSelectionKey = ['),
-    source.indexOf('].join', source.indexOf('const resetSelectionKey = [')),
-  );
+test('members scene owns controlled row selection and clears it with search changes', () => {
+  const sceneSource = readFileSync('src/modules/admin/users/list/MembersScene.tsx', 'utf8');
+  const tableSource = readFileSync('src/modules/admin/users/list/MembersTable.tsx', 'utf8');
 
-  expect(resetSelectionKeyBlock).toContain('effectiveSearch.page');
-  expect(resetSelectionKeyBlock).toContain('effectiveSearch.pageSize');
+  expect(sceneSource).toContain('useState<RowSelectionState>({})');
+  expect(sceneSource).toContain('handleRowSelectionChange');
+  expect(sceneSource).toContain(
+    'setRowSelection((current) => (typeof updater === \'function\' ? updater(current) : updater))',
+  );
+  expect(sceneSource).toContain('clearRowSelection()');
+  expect(sceneSource).toContain('onSearchChange(patch)');
+  expect(sceneSource).toContain('rowSelection={rowSelection}');
+  expect(sceneSource).toContain('onRowSelectionChange={handleRowSelectionChange}');
+  expect(sceneSource).not.toContain('resetSelectionKey');
+
+  expect(tableSource).toContain('rowSelection: RowSelectionState');
+  expect(tableSource).toContain('onRowSelectionChange: OnChangeFn<RowSelectionState>');
+  expect(tableSource).toContain('userColumns');
+  expect(tableSource).not.toContain('userColumnsV2');
+  expect(tableSource).toContain('onClearSelection');
+  expect(tableSource).not.toContain('resetSelectionKey');
+  expect(tableSource).not.toContain('bulkResetVersion');
+  expect(tableSource).not.toContain('currentPageIds');
+});
+
+test('member columns expose TanStack ColumnDef without legacy DataTable column API', () => {
+  const source = readFileSync('src/modules/admin/users/list/columns.tsx', 'utf8');
+
+  expect(source).toContain("import type { ColumnDef } from '@tanstack/react-table'");
+  expect(source).toContain('export function userColumns');
+  expect(source).toContain('): ColumnDef<UserDto>[]');
+  expect(source).not.toContain('DataTableColumn');
+  expect(source).not.toContain('userColumnsV2');
+  expect(source).toContain('row.original');
+  expect(source).toContain('row.index');
+  expect(source.match(/enableSorting: false/g)).toHaveLength(5);
+  expect(source).toContain("meta: { width: '24%' }");
+  expect(source).toContain("meta: { width: '17%' }");
+  expect(source).toContain("meta: { width: 'calc(120px * var(--app-scale))', align: 'end' }");
+  expect(source).not.toContain('getSortedRowModel');
+  expect(source).not.toContain('getFilteredRowModel');
+  expect(source).not.toContain('size:');
+});
+
+test('TanStack ColumnMeta exposes table layout metadata without type assertions', () => {
+  const column: ColumnDef<ColumnMetaProbeRow> = {
+    id: 'probe',
+    meta: { width: '24%', align: 'end' },
+  };
+
+  const width: string | undefined = column.meta?.width;
+  const align: 'start' | 'center' | 'end' | undefined = column.meta?.align;
+
+  expect(width).toBe('24%');
+  expect(align).toBe('end');
 });
 
 test('department tree count keeps baseline numeric meta without member suffix', async () => {

@@ -28,7 +28,7 @@ function Checkbox({
       data-slot="checkbox"
       data-checked={checked || indeterminate || undefined}
       data-disabled={disabled || undefined}
-      className={cn('relative inline-flex size-[calc(18px*var(--app-scale))] shrink-0 items-center justify-center', className)}
+      className={cn('relative inline-flex size-[calc(18px*var(--app-scale))] shrink-0 items-center justify-center align-middle leading-none', className)}
     >
       <input
         ref={inputRef}

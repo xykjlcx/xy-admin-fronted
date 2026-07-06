@@ -734,7 +734,7 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(appearanceDrawerSource).toContain('bg-(--nav-item-bg-current)');
   expect(appearanceDrawerSource).toContain('text-(--nav-item-fg-current)');
 
-  expect(dataTableSource).toContain("const state = selectedIdSet.has(id) ? 'selected' : rowState?.(row);");
+  expect(dataTableSource).toContain("const state = selectionEnabled && row.getIsSelected() ? 'selected' : rowState?.(row.original);");
   expect(dataTableSource).toContain('data-state={state}');
   expect(membersTableSource).toContain('bg-(--table-row-bg-selected)');
   expect(roleListPanelSource).toContain('bg-(--side-list-item-bg-active)');
@@ -786,6 +786,47 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
       expect(source).not.toContain(primitiveClass);
     }
   }
+});
+
+test('DataTable TanStack 迁移守卫：无旧状态机、无 checkbox 补丁、无范围外 rowModel', () => {
+  expect(dataTableSource).toContain('useReactTable');
+  expect(dataTableSource).toContain('getCoreRowModel');
+  expect(dataTableSource).toContain('flexRender');
+  expect(dataTableSource).toContain("const rowSelectionColumnId = '__row_selection__'");
+  expect(dataTableSource).toContain('[selectionColumn, ...columns]');
+  expect(dataTableSource).toContain('column.id === rowSelectionColumnId');
+  expect(dataTableSource).toContain('getIsAllPageRowsSelected');
+  expect(dataTableSource).toContain('getIsSomePageRowsSelected');
+  expect(dataTableSource).toContain('toggleAllPageRowsSelected');
+  expect(dataTableSource).toContain('getSelectedRowModel');
+  expect(dataTableSource).toContain('stopPropagation');
+  expect(dataTableSource).not.toMatch(/selectedIds|toggleRow|toggleVisibleRows|resetSelectionKey/);
+  expect(dataTableSource).not.toMatch(/DataTableColumn|DataTableLegacySelection|legacyRowSelection|onSelectionChange/);
+  expect(dataTableSource).not.toMatch(/selectionColumnWidth|selectionCellClassName|bodyCellWithSelectionClassName/);
+  expect(dataTableSource).not.toMatch(/selectionSlotClassName|selectionCheckboxClassName/);
+  expect(dataTableSource).not.toContain("id: 'select'");
+  expect(dataTableSource).not.toContain("cellIndex === 0 && 'mx-auto w-4'");
+  expect(dataTableSource).not.toMatch(/getSortedRowModel|manualSorting|getFilteredRowModel|manualFiltering/);
+  expect(dataTableSource).not.toMatch(/getGroupedRowModel|getFacetedRowModel|useVirtualizer/);
+  expect(dataTableSource).not.toContain('@/modules/');
+  expect(dataTableSource).not.toContain('useTranslation');
+  expect(tableSource).not.toMatch(/\[role=checkbox\]|translate-y/);
+});
+
+test('主题状态页暴露 DataTable 选择列三态对齐矩阵', () => {
+  expect(themeStatesSource).toContain('dataTableSelectionStates');
+  expect(themeStatesSource).toContain("id: 'partial'");
+  expect(themeStatesSource).toContain("id: 'all'");
+  expect(themeStatesSource).toContain("id: 'single'");
+  expect(themeStatesSource).toContain('data-testid={`datatable-selection-${state.id}`}');
+  expect(themeStatesSource).toContain('dataTableSingleRows');
+  expect(themeStatesSource).toContain('rowSelection: state.rowSelection');
+  expect(themeStatesSource).toContain('onRowSelectionChange: noopDataTableRowSelectionChange');
+  expect(themeStatesSource).toContain("t('dev.themeStates.choiceIndeterminate')");
+  expect(themeStatesSource).toContain("t('dev.themeStates.choiceChecked')");
+  expect(themeStatesSource).toContain("t('dev.themeStates.dataTableSelected')");
+  expect(themeStatesSource).toContain('dataTableLoading');
+  expect(themeStatesSource).toContain('dataTableEmpty');
 });
 
 test('claude display font 只进入页面标题层，不污染 Field label / 表头', () => {

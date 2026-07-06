@@ -12,6 +12,7 @@ import { resetDb } from '@/mocks/db';
 
 const server = setupServer(...usersModuleHandlers);
 const defaultSearch: UsersSearch = { page: 1, pageSize: 10, status: 'all', keyword: '' };
+const fullPermissions = ['*:*:*'];
 
 beforeAll(async () => {
   await i18nInit;
@@ -23,13 +24,25 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-function renderUsersPage(search: UsersSearch = defaultSearch) {
+function UsersPageTestHarness({
+  search = defaultSearch,
+  permissions = fullPermissions,
+}: {
+  search?: UsersSearch;
+  permissions?: string[];
+}) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
-  render(
+  return (
     <QueryClientProvider client={queryClient}>
-      <UsersPage permissions={['*:*:*']} search={search} onSearchChange={() => undefined} />
-    </QueryClientProvider>,
+      <UsersPage permissions={permissions} search={search} onSearchChange={() => undefined} />
+    </QueryClientProvider>
+  );
+}
+
+function renderUsersPage(search: UsersSearch = defaultSearch, permissions = fullPermissions) {
+  render(
+    <UsersPageTestHarness search={search} permissions={permissions} />,
   );
 }
 
@@ -85,6 +98,52 @@ test('batch disable clears member table selection after mutation succeeds', asyn
 
   await waitFor(() => expect(screen.queryByText('已选 1 人')).not.toBeInTheDocument());
   expect(screen.queryByRole('button', { name: '批量禁用' })).not.toBeInTheDocument();
+});
+
+test('members table hides row selection when batch disable permission is absent', async () => {
+  renderUsersPage(defaultSearch, ['iam:user:view']);
+
+  await screen.findByText('李长昕');
+
+  expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+  expect(screen.queryByText(/已选 \d+ 人/)).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '批量禁用' })).not.toBeInTheDocument();
+});
+
+test('external search prop changes clear member table selection without reviving old page picks', async () => {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const { rerender } = render(
+    <QueryClientProvider client={queryClient}>
+      <UsersPage permissions={fullPermissions} search={defaultSearch} onSearchChange={() => undefined} />
+    </QueryClientProvider>,
+  );
+
+  await screen.findByText('李长昕');
+  const [, firstRowCheckbox] = screen.getAllByRole('checkbox');
+  if (!firstRowCheckbox) throw new Error('first row checkbox missing');
+
+  await userEvent.click(firstRowCheckbox);
+  expect(screen.getByText('已选 1 人')).toBeInTheDocument();
+
+  rerender(
+    <QueryClientProvider client={queryClient}>
+      <UsersPage
+        permissions={fullPermissions}
+        search={{ ...defaultSearch, page: 2 }}
+        onSearchChange={() => undefined}
+      />
+    </QueryClientProvider>,
+  );
+  await waitFor(() => expect(screen.queryByText('已选 1 人')).not.toBeInTheDocument());
+
+  rerender(
+    <QueryClientProvider client={queryClient}>
+      <UsersPage permissions={fullPermissions} search={defaultSearch} onSearchChange={() => undefined} />
+    </QueryClientProvider>,
+  );
+  await screen.findByText('李长昕');
+
+  expect(screen.queryByText('已选 1 人')).not.toBeInTheDocument();
 });
 
 test('left variant passes undefined write callbacks and keeps detail read entry only', async () => {
