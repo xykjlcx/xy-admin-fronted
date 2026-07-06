@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { Pagination } from './Pagination';
 
 type DataTableAlign = 'start' | 'center' | 'end';
+type DataTableLoadingColumn = { id: string; align?: DataTableAlign };
 
 export interface DataTableSelection {
   enabled: boolean;
@@ -60,7 +61,8 @@ export interface DataTableProps<T> {
 
 const bodyCellClassName = 'py-[calc(12.5px*var(--app-scale))]';
 const emptyRowSelection: RowSelectionState = {};
-const selectionCellContentClassName = 'flex items-center justify-center leading-none';
+const rowSelectionColumnId = '__row_selection__';
+const checkboxCellContentClassName = 'flex items-center justify-center leading-none';
 
 function alignClass(align: DataTableAlign | undefined) {
   if (align === 'center') return 'text-center';
@@ -86,7 +88,7 @@ export function DataTable<T>({
 
   const selectionColumn = useMemo<ColumnDef<T>>(
     () => ({
-      id: 'select',
+      id: rowSelectionColumnId,
       enableSorting: false,
       meta: { width: 'calc(44px * var(--app-scale))', align: 'center' },
       header: ({ table }) => {
@@ -94,7 +96,7 @@ export function DataTable<T>({
         const someSelected = table.getIsSomePageRowsSelected();
 
         return (
-          <div className={selectionCellContentClassName}>
+          <div className={checkboxCellContentClassName}>
             <Checkbox
               checked={allSelected}
               indeterminate={someSelected && !allSelected}
@@ -106,7 +108,7 @@ export function DataTable<T>({
         );
       },
       cell: ({ row }) => (
-        <div className={selectionCellContentClassName}>
+        <div className={checkboxCellContentClassName}>
           <Checkbox
             checked={row.getIsSelected()}
             onCheckedChange={(checked) => row.toggleSelected(checked)}
@@ -141,6 +143,10 @@ export function DataTable<T>({
       ? selection?.renderBulkBar?.(selectedVisibleIds)
       : null;
   const columnCount = table.getVisibleLeafColumns().length;
+  const loadingColumns = table.getVisibleLeafColumns().map((column) => ({
+    id: column.id,
+    align: column.columnDef.meta?.align,
+  }));
 
   return (
     <>
@@ -173,7 +179,7 @@ export function DataTable<T>({
           </TableHeader>
           <TableBody className="[&_tr:last-child]:border-t">
             {loading ? (
-              <LoadingRows columns={columnCount} loadingText={loadingText} />
+              <LoadingRows columns={loadingColumns} loadingText={loadingText} />
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => {
                 const state = selectionEnabled && row.getIsSelected() ? 'selected' : rowState?.(row.original);
@@ -186,7 +192,7 @@ export function DataTable<T>({
                     onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                   >
                     {row.getVisibleCells().map((cell) => {
-                      const stopRowClick = cell.column.id === 'select';
+                      const stopRowClick = cell.column.id === rowSelectionColumnId;
 
                       return (
                         <TableCell
@@ -227,28 +233,34 @@ export function DataTable<T>({
   );
 }
 
-function LoadingRows({ columns, loadingText }: { columns: number; loadingText: string }) {
+function LoadingRows({ columns, loadingText }: { columns: DataTableLoadingColumn[]; loadingText: string }) {
   return (
     <>
       {Array.from({ length: 6 }).map((_, rowIndex) => (
         <TableRow key={rowIndex} data-testid="data-table-loading-row">
-          {Array.from({ length: columns }).map((__, cellIndex) => (
-            <TableCell key={cellIndex}>
-              {rowIndex === 0 && cellIndex === 0 && (
-                <span role="status" aria-label={loadingText} className="sr-only">
-                  {loadingText}
-                </span>
-              )}
-              <Skeleton
-                className={cn(
-                  'h-3',
-                  cellIndex === 0 && 'mx-auto w-4',
-                  cellIndex === columns - 1 && 'w-16',
-                  cellIndex > 0 && cellIndex < columns - 1 && 'w-3/4',
+          {columns.map((column, cellIndex) => {
+            const isSelectionColumn = column.id === rowSelectionColumnId;
+            const isLastColumn = cellIndex === columns.length - 1;
+
+            return (
+              <TableCell key={column.id}>
+                {rowIndex === 0 && cellIndex === 0 && (
+                  <span role="status" aria-label={loadingText} className="sr-only">
+                    {loadingText}
+                  </span>
                 )}
-              />
-            </TableCell>
-          ))}
+                <Skeleton
+                  className={cn(
+                    'h-3',
+                    isSelectionColumn && 'mx-auto w-4',
+                    !isSelectionColumn && isLastColumn && 'w-16',
+                    !isSelectionColumn && column.align === 'end' && 'ml-auto',
+                    !isSelectionColumn && !isLastColumn && 'w-3/4',
+                  )}
+                />
+              </TableCell>
+            );
+          })}
         </TableRow>
       ))}
     </>

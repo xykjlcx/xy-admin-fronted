@@ -17,7 +17,7 @@ interface UserColumnsContext {
   onDelete?: (user: UserDto) => void;
 }
 
-export function userColumnsV2({
+export function userColumns({
   t,
   permissions,
   deptById,

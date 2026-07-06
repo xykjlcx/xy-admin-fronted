@@ -6,7 +6,7 @@ import { DataTable } from '@/components/pro/DataTable';
 import { Button } from '@/components/ui/button';
 import { matchPermission } from '@/lib/permission';
 import { deptsQuery, usersQuery, type UserDto, type UsersQueryParams } from '../api';
-import { userColumnsV2 } from './columns';
+import { userColumns } from './columns';
 import type { MembersVariant, UsersSearch } from '../types';
 
 interface MembersTableProps {
@@ -71,7 +71,7 @@ export function MembersTable({
       {toolbar}
 
       <DataTable
-        columns={userColumnsV2({ t, permissions, deptById, onView, onEdit, onDelete })}
+        columns={userColumns({ t, permissions, deptById, onView, onEdit, onDelete })}
         data={usersPage.list}
         rowKey={(user) => user.id}
         loading={usersResult.isPending}

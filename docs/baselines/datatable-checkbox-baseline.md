@@ -74,4 +74,3 @@ rg -n "selectionColumnWidth|selectionCellClassName|bodyCellWithSelectionClassNam
 | 半选态 | 108% | -0.25px | -0.0078px | -0.0078px |
 
 当前视觉上主要靠 6 处补丁互相抵消维持对齐。后续验收不是只看数值，而是要求这些补丁全部消失后，选择列作为普通列仍在三档与半选态下不退化。
-

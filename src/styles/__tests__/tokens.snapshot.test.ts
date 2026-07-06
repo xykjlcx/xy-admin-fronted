@@ -792,7 +792,9 @@ test('DataTable TanStack 迁移守卫：无旧状态机、无 checkbox 补丁、
   expect(dataTableSource).toContain('useReactTable');
   expect(dataTableSource).toContain('getCoreRowModel');
   expect(dataTableSource).toContain('flexRender');
+  expect(dataTableSource).toContain("const rowSelectionColumnId = '__row_selection__'");
   expect(dataTableSource).toContain('[selectionColumn, ...columns]');
+  expect(dataTableSource).toContain('column.id === rowSelectionColumnId');
   expect(dataTableSource).toContain('getIsAllPageRowsSelected');
   expect(dataTableSource).toContain('getIsSomePageRowsSelected');
   expect(dataTableSource).toContain('toggleAllPageRowsSelected');
@@ -802,6 +804,8 @@ test('DataTable TanStack 迁移守卫：无旧状态机、无 checkbox 补丁、
   expect(dataTableSource).not.toMatch(/DataTableColumn|DataTableLegacySelection|legacyRowSelection|onSelectionChange/);
   expect(dataTableSource).not.toMatch(/selectionColumnWidth|selectionCellClassName|bodyCellWithSelectionClassName/);
   expect(dataTableSource).not.toMatch(/selectionSlotClassName|selectionCheckboxClassName/);
+  expect(dataTableSource).not.toContain("id: 'select'");
+  expect(dataTableSource).not.toContain("cellIndex === 0 && 'mx-auto w-4'");
   expect(dataTableSource).not.toMatch(/getSortedRowModel|manualSorting|getFilteredRowModel|manualFiltering/);
   expect(dataTableSource).not.toMatch(/getGroupedRowModel|getFacetedRowModel|useVirtualizer/);
   expect(dataTableSource).not.toContain('@/modules/');

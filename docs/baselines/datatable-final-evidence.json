@@ -1,0 +1,310 @@
+{
+  "generatedAt": "2026-07-06T05:14:14.643Z",
+  "sourceArtifacts": {
+    "finalManifest": "test-results/final-datatable/manifest.json",
+    "behaviorEvidence": "test-results/final-datatable/behavior-evidence.json",
+    "visualReport": "test-results/m0-visual/report.md",
+    "finalDiffReport": "test-results/final-datatable/diff/report.json"
+  },
+  "checkboxAlignment": [
+    {
+      "zoom": "sm",
+      "scale": "90%",
+      "state": "unchecked",
+      "checkboxCount": 11,
+      "baselineDeltas": [
+        -0.2578,
+        0,
+        0
+      ],
+      "finalDeltas": [
+        -0.25,
+        0,
+        0
+      ],
+      "maxAbsRegression": 0
+    },
+    {
+      "zoom": "sm",
+      "scale": "90%",
+      "state": "half-selected",
+      "checkboxCount": 11,
+      "baselineDeltas": [
+        -0.2578,
+        0,
+        0
+      ],
+      "finalDeltas": [
+        -0.25,
+        0,
+        0
+      ],
+      "maxAbsRegression": 0
+    },
+    {
+      "zoom": "md",
+      "scale": "100%",
+      "state": "unchecked",
+      "checkboxCount": 11,
+      "baselineDeltas": [
+        -0.25,
+        0,
+        0
+      ],
+      "finalDeltas": [
+        -0.25,
+        0,
+        0
+      ],
+      "maxAbsRegression": 0
+    },
+    {
+      "zoom": "md",
+      "scale": "100%",
+      "state": "half-selected",
+      "checkboxCount": 11,
+      "baselineDeltas": [
+        -0.25,
+        0,
+        0
+      ],
+      "finalDeltas": [
+        -0.25,
+        0,
+        0
+      ],
+      "maxAbsRegression": 0
+    },
+    {
+      "zoom": "lg",
+      "scale": "108%",
+      "state": "unchecked",
+      "checkboxCount": 11,
+      "baselineDeltas": [
+        -0.25,
+        -0.0078,
+        -0.0078
+      ],
+      "finalDeltas": [
+        -0.2578,
+        -0.0078,
+        -0.0078
+      ],
+      "maxAbsRegression": 0.0078
+    },
+    {
+      "zoom": "lg",
+      "scale": "108%",
+      "state": "half-selected",
+      "checkboxCount": 11,
+      "baselineDeltas": [
+        -0.25,
+        -0.0078,
+        -0.0078
+      ],
+      "finalDeltas": [
+        -0.2578,
+        -0.0078,
+        -0.0078
+      ],
+      "maxAbsRegression": 0.0078
+    }
+  ],
+  "behavior": [
+    {
+      "label": "initial",
+      "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "checkboxCount": 11,
+      "header": {
+        "checked": false,
+        "indeterminate": false
+      },
+      "first": {
+        "checked": false,
+        "indeterminate": false
+      },
+      "checkedCount": 0,
+      "bulkVisible": false,
+      "selectedCount": null,
+      "detailButtons": 10,
+      "editButtons": 10,
+      "deleteButtons": 10
+    },
+    {
+      "label": "single-select",
+      "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "checkboxCount": 11,
+      "header": {
+        "checked": false,
+        "indeterminate": true
+      },
+      "first": {
+        "checked": true,
+        "indeterminate": false
+      },
+      "checkedCount": 1,
+      "bulkVisible": true,
+      "selectedCount": "已选 1 人",
+      "detailButtons": 10,
+      "editButtons": 10,
+      "deleteButtons": 10
+    },
+    {
+      "label": "select-all-page",
+      "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "checkboxCount": 11,
+      "header": {
+        "checked": true,
+        "indeterminate": false
+      },
+      "first": {
+        "checked": true,
+        "indeterminate": false
+      },
+      "checkedCount": 11,
+      "bulkVisible": true,
+      "selectedCount": "已选 10 人",
+      "detailButtons": 10,
+      "editButtons": 10,
+      "deleteButtons": 10
+    },
+    {
+      "label": "after-page-change",
+      "url": "http://localhost:5173/admin/users?page=2&pageSize=10&status=all&keyword=",
+      "checkboxCount": 5,
+      "header": {
+        "checked": false,
+        "indeterminate": false
+      },
+      "first": {
+        "checked": false,
+        "indeterminate": false
+      },
+      "checkedCount": 0,
+      "bulkVisible": false,
+      "selectedCount": null,
+      "detailButtons": 4,
+      "editButtons": 4,
+      "deleteButtons": 4
+    },
+    {
+      "label": "before-filter-change",
+      "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=all&keyword=",
+      "checkboxCount": 11,
+      "header": {
+        "checked": false,
+        "indeterminate": true
+      },
+      "first": {
+        "checked": true,
+        "indeterminate": false
+      },
+      "checkedCount": 1,
+      "bulkVisible": true,
+      "selectedCount": "已选 1 人",
+      "detailButtons": 10,
+      "editButtons": 10,
+      "deleteButtons": 10
+    },
+    {
+      "label": "after-status-filter-change",
+      "url": "http://localhost:5173/admin/users?page=1&pageSize=10&status=disabled&keyword=",
+      "checkboxCount": 2,
+      "header": {
+        "checked": false,
+        "indeterminate": false
+      },
+      "first": {
+        "checked": false,
+        "indeterminate": false
+      },
+      "checkedCount": 0,
+      "bulkVisible": false,
+      "selectedCount": null,
+      "detailButtons": 1,
+      "editButtons": 1,
+      "deleteButtons": 1
+    }
+  ],
+  "visual": {
+    "fullPagePrototypeDiffs": [
+      {
+        "page": "login",
+        "diffPercent": 3.25,
+        "differentPixels": 42159,
+        "totalPixels": 1296000
+      },
+      {
+        "page": "dashboard",
+        "diffPercent": 5.39,
+        "differentPixels": 69845,
+        "totalPixels": 1296000
+      },
+      {
+        "page": "users",
+        "diffPercent": 5.64,
+        "differentPixels": 73076,
+        "totalPixels": 1296000
+      },
+      {
+        "page": "roles",
+        "diffPercent": 5.1,
+        "differentPixels": 66131,
+        "totalPixels": 1296000
+      },
+      {
+        "page": "menus",
+        "diffPercent": 6.53,
+        "differentPixels": 84613,
+        "totalPixels": 1296000
+      }
+    ],
+    "scaleChecks": [
+      {
+        "zoom": "sm",
+        "assertions": "no horizontal overflow / status popover in viewport / detail sheet in viewport / roles dialog in viewport / menus dialog in viewport"
+      },
+      {
+        "zoom": "md",
+        "assertions": "no horizontal overflow / status popover in viewport / detail sheet in viewport / roles dialog in viewport / menus dialog in viewport"
+      },
+      {
+        "zoom": "lg",
+        "assertions": "no horizontal overflow / status popover in viewport / detail sheet in viewport / roles dialog in viewport / menus dialog in viewport"
+      }
+    ],
+    "datatableScreenshotDiffs": [
+      {
+        "zoom": "sm",
+        "state": "unchecked",
+        "stdout": "✗ 6.56% pixels differ\n  Diff image: /Users/ocean/Documents/通用脚手架前端/test-results/final-datatable/diff/diff-users-members-sm.png\n  84980 different / 1296000 total pixels"
+      },
+      {
+        "zoom": "sm",
+        "state": "half",
+        "stdout": "✗ 5.79% pixels differ\n  Diff image: /Users/ocean/Documents/通用脚手架前端/test-results/final-datatable/diff/diff-users-members-sm-half.png\n  75044 different / 1296000 total pixels"
+      },
+      {
+        "zoom": "md",
+        "state": "unchecked",
+        "stdout": "✗ 5.49% pixels differ\n  Diff image: /Users/ocean/Documents/通用脚手架前端/test-results/final-datatable/diff/diff-users-members-md.png\n  71213 different / 1296000 total pixels"
+      },
+      {
+        "zoom": "md",
+        "state": "half",
+        "stdout": "✗ 4.52% pixels differ\n  Diff image: /Users/ocean/Documents/通用脚手架前端/test-results/final-datatable/diff/diff-users-members-md-half.png\n  58631 different / 1296000 total pixels"
+      },
+      {
+        "zoom": "lg",
+        "state": "unchecked",
+        "stdout": "✗ 5.64% pixels differ\n  Diff image: /Users/ocean/Documents/通用脚手架前端/test-results/final-datatable/diff/diff-users-members-lg.png\n  73095 different / 1296000 total pixels"
+      },
+      {
+        "zoom": "lg",
+        "state": "half",
+        "stdout": "✗ 5.10% pixels differ\n  Diff image: /Users/ocean/Documents/通用脚手架前端/test-results/final-datatable/diff/diff-users-members-lg-half.png\n  66152 different / 1296000 total pixels"
+      }
+    ],
+    "note": "Full-page prototype and DataTable screenshot diffs are informational because they include stable page-level differences beyond checkbox alignment; hard gating uses checkbox delta and functional scale assertions."
+  }
+}

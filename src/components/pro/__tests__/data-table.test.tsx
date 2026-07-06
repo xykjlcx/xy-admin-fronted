@@ -212,6 +212,46 @@ test('DataTable handles loading and empty states inside tbody', () => {
   expect(within(row).getByRole('cell', { name: '暂无成员' })).toHaveAttribute('colspan', '3');
 });
 
+test('DataTable loading skeleton follows visible column roles instead of assuming the first column is selection', () => {
+  const { rerender } = render(
+    <DataTable
+      columns={columns}
+      data={[]}
+      rowKey={(row) => row.id}
+      loading
+      emptyText="暂无成员"
+      loadingText="正在加载成员"
+    />,
+  );
+
+  const firstLoadingRow = screen.getAllByTestId('data-table-loading-row')[0];
+  if (!firstLoadingRow) throw new Error('loading row missing');
+  const firstSkeleton = firstLoadingRow.querySelector('[data-slot="skeleton"]');
+  expect(firstSkeleton).toHaveClass('w-3/4');
+  expect(firstSkeleton).not.toHaveClass('mx-auto', 'w-4');
+
+  rerender(
+    <DataTable
+      columns={columns}
+      data={[]}
+      rowKey={(row) => row.id}
+      loading
+      emptyText="暂无成员"
+      loadingText="正在加载成员"
+      selection={{
+        enabled: true,
+        rowSelection: {},
+        onRowSelectionChange: () => undefined,
+      }}
+    />,
+  );
+
+  const selectedLoadingRow = screen.getAllByTestId('data-table-loading-row')[0];
+  if (!selectedLoadingRow) throw new Error('selection loading row missing');
+  const selectionSkeleton = selectedLoadingRow.querySelector('[data-slot="skeleton"]');
+  expect(selectionSkeleton).toHaveClass('mx-auto', 'w-4');
+});
+
 test('DataTable uses ui table and checkbox primitives without module or i18n coupling', () => {
   const source = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
 
@@ -254,8 +294,10 @@ test('DataTable uses ui table and checkbox primitives without module or i18n cou
 test('DataTable injects selection as a ColumnDef instead of rendering special selection cells', () => {
   const source = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
 
+  expect(source).toContain("const rowSelectionColumnId = '__row_selection__'");
   expect(source).toContain('selectionColumn');
   expect(source).toContain('[selectionColumn, ...columns]');
+  expect(source).not.toContain("id: 'select'");
   expect(source).not.toContain('selectionEnabled && (');
   expect(source).not.toContain('selectionEnabled && <');
 });

@@ -58,4 +58,3 @@ Agent Browser 证据文件：`test-results/baseline-datatable/behavior-evidence.
 ## Step 0 SPEC-QUESTION
 
 无。
-

@@ -138,7 +138,7 @@ grep '@tanstack/react-table' package.json         # 确认已存在（应为 ^8.
 
 ```tsx
 const selectionColumn: ColumnDef<T> = {
-  id: 'select',
+  id: '__row_selection__',
   enableSorting: false,
   meta: { width: 'calc(44px * var(--app-scale))' },   // 普通列宽，非特殊常量
   header: ({ table }) => {
@@ -324,7 +324,9 @@ export function userColumns(ctx: UserColumnsContext): ColumnDef<UserDto>[] {
 - 通用 DataTable 旧状态机的跨数据页累积能力已删除，按 §0.6 记为选择模型替换，不作为成员页回归。
 - 分页、空态、加载态、详情/编辑/删除入口 与基线等价。
 ### 9.4 视觉回归
-- 成员/部门/离职三页 × 三档 diff < 0.5% 且无功能性差异（本次无新增可见 UI；checkbox 对齐应改善或持平）。
+- DataTable 局部验收以 Step 0/Final 的 checkbox 对齐数值和截图为准：90%/100%/108% 下未选中与半选态的表头/行 checkbox `deltaToCellCenter` 改善或持平，亚像素级四舍五入差异不得形成可见偏移。
+- `/dev/theme-states` 必须覆盖 partial/all/single/loading/empty，相关状态三档缩放下无溢出或功能性视觉差异。
+- 全页 prototype diff（`pnpm visual`）作为辅助证据记录；若因既有原型/实现全页差异超过 0.5%，不得据此掩盖 DataTable 局部退化，需在报告中说明差异口径与是否和本次表格迁移相关。
 
 ---
 
@@ -374,7 +376,7 @@ pnpm theme:guard
 - [ ] checkbox 三档对齐验收通过（对照基线，改善或持平，无退化）。
 - [ ] 行为等价清单逐条勾选通过（成员页继续保持单页选择；通用 DataTable 跨数据页累积能力删除按 §0.6 记录为选择模型替换）。
 - [ ] **单页选择的产品可接受性已由维护者确认**（翻页后选择清空、批量操作仅作用当前页选中项；报告中仍需显式列出该产品行为）。
-- [ ] 视觉回归 < 0.5% 且无功能性差异。
+- [ ] DataTable 局部视觉验收通过：checkbox 对齐改善或持平，theme-states 三态/加载/空态无功能性视觉差异；全页 prototype diff 若超过 0.5%，已在报告中说明口径与非本次回归依据。
 - [ ] §11 门禁全绿；生产包无 mock 残留。
 - [ ] 每步独立 commit；每个 SPEC-QUESTION 在 PR 描述列出并说明处置。
 
@@ -387,7 +389,7 @@ pnpm theme:guard
 | 1 | DataTable | `selectionColumnWidth = 'calc(44px*var(--app-scale))'` | 改为选择列 `meta.width` 的普通列宽 |
 | 2 | DataTable | `selectionCellClassName = 'h-14 p-0'` | 删除，选择单元格走普通 TableCell |
 | 3 | DataTable | `bodyCellWithSelectionClassName = 'h-14 py-0'` | 删除，普通单元格不因选择列改变 |
-| 4 | DataTable | `selectionSlotClassName = 'flex h-full items-center justify-center'` | 删除，align-middle 统一居中 |
+| 4 | DataTable | `selectionSlotClassName = 'flex h-full items-center justify-center'` | 删除 DataTable 级 slot 补丁；选择列只允许作为普通 ColumnDef cell 内容布局，不得使用 table/role selector hack |
 | 5 | ui/table TableHead/Cell | `[&:has([role=checkbox])]:pr-0` | 删除 |
 | 6 | ui/table TableHead/Cell | `[&>[role=checkbox]]:translate-y-[calc(2px*var(--app-scale))]` | 删除，垂直居中靠 align-middle |
 

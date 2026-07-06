@@ -82,7 +82,8 @@ test('members scene owns controlled row selection and clears it with search chan
 
   expect(tableSource).toContain('rowSelection: RowSelectionState');
   expect(tableSource).toContain('onRowSelectionChange: OnChangeFn<RowSelectionState>');
-  expect(tableSource).toContain('userColumnsV2');
+  expect(tableSource).toContain('userColumns');
+  expect(tableSource).not.toContain('userColumnsV2');
   expect(tableSource).toContain('onClearSelection');
   expect(tableSource).not.toContain('resetSelectionKey');
   expect(tableSource).not.toContain('bulkResetVersion');
@@ -93,10 +94,10 @@ test('member columns expose TanStack ColumnDef without legacy DataTable column A
   const source = readFileSync('src/modules/admin/users/list/columns.tsx', 'utf8');
 
   expect(source).toContain("import type { ColumnDef } from '@tanstack/react-table'");
-  expect(source).toContain('export function userColumnsV2');
+  expect(source).toContain('export function userColumns');
   expect(source).toContain('): ColumnDef<UserDto>[]');
   expect(source).not.toContain('DataTableColumn');
-  expect(source).not.toContain('export function userColumns({');
+  expect(source).not.toContain('userColumnsV2');
   expect(source).toContain('row.original');
   expect(source).toContain('row.index');
   expect(source.match(/enableSorting: false/g)).toHaveLength(5);

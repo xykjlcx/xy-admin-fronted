@@ -16,6 +16,14 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
   const { t } = useTranslation('admin');
   const [tab, setTab] = useState<TabKey>(search.status === 'left' ? 'left' : 'members');
   const activeTab: TabKey = search.status === 'left' ? 'left' : tab;
+  const membersSceneKey = [
+    activeTab,
+    search.page,
+    search.pageSize,
+    search.status,
+    search.keyword,
+    search.deptId ?? '',
+  ].join(':');
   const tabItems = [
     { value: 'members', label: t('users.tabs.members') },
     { value: 'depts', label: t('users.tabs.depts') },
@@ -38,7 +46,7 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
           <DeptScene search={search} onSearchChange={onSearchChange} />
         ) : (
           <MembersScene
-            key={activeTab}
+            key={membersSceneKey}
             variant={activeTab}
             permissions={permissions}
             search={search}
