@@ -108,6 +108,11 @@ test('dev-only theme states route is gated out of production', () => {
   expect(source).toContain('notFound()');
 });
 
+// —— 以下 theme-states 矩阵守卫是「实现快照」而非架构不变量 ——
+// 它们逐字断言 /dev/theme-states 页展示了各组件族状态矩阵（AGENTS §9 要求每个 token 化组件族
+// 在此有可截图矩阵）。代价是脆弱：重命名页内变量/类名会误红。保留是因为它们守护「矩阵完整性」；
+// 若主题组件族 token 体系重估（AGENTS §9 标注的「第一个可重新评估的对象」），这批应一并改为
+// 基于 data-testid 的稳定断言，而非逐字符串匹配。
 test('theme states route exposes the Field family state matrix', () => {
   const source = readProjectFile(themeStatesRoute);
 
