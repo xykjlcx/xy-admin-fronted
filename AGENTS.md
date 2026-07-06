@@ -1,13 +1,13 @@
 # AGENTS.md — 通用后台管理脚手架前端规则
 
-> AI agent(Claude Code / Codex)每次会话的执行规则。权威解释见 `docs/ARCHITECTURE.md`;具体改造见对应 `SPEC-*.md`。
-> 冲突时优先级:**当前代码 > docs/ARCHITECTURE.md > 本文 > 历史 plan/spec**。
+> AI agent(Claude Code / Codex)每次会话的执行规则。权威解释见 `docs/architecture.md`;具体改造见对应 `SPEC-*.md`。
+> 冲突时优先级:**当前代码 > docs/architecture.md > 本文 > 历史 plan/spec**。
 
 ## 项目定位
 
 - Vite + React + TypeScript + Tailwind CSS v4 + shadcn/ui + TanStack(Router / Query / Table) 的企业后台管理模板。
-- 高保真视觉基准:`后台管理脚手架.dc.html`。当 README 与实现方案冲突,以 `docs/superpowers/specs/2026-07-02-admin-scaffold-frontend-design.md` 和当前代码为准。
-- 交付形态:此仓库作为脚手架范本,新业务域复制既定纵切结构开发(见「模块纵切」)。
+- 高保真视觉基准:`后台管理脚手架.dc.html`。工程架构真相源是 `docs/architecture.md`;当文档与实现冲突,以 `docs/architecture.md` 和当前代码为准。`docs/superpowers/specs/` 下是历史设计草案,只作执行记录。
+- 交付形态:此仓库作为脚手架范本,新业务域复制既定纵切结构开发(见「模块纵切」);唯一纵切范本是 `modules/admin/users/`,`modules/admin/pages/{roles,menus,dashboard}` 是待迁移的横切遗留,勿模仿。
 
 ## 全局目录总览(先建立地图)
 
@@ -35,7 +35,7 @@ src/
 - **routes 是薄壳**:只做 URL / `validateSearch` / `staticData` / loader / route context 适配。**禁止** `useQuery` / `useMutation` / `useQueryClient` / `useSuspenseQuery` / `from 'sonner'` / `useTranslation` / 直接依赖业务子组件。
 - **config 是启动中心不是设置中心**:`env.ts` 是唯一读 `import.meta.env` 的文件;禁止把业务菜单树、业务权限实现、DTO、表单字段、页面状态搬进 config。
 - **stores 只存纯客户端状态**(token、外观、折叠);服务端数据一律归 TanStack Query,禁止在 store 里存服务端数据副本。
-- 工程结构、页面目录、Route 边界的权威说明以 `docs/ARCHITECTURE.md` 为准;历史 plan/spec 的旧路径只作执行记录。
+- 工程结构、页面目录、Route 边界的权威说明以 `docs/architecture.md` 为准;历史 plan/spec 的旧路径只作执行记录。
 
 ## 模块纵切(唯一形态)
 
@@ -66,7 +66,7 @@ src/
 - 跨组件数据同步只经 `invalidateQueries(xxxKeys.all)`,不经 props 传数据、不经状态上提。变更后按前缀失效。
 - staleTime 分档:易变数据(列表/详情)默认 0(靠 invalidate + 聚焦保新鲜);准静态(部门/字典/权限点)设长 staleTime。就地写在 queryOptions。
 - 写操作若影响关联数据(如部门成员数),额外失效对应 keys。
-- 服务端数据归 TanStack Query;缓存模型(staleTime / gcTime / stale-while-revalidate)详见 `docs/ARCHITECTURE.md` 第 6 章。
+- 服务端数据归 TanStack Query;缓存模型(staleTime / gcTime / stale-while-revalidate)详见 `docs/architecture.md` 第 6 章。
 
 ## 类型与契约
 
@@ -109,6 +109,7 @@ src/
 
 - 文案走 i18n key;**禁止**新增中文硬编码进组件。路由 `staticData` 用 `labelKey / groupKey / action.labelKey`,不把用户可见中文散落在路由元数据里。
 - 前端权限只负责体验与防误触,**不是安全边界**;生产权限必须由后端校验。
+- 路由 `staticData.actions` 是**按钮级权限点的前端声明源**(权威目录):接真后端时用它做权限初始化 seed,版本迭代时 diff 它得出权限变更集。这是刻意保留的设计资产,勿当"无消费方的死字段"删除。对接模式下,后端 permission/menu 表为准,前端 `staticData` 做声明校验。
 - mock 只在开发态、demo 或 `VITE_ENABLE_MOCK=true` 时启用;生产构建**必须**剥离 faker/msw/mock worker。mock 随业务纵切(`<business>/mocks/`),在 `src/mocks` 总聚合点挂载。
 - 环境文件 `.env*` 不提交;开发默认已启用 mock,覆盖时只写本地 `.env.development`。
 

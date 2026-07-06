@@ -45,6 +45,14 @@ src/
 ├── locales/  mocks/  styles/
 ```
 
+### 1.1 脚手架核心 vs 示例业务（派生新项目 / 回流的边界）
+
+派生新项目、或从脚手架回流修复时，按这条线区分（实例化清单见 `docs/NEW-PROJECT.md`）：
+
+- **脚手架核心**（每个派生项目共享、回流价值高）：`app/`、`config/`、`lib/`、`components/{ui,pro}`、`stores/`、`styles/`、`routes/{__root,_auth,login,403}.tsx`。修 bug 主要落在这里，也是长期自有产品该 `git merge scaffold` 吃回来的部分。
+- **示例业务**（每个派生项目替换、不回流）：`modules/admin/{users,roles,menus,dashboard}` 及其 mock 种子、`dashboard` 假数据。它们是「怎么写业务」的范本，新项目照 `users` 纵切结构重写，不保留示例数据。
+- **原型 / 开发产物**（派生时删除）：`后台管理脚手架.dc.html`、`support.js`、`docs/design/research/`、`docs/baselines/`、`docs/日志/`、`docs/prototype-handoff.md`。
+
 ## 2. 业务纵切包（标准形态与范本）
 
 模块内从「横切」（旧：`admin/{api,mocks,pages}`）改为「按业务域纵切」。一个业务域是一个自足包，结构固定，新业务**复制此骨架，不裁剪、不发明第二种形态**：

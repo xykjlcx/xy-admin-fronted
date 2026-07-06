@@ -2,7 +2,9 @@
 
 生成时间：2026-07-05 17:35 CST
 
-基线对象：`/admin/users?page=1&pageSize=10&status=all&keyword=`，当前实现路径为 `src/modules/admin/pages/users/`。
+基线对象：`/admin/users?page=1&pageSize=10&status=all&keyword=`。
+
+> ⚠️ **历史快照（users 纵切改造前）**：本文所述路径 `src/modules/admin/pages/users/` 已删除，实现迁至 `src/modules/admin/users/`（api/list/detail/form）。本文仅作改造前行为的历史参考，不反映当前实现（见 `SPEC-datatable-tanstack.md` §3.3「不得复用、只作历史参考」）。
 
 ## 环境与脚本
 
