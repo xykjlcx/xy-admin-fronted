@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router';
-import { Check, Eye, Globe2, Lock, Mail, MessageSquare, Moon, QrCode, ShieldCheck, Smartphone } from 'lucide-react';
+import { Check, Eye, Globe2, Lock, Mail, MessageSquare, Moon, QrCode, ShieldCheck, Smartphone, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,8 @@ import { authApi } from '@/modules/admin/api/auth.api';
 import { resetAuth } from '@/lib/reset-auth';
 import { cn } from '@/lib/utils';
 import { appConfig } from '@/config';
+import { useAppearance } from '@/stores/appearance';
+import { LOCALE_STORAGE_KEY } from '@/lib/i18n-config';
 
 const searchSchema = z.object({ redirect: z.string().optional() });
 
@@ -38,8 +40,16 @@ const authTabs = [
 ] as const;
 
 function LoginPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { redirect: to } = Route.useSearch();
+  const mode = useAppearance((s) => s.mode);
+  const setAppearance = useAppearance((s) => s.set);
+  const toggleLang = () => {
+    const next = i18n.language.startsWith('zh') ? 'en-US' : 'zh-CN';
+    void i18n.changeLanguage(next);
+    localStorage.setItem(LOCALE_STORAGE_KEY, next);
+  };
+  const toggleTheme = () => setAppearance({ mode: mode === 'dark' ? 'light' : 'dark' });
   const nav = useNavigate();
   const router = useRouter();
   const [tab, setTab] = useState<AuthTab>('password');
@@ -73,12 +83,16 @@ function LoginPage() {
 
       <section className="flex min-w-0 flex-1 flex-col overflow-y-auto px-[calc(56px*var(--app-scale))] py-[calc(40px*var(--app-scale))]">
         <div className="flex justify-end gap-6 text-[calc(13px*var(--app-scale))] text-text-2">
-          <button type="button" className="flex items-center gap-1.5 hover:text-text">
+          <button type="button" onClick={toggleLang} className="flex items-center gap-1.5 hover:text-text">
             <Globe2 className="size-[calc(15px*var(--app-scale))]" />
-            English
+            {i18n.language.startsWith('zh') ? 'English' : '简体中文'}
           </button>
-          <button type="button" className="flex items-center gap-1.5 hover:text-text">
-            <Moon className="size-[calc(15px*var(--app-scale))]" />
+          <button type="button" onClick={toggleTheme} className="flex items-center gap-1.5 hover:text-text">
+            {mode === 'dark' ? (
+              <Sun className="size-[calc(15px*var(--app-scale))]" />
+            ) : (
+              <Moon className="size-[calc(15px*var(--app-scale))]" />
+            )}
             {t('auth.switchTheme')}
           </button>
         </div>
@@ -119,12 +133,6 @@ function LoginPage() {
                 <SmsFields />
               )}
 
-              <label className="mt-4 flex cursor-pointer items-center gap-2">
-                <span className="flex size-4 items-center justify-center rounded-4 bg-pri text-white">
-                  <Check className="size-3 stroke-[3px]" />
-                </span>
-                <span className="text-[calc(13px*var(--app-scale))] text-text-2">{t('auth.remember')}</span>
-              </label>
 
               {formState.errors.root && (
                 <p className="mt-4 rounded-8 bg-danger-soft px-3 py-2 text-[calc(13px*var(--app-scale))] text-danger">

@@ -15,6 +15,9 @@ export function createFeatureConfig(source: ParsedEnv) {
       (source.dev && source.enableMockOverride !== false),
     enableDevtools: source.enableDevtoolsOverride ?? source.dev,
     enableVisualDebug: source.enableVisualDebugOverride ?? false,
+    // stub chrome（搜索框/通知铃铛等未接真的假部件）：接真前只在开发/demo 预览，
+    // 生产交付隐藏，避免客户点到假按钮（诊断 F8）。demo 时 source.dev 亦为 true。
+    showStubChrome: source.dev,
   };
 }
 

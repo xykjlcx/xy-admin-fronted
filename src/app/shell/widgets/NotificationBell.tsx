@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { featuresConfig } from '@/config';
 
 const UNREAD = 3; // M0 写死；消息中心在 M1 接真实未读数
 
+// 未接真前只在开发/demo 显示，生产交付隐藏避免露假功能（诊断 F8）。
 export function NotificationBell() {
   const { t } = useTranslation();
+  if (!featuresConfig.showStubChrome) return null;
   return (
     <Tooltip>
       <TooltipTrigger asChild>
