@@ -22,7 +22,7 @@ export type AccentKey = (typeof ACCENTS)[number]['key'] | 'custom';
 // （ESLint 色值铁律只约束 .tsx），组件用 style 内联消费（数据，非硬编码字面量）。
 export const FLAVOR_PRESETS = [
   { key: 'feishu', pri: '#3370ff', chrome: '#ffffff', surface2: '#f2f3f5' },
-  { key: 'claude', pri: '#cc785c', chrome: '#faf9f5', surface2: '#f5f0e8' },
+  { key: 'claude', pri: '#d97757', chrome: '#faf9f5', surface2: '#f5f0e8' }, // clay 对齐 ACCENTS/tokens 官方值（原型旧值 #cc785c）
   { key: 'shadcn', pri: '#18181b', chrome: '#ffffff', surface2: '#f4f4f5' },
 ] as const;
 
