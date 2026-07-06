@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { render, screen } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
@@ -476,11 +477,19 @@ test('Tabs、Table、Textarea、RadioGroup、Alert、Separator 走项目基础 U
   );
 
   expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('text-(--tabs-seg-trigger-fg)');
+  expect(screen.getByRole('table')).toHaveClass('table-fixed');
   expect(screen.getByRole('cell', { name: '张三' })).toHaveClass('whitespace-nowrap');
   expect(screen.getByRole('textbox', { name: '备注' })).toHaveAttribute('aria-invalid', 'true');
   expect(screen.getByRole('radio', { name: '启用' })).toHaveAttribute('data-state', 'checked');
   expect(screen.getByText('保存成功').closest('[data-slot="alert"]')).toHaveClass('bg-success-bg');
   expect(screen.getByRole('separator')).toHaveAttribute('data-slot', 'separator');
+});
+
+test('Table primitive has no checkbox-specific layout hacks', () => {
+  const source = readFileSync('src/components/ui/table.tsx', 'utf8');
+
+  expect(source).not.toContain('[role=checkbox]');
+  expect(source).not.toContain('translate-y');
 });
 
 test('Tabs 分结构消费 Step 6 token 并保留 line 指示条动画', () => {

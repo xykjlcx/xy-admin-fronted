@@ -12,7 +12,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     >
       <table
         data-slot="table"
-        className={cn('w-full caption-bottom bg-(--table-bg) text-sm text-(--table-row-fg)', className)}
+        className={cn('w-full table-fixed caption-bottom bg-(--table-bg) text-sm text-(--table-row-fg)', className)}
         {...props}
       />
     </div>
@@ -70,7 +70,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        'h-11 px-3 text-left align-middle text-[calc(13px*var(--app-scale))] font-medium whitespace-nowrap text-(--table-header-fg) [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[calc(2px*var(--app-scale))]',
+        'h-11 px-3 text-left align-middle text-[calc(13px*var(--app-scale))] font-medium whitespace-nowrap text-(--table-header-fg)',
         className,
       )}
       {...props}
@@ -83,7 +83,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        'px-3 py-[calc(10px*var(--app-scale))] align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[calc(2px*var(--app-scale))]',
+        'px-3 py-[calc(10px*var(--app-scale))] align-middle whitespace-nowrap',
         className,
       )}
       {...props}
