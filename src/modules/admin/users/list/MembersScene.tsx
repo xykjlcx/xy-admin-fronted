@@ -37,6 +37,14 @@ export function MembersScene({
   const writable = variant === 'members';
 
   const clearRowSelection = useCallback(() => setRowSelection({}), []);
+  // search（页码/筛选/部门）变化时清空行选择——用「渲染期同步 setState」而非整场景 remount，
+  // 防跨页/跨筛选选择错乱，同时避免翻页重挂场景与 DeptTree 滚动丢失（诊断 F9）。
+  const searchKey = `${search.page}:${search.pageSize}:${search.status}:${search.keyword ?? ''}:${search.deptId ?? ''}`;
+  const [prevSearchKey, setPrevSearchKey] = useState(searchKey);
+  if (searchKey !== prevSearchKey) {
+    setPrevSearchKey(searchKey);
+    setRowSelection({});
+  }
   const handleRowSelectionChange = useCallback<OnChangeFn<RowSelectionState>>((updater) => {
     setRowSelection((current) => (typeof updater === 'function' ? updater(current) : updater));
   }, []);

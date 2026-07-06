@@ -16,14 +16,9 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
   const { t } = useTranslation('admin');
   const [tab, setTab] = useState<TabKey>(search.status === 'left' ? 'left' : 'members');
   const activeTab: TabKey = search.status === 'left' ? 'left' : tab;
-  const membersSceneKey = [
-    activeTab,
-    search.page,
-    search.pageSize,
-    search.status,
-    search.keyword,
-    search.deptId ?? '',
-  ].join(':');
+  // key 仅按变体（members/left）分场景实例：翻页/搜索/点部门靠 props 与查询缓存响应，不重挂整个场景。
+  // 原来把 page/keyword/deptId 编进 key 会导致每次翻页整场景 remount（实测：table DOM 重建、
+  // keepPreviousData 失效、DeptTree 滚动丢失）；行选择清空已由 MembersScene.handleSearchChange 负责。
   const tabItems = [
     { value: 'members', label: t('users.tabs.members') },
     { value: 'depts', label: t('users.tabs.depts') },
@@ -46,7 +41,7 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
           <DeptScene search={search} onSearchChange={onSearchChange} />
         ) : (
           <MembersScene
-            key={membersSceneKey}
+            key={activeTab}
             variant={activeTab}
             permissions={permissions}
             search={search}
