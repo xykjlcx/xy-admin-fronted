@@ -38,6 +38,21 @@ test('feature config preserves mock gating rules', () => {
   expect(createFeatureConfig(parseEnv({ MODE: 'demo', DEV: false, PROD: true })).enableMock).toBe(true);
 });
 
+test('feature config gates dev-only surfaces by environment', () => {
+  // /dev/theme-states 的环境门前提：dev 放行、生产拦截、生产可用 VITE_ENABLE_VISUAL_DEBUG 逃生阀
+  const dev = createFeatureConfig(parseEnv({ MODE: 'development', DEV: true, PROD: false }));
+  expect(dev.isDev).toBe(true);
+
+  const prod = createFeatureConfig(parseEnv({ MODE: 'production', DEV: false, PROD: true }));
+  expect(prod.isDev).toBe(false);
+  expect(prod.enableVisualDebug).toBe(false);
+
+  const prodDebug = createFeatureConfig(
+    parseEnv({ MODE: 'production', DEV: false, PROD: true, VITE_ENABLE_VISUAL_DEBUG: 'true' }),
+  );
+  expect(prodDebug.enableVisualDebug).toBe(true);
+});
+
 test('request config is derived from validated env and keeps backend contract knobs together', () => {
   const request = createRequestConfig(
     parseEnv({

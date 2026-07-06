@@ -1,4 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
+import { featuresConfig } from '@/config';
 import type { ColumnDef, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import { CheckIcon, ChevronDownIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -27,6 +28,11 @@ import { SideList, type SideListItem } from '@/components/pro/SideList';
 import { Pagination } from '@/components/pro/Pagination';
 
 export const Route = createFileRoute('/_auth/dev/theme-states')({
+  // dev 组件状态矩阵：仅开发态 / 视觉验收（VITE_ENABLE_VISUAL_DEBUG）可见，生产环境视同不存在。
+  // 无此门则任何登录用户直连 URL 即可访问内部组件画廊。
+  beforeLoad: () => {
+    if (!featuresConfig.isDev && !featuresConfig.enableVisualDebug) throw notFound();
+  },
   component: ThemeStatesRoute,
 });
 

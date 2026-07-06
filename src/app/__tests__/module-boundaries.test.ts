@@ -79,6 +79,16 @@ test('theme states route is available for token slice verification', () => {
   expect(readProjectFile('src/routeTree.gen.ts')).toContain("path: '/dev/theme-states'");
 });
 
+test('dev-only theme states route is gated out of production', () => {
+  // 架构不变量：dev 组件画廊必须有环境门，否则任何登录用户直连 URL 即可访问。
+  const source = readProjectFile(themeStatesRoute);
+
+  expect(source).toContain('beforeLoad');
+  expect(source).toContain('featuresConfig');
+  expect(source).toMatch(/isDev|enableVisualDebug/);
+  expect(source).toContain('notFound()');
+});
+
 test('theme states route exposes the Field family state matrix', () => {
   const source = readProjectFile(themeStatesRoute);
 
