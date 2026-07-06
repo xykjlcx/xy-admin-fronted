@@ -89,6 +89,30 @@ const dataTableRows: DataTableThemeRow[] = [
   { id: 'normal', nameKey: 'dev.themeStates.dataTableNormal', statusKey: 'dev.themeStates.tableStatusEnabled' },
   { id: 'disabled', nameKey: 'dev.themeStates.dataTableDisabled', statusKey: 'dev.themeStates.fieldInactive' },
 ];
+const dataTableSingleRows: DataTableThemeRow[] = [
+  { id: 'single', nameKey: 'dev.themeStates.dataTableSelected', statusKey: 'dev.themeStates.tableStatusEnabled' },
+];
+const dataTablePartialRowSelection: RowSelectionState = { selected: true };
+const dataTableAllRowSelection: RowSelectionState = { selected: true, normal: true, disabled: true };
+const dataTableSingleRowSelection: RowSelectionState = { single: true };
+const dataTableSelectionStates = [
+  {
+    id: 'partial',
+    rows: dataTableRows,
+    rowSelection: dataTablePartialRowSelection,
+  },
+  {
+    id: 'all',
+    rows: dataTableRows,
+    rowSelection: dataTableAllRowSelection,
+  },
+  {
+    id: 'single',
+    rows: dataTableSingleRows,
+    rowSelection: dataTableSingleRowSelection,
+  },
+] satisfies { id: 'partial' | 'all' | 'single'; rows: DataTableThemeRow[]; rowSelection: RowSelectionState }[];
+const noopDataTableRowSelectionChange: OnChangeFn<RowSelectionState> = () => undefined;
 const treeThemeNodes: TreeThemeNode[] = [
   { id: 'all', labelKey: 'dev.themeStates.treeNodes.all', depth: 0, meta: '42' },
   { id: 'rd', labelKey: 'dev.themeStates.treeNodes.rd', depth: 1, meta: '18' },
@@ -100,10 +124,6 @@ function ThemeStatesRoute() {
   const { flavor, mode, accent, customAccent, set, setFlavor } = useAppearance();
   const [animatedTabsValue, setAnimatedTabsValue] = useState<'members' | 'logs'>('members');
   const [sideListActive, setSideListActive] = useState<(typeof shellTokenItems)[number]>('members');
-  const [dataTableRowSelection, setDataTableRowSelection] = useState<RowSelectionState>({ selected: true });
-  const handleDataTableRowSelectionChange: OnChangeFn<RowSelectionState> = (updater) => {
-    setDataTableRowSelection((current) => (typeof updater === 'function' ? updater(current) : updater));
-  };
   const fieldSelectOptions = [
     { value: '', label: t('dev.themeStates.fieldSelectPlaceholder') },
     { value: 'rd', label: t('dev.themeStates.fieldResearch') },
@@ -424,36 +444,50 @@ function ThemeStatesRoute() {
           <div>
             <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.dataTableMatrix')}</p>
             <div className="grid gap-4">
-              <DataTable
-                columns={dataTableColumns}
-                data={dataTableRows}
-                rowKey={(row) => row.id}
-                emptyText={t('dev.themeStates.dataTableEmpty')}
-                loadingText={t('dev.themeStates.dataTableLoading')}
-                rowState={(row) => (row.id === 'selected' ? 'selected' : undefined)}
-                selection={{
-                  enabled: true,
-                  rowSelection: dataTableRowSelection,
-                  onRowSelectionChange: handleDataTableRowSelectionChange,
-                  renderBulkBar: (ids) => (
-                    <div className="mb-3 rounded-8 bg-(--table-row-bg-selected) px-3 py-2 text-sm text-text-2">
-                      {ids.length}
-                    </div>
-                  ),
-                }}
-                pagination={{
-                  page: 2,
-                  pageCount: 4,
-                  total: 42,
-                  refreshing: true,
-                  totalLabel: t('dev.themeStates.paginationTotal'),
-                  refreshingLabel: t('dev.themeStates.paginationRefreshing'),
-                  prevLabel: t('dev.themeStates.paginationPrev'),
-                  nextLabel: t('dev.themeStates.paginationNext'),
-                  currentLabel: t('dev.themeStates.paginationCurrent'),
-                  onPageChange: () => undefined,
-                }}
-              />
+              {dataTableSelectionStates.map((state) => (
+                <div key={state.id} data-testid={`datatable-selection-${state.id}`} className="grid gap-2">
+                  <p className="text-sm font-medium text-text">
+                    {state.id === 'partial'
+                      ? t('dev.themeStates.choiceIndeterminate')
+                      : state.id === 'all'
+                        ? t('dev.themeStates.choiceChecked')
+                        : t('dev.themeStates.dataTableSelected')}
+                  </p>
+                  <DataTable
+                    columns={dataTableColumns}
+                    data={state.rows}
+                    rowKey={(row) => row.id}
+                    emptyText={t('dev.themeStates.dataTableEmpty')}
+                    loadingText={t('dev.themeStates.dataTableLoading')}
+                    selection={{
+                      enabled: true,
+                      rowSelection: state.rowSelection,
+                      onRowSelectionChange: noopDataTableRowSelectionChange,
+                      renderBulkBar: (ids) => (
+                        <div className="mb-3 rounded-8 bg-(--table-row-bg-selected) px-3 py-2 text-sm text-text-2">
+                          {ids.length}
+                        </div>
+                      ),
+                    }}
+                    pagination={
+                      state.id === 'partial'
+                        ? {
+                            page: 2,
+                            pageCount: 4,
+                            total: 42,
+                            refreshing: true,
+                            totalLabel: t('dev.themeStates.paginationTotal'),
+                            refreshingLabel: t('dev.themeStates.paginationRefreshing'),
+                            prevLabel: t('dev.themeStates.paginationPrev'),
+                            nextLabel: t('dev.themeStates.paginationNext'),
+                            currentLabel: t('dev.themeStates.paginationCurrent'),
+                            onPageChange: () => undefined,
+                          }
+                        : undefined
+                    }
+                  />
+                </div>
+              ))}
               <DataTable
                 columns={dataTableColumns}
                 data={[]}
