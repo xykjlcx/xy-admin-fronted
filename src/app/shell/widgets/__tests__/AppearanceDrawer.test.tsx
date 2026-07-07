@@ -46,3 +46,36 @@ test('外观设置可以切换到 shadcn 风格并使用其中性默认主题色
   expect(useAppearance.getState().flavor).toBe('shadcn');
   expect(useAppearance.getState().accent).toBe('shadcn');
 });
+
+test('点风格卡套用完整视觉预设：切 claude 后 radius/zoom 被重置为预设值', async () => {
+  const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+  // 先把用户细调轴改成非预设值
+  useAppearance.setState({ ...DEFAULTS, radius: 'round', zoom: 'lg' });
+  render(
+    <TooltipProvider>
+      <AppearanceDrawer />
+    </TooltipProvider>,
+  );
+
+  await user.click(screen.getByRole('button', { name: '外观设置' }));
+  await user.click(await screen.findByRole('button', { name: /Claude 风格/ }));
+
+  const s = useAppearance.getState();
+  expect(s.flavor).toBe('claude');
+  expect(s.accent).toBe('claude');
+  expect(s.radius).toBe('default'); // 被完整预设覆盖
+  expect(s.zoom).toBe('md');        // 被完整预设覆盖
+});
+
+test('分组标题 Preset/Theme/Shell 均渲染', async () => {
+  const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+  render(
+    <TooltipProvider>
+      <AppearanceDrawer />
+    </TooltipProvider>,
+  );
+  await user.click(screen.getByRole('button', { name: '外观设置' }));
+  expect(await screen.findByText('预设风格')).toBeInTheDocument();
+  expect(screen.getByText('主题细节')).toBeInTheDocument();
+  expect(screen.getByText('界面框架')).toBeInTheDocument();
+});

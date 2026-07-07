@@ -54,6 +54,14 @@ function SectionTitle({ children }: { children: string }) {
   return <div className="mb-2.5 mt-6 text-[calc(13px*var(--app-scale))] font-semibold text-text-2">{children}</div>;
 }
 
+function GroupTitle({ children }: { children: string }) {
+  return (
+    <div className="mb-1 mt-7 border-b border-border pb-1.5 text-[calc(11px*var(--app-scale))] font-bold uppercase tracking-normal text-text-3 first:mt-0">
+      {children}
+    </div>
+  );
+}
+
 export function AppearanceDrawer() {
   const { t } = useTranslation();
   const flavor = useAppearance((s) => s.flavor);
@@ -64,7 +72,7 @@ export function AppearanceDrawer() {
   const zoom = useAppearance((s) => s.zoom);
   const radius = useAppearance((s) => s.radius);
   const set = useAppearance((s) => s.set);
-  const setFlavor = useAppearance((s) => s.setFlavor);
+  const applyPreset = useAppearance((s) => s.applyPreset);
 
   const dk = (k: string) => t(`shell.appearanceDrawer.${k}`);
 
@@ -87,13 +95,12 @@ export function AppearanceDrawer() {
         </SheetHeader>
 
         <div className="px-6 pb-8">
-          {/* 界面风格 */}
-          <SectionTitle>{dk('flavor')}</SectionTitle>
+          <GroupTitle>{dk('groupPreset')}</GroupTitle>
           <div className="flex flex-col gap-2.5">
             {FLAVOR_OPTS.map((f) => (
               <button
                 key={f.key}
-                onClick={() => setFlavor(f.key as Flavor)}
+                onClick={() => applyPreset(f.key as Flavor)}
                 className={cn(
                   'flex items-center gap-3 rounded-11 border p-2.5 text-left transition-colors',
                   flavor === f.key
@@ -121,39 +128,7 @@ export function AppearanceDrawer() {
             ))}
           </div>
 
-          {/* 导航布局 */}
-          <SectionTitle>{dk('layout')}</SectionTitle>
-          <div className="grid grid-cols-3 gap-2.5">
-            {(['sidebar', 'rail', 'inset'] as const).map((k) => (
-              <button
-                key={k}
-                onClick={() => set({ layout: k })}
-                className={cn(
-                  'relative flex flex-col gap-2 rounded-12 border p-2 transition-colors',
-                  layout === k
-                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current)'
-                    : 'border-border bg-(--table-header-bg)',
-                )}
-              >
-                <LayoutThumb kind={k} />
-                <div className="text-center">
-                  <div className="text-xs font-semibold text-text">
-                    {dk(`layout${k[0]!.toUpperCase()}${k.slice(1)}`)}
-                  </div>
-                  <div className="text-[calc(10px*var(--app-scale))] text-text-3">
-                    {dk(`layout${k[0]!.toUpperCase()}${k.slice(1)}Desc`)}
-                  </div>
-                </div>
-                {layout === k && (
-                  <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-(--nav-item-fg-current)">
-                    <Check className="size-2.5 text-white" />
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* 主题色 */}
+          <GroupTitle>{dk('groupTheme')}</GroupTitle>
           <SectionTitle>{dk('accent')}</SectionTitle>
           <div className="grid grid-cols-6 gap-2">
             {ACCENTS.map((a) => (
@@ -198,48 +173,6 @@ export function AppearanceDrawer() {
             </label>
           </div>
 
-          {/* 页面切换动画 */}
-          <SectionTitle>{dk('pageAnim')}</SectionTitle>
-          <div className="flex gap-2">
-            {ANIM_OPTS.map((k) => (
-              <button
-                key={k}
-                onClick={() => set({ pageAnim: k })}
-                className={cn(
-                  'h-9 flex-1 rounded-8 border text-[calc(13px*var(--app-scale))] transition-colors',
-                  pageAnim === k
-                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current)'
-                    : 'border-border bg-surface text-text-2',
-                )}
-              >
-                {dk(ANIM_LABEL[k]!)}
-              </button>
-            ))}
-          </div>
-          <div className="mt-2 text-xs text-text-3">{dk('pageAnimHint')}</div>
-
-          {/* 显示比例 */}
-          <SectionTitle>{dk('zoom')}</SectionTitle>
-          <div className="flex gap-2">
-            {ZOOM_OPTS.map((o) => (
-              <button
-                key={o.key}
-                onClick={() => set({ zoom: o.key })}
-                className={cn(
-                  'flex h-[calc(52px*var(--app-scale))] flex-1 flex-col items-center justify-center gap-0.5 rounded-9 border transition-colors',
-                  zoom === o.key
-                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current) text-(--nav-item-fg-current)'
-                    : 'border-border bg-surface text-text-2',
-                )}
-              >
-                <span className="text-sm font-semibold">{dk(o.label)}</span>
-                <span className="text-[calc(11px*var(--app-scale))] opacity-70">{dk(o.hint)}</span>
-              </button>
-            ))}
-          </div>
-          <div className="mt-2 text-xs text-text-3">{dk('zoomHint')}</div>
-
-          {/* 圆角风格 */}
           <SectionTitle>{dk('radius')}</SectionTitle>
           <div className="flex gap-2">
             {RADIUS_OPTS.map((o) => (
@@ -266,6 +199,77 @@ export function AppearanceDrawer() {
             ))}
           </div>
           <div className="mt-2 text-xs text-text-3">{dk('radiusHint')}</div>
+
+          <SectionTitle>{dk('zoom')}</SectionTitle>
+          <div className="flex gap-2">
+            {ZOOM_OPTS.map((o) => (
+              <button
+                key={o.key}
+                onClick={() => set({ zoom: o.key })}
+                className={cn(
+                  'flex h-[calc(52px*var(--app-scale))] flex-1 flex-col items-center justify-center gap-0.5 rounded-9 border transition-colors',
+                  zoom === o.key
+                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current) text-(--nav-item-fg-current)'
+                    : 'border-border bg-surface text-text-2',
+                )}
+              >
+                <span className="text-sm font-semibold">{dk(o.label)}</span>
+                <span className="text-[calc(11px*var(--app-scale))] opacity-70">{dk(o.hint)}</span>
+              </button>
+            ))}
+          </div>
+          <div className="mt-2 text-xs text-text-3">{dk('zoomHint')}</div>
+
+          <GroupTitle>{dk('groupShell')}</GroupTitle>
+          <SectionTitle>{dk('layout')}</SectionTitle>
+          <div className="grid grid-cols-3 gap-2.5">
+            {(['sidebar', 'rail', 'inset'] as const).map((k) => (
+              <button
+                key={k}
+                onClick={() => set({ layout: k })}
+                className={cn(
+                  'relative flex flex-col gap-2 rounded-12 border p-2 transition-colors',
+                  layout === k
+                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current)'
+                    : 'border-border bg-(--table-header-bg)',
+                )}
+              >
+                <LayoutThumb kind={k} />
+                <div className="text-center">
+                  <div className="text-xs font-semibold text-text">
+                    {dk(`layout${k[0]!.toUpperCase()}${k.slice(1)}`)}
+                  </div>
+                  <div className="text-[calc(10px*var(--app-scale))] text-text-3">
+                    {dk(`layout${k[0]!.toUpperCase()}${k.slice(1)}Desc`)}
+                  </div>
+                </div>
+                {layout === k && (
+                  <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-(--nav-item-fg-current)">
+                    <Check className="size-2.5 text-white" />
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <SectionTitle>{dk('pageAnim')}</SectionTitle>
+          <div className="flex gap-2">
+            {ANIM_OPTS.map((k) => (
+              <button
+                key={k}
+                onClick={() => set({ pageAnim: k })}
+                className={cn(
+                  'h-9 flex-1 rounded-8 border text-[calc(13px*var(--app-scale))] transition-colors',
+                  pageAnim === k
+                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current)'
+                    : 'border-border bg-surface text-text-2',
+                )}
+              >
+                {dk(ANIM_LABEL[k]!)}
+              </button>
+            ))}
+          </div>
+          <div className="mt-2 text-xs text-text-3">{dk('pageAnimHint')}</div>
         </div>
       </SheetContent>
     </Sheet>
