@@ -229,6 +229,9 @@
     "appearanceDrawer": {
       "title": "Appearance",
       "subtitle": "Adjust style, theme color, and layout",
+      "groupPreset": "Preset",
+      "groupTheme": "Theme",
+      "groupShell": "Shell",
       "flavor": "Style",
       "layout": "Navigation layout",
       "accent": "Theme color",
