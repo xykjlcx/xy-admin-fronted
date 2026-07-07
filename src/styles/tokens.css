@@ -189,6 +189,9 @@
   --pagination-current-border: var(--pri);
   --focus-ring: calc(3px * var(--app-scale));
   --font-display: var(--font-sans);
+  /* 输入框水平内距（密度轴）。feishu/shadcn 紧凑 12px，claude 在下方覆盖为宽松 16px。
+     只随 --app-scale 缩放，随 flavor 换档；页面布局间距（--spacing）不动。 */
+  --field-px: calc(12px * var(--app-scale));
   --field-bg: var(--surface-2);
   --field-fg: var(--text);
   --field-placeholder: var(--text-3);
@@ -262,6 +265,7 @@
   --field-border-focus: var(--pri);
   --field-ring-focus: color-mix(in srgb, var(--pri) 15%, transparent);
   --field-shadow: none;
+  --field-px: calc(16px * var(--app-scale));
   --control-btn-md: calc(36px * var(--app-scale));
   --button-font-weight: 400;
   --option-fg-highlighted: var(--pri-active);

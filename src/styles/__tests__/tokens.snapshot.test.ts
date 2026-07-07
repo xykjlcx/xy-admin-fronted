@@ -124,8 +124,15 @@ const MUST_CONTAIN = [
   // [data-radius='sharp'] / [data-radius='round']
   '--radius-factor: 0.28;',
   '--radius-factor: 1.55;',
+  '--field-px: calc(12px * var(--app-scale));',
 ];
 test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain(t));
+
+// field 水平内距分档（密度轴）：feishu/shadcn 紧凑 12px（:root 默认），claude 宽松 16px
+test('field 水平内距分档：claude 覆盖为宽松档', () => {
+  expect(css).toContain('--field-px: calc(12px * var(--app-scale));'); // :root 默认（feishu/shadcn）
+  expect(css).toContain('--field-px: calc(16px * var(--app-scale));'); // claude 覆盖
+});
 
 test('显示比例三档走 --app-scale token 乘法，不再使用 CSS zoom 反向补偿', () => {
   expect(css).toContain(':root { --app-scale: 1; }');
