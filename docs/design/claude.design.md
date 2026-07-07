@@ -72,6 +72,7 @@ components:
     typography: "{typography.body-md}"
     rounded: "{rounded.md}"
     height: 36px
+    padding: 0 16px
   text-input-focused:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
