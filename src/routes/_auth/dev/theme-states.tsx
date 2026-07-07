@@ -26,6 +26,7 @@ import { Tree, type TreeNode } from '@/components/pro/Tree';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 import { SideList, type SideListItem } from '@/components/pro/SideList';
 import { Pagination } from '@/components/pro/Pagination';
+import { SearchField } from '@/components/pro/SearchField';
 
 export const Route = createFileRoute('/_auth/dev/theme-states')({
   // dev 组件状态矩阵：仅开发态 / 视觉验收（VITE_ENABLE_VISUAL_DEBUG）可见，生产环境视同不存在。
@@ -356,6 +357,11 @@ function ThemeStatesRoute() {
             />
           </Field>
 
+          <Field>
+            <FieldLabel htmlFor="theme-field-search">{t('dev.themeStates.fieldSearch')}</FieldLabel>
+            <SearchField id="theme-field-search" placeholder={t('dev.themeStates.fieldSearchPlaceholder')} />
+          </Field>
+
           <Field className="md:col-span-2">
             <FieldLabel htmlFor="theme-field-textarea">{t('dev.themeStates.fieldTextarea')}</FieldLabel>
             <Textarea id="theme-field-textarea" placeholder={t('dev.themeStates.fieldTextareaPlaceholder')} />
@@ -630,7 +636,7 @@ function ThemeStatesRoute() {
                 type="button"
                 aria-expanded="true"
                 aria-haspopup="listbox"
-                className="ui-field flex h-[var(--control-md)] w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border px-3 text-sm outline-none"
+                className="ui-field flex h-[var(--control-md)] w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border px-(--field-px) text-sm outline-none"
                 data-state="open"
               >
                 <span>{t('dev.themeStates.fieldResearch')}</span>

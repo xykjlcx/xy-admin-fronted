@@ -117,6 +117,8 @@
       "fieldOperations": "运营部",
       "fieldTextarea": "多行文本",
       "fieldTextareaPlaceholder": "请输入备注",
+      "fieldSearch": "搜索框",
+      "fieldSearchPlaceholder": "搜索",
       "step8Matrix": "Overlay / Option / Menu 状态矩阵",
       "step8MatrixDesc": "覆盖弹层容器、选择项、菜单项的 open、selected、highlighted 和 danger 状态。",
       "overlayPopover": "弹层容器",

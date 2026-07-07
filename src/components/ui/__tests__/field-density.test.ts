@@ -28,4 +28,17 @@ describe('field 密度：水平内距走 --field-px', () => {
     const src = readFileSync('src/components/pro/SearchField.tsx', 'utf8');
     expect(src).not.toContain('px-2.5');
   });
+
+  // SearchField 是改造的 Pro 组件，必须进 theme-states 矩阵做确定性截图（CLAUDE.md 纪律）
+  test('theme-states 矩阵含 SearchField 实例', () => {
+    const src = readFileSync('src/routes/_auth/dev/theme-states.tsx', 'utf8');
+    expect(src).toContain('<SearchField');
+  });
+
+  // 手抄的 open 态 Select 演示块复制了 SelectTrigger 的 class，须随 --field-px 对齐，
+  // 否则改造后与真实 SelectTrigger 在同一验收页面内距不一致。
+  test('theme-states 手抄 open 态 Select 不残留 border px-3', () => {
+    const src = readFileSync('src/routes/_auth/dev/theme-states.tsx', 'utf8');
+    expect(src).not.toContain('border px-3');
+  });
 });

@@ -117,6 +117,8 @@
       "fieldOperations": "Operations",
       "fieldTextarea": "Textarea",
       "fieldTextareaPlaceholder": "Enter notes",
+      "fieldSearch": "Search field",
+      "fieldSearchPlaceholder": "Search",
       "step8Matrix": "Overlay / Option / Menu state matrix",
       "step8MatrixDesc": "Covers open, selected, highlighted, and danger states for popup surfaces, options, and menu items.",
       "overlayPopover": "Popup surface",
