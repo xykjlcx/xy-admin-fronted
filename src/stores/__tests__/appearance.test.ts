@@ -74,6 +74,24 @@ test('set 持久化 claude 官方 active 色，供 FOUC 脚本首帧注入', () 
   expect(document.documentElement.style.getPropertyValue('--on-pri')).toBe('#ffffff');
 });
 
+test('applyPreset 一键应用完整视觉预设（flavor+accent+radius+scale），覆盖用户细调轴', () => {
+  useAppearance.getState().set({ flavor: 'feishu', accent: 'blue', radius: 'round', zoom: 'lg' });
+  useAppearance.getState().applyPreset('claude');
+  const s = useAppearance.getState();
+  expect(s.flavor).toBe('claude');
+  expect(s.accent).toBe('claude');
+  expect(s.radius).toBe('default'); // preset 覆盖视觉轴
+  expect(s.zoom).toBe('md');        // preset 覆盖视觉轴
+});
+
+test('applyPreset 不改 layout/pageAnim（Shell 轴独立于视觉预设）', () => {
+  useAppearance.getState().set({ layout: 'rail', pageAnim: 'slide' });
+  useAppearance.getState().applyPreset('shadcn');
+  const s = useAppearance.getState();
+  expect(s.layout).toBe('rail');
+  expect(s.pageAnim).toBe('slide');
+});
+
 // ⚠️ 本用例依赖 vi.resetModules() 产生独立 store 实例（重跑 rehydrate），
 // 必须保持在文件最后/可独立运行——否则污染后续用例共享的模块单例。
 test('rehydrate 时重放 accent 注入（F5 后自选主题色不丢失）', async () => {

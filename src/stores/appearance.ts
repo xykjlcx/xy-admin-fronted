@@ -8,6 +8,7 @@ import {
   resolveAccentVars,
   type AppearanceState,
 } from '@/lib/appearance-dom';
+import { presetToPatch } from '@/lib/design-presets';
 import { appearanceConfig } from '@/config';
 
 interface AppearanceStore extends AppearanceState {
@@ -21,6 +22,7 @@ interface AppearanceStore extends AppearanceState {
   _onPriResolved: string;
   set: (patch: Partial<AppearanceStore>) => void;
   setFlavor: (f: AppearanceState['flavor']) => void; // 耦合：切 flavor 重置 accent
+  applyPreset: (key: AppearanceState['flavor']) => void; // 一键套用完整视觉预设（视觉轴，不含 layout/pageAnim）
   setCollapsed: (layoutKey: string, collapsed: boolean) => void;
   toggleCollapsed: (layoutKey: string) => void;
 }
@@ -52,6 +54,10 @@ export const useAppearance = create<AppearanceStore>()(
         set({ _priResolved: pri, _priActiveResolved: priActive, _priSoftResolved: soft, _onPriResolved: onPri });
       },
       setFlavor: (flavor) => get().set({ flavor, accent: flavorDefaultAccent(flavor) }), // 原型 L4951
+      applyPreset: (key) => {
+        const p = presetToPatch(key); // scale→zoom：视觉预设的 scale 落到 store 的 zoom 字段
+        get().set({ flavor: p.flavor, accent: p.accent, radius: p.radius, zoom: p.scale });
+      },
       setCollapsed: (k, collapsed) =>
         set((s) => ({ collapsed: { ...s.collapsed, [k]: collapsed } })),
       toggleCollapsed: (k) => set((s) => ({ collapsed: { ...s.collapsed, [k]: !s.collapsed[k] } })),
