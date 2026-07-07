@@ -70,6 +70,7 @@
       "title": "Theme States",
       "description": "Runtime switches for visual QA. Each token slice will add its state matrix here.",
       "mode": "Mode",
+      "scale": "Scale",
       "light": "Light",
       "dark": "Dark",
       "primaryAction": "Primary action",

@@ -38,6 +38,7 @@ export const Route = createFileRoute('/_auth/dev/theme-states')({
 
 const flavors = ['feishu', 'claude', 'shadcn'] as const;
 const modes = ['light', 'dark'] as const;
+const scales = ['sm', 'md', 'lg'] as const;
 const flavorLabelKeys: Record<(typeof flavors)[number], string> = {
   feishu: 'shell.appearanceDrawer.flavorFeishu',
   claude: 'shell.appearanceDrawer.flavorClaude',
@@ -127,7 +128,7 @@ const treeThemeNodes: TreeThemeNode[] = [
 
 function ThemeStatesRoute() {
   const { t } = useTranslation();
-  const { flavor, mode, accent, customAccent, set, setFlavor } = useAppearance();
+  const { flavor, mode, accent, customAccent, zoom, set, setFlavor } = useAppearance();
   const [animatedTabsValue, setAnimatedTabsValue] = useState<'members' | 'logs'>('members');
   const [sideListActive, setSideListActive] = useState<(typeof shellTokenItems)[number]>('members');
   const fieldSelectOptions = [
@@ -186,10 +187,11 @@ function ThemeStatesRoute() {
         </p>
       </header>
 
-      <section className="grid gap-3 rounded-lg border border-border bg-surface p-4 shadow-card-sm md:grid-cols-4">
+      <section className="grid gap-3 rounded-lg border border-border bg-surface p-4 shadow-card-sm md:grid-cols-5">
         <label className="flex flex-col gap-1.5 text-sm font-medium text-text">
           {t('shell.appearanceDrawer.flavor')}
           <NativeSelect
+            data-matrix="flavor"
             value={flavor}
             onChange={(event) => setFlavor(event.currentTarget.value as typeof flavor)}
           >
@@ -203,10 +205,29 @@ function ThemeStatesRoute() {
 
         <label className="flex flex-col gap-1.5 text-sm font-medium text-text">
           {t('dev.themeStates.mode')}
-          <NativeSelect value={mode} onChange={(event) => set({ mode: event.currentTarget.value as typeof mode })}>
+          <NativeSelect
+            data-matrix="mode"
+            value={mode}
+            onChange={(event) => set({ mode: event.currentTarget.value as typeof mode })}
+          >
             {modes.map((item) => (
               <option key={item} value={item}>
                 {t(modeLabelKeys[item])}
+              </option>
+            ))}
+          </NativeSelect>
+        </label>
+
+        <label className="flex flex-col gap-1.5 text-sm font-medium text-text">
+          {t('dev.themeStates.scale')}
+          <NativeSelect
+            data-matrix="scale"
+            value={zoom}
+            onChange={(event) => set({ zoom: event.currentTarget.value as typeof zoom })}
+          >
+            {scales.map((item) => (
+              <option key={item} value={item}>
+                {item}
               </option>
             ))}
           </NativeSelect>

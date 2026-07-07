@@ -70,6 +70,7 @@
       "title": "主题状态面板",
       "description": "用于视觉 QA 的运行时切换入口。后续每个 token 切片都会在这里补充对应的状态矩阵。",
       "mode": "明暗模式",
+      "scale": "显示比例",
       "light": "浅色",
       "dark": "深色",
       "primaryAction": "主按钮",
