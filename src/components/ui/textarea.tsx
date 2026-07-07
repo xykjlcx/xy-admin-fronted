@@ -19,7 +19,7 @@ function Textarea({
       data-slot="textarea"
       className={cn(
         [
-          'ui-field flex min-h-[calc(88px*var(--app-scale))] w-full rounded-md border px-3 py-2 text-sm outline-none transition-[background,border-color,box-shadow,color]',
+          'ui-field flex min-h-[calc(88px*var(--app-scale))] w-full rounded-md border px-(--field-px) py-2 text-sm outline-none transition-[background,border-color,box-shadow,color]',
           'disabled:cursor-not-allowed disabled:opacity-50',
           resize === 'none' && 'resize-none',
           resize === 'vertical' && 'resize-y',

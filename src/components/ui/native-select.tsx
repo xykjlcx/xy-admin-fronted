@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 const nativeSelectVariants = cva(
   [
-    'ui-field w-full min-w-0 cursor-pointer rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow,background,color]',
+    'ui-field w-full min-w-0 cursor-pointer rounded-md border px-(--field-px) text-sm outline-none transition-[border-color,box-shadow,background,color]',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
   ].join(' '),
   {

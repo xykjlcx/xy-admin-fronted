@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 const inputVariants = cva(
   [
-    'ui-field w-full min-w-0 rounded-md border px-3 outline-none transition-[border-color,box-shadow,background,color]',
+    'ui-field w-full min-w-0 rounded-md border px-(--field-px) outline-none transition-[border-color,box-shadow,background,color]',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
   ].join(' '),
   {
@@ -95,7 +95,7 @@ function InputGroup({
       data-size={inputSize}
       data-status={status}
       className={cn(
-        'ui-field flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md border px-3 transition-[border-color,box-shadow,background,color]',
+        'ui-field flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md border px-(--field-px) transition-[border-color,box-shadow,background,color]',
         'data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50',
         'data-[addon-before=true]:pl-0',
         inputSize === 'sm' && 'h-[var(--control-sm)] text-[calc(13px*var(--app-scale))]',
@@ -129,7 +129,7 @@ function InputGroupAddon({ className, ...props }: React.ComponentProps<'span'>) 
     <span
       data-slot="input-group-addon"
       className={cn(
-        'inline-flex self-stretch items-center border-r px-3',
+        'inline-flex self-stretch items-center border-r px-(--field-px)',
         className,
       )}
       {...props}

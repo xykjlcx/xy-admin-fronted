@@ -38,7 +38,7 @@ function SelectTrigger({
       data-size={size}
       className={cn(
         [
-          'ui-field flex w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border px-3 text-sm outline-none transition-[background,border-color,color,box-shadow]',
+          'ui-field flex w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border px-(--field-px) text-sm outline-none transition-[background,border-color,color,box-shadow]',
           'disabled:cursor-not-allowed disabled:opacity-50',
           'data-[size=sm]:h-[var(--control-sm)] data-[size=md]:h-[var(--control-md)] data-[size=lg]:h-[var(--control-lg)]',
           '*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2',
