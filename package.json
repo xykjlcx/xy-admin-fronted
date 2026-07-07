@@ -17,6 +17,7 @@
     "visual:baseline": "node scripts/visual-agent-browser.mjs baseline",
     "visual:app": "node scripts/visual-agent-browser.mjs app",
     "visual:scale": "node scripts/visual-agent-browser.mjs scale",
+    "visual:matrix": "node scripts/visual-agent-browser.mjs matrix",
     "preview": "vite preview"
   },
   "dependencies": {

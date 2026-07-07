@@ -620,6 +620,129 @@ async function runScaleChecks() {
   }
 }
 
+function setMatrixSelect(session, matrixKey, value) {
+  evalIn(
+    session,
+    `
+    const el = document.querySelector('select[data-matrix=${JSON.stringify(matrixKey)}]');
+    if (!el) throw new Error('matrix select not found: ${matrixKey}');
+    const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value')?.set;
+    if (!setter) throw new Error('native select setter not found');
+    setter.call(el, ${JSON.stringify(value)});
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    true;
+    `,
+  );
+}
+
+function assertThemeMatrixReady(session) {
+  evalIn(
+    session,
+    `
+    const selects = [...document.querySelectorAll('select[data-matrix]')];
+    if (selects.length !== 3) {
+      throw new Error('theme matrix ready failed: expected 3 matrix selects, got ' + selects.length);
+    }
+    const expected = { flavor: 3, mode: 2, scale: 3 };
+    for (const [key, expectedCount] of Object.entries(expected)) {
+      const select = document.querySelector('select[data-matrix="' + key + '"]');
+      if (!select) throw new Error('theme matrix ready failed: missing select ' + key);
+      const actualCount = select.options.length;
+      if (actualCount !== expectedCount) {
+        throw new Error('theme matrix ready failed: select ' + key + ' expected ' + expectedCount + ' options, got ' + actualCount);
+      }
+    }
+    true;
+    `,
+  );
+}
+
+function assertMatrixStateApplied(session, expected) {
+  evalIn(
+    session,
+    `
+    const expected = ${JSON.stringify(expected)};
+    const selectValue = (key) => document.querySelector('select[data-matrix="' + key + '"]')?.value ?? '';
+    const actual = {
+      flavor: selectValue('flavor'),
+      mode: selectValue('mode'),
+      scale: selectValue('scale'),
+      datasetFlavor: document.documentElement.dataset.flavor ?? '',
+      datasetMode: document.documentElement.dataset.mode ?? '',
+      datasetZoom: document.documentElement.dataset.zoom ?? '',
+    };
+    if (actual.flavor !== expected.flavor) {
+      throw new Error('matrix state failed: flavor select expected ' + expected.flavor + ', got ' + actual.flavor);
+    }
+    if (actual.mode !== expected.mode) {
+      throw new Error('matrix state failed: mode select expected ' + expected.mode + ', got ' + actual.mode);
+    }
+    if (actual.scale !== expected.scale) {
+      throw new Error('matrix state failed: scale select expected ' + expected.scale + ', got ' + actual.scale);
+    }
+    if (actual.datasetFlavor !== expected.flavor) {
+      throw new Error('matrix state failed: dataset flavor expected ' + expected.flavor + ', got ' + actual.datasetFlavor);
+    }
+    if (actual.datasetMode !== expected.mode) {
+      throw new Error('matrix state failed: dataset mode expected ' + expected.mode + ', got ' + actual.datasetMode);
+    }
+    const expectedZoom = expected.scale === 'md' ? '' : expected.scale;
+    if (actual.datasetZoom !== expectedZoom) {
+      throw new Error('matrix state failed: dataset zoom expected ' + expectedZoom + ', got ' + actual.datasetZoom);
+    }
+    true;
+    `,
+  );
+}
+
+async function runThemeMatrix() {
+  const matrixDir = path.join(reportDir, 'theme-matrix');
+  await ensureDir(matrixDir);
+  const server = await ensureDevServer();
+  const cells = [];
+  const expectedCells = 18;
+  const assertionLabel = 'page-ready / state-applied / no-horizontal-overflow';
+  try {
+    setViewport(appSession);
+    loginAsAdmin(appSession);
+    agent(appSession, ['open', new URL('/dev/theme-states', baseOrigin).href]);
+    agent(appSession, ['wait', '1000']);
+    assertThemeMatrixReady(appSession);
+
+    for (const flavor of ['feishu', 'claude', 'shadcn']) {
+      for (const mode of ['light', 'dark']) {
+        for (const scale of ['sm', 'md', 'lg']) {
+          setMatrixSelect(appSession, 'flavor', flavor);
+          setMatrixSelect(appSession, 'mode', mode);
+          setMatrixSelect(appSession, 'scale', scale);
+          agent(appSession, ['wait', '350']);
+          assertMatrixStateApplied(appSession, { flavor, mode, scale });
+          assertNoHorizontalOverflow(appSession);
+          const file = path.join(matrixDir, `${flavor}-${mode}-${scale}.png`);
+          agent(appSession, ['screenshot', file]);
+          cells.push({
+            flavor,
+            mode,
+            scale,
+            file: path.relative(root, file),
+            assertions: ['state applied', 'no horizontal overflow'],
+          });
+        }
+      }
+    }
+    return {
+      cells,
+      expectedCells,
+      actualCells: cells.length,
+      assertionLabel,
+      noHorizontalOverflowPassed: cells.length === expectedCells,
+      serverReused: server.reused,
+    };
+  } finally {
+    await server.stop();
+  }
+}
+
 async function writeReport(data) {
   await ensureDir(reportDir);
   const lines = [
@@ -656,6 +779,16 @@ async function writeReport(data) {
     }
     lines.push('');
   }
+  if (data.matrix?.cells?.length) {
+    lines.push('## 主题矩阵（flavor × mode × scale）', '');
+    lines.push(`- 矩阵截图总数: ${data.matrix.actualCells ?? data.matrix.cells.length}/${data.matrix.expectedCells ?? data.matrix.cells.length}`);
+    lines.push(`- 断言: ${data.matrix.assertionLabel ?? 'state-applied / no-horizontal-overflow'}`);
+    lines.push(`- 水平溢出检查: ${data.matrix.noHorizontalOverflowPassed ? '全部通过' : '未全部通过'}`);
+    for (const cell of data.matrix.cells) {
+      lines.push(`- ${cell.flavor} / ${cell.mode} / ${cell.scale}: ${cell.file}`);
+    }
+    lines.push('');
+  }
 
   await writeFile(path.join(reportDir, 'report.md'), `${lines.join('\n')}\n`);
   await writeFile(path.join(reportDir, 'report.json'), `${JSON.stringify(data, null, 2)}\n`);
@@ -675,7 +808,10 @@ async function main() {
   if (command === 'scale' || command === 'all') {
     data.scale = await runScaleChecks();
   }
-  if (!['baseline', 'app', 'scale', 'all'].includes(command)) {
+  if (command === 'matrix' || command === 'all') {
+    data.matrix = await runThemeMatrix();
+  }
+  if (!['baseline', 'app', 'scale', 'matrix', 'all'].includes(command)) {
     throw new Error(`unknown command: ${command}`);
   }
 
