@@ -108,6 +108,20 @@ test('dev-only theme states route is gated out of production', () => {
   expect(source).toContain('notFound()');
 });
 
+test('theme states route exposes stable visual matrix controls', () => {
+  const source = readProjectFile(themeStatesRoute);
+
+  expect(source).toContain('data-matrix="flavor"');
+  expect(source).toContain('data-matrix="mode"');
+  expect(source).toContain('data-matrix="scale"');
+  expect(source).toContain('value={zoom}');
+  expect(source).toContain('set({ zoom:');
+  expect(source).toContain("dev.themeStates.scale");
+  expect(source).toContain('scaleLabelKeys');
+  expect(source).toContain("shell.appearanceDrawer.zoomSm");
+  expect(source).toContain('t(scaleLabelKeys[item])');
+});
+
 // —— 以下 theme-states 矩阵守卫是「实现快照」而非架构不变量 ——
 // 它们逐字断言 /dev/theme-states 页展示了各组件族状态矩阵（AGENTS §9 要求每个 token 化组件族
 // 在此有可截图矩阵）。代价是脆弱：重命名页内变量/类名会误红。保留是因为它们守护「矩阵完整性」；

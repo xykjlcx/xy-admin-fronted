@@ -17,7 +17,6 @@ import {
   FLAVOR_PRESETS,
   CUSTOM_ACCENT_GRADIENT,
   isValidHex,
-  type Flavor,
   type Zoom,
   type Radius,
 } from '@/lib/appearance-dom';
@@ -100,7 +99,7 @@ export function AppearanceDrawer() {
             {FLAVOR_OPTS.map((f) => (
               <button
                 key={f.key}
-                onClick={() => applyPreset(f.key as Flavor)}
+                onClick={() => applyPreset(f.key)}
                 className={cn(
                   'flex items-center gap-3 rounded-11 border p-2.5 text-left transition-colors',
                   flavor === f.key

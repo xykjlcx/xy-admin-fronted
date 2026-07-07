@@ -9,7 +9,7 @@
 2. **官方源码进来只经 diff 人工合并**，标准流程：
    - `pnpm dlx shadcn@latest add <component> --dry-run` 看影响面
    - `pnpm dlx shadcn@latest add <component> --diff <file>` 看逐文件差异
-   - 有本地改动的文件：读本地 + 读 diff，人工把上游变化并入，保留本地 token/scale/variant
+   - 已被本仓库 fork/定制的文件：读本地 + 读 diff，人工把上游变化并入，保留本地 token/scale/variant
    - 只有新增文件，或经定制清单 + 人工 diff 确认未被本仓库 fork/定制的文件，才可从官方输出写入
    - 既有 `src/components/ui/*` 默认按本地 fork 处理，除非已证明不是本仓库定制文件
 3. **源码判断基准钉住 style 无关的 canonical URL**：`https://ui.shadcn.com/code/apps/v4/registry/bases/radix/ui/<component-file>`（语义类版本）。

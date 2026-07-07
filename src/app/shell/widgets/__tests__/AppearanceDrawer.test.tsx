@@ -75,7 +75,7 @@ test('分组标题 Preset/Theme/Shell 均渲染', async () => {
     </TooltipProvider>,
   );
   await user.click(screen.getByRole('button', { name: '外观设置' }));
-  expect(await screen.findByText('预设风格')).toBeInTheDocument();
-  expect(screen.getByText('主题细节')).toBeInTheDocument();
-  expect(screen.getByText('界面框架')).toBeInTheDocument();
+  expect(await screen.findByText(i18n.t('shell.appearanceDrawer.groupPreset'))).toBeInTheDocument();
+  expect(screen.getByText(i18n.t('shell.appearanceDrawer.groupTheme'))).toBeInTheDocument();
+  expect(screen.getByText(i18n.t('shell.appearanceDrawer.groupShell'))).toBeInTheDocument();
 });

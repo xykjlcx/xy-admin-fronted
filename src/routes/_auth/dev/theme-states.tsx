@@ -4,7 +4,7 @@ import type { ColumnDef, OnChangeFn, RowSelectionState } from '@tanstack/react-t
 import { CheckIcon, ChevronDownIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ACCENTS, type AccentKey } from '@/lib/appearance-dom';
+import { ACCENTS, type AccentKey, type Zoom } from '@/lib/appearance-dom';
 import { useAppearance } from '@/stores/appearance';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Input } from '@/components/ui/input';
@@ -38,7 +38,7 @@ export const Route = createFileRoute('/_auth/dev/theme-states')({
 
 const flavors = ['feishu', 'claude', 'shadcn'] as const;
 const modes = ['light', 'dark'] as const;
-const scales = ['sm', 'md', 'lg'] as const;
+const scales = ['sm', 'md', 'lg'] as const satisfies readonly Zoom[];
 const flavorLabelKeys: Record<(typeof flavors)[number], string> = {
   feishu: 'shell.appearanceDrawer.flavorFeishu',
   claude: 'shell.appearanceDrawer.flavorClaude',
@@ -47,6 +47,11 @@ const flavorLabelKeys: Record<(typeof flavors)[number], string> = {
 const modeLabelKeys: Record<(typeof modes)[number], string> = {
   light: 'dev.themeStates.light',
   dark: 'dev.themeStates.dark',
+};
+const scaleLabelKeys: Record<(typeof scales)[number], string> = {
+  sm: 'shell.appearanceDrawer.zoomSm',
+  md: 'shell.appearanceDrawer.zoomMd',
+  lg: 'shell.appearanceDrawer.zoomLg',
 };
 const buttonVariantsForThemeStates = [
   'default',
@@ -227,7 +232,7 @@ function ThemeStatesRoute() {
           >
             {scales.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {t(scaleLabelKeys[item])}
               </option>
             ))}
           </NativeSelect>
