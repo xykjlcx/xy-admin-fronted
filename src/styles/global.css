@@ -1,6 +1,9 @@
 @import 'tailwindcss' source('../');
 @import 'tw-animate-css';
-@import './tokens.css';
+@import './tokens.base.css';
+@import './tokens.feishu.css';
+@import './tokens.claude.css';
+@import './tokens.shadcn.css';
 
 @theme inline {
   --color-bg: var(--bg);

@@ -1,7 +1,10 @@
 // 确定性验收（spec §13.1）：jsdom 不解析 CSS 文件，直接读 tokens.css 文本断言字面值。
 import { readFileSync } from 'node:fs';
 
-const css = readFileSync('src/styles/tokens.css', 'utf8');
+// tokens.css 已拆分为 base + 三 flavor profile（S1）。拼接后断言不变——MUST_CONTAIN 逐值校验一律照旧。
+const css = ['tokens.base.css', 'tokens.feishu.css', 'tokens.claude.css', 'tokens.shadcn.css']
+  .map((f) => readFileSync(`src/styles/${f}`, 'utf8'))
+  .join('\n');
 const globalCss = readFileSync('src/styles/global.css', 'utf8');
 const claudeDesignSource = readFileSync('docs/design/claude.design.md', 'utf8');
 const appearanceDomSource = readFileSync('src/lib/appearance-dom.ts', 'utf8');
@@ -905,4 +908,9 @@ test('index.html FOUC 脚本契约不被静默删除（含 --pri 注入）', () 
 
 test('Tailwind source 限定在 src，避免 docs 里的示例 class 污染生产 CSS', () => {
   expect(globalCss).toContain("@import 'tailwindcss' source('../');");
+});
+
+test('global.css 必须最先 @import tokens.base.css（flavor 覆盖与 base 默认同特异性，靠源顺序决胜）', () => {
+  const imports = [...globalCss.matchAll(/@import '\.\/(tokens\.[a-z]+\.css)';/g)].map((m) => m[1]);
+  expect(imports).toEqual(['tokens.base.css', 'tokens.feishu.css', 'tokens.claude.css', 'tokens.shadcn.css']);
 });

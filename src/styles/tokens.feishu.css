@@ -1,0 +1,11 @@
+/* src/styles/tokens.feishu.css —— feishu 相对 base 默认的增量（dark 颜色 + radius-factor）。
+   feishu light = base 的 :root 默认，不在此重复（选项 Z）。 */
+
+[data-flavor='feishu'][data-mode='dark'] {
+  --pri-soft: rgba(255, 255, 255, 0.08);
+  --bg: #111318; --canvas: #0c0d10; --surface: #1b1d23; --chrome: #16181d;
+  --surface-2: #262931; --surface-blur: rgba(27, 29, 35, 0.72);
+  --text: #e7e9ec; --text-2: #a3aab3; --text-3: #7a818b; --border: #2c2f38;
+}
+
+html:not([data-radius])[data-flavor='feishu'] { --radius-factor: 0.75; }

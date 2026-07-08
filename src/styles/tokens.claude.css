@@ -1,0 +1,45 @@
+/* src/styles/tokens.claude.css —— claude 风格自包含 profile（颜色 + 组件族覆盖 + radius-factor）。 */
+
+[data-flavor='claude'][data-mode='light'] {
+  --pri: #d97757; --pri-soft: rgba(217, 119, 87, 0.12);
+  --bg: #faf9f5; --canvas: #faf9f5; --surface: #ffffff; --chrome: #faf9f5;
+  --surface-2: #f5f4ed; --surface-blur: rgba(250, 249, 245, 0.78);
+  --text: #141413; --text-2: #3d3d3a; --text-3: #6c6a64; --border: rgba(31, 30, 29, 0.3);
+  --control-border: rgba(31, 30, 29, 0.4); --divider: rgba(31, 30, 29, 0.15);
+}
+[data-flavor='claude'][data-mode='dark'] {
+  --pri: #d97757;
+  --pri-soft: rgba(255, 255, 255, 0.09);
+  --bg: #141413; --canvas: #141413; --surface: #30302e; --chrome: #262624;
+  --surface-2: #262624; --surface-blur: rgba(38, 38, 36, 0.78);
+  --text: #faf9f5; --text-2: #dedcd1; --text-3: #b8b5a8; --border: rgba(222, 220, 209, 0.3);
+  --control-border: rgba(222, 220, 209, 0.4); --divider: rgba(222, 220, 209, 0.15);
+}
+[data-flavor='claude'] {
+  --pri-hover: color-mix(in srgb, var(--pri) 92%, black);
+  --pri-active: #c6613f;
+  --fill-hover: rgba(31, 30, 29, 0.08);
+  --fill-pressed: rgba(31, 30, 29, 0.12);
+  --fill-selected: rgba(217, 119, 87, 0.12);
+  --field-bg: var(--surface);
+  --field-bg-focus: var(--surface);
+  --field-border: var(--border);
+  --field-border-focus: var(--pri);
+  --field-ring-focus: color-mix(in srgb, var(--pri) 15%, transparent);
+  --field-shadow: none;
+  --field-px: calc(16px * var(--app-scale));
+  --table-row-h: calc(48px * var(--app-scale));
+  --control-btn-md: calc(36px * var(--app-scale));
+  --button-font-weight: 400;
+  --option-fg-highlighted: var(--pri-active);
+  --option-fg-selected: var(--pri-active);
+  --option-check: var(--pri-active);
+  --font-display: "Cormorant Garamond", Georgia, "Songti SC", serif;
+}
+[data-flavor='claude'][data-mode='dark'] {
+  --fill-hover: rgba(222, 220, 209, 0.08);
+  --fill-pressed: rgba(222, 220, 209, 0.12);
+  --fill-selected: color-mix(in srgb, var(--pri) 12%, transparent);
+}
+
+html:not([data-radius])[data-flavor='claude'] { --radius-factor: 1; }

@@ -1,5 +1,8 @@
-/* src/styles/tokens.css —— 权威源：spec v4.1 §10.2b + docs/design/*.design.md。
-   耦合规则见 spec §4.7：accent 运行时拥有 --pri / --pri-soft / --on-pri，CSS 只提供 flavor fallback。 */
+/* src/styles/tokens.base.css —— flavor 无关的共享 token 骨架。
+   权威源：spec v4.1 §10.2b + docs/design/*.design.md。
+   本文件含：:root 颜色兜底(=feishu light，FOUC 兜底) + 组件族默认 + 通用暗色 + radius/scale 档。
+   per-flavor 增量在 tokens.{feishu,claude,shadcn}.css。
+   ⚠️ global.css 中本文件必须最先 @import：巨型 :root 与 [data-flavor=xxx] 同特异性，靠源顺序决胜。 */
 
 :root, [data-flavor='feishu'][data-mode='light'] {
   --pri: #3370ff; --pri-soft: #eef3ff;
@@ -7,40 +10,6 @@
   --surface-2: #f2f3f5; --surface-blur: rgba(255, 255, 255, 0.72);
   --text: #1f2329; --text-2: #4e5969; --text-3: #8f959e; --border: #dee0e3;
   --control-border: #d0d3d6; --divider: rgba(31, 35, 41, 0.15);
-}
-[data-flavor='feishu'][data-mode='dark'] {
-  --pri-soft: rgba(255, 255, 255, 0.08);
-  --bg: #111318; --canvas: #0c0d10; --surface: #1b1d23; --chrome: #16181d;
-  --surface-2: #262931; --surface-blur: rgba(27, 29, 35, 0.72);
-  --text: #e7e9ec; --text-2: #a3aab3; --text-3: #7a818b; --border: #2c2f38;
-}
-[data-flavor='claude'][data-mode='light'] {
-  --pri: #d97757; --pri-soft: rgba(217, 119, 87, 0.12);
-  --bg: #faf9f5; --canvas: #faf9f5; --surface: #ffffff; --chrome: #faf9f5;
-  --surface-2: #f5f4ed; --surface-blur: rgba(250, 249, 245, 0.78);
-  --text: #141413; --text-2: #3d3d3a; --text-3: #6c6a64; --border: rgba(31, 30, 29, 0.3);
-  --control-border: rgba(31, 30, 29, 0.4); --divider: rgba(31, 30, 29, 0.15);
-}
-[data-flavor='claude'][data-mode='dark'] {
-  --pri: #d97757;
-  --pri-soft: rgba(255, 255, 255, 0.09);
-  --bg: #141413; --canvas: #141413; --surface: #30302e; --chrome: #262624;
-  --surface-2: #262624; --surface-blur: rgba(38, 38, 36, 0.78);
-  --text: #faf9f5; --text-2: #dedcd1; --text-3: #b8b5a8; --border: rgba(222, 220, 209, 0.3);
-  --control-border: rgba(222, 220, 209, 0.4); --divider: rgba(222, 220, 209, 0.15);
-}
-[data-flavor='shadcn'][data-mode='light'] {
-  --pri: #18181b; --pri-soft: #f4f4f5;
-  --bg: #ffffff; --canvas: #fafafa; --surface: #ffffff; --chrome: #ffffff;
-  --surface-2: #f4f4f5; --surface-blur: rgba(255, 255, 255, 0.82);
-  --text: #09090b; --text-2: #3f3f46; --text-3: #71717a; --border: #e4e4e7;
-}
-[data-flavor='shadcn'][data-mode='dark'] {
-  --pri-soft: rgba(255, 255, 255, 0.10);
-  --bg: #09090b; --canvas: #09090b; --surface: #18181b; --chrome: #09090b;
-  --surface-2: #27272a; --surface-blur: rgba(24, 24, 27, 0.78);
-  --text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: oklch(1 0 0 / 10%);
-  --control-border: oklch(1 0 0 / 10%); --divider: oklch(1 0 0 / 10%);
 }
 
 :root {
@@ -252,6 +221,7 @@
   --shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.08);
   --shadow-header: 0 1px 12px rgba(0, 0, 0, 0.06);
 }
+
 [data-mode='dark'] {
   --pri-active: color-mix(in srgb, var(--pri) 76%, white);
   --fill-hover: rgba(255, 255, 255, 0.08);
@@ -259,61 +229,7 @@
   --field-ring-invalid: color-mix(in srgb, var(--danger) 24%, transparent);
   --menu-item-bg-danger-highlighted: color-mix(in srgb, var(--danger) 20%, transparent);
 }
-[data-flavor='claude'] {
-  --pri-hover: color-mix(in srgb, var(--pri) 92%, black);
-  --pri-active: #c6613f;
-  --fill-hover: rgba(31, 30, 29, 0.08);
-  --fill-pressed: rgba(31, 30, 29, 0.12);
-  --fill-selected: rgba(217, 119, 87, 0.12);
-  --field-bg: var(--surface);
-  --field-bg-focus: var(--surface);
-  --field-border: var(--border);
-  --field-border-focus: var(--pri);
-  --field-ring-focus: color-mix(in srgb, var(--pri) 15%, transparent);
-  --field-shadow: none;
-  --field-px: calc(16px * var(--app-scale));
-  --table-row-h: calc(48px * var(--app-scale));
-  --control-btn-md: calc(36px * var(--app-scale));
-  --button-font-weight: 400;
-  --option-fg-highlighted: var(--pri-active);
-  --option-fg-selected: var(--pri-active);
-  --option-check: var(--pri-active);
-  --font-display: "Cormorant Garamond", Georgia, "Songti SC", serif;
-}
-[data-flavor='claude'][data-mode='dark'] {
-  --fill-hover: rgba(222, 220, 209, 0.08);
-  --fill-pressed: rgba(222, 220, 209, 0.12);
-  --fill-selected: color-mix(in srgb, var(--pri) 12%, transparent);
-}
-[data-flavor='shadcn'] {
-  --pri-hover: color-mix(in srgb, var(--pri) 90%, transparent);
-  --pri-active: color-mix(in srgb, var(--pri) 80%, transparent);
-  --field-bg: transparent;
-  --field-bg-focus: transparent;
-  --field-border: var(--border);
-  --field-border-focus: var(--control-border);
-  --field-ring-focus: color-mix(in srgb, var(--text-3) 50%, transparent);
-  --field-ring-invalid: color-mix(in srgb, var(--danger) 20%, transparent);
-  --field-shadow: none;
-  --button-font-weight: 500;
-  --button-secondary-bg-hover: var(--fill-hover);
-  --button-secondary-border-hover: var(--border);
-  --button-secondary-fg-hover: var(--text);
-  --option-bg-highlighted: var(--fill-hover);
-  --option-fg-highlighted: var(--text);
-  --option-bg-selected: var(--fill-selected);
-  --option-fg-selected: var(--text);
-  --option-check: var(--text);
-  --table-header-h: calc(44px * var(--app-scale));
-}
-[data-flavor='shadcn'][data-mode='dark'] {
-  --field-bg: oklch(1 0 0 / 4.5%);
-  --field-bg-focus: oklch(1 0 0 / 4.5%);
-  --field-ring-invalid: color-mix(in srgb, var(--danger) 40%, transparent);
-}
-html:not([data-radius])[data-flavor='feishu'] { --radius-factor: 0.75; }
-html:not([data-radius])[data-flavor='claude'] { --radius-factor: 1; }
-html:not([data-radius])[data-flavor='shadcn'] { --radius-factor: 1.25; }
+
 [data-radius='sharp'] { --radius-factor: 0.28; }
 [data-radius='round'] { --radius-factor: 1.55; }
 

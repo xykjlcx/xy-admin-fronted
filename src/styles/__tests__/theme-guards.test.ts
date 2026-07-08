@@ -4,7 +4,13 @@ import { resolve } from 'node:path';
 const projectRoot = resolve(__dirname, '../../..');
 const baselinePath = resolve(__dirname, 'theme-token-violations-baseline.json');
 
-const tokenDeclarationFiles = ['src/styles/tokens.css', 'src/styles/global.css'];
+const tokenDeclarationFiles = [
+  'src/styles/tokens.base.css',
+  'src/styles/tokens.feishu.css',
+  'src/styles/tokens.claude.css',
+  'src/styles/tokens.shadcn.css',
+  'src/styles/global.css',
+];
 const tokenReferenceRoots = [
   'src/styles',
   'src/components/ui',

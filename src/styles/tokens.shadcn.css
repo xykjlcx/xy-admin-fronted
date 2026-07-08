@@ -1,0 +1,43 @@
+/* src/styles/tokens.shadcn.css —— shadcn 风格自包含 profile（颜色 + 组件族覆盖 + radius-factor）。 */
+
+[data-flavor='shadcn'][data-mode='light'] {
+  --pri: #18181b; --pri-soft: #f4f4f5;
+  --bg: #ffffff; --canvas: #fafafa; --surface: #ffffff; --chrome: #ffffff;
+  --surface-2: #f4f4f5; --surface-blur: rgba(255, 255, 255, 0.82);
+  --text: #09090b; --text-2: #3f3f46; --text-3: #71717a; --border: #e4e4e7;
+}
+[data-flavor='shadcn'][data-mode='dark'] {
+  --pri-soft: rgba(255, 255, 255, 0.10);
+  --bg: #09090b; --canvas: #09090b; --surface: #18181b; --chrome: #09090b;
+  --surface-2: #27272a; --surface-blur: rgba(24, 24, 27, 0.78);
+  --text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: oklch(1 0 0 / 10%);
+  --control-border: oklch(1 0 0 / 10%); --divider: oklch(1 0 0 / 10%);
+}
+[data-flavor='shadcn'] {
+  --pri-hover: color-mix(in srgb, var(--pri) 90%, transparent);
+  --pri-active: color-mix(in srgb, var(--pri) 80%, transparent);
+  --field-bg: transparent;
+  --field-bg-focus: transparent;
+  --field-border: var(--border);
+  --field-border-focus: var(--control-border);
+  --field-ring-focus: color-mix(in srgb, var(--text-3) 50%, transparent);
+  --field-ring-invalid: color-mix(in srgb, var(--danger) 20%, transparent);
+  --field-shadow: none;
+  --button-font-weight: 500;
+  --button-secondary-bg-hover: var(--fill-hover);
+  --button-secondary-border-hover: var(--border);
+  --button-secondary-fg-hover: var(--text);
+  --option-bg-highlighted: var(--fill-hover);
+  --option-fg-highlighted: var(--text);
+  --option-bg-selected: var(--fill-selected);
+  --option-fg-selected: var(--text);
+  --option-check: var(--text);
+  --table-header-h: calc(44px * var(--app-scale));
+}
+[data-flavor='shadcn'][data-mode='dark'] {
+  --field-bg: oklch(1 0 0 / 4.5%);
+  --field-bg-focus: oklch(1 0 0 / 4.5%);
+  --field-ring-invalid: color-mix(in srgb, var(--danger) 40%, transparent);
+}
+
+html:not([data-radius])[data-flavor='shadcn'] { --radius-factor: 1.25; }
