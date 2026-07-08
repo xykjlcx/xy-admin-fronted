@@ -211,7 +211,18 @@
       "cardDescription": "卡片描述文案，走次级文字色。",
       "cardActionBadge": "操作位",
       "cardContent": "卡片正文区，内距与圆角走 --card-spacing / --card-radius 挂点。",
-      "cardFooter": "卡片页脚区"
+      "cardFooter": "卡片页脚区",
+      "dialogMatrix": "弹窗标题",
+      "dialogMatrixDesc": "DialogTitle 排印走 --title-* 挂点（与 CardTitle 共用）；静态内嵌预览，默认 none/normal 零视觉变化，sera 批2 兑现大写。",
+      "dialogTitle": "删除该管理员",
+      "dialogDescription": "此操作不可撤销，将永久移除该成员及其权限。",
+      "dialogCancel": "取消",
+      "dialogConfirm": "确认删除",
+      "labelMatrix": "标签排印与 peer 豁免",
+      "labelMatrixDesc": "Label 排印走 --label-* 挂点；挨 checkbox/switch 的 label 走 peer 豁免（收窄版，只撤 transform+tracking），三 flavor 当前均无视觉差异，sera 批2 兑现。",
+      "labelStandalone": "独立字段标签",
+      "labelCheckbox": "接收邮件通知",
+      "labelSwitch": "启用双因子认证"
     }
   },
   "shell": {

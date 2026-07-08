@@ -20,6 +20,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
   SelectControl,
@@ -375,6 +376,69 @@ function ThemeStatesRoute() {
               <span className="text-sm text-text-3">{t('dev.themeStates.cardFooter')}</span>
             </CardFooter>
           </Card>
+        </div>
+      </section>
+
+      <section data-testid="dialogTitleMatrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.dialogMatrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.dialogMatrixDesc')}</p>
+        </div>
+        {/* Dialog 组件必须 portal + open 才渲染 DialogTitle（radix useDialogContext 无 provider 会抛错），
+            portal 到 body 又会脱离本 section 打断矩阵截图——照 step8 弹层块先例静态内嵌 raw 预览，
+            dialog-title 元素带与真实 DialogTitle 逐字节相同的 --title-* 排印类，作 title token 束的可截图载体。 */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <div
+            data-slot="dialog-content"
+            className="grid gap-4 rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-6 text-(--overlay-fg) shadow-(--overlay-shadow-modal)"
+          >
+            <div className="flex flex-col gap-2">
+              <div
+                data-slot="dialog-title"
+                className="text-lg leading-none font-semibold [text-transform:var(--title-transform)] [letter-spacing:var(--title-tracking)]"
+              >
+                {t('dev.themeStates.dialogTitle')}
+              </div>
+              <p data-slot="dialog-description" className="text-sm text-text-2">
+                {t('dev.themeStates.dialogDescription')}
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline">{t('dev.themeStates.dialogCancel')}</Button>
+              <Button variant="danger">{t('dev.themeStates.dialogConfirm')}</Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-testid="labelPeerMatrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.labelMatrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.labelMatrixDesc')}</p>
+        </div>
+        {/* peer 豁免的验证载体：peer 元素（checkbox/switch）须带 .peer 类且是 Label 的前置兄弟，
+            豁免规则 .peer[data-slot=checkbox] ~ label 才能命中。switch 根自带 peer；checkbox 外层 span
+            的 peer 在内层 input 上，故显式补 className="peer" 让外层（带 data-slot=checkbox）成为 peer 锚点。 */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="flex flex-col gap-2 rounded-md border border-border bg-surface-2 p-4">
+            <p className="text-sm font-medium text-text">{t('dev.themeStates.labelStandalone')}</p>
+            <Label htmlFor="theme-label-standalone">{t('dev.themeStates.labelStandalone')}</Label>
+            <Input id="theme-label-standalone" placeholder={t('dev.themeStates.focusPlaceholder')} />
+          </div>
+          <div className="flex flex-col gap-2 rounded-md border border-border bg-surface-2 p-4">
+            <p className="text-sm font-medium text-text">{t('dev.themeStates.labelCheckbox')}</p>
+            <div className="flex items-center gap-2">
+              <Checkbox className="peer" aria-label={t('dev.themeStates.labelCheckbox')} checked readOnly />
+              <Label>{t('dev.themeStates.labelCheckbox')}</Label>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 rounded-md border border-border bg-surface-2 p-4">
+            <p className="text-sm font-medium text-text">{t('dev.themeStates.labelSwitch')}</p>
+            <div className="flex items-center gap-2">
+              <Switch aria-label={t('dev.themeStates.labelSwitch')} defaultChecked />
+              <Label>{t('dev.themeStates.labelSwitch')}</Label>
+            </div>
+          </div>
         </div>
       </section>
 

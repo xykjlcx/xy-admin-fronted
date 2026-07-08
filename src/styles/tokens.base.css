@@ -155,6 +155,14 @@
   --card-spacing: calc(24px * var(--app-scale));
   --card-radius: var(--radius-12);
   --card-shadow: var(--shadow-card);
+  /* 排印 transform/tracking 挂点（S5 批1，值=none/normal，当前全 flavor 默认无效果）。
+     sera（S5 批2）兑现差异：button uppercase/0.1em、label uppercase/0.025em、
+     表头 uppercase/0.05em、标题 uppercase/0.05em。tracking 用 em 原值不乘 --app-scale
+     （em 相对 font-size 已天然等比）。--title-* 由 dialog title / card title 共用。 */
+  --button-transform: none;    --button-tracking: normal;
+  --label-transform: none;     --label-tracking: normal;
+  --table-header-transform: none; --table-header-tracking: normal;
+  --title-transform: none;     --title-tracking: normal;
   --accent-emphasis: var(--pri);
   --accent-emphasis-soft: var(--fill-selected);
   --pro-page-bg: var(--bg);

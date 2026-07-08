@@ -70,7 +70,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        'h-(--table-header-h) px-(--table-cell-px) text-left align-middle text-[calc(13px*var(--app-scale))] font-medium whitespace-nowrap text-(--table-header-fg)',
+        'h-(--table-header-h) px-(--table-cell-px) text-left align-middle text-[calc(13px*var(--app-scale))] font-medium whitespace-nowrap text-(--table-header-fg) [text-transform:var(--table-header-transform)] [letter-spacing:var(--table-header-tracking)]',
         className,
       )}
       {...props}

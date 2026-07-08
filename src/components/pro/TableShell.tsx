@@ -66,7 +66,7 @@ export function TableShellHeader({ gridTemplateColumns, children, className, sty
   return (
     <div
       className={cn(
-        'grid h-(--table-header-h) items-center bg-(--table-header-bg) px-(--table-cell-px) text-[calc(13px*var(--app-scale))] font-medium text-(--table-header-fg)',
+        'grid h-(--table-header-h) items-center bg-(--table-header-bg) px-(--table-cell-px) text-[calc(13px*var(--app-scale))] font-medium text-(--table-header-fg) [text-transform:var(--table-header-transform)] [letter-spacing:var(--table-header-tracking)]',
         className,
       )}
       style={withGridTemplate(gridTemplateColumns, style)}

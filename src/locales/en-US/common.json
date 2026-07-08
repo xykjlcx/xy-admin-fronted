@@ -211,7 +211,18 @@
       "cardDescription": "Card description copy rendered in the secondary text color.",
       "cardActionBadge": "Action",
       "cardContent": "Card body region; padding and radius follow the --card-spacing / --card-radius hooks.",
-      "cardFooter": "Card footer region"
+      "cardFooter": "Card footer region",
+      "dialogMatrix": "Dialog title",
+      "dialogMatrixDesc": "DialogTitle typography follows the --title-* hooks (shared with CardTitle); static inline preview, none/normal by default with zero visual change, sera batch 2 delivers uppercase.",
+      "dialogTitle": "Remove this admin",
+      "dialogDescription": "This action cannot be undone and permanently removes the member and their permissions.",
+      "dialogCancel": "Cancel",
+      "dialogConfirm": "Confirm removal",
+      "labelMatrix": "Label typography and peer exemption",
+      "labelMatrixDesc": "Label typography follows the --label-* hooks; labels next to a checkbox/switch use the peer exemption (narrowed: only transform+tracking are reset). No visual difference across flavors today; sera batch 2 delivers it.",
+      "labelStandalone": "Standalone field label",
+      "labelCheckbox": "Receive email notifications",
+      "labelSwitch": "Enable two-factor auth"
     }
   },
   "shell": {

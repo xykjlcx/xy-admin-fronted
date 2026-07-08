@@ -33,9 +33,14 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
-  // 字号/字重取现状页面卡片标题惯例（dashboard text-base/semibold）；不引入 uppercase/tracking（sera 的活）。
+  // 字号/字重取现状页面卡片标题惯例（dashboard text-base/semibold）；uppercase/tracking 走 --title-* 挂点
+  // （默认 none/normal 零视觉变化，与 dialog title 共用，sera 批2 兑现）。
   return (
-    <div data-slot="card-title" className={cn('text-base font-semibold text-text', className)} {...props} />
+    <div
+      data-slot="card-title"
+      className={cn('text-base font-semibold text-text [text-transform:var(--title-transform)] [letter-spacing:var(--title-tracking)]', className)}
+      {...props}
+    />
   );
 }
 
