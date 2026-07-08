@@ -530,6 +530,11 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
   expect(languageMenuSource).not.toContain('bg-pri-soft focus:bg-pri-soft');
 });
 
+test('主题状态页暴露 Badge 可截图矩阵（S3 挂点验收载体，防误删）', () => {
+  expect(themeStatesSource).toContain('badgeVariantsForThemeStates');
+  expect(themeStatesSource).toContain("import { Badge } from '@/components/ui/badge'");
+});
+
 test('主题状态页暴露 Overlay / Option / Menu 可截图矩阵', () => {
   expect(themeStatesSource).toContain('step8OverlayOptionMatrix');
   expect(themeStatesSource).toContain('data-slot="popover-content"');
