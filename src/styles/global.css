@@ -64,7 +64,7 @@
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
-  /* 数字全档 → rounded-4…rounded-14 工具类（原型精确 7/9/11 档）；圆角乘法体系见 tokens.css */
+  /* 数字全档 → rounded-4…rounded-14 工具类（原型精确 7/9/11 档）；圆角乘法体系见 tokens.base.css */
   --radius-4: var(--radius-4);
   --radius-5: var(--radius-5);
   --radius-6: var(--radius-6);
@@ -75,7 +75,7 @@
   --radius-11: var(--radius-11);
   --radius-12: var(--radius-12);
   --radius-14: var(--radius-14);
-  /* 弹层/悬浮阴影 → shadow-popover/modal/drawer/tooltip/card/card-sm/inset-card/lift/header 工具类（原型精确值，tokens.css 定义） */
+  /* 弹层/悬浮阴影 → shadow-popover/modal/drawer/tooltip/card/card-sm/inset-card/lift/header 工具类（原型精确值，tokens.base.css 定义） */
   --shadow-popover: var(--shadow-popover);
   --shadow-modal: var(--shadow-modal);
   --shadow-drawer: var(--shadow-drawer);
@@ -299,7 +299,7 @@
 
 html { font-family: var(--font-sans); }
 
-/* 显示比例 token 乘法（取代 CSS zoom，机制见 tokens.css --app-scale 注释）：
+/* 显示比例 token 乘法（取代 CSS zoom，机制见 tokens.base.css --app-scale 注释）：
    盖写 Tailwind v4 内置主题变量，使 spacing 与 text 工具类随显示比例档等比缩放。
    本 :root 块刻意不放进任何 @layer——未分层规则优先级高于 @layer theme，才能盖掉 Tailwind 默认值。
    覆盖常用正文/标题字号与 Dialog 宽度 token；行高伴生变量是比值不动。 */

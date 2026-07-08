@@ -20,7 +20,7 @@ git checkout <latest-tag>          # 见 git tag -l 与 CHANGELOG.md，从最新
 - `index.html`：`<title>`、`<meta name="m0-app-id">`
 - `src/config/app.ts`：`id`、`routes`（若默认落地页 / 登录路径不同）
 - `.env.development` / `.env.production` / `.env.demo`：`VITE_APP_ENV`、`VITE_API_BASE_URL`、`VITE_DEFAULT_LOCALE`
-- 品牌：`public/favicon.svg`、主题色（`src/styles/tokens.css` 的 accent、`src/config/appearance.ts` 默认）
+- 品牌：`public/favicon.svg`、主题色（`src/styles/tokens.base.css` 的 accent、`src/config/appearance.ts` 默认）
 
 ## 2. 删示例业务与假数据
 
