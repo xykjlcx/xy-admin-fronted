@@ -125,6 +125,9 @@ const MUST_CONTAIN = [
   '--radius-factor: 0.28;',
   '--radius-factor: 1.55;',
   '--field-px: calc(12px * var(--app-scale));',
+  '--table-cell-px: var(--field-px);',
+  '--table-row-h: calc(44px * var(--app-scale));',
+  '--table-header-h: calc(48px * var(--app-scale));',
 ];
 test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain(t));
 
@@ -132,6 +135,15 @@ test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain
 test('field 水平内距分档：claude 覆盖为宽松档', () => {
   expect(css).toContain('--field-px: calc(12px * var(--app-scale));'); // :root 默认（feishu/shadcn）
   expect(css).toContain('--field-px: calc(16px * var(--app-scale));'); // claude 覆盖
+});
+
+// table 密度分档（几何轴）：cell 内距链 field-px；行高 feishu/shadcn 44、claude 48；表头 feishu/claude 48、shadcn 44
+test('table 密度分档：claude 行高宽松、shadcn 表头收紧', () => {
+  expect(css).toContain('--table-cell-px: var(--field-px);');           // cell 内距链 field-px 单一真相源
+  expect(css).toContain('--table-row-h: calc(44px * var(--app-scale));');   // :root 数据行 44（feishu/shadcn）
+  expect(css).toContain('--table-header-h: calc(48px * var(--app-scale));'); // :root 表头 48（feishu/claude）
+  expect(css).toContain('--table-row-h: calc(48px * var(--app-scale));');    // claude 覆盖：数据行 48
+  expect(css).toContain('--table-header-h: calc(44px * var(--app-scale));'); // shadcn 覆盖：表头 44
 });
 
 test('显示比例三档走 --app-scale token 乘法，不再使用 CSS zoom 反向补偿', () => {

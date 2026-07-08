@@ -167,6 +167,12 @@
   --table-row-bg-expanded: var(--fill-hover);
   --table-row-fg: var(--text);
   --table-action-fg: var(--pri);
+  /* 表格几何（密度轴）。cell 水平内距链 --field-px 单一真相源（feishu/shadcn 12、claude 16）；
+     行高 feishu/shadcn 44，claude 在下方覆盖为宽松 48；表头 feishu/claude 48，shadcn 覆盖为 44。
+     只随 --app-scale 缩放，随 flavor 换档；页面布局间距（--spacing）不动。 */
+  --table-cell-px: var(--field-px);
+  --table-row-h: calc(44px * var(--app-scale));
+  --table-header-h: calc(48px * var(--app-scale));
   --accent-emphasis: var(--pri);
   --accent-emphasis-soft: var(--fill-selected);
   --pro-page-bg: var(--bg);
@@ -266,6 +272,7 @@
   --field-ring-focus: color-mix(in srgb, var(--pri) 15%, transparent);
   --field-shadow: none;
   --field-px: calc(16px * var(--app-scale));
+  --table-row-h: calc(48px * var(--app-scale));
   --control-btn-md: calc(36px * var(--app-scale));
   --button-font-weight: 400;
   --option-fg-highlighted: var(--pri-active);
@@ -297,6 +304,7 @@
   --option-bg-selected: var(--fill-selected);
   --option-fg-selected: var(--text);
   --option-check: var(--text);
+  --table-header-h: calc(44px * var(--app-scale));
 }
 [data-flavor='shadcn'][data-mode='dark'] {
   --field-bg: oklch(1 0 0 / 4.5%);
