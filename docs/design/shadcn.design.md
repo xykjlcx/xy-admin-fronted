@@ -93,6 +93,8 @@ components:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.muted}"
     typography: "{typography.caption}"
+    height: 44px
+    padding: 0 12px
 ---
 
 ## Overview

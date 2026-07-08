@@ -137,6 +137,10 @@ components:
     typography: "{typography.caption}"
     rounded: "{rounded.pill}"
     padding: 4px 12px
+  table-header:
+    typography: "{typography.caption}"
+    height: 48px
+    padding: 0 16px
 ---
 
 ## Overview

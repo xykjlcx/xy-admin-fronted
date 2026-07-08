@@ -103,6 +103,8 @@ components:
     backgroundColor: transparent
     textColor: "{colors.ink}"
     typography: "{typography.body-md}"
+    height: 48px
+    padding: 0 12px
   sidebar:
     backgroundColor: "{colors.sidebar}"
     textColor: "{colors.body}"
@@ -151,7 +153,7 @@ divider N900@15%。主蓝保留 admin 实测 `#3370FF`（主应用当代蓝 `#14
 ## Layout
 
 4px 基础网格；控件间距 8/12px，区块间距 16/24px。密度倾向紧凑：
-表格行高目标 ≈40px（管理后台适配值；飞书真身更紧至 ≈28-32px，完整密度值待 Step 7 补采定稿）。
+表格实测（2026-07-08 admin.feishu.cn 真机 computed style）：表头行 48px、数据行 44px、单元格水平内距 12px、字号 14px、行分隔 1px hairline。旧「≈40px / 真身 28-32」估值作废，以实测为准。
 
 ## Elevation & Depth
 
