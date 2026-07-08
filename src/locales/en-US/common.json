@@ -286,6 +286,8 @@
       "flavorClaudeDesc": "Warm paper",
       "flavorShadcn": "shadcn",
       "flavorShadcnDesc": "Neutral default",
+      "flavorSera": "sera",
+      "flavorSeraDesc": "Square · uppercase · underline",
       "layoutSidebar": "Sidebar",
       "layoutSidebarDesc": "Classic",
       "layoutRail": "Rail",

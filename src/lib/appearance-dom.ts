@@ -2,7 +2,7 @@
 // 契约：boot/rehydrate 时必须调用一次 applyAppearance，否则 --pri 注入丢失（CSS 只有 feishu 蓝兜底）。
 // 首帧防闪：appearance store 额外持久化派生的 _priResolved/_priActiveResolved/_priSoftResolved/_onPriResolved（= resolveAccentVars 结果），
 //   index.html FOUC 脚本读到就直接 setProperty --pri/--pri-active/--pri-soft/--on-pri，避免自选主题色首帧闪回默认值。
-export type Flavor = 'feishu' | 'claude' | 'shadcn';
+export type Flavor = 'feishu' | 'claude' | 'shadcn' | 'sera';
 export type Mode = 'light' | 'dark';
 export type Zoom = 'sm' | 'md' | 'lg';
 export type Radius = 'sharp' | 'default' | 'round';
@@ -24,6 +24,7 @@ export const FLAVOR_PRESETS = [
   { key: 'feishu', pri: '#3370ff', chrome: '#ffffff', surface2: '#f2f3f5' },
   { key: 'claude', pri: '#d97757', chrome: '#faf9f5', surface2: '#f5f0e8' }, // clay 对齐 ACCENTS/tokens 官方值（原型旧值 #cc785c）
   { key: 'shadcn', pri: '#18181b', chrome: '#ffffff', surface2: '#f4f4f5' },
+  { key: 'sera', pri: '#18181b', chrome: '#ffffff', surface2: '#f4f4f5' }, // 与 shadcn 同色系（D1：sera 复用 zinc 黑白）；色点相同为已知 UX 限制，风格卡 desc 强调直角/大写/下划线区分
 ] as const;
 
 // 自定义取色 tile 的彩虹底（原型 customAccentTileStyle L4964）；含十六进制，放 .ts 承载，组件 style 消费。
@@ -40,6 +41,7 @@ const FLAVOR_DEFAULT_ACCENT: Record<Flavor, AccentKey> = {
   feishu: 'blue',
   claude: 'claude',
   shadcn: 'shadcn',
+  sera: 'shadcn', // sera 复用 shadcn 中性黑 accent（D1）
 }; // 原型 L4785
 
 export function flavorDefaultAccent(flavor: Flavor): AccentKey {

@@ -20,6 +20,7 @@ export const DESIGN_PRESETS: Readonly<Record<Flavor, DesignPreset>> = Object.fre
   feishu: presetFor('feishu'),
   claude: presetFor('claude'),
   shadcn: presetFor('shadcn'),
+  sera: presetFor('sera'),
 });
 
 export function presetToPatch(key: Flavor): DesignPreset {

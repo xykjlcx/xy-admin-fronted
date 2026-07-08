@@ -27,7 +27,7 @@ import { resolve } from 'node:path';
 // ============================================================================
 
 /** 已注册 flavor。新增 flavor：加 key + 建同名 tokens.<key>.css（M4 双向绑定）。 */
-const FLAVORS = ['feishu', 'claude', 'shadcn'] as const;
+const FLAVORS = ['feishu', 'claude', 'shadcn', 'sera'] as const;
 
 /** 默认 flavor：其 light 颜色块住 base 兜底合并选择器（选项 Z）。 */
 const DEFAULT_FLAVOR = 'feishu';
@@ -277,6 +277,7 @@ function realFiles(): Record<string, string> {
     'tokens.feishu.css': readCss('tokens.feishu.css'),
     'tokens.claude.css': readCss('tokens.claude.css'),
     'tokens.shadcn.css': readCss('tokens.shadcn.css'),
+    'tokens.sera.css': readCss('tokens.sera.css'),
   };
 }
 
@@ -338,17 +339,21 @@ describe('profile-contract 红灯组（§4 变异表 11 条）', () => {
     expect(hasRule(v, 'M4:')).toBe(true);
   });
 
-  test('变异5：新增 tokens.sera.css 但 FLAVORS 未注册 → M4（文件未注册臂）', () => {
+  test('变异5：新增 tokens.nova.css 但 FLAVORS 未注册 → M4（文件未注册臂）', () => {
+    // S5 后 sera 已成正式 flavor，孤儿文件例改用仍未注册的 nova，保留「文件存在但未注册」这条 M4 臂的守护。
     const files = realFiles();
-    // sera 内容自身结构合规（token 在 base、选择器合法），只是没进 FLAVORS，故仅 M4 报红。
-    files['tokens.sera.css'] = "[data-flavor='sera'][data-mode='light'] { --bg: #ffffff; }";
+    // nova 内容自身结构合规（token 在 base、选择器合法），只是没进 FLAVORS，故仅 M4 报红。
+    files['tokens.nova.css'] = "[data-flavor='nova'][data-mode='light'] { --bg: #ffffff; }";
     const v = runContract(files);
     expect(hasRule(v, 'M4:')).toBe(true);
   });
 
   test('变异12：FLAVORS 注册 sera 但文件不存在 → M4（缺文件臂）', () => {
-    // S5 逆场景红灯：先注册后建文件时，中间态必须被拦（M1 也会红——检查域退化到 base 找不到 sera 块）。
-    const v = runContract(realFiles(), {
+    // S5 逆场景红灯：先注册后建文件的中间态必须被拦。sera 现已是正式 flavor 且 realFiles() 会读到其文件，
+    // 故此处显式移除文件重建「已注册但缺文件」态（M1/M3 也会红——检查域退化到 base 找不到 sera 块）。
+    const files = realFiles();
+    delete files['tokens.sera.css'];
+    const v = runContract(files, {
       ...DEFAULT_CONFIG,
       flavors: ['feishu', 'claude', 'shadcn', 'sera'],
     });

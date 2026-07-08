@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { flavorDefaultAccent, type Flavor } from '@/lib/appearance-dom';
 import { DESIGN_PRESETS, presetToPatch, type DesignPreset } from '@/lib/design-presets';
 
-const flavors: Flavor[] = ['feishu', 'claude', 'shadcn'];
+const flavors: Flavor[] = ['feishu', 'claude', 'shadcn', 'sera'];
 
 type MutableDesignPreset = {
   -readonly [Key in keyof DesignPreset]: DesignPreset[Key];

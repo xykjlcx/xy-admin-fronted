@@ -643,7 +643,7 @@ function assertThemeMatrixReady(session) {
     if (selects.length !== 3) {
       throw new Error('theme matrix ready failed: expected 3 matrix selects, got ' + selects.length);
     }
-    const expected = { flavor: 3, mode: 2, scale: 3 };
+    const expected = { flavor: 4, mode: 2, scale: 3 };
     for (const [key, expectedCount] of Object.entries(expected)) {
       const select = document.querySelector('select[data-matrix="' + key + '"]');
       if (!select) throw new Error('theme matrix ready failed: missing select ' + key);
@@ -700,7 +700,7 @@ async function runThemeMatrix() {
   await ensureDir(matrixDir);
   const server = await ensureDevServer();
   const cells = [];
-  const expectedCells = 18;
+  const expectedCells = 24;
   const assertionLabel = 'page-ready / state-applied / no-horizontal-overflow';
   try {
     setViewport(appSession);
@@ -709,7 +709,7 @@ async function runThemeMatrix() {
     agent(appSession, ['wait', '1000']);
     assertThemeMatrixReady(appSession);
 
-    for (const flavor of ['feishu', 'claude', 'shadcn']) {
+    for (const flavor of ['feishu', 'claude', 'shadcn', 'sera']) {
       for (const mode of ['light', 'dark']) {
         for (const scale of ['sm', 'md', 'lg']) {
           setMatrixSelect(appSession, 'flavor', flavor);

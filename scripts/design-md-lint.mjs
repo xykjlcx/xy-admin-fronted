@@ -56,6 +56,15 @@ const allowedWarnings = new Map([
   ['docs/design/shadcn.design.md:colors.ring', '设计身份层 focus ring token，作为值表来源保留。'],
   ['docs/design/shadcn.design.md:colors.success', '语义状态色，作为值表来源保留。'],
   ['docs/design/shadcn.design.md:colors.warning', '语义状态色，作为值表来源保留。'],
+  // sera 复用 shadcn zinc 色 + 透明底输入（D1），contrast/未引用告警与 shadcn 逐条镜像。
+  ['docs/design/sera.design.md:components.text-input', 'transparent 底由 lint 工具当黑底处理，实际背景由页面 surface/token 决定；sera 输入为底边线透明底。'],
+  ['docs/design/sera.design.md:components.text-input-focused', 'transparent 底由 lint 工具当黑底处理，实际背景由页面 surface/token 决定；sera 聚焦只变底边不铺底。'],
+  ['docs/design/sera.design.md:colors.primary-fg', '设计身份层前景 token，作为 sera（复用 shadcn 色）语义来源保留。'],
+  ['docs/design/sera.design.md:colors.body', '设计身份层文字 token，作为值表来源保留。'],
+  ['docs/design/sera.design.md:colors.hairline', '设计身份层边框 token，作为值表来源保留。'],
+  ['docs/design/sera.design.md:colors.ring', '设计身份层 focus ring token，作为值表来源保留。'],
+  ['docs/design/sera.design.md:colors.success', '语义状态色，作为值表来源保留。'],
+  ['docs/design/sera.design.md:colors.warning', '语义状态色，作为值表来源保留。'],
 ]);
 
 const reports = [];

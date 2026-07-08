@@ -28,6 +28,7 @@ const FLAVOR_OPTS = [
   { key: 'feishu', preset: FLAVOR_PRESETS[0], label: 'flavorFeishu', desc: 'flavorFeishuDesc' },
   { key: 'claude', preset: FLAVOR_PRESETS[1], label: 'flavorClaude', desc: 'flavorClaudeDesc' },
   { key: 'shadcn', preset: FLAVOR_PRESETS[2], label: 'flavorShadcn', desc: 'flavorShadcnDesc' },
+  { key: 'sera', preset: FLAVOR_PRESETS[3], label: 'flavorSera', desc: 'flavorSeraDesc' },
 ] as const;
 const ANIM_OPTS = ['none', 'fade', 'slide', 'up', 'scale'] as const;
 const ANIM_LABEL: Record<string, string> = {

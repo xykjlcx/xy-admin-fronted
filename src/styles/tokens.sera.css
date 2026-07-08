@@ -1,0 +1,47 @@
+/* src/styles/tokens.sera.css —— sera 风格自包含 profile（第四风格，S5 北极星验收）。
+   颜色抄 shadcn 明暗块（D1：sera 官方本无自带色系，复用 zinc 黑白硬朗基线贴 editorial 气质，
+   差异化全交几何/排印，零幻想色轴）。几何=直角（radius-factor 0）、按钮 40 高、卡片 32 内距+shadow-sm、
+   badge 裸文字、ring 收窄 2px。排印束=uppercase + 加宽字距（tracking 用 em 原值，不乘 --app-scale）。
+   输入族=透明底 + 仅底边线：几何由 global.css D4 唯一型分支落，颜色/无 ring 由本文件 field token 落。 */
+
+[data-flavor='sera'][data-mode='light'] {
+  --pri: #18181b; --pri-soft: #f4f4f5;
+  --bg: #ffffff; --canvas: #fafafa; --surface: #ffffff; --chrome: #ffffff;
+  --surface-2: #f4f4f5; --surface-blur: rgba(255, 255, 255, 0.82);
+  --text: #09090b; --text-2: #3f3f46; --text-3: #71717a; --border: #e4e4e7;
+}
+[data-flavor='sera'][data-mode='dark'] {
+  --pri-soft: rgba(255, 255, 255, 0.10);
+  --bg: #09090b; --canvas: #09090b; --surface: #18181b; --chrome: #09090b;
+  --surface-2: #27272a; --surface-blur: rgba(24, 24, 27, 0.78);
+  --text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: oklch(1 0 0 / 10%);
+  --control-border: oklch(1 0 0 / 10%); --divider: oklch(1 0 0 / 10%);
+}
+[data-flavor='sera'] {
+  /* 输入族（底边线）：透明底 + 底边着色（其余三边 transparent 由 D4 型分支落）。--field-border 走 var(--border)
+     hairline，D4 把它落到底边。--field-bg/--field-bg-focus transparent 保证 focus 不铺底色（否则 base 默认
+     focus 铺 surface）。--field-ring-invalid: transparent 覆盖 base 明暗两处默认（否则 invalid+focus 漏红 ring，
+     对抗审 V2）。--field-border-focus / --field-ring-focus 用 base 默认（pri 底边 / 无 ring，D4 天然工作）。 */
+  --field-bg: transparent;
+  --field-bg-focus: transparent;
+  --field-border: var(--border);
+  --field-ring-invalid: transparent;
+  /* 几何（量）：直角起步的疏朗版式。 */
+  --control-btn-md: calc(40px * var(--app-scale));
+  --button-font-weight: 600;
+  --table-row-h: calc(48px * var(--app-scale));
+  --card-spacing: calc(32px * var(--app-scale));
+  --card-shadow: var(--shadow-card-sm);
+  --badge-px: 0;
+  --badge-py: 0;
+  --badge-font-size: calc(10px * var(--app-scale));
+  --badge-font-weight: 600;
+  --focus-ring: calc(2px * var(--app-scale));
+  /* 排印（型）：uppercase + 加宽字距。tracking 用 em 原值不乘 --app-scale（em 相对 font-size 已天然等比）。 */
+  --button-transform: uppercase;    --button-tracking: 0.1em;
+  --label-transform: uppercase;     --label-tracking: 0.025em;
+  --table-header-transform: uppercase; --table-header-tracking: 0.05em;
+  --title-transform: uppercase;     --title-tracking: 0.05em;
+}
+
+html:not([data-radius])[data-flavor='sera'] { --radius-factor: 0; }

@@ -48,13 +48,14 @@ export const Route = createFileRoute('/_auth/dev/theme-states')({
   component: ThemeStatesRoute,
 });
 
-const flavors = ['feishu', 'claude', 'shadcn'] as const;
+const flavors = ['feishu', 'claude', 'shadcn', 'sera'] as const;
 const modes = ['light', 'dark'] as const;
 const scales = ['sm', 'md', 'lg'] as const satisfies readonly Zoom[];
 const flavorLabelKeys: Record<(typeof flavors)[number], string> = {
   feishu: 'shell.appearanceDrawer.flavorFeishu',
   claude: 'shell.appearanceDrawer.flavorClaude',
   shadcn: 'shell.appearanceDrawer.flavorShadcn',
+  sera: 'shell.appearanceDrawer.flavorSera',
 };
 const modeLabelKeys: Record<(typeof modes)[number], string> = {
   light: 'dev.themeStates.light',
