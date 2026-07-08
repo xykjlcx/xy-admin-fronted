@@ -137,6 +137,11 @@ function DialogFooter({
   )
 }
 
+// DialogTitle 的排印类串导出为单一真相源：theme-states 的可截图矩阵 import 同一常量，
+// 防止两处 --title-* 排印类漂移（截图载体与真实组件不再各自硬编码同一串）。
+const dialogTitleClassName =
+  "text-lg leading-none font-semibold [text-transform:var(--title-transform)] [letter-spacing:var(--title-tracking)]"
+
 function DialogTitle({
   className,
   ...props
@@ -144,7 +149,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-lg leading-none font-semibold [text-transform:var(--title-transform)] [letter-spacing:var(--title-tracking)]", className)}
+      className={cn(dialogTitleClassName, className)}
       {...props}
     />
   )
@@ -174,4 +179,5 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  dialogTitleClassName,
 }

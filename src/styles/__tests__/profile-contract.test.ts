@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 /**
@@ -270,15 +270,18 @@ function readCss(name: string): string {
   return readFileSync(resolve(STYLES_DIR, name), 'utf8');
 }
 
-/** 每次返回一份全新对象，保证各变异 test 互不污染。 */
+/**
+ * 每次返回一份全新对象，保证各变异 test 互不污染。
+ * files 键集直接 readdirSync 扫 src/styles/ 得到（tokens.<flavor>.css + tokens.base.css），
+ * 这是 M4「文件系统双向绑定」文件系统侧的真实来源——孤儿文件臂靠真实目录发现，
+ * 不靠作者手记清单（硬编码清单只会漏抓忘写进列表的新 tokens 文件，自相矛盾）。
+ */
 function realFiles(): Record<string, string> {
-  return {
-    'tokens.base.css': readCss('tokens.base.css'),
-    'tokens.feishu.css': readCss('tokens.feishu.css'),
-    'tokens.claude.css': readCss('tokens.claude.css'),
-    'tokens.shadcn.css': readCss('tokens.shadcn.css'),
-    'tokens.sera.css': readCss('tokens.sera.css'),
-  };
+  const files: Record<string, string> = {};
+  for (const name of readdirSync(STYLES_DIR)) {
+    if (/^tokens\.[a-z]+\.css$/.test(name)) files[name] = readCss(name);
+  }
+  return files;
 }
 
 /** 读真文件 + 对某个 key 做字符串替换注入，返回全新 files 对象。 */

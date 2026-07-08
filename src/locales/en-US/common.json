@@ -219,9 +219,10 @@
       "dialogCancel": "Cancel",
       "dialogConfirm": "Confirm removal",
       "labelMatrix": "Label typography and peer exemption",
-      "labelMatrixDesc": "Label typography follows the --label-* hooks; labels next to a checkbox/switch use the peer exemption (narrowed: only transform+tracking are reset). No visual difference across flavors today; sera batch 2 delivers it.",
+      "labelMatrixDesc": "Label typography follows the --label-* hooks; labels next to a checkbox/radio/switch use the peer exemption (narrowed: only transform+tracking are reset). No visual difference across flavors today; sera batch 2 delivers it.",
       "labelStandalone": "Standalone field label",
       "labelCheckbox": "Receive email notifications",
+      "labelRadio": "Default workspace",
       "labelSwitch": "Enable two-factor auth"
     }
   },

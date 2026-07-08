@@ -219,9 +219,10 @@
       "dialogCancel": "取消",
       "dialogConfirm": "确认删除",
       "labelMatrix": "标签排印与 peer 豁免",
-      "labelMatrixDesc": "Label 排印走 --label-* 挂点；挨 checkbox/switch 的 label 走 peer 豁免（收窄版，只撤 transform+tracking），三 flavor 当前均无视觉差异，sera 批2 兑现。",
+      "labelMatrixDesc": "Label 排印走 --label-* 挂点；挨 checkbox/radio/switch 的 label 走 peer 豁免（收窄版，只撤 transform+tracking），三 flavor 当前均无视觉差异，sera 批2 兑现。",
       "labelStandalone": "独立字段标签",
       "labelCheckbox": "接收邮件通知",
+      "labelRadio": "默认工作区",
       "labelSwitch": "启用双因子认证"
     }
   },

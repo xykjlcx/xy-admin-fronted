@@ -20,6 +20,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { dialogTitleClassName } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -386,8 +387,9 @@ function ThemeStatesRoute() {
           <p className="text-sm text-text-2">{t('dev.themeStates.dialogMatrixDesc')}</p>
         </div>
         {/* Dialog 组件必须 portal + open 才渲染 DialogTitle（radix useDialogContext 无 provider 会抛错），
-            portal 到 body 又会脱离本 section 打断矩阵截图——照 step8 弹层块先例静态内嵌 raw 预览，
-            dialog-title 元素带与真实 DialogTitle 逐字节相同的 --title-* 排印类，作 title token 束的可截图载体。 */}
+            portal 到 body 又会脱离本 section 打断矩阵截图——照 step8 弹层块先例静态内嵌 raw 预览。
+            dialog-title 元素的排印类 import dialog.tsx 导出的 dialogTitleClassName 单一真相源，
+            与真实 DialogTitle 共用同一常量（防漂移），作 title token 束的可截图载体。 */}
         <div className="grid gap-4 md:grid-cols-2">
           <div
             data-slot="dialog-content"
@@ -396,7 +398,7 @@ function ThemeStatesRoute() {
             <div className="flex flex-col gap-2">
               <div
                 data-slot="dialog-title"
-                className="text-lg leading-none font-semibold [text-transform:var(--title-transform)] [letter-spacing:var(--title-tracking)]"
+                className={dialogTitleClassName}
               >
                 {t('dev.themeStates.dialogTitle')}
               </div>
@@ -417,10 +419,11 @@ function ThemeStatesRoute() {
           <h2 className="text-base font-semibold text-text">{t('dev.themeStates.labelMatrix')}</h2>
           <p className="text-sm text-text-2">{t('dev.themeStates.labelMatrixDesc')}</p>
         </div>
-        {/* peer 豁免的验证载体：peer 元素（checkbox/switch）须带 .peer 类且是 Label 的前置兄弟，
-            豁免规则 .peer[data-slot=checkbox] ~ label 才能命中。switch 根自带 peer；checkbox 外层 span
-            的 peer 在内层 input 上，故显式补 className="peer" 让外层（带 data-slot=checkbox）成为 peer 锚点。 */}
-        <div className="grid gap-4 md:grid-cols-3">
+        {/* peer 豁免的验证载体：peer 元素（checkbox/radio-group-item/switch）须带 .peer 类且是 Label 的前置兄弟，
+            豁免规则 .peer[data-slot=checkbox] ~ label 才能命中。switch 根 / RadioGroupItem 自带 peer；checkbox 外层 span
+            的 peer 在内层 input 上，故显式补 className="peer" 让外层（带 data-slot=checkbox）成为 peer 锚点。
+            radio：RadioGroupItem 自带 peer + data-slot=radio-group-item，与 Label 同为 RadioGroup 直接子级（前置兄弟）才命中豁免。 */}
+        <div className="grid gap-4 md:grid-cols-4">
           <div className="flex flex-col gap-2 rounded-md border border-border bg-surface-2 p-4">
             <p className="text-sm font-medium text-text">{t('dev.themeStates.labelStandalone')}</p>
             <Label htmlFor="theme-label-standalone">{t('dev.themeStates.labelStandalone')}</Label>
@@ -432,6 +435,13 @@ function ThemeStatesRoute() {
               <Checkbox className="peer" aria-label={t('dev.themeStates.labelCheckbox')} checked readOnly />
               <Label>{t('dev.themeStates.labelCheckbox')}</Label>
             </div>
+          </div>
+          <div className="flex flex-col gap-2 rounded-md border border-border bg-surface-2 p-4">
+            <p className="text-sm font-medium text-text">{t('dev.themeStates.labelRadio')}</p>
+            <RadioGroup defaultValue="on" className="flex items-center gap-2">
+              <RadioGroupItem value="on" aria-label={t('dev.themeStates.labelRadio')} />
+              <Label>{t('dev.themeStates.labelRadio')}</Label>
+            </RadioGroup>
           </div>
           <div className="flex flex-col gap-2 rounded-md border border-border bg-surface-2 p-4">
             <p className="text-sm font-medium text-text">{t('dev.themeStates.labelSwitch')}</p>
