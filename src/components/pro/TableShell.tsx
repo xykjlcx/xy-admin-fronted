@@ -66,7 +66,7 @@ export function TableShellHeader({ gridTemplateColumns, children, className, sty
   return (
     <div
       className={cn(
-        'grid h-11 items-center bg-(--table-header-bg) px-2 text-[calc(13px*var(--app-scale))] font-medium text-(--table-header-fg)',
+        'grid h-(--table-header-h) items-center bg-(--table-header-bg) px-(--table-cell-px) text-[calc(13px*var(--app-scale))] font-medium text-(--table-header-fg)',
         className,
       )}
       style={withGridTemplate(gridTemplateColumns, style)}
@@ -81,7 +81,7 @@ export function TableShellRow({ gridTemplateColumns, children, className, style,
   return (
     <div
       className={cn(
-        'ui-table-row grid h-14 items-center border-t border-(--table-border) px-2',
+        'ui-table-row grid h-(--table-row-h) items-center border-t border-(--table-border) px-(--table-cell-px)',
         className,
       )}
       style={withGridTemplate(gridTemplateColumns, style)}
@@ -104,11 +104,11 @@ export function TableShellLoadingRows({
         <div
           key={rowIndex}
           data-testid="table-loading-row"
-          className="grid h-14 items-center border-t border-(--table-border) px-2"
+          className="grid h-(--table-row-h) items-center border-t border-(--table-border) px-(--table-cell-px)"
           style={{ gridTemplateColumns }}
         >
           {Array.from({ length: cells }).map((__, cellIndex) => (
-            <div key={cellIndex} className="px-2">
+            <div key={cellIndex} className="px-(--table-cell-px)">
               <Skeleton
                 className={cn(
                   'h-3',

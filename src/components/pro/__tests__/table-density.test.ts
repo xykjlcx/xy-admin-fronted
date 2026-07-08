@@ -22,4 +22,18 @@ describe('table 密度：行高与内距走 --table-* token', () => {
     const src = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
     expect(src).not.toMatch(/py-\[calc\(12\.5px/);
   });
+
+  test('TableShell.tsx 消费 --table-header-h / --table-row-h / --table-cell-px', () => {
+    const src = readFileSync('src/components/pro/TableShell.tsx', 'utf8');
+    expect(src).toContain('h-(--table-header-h)');
+    expect(src).toContain('h-(--table-row-h)');
+    expect(src).toContain('px-(--table-cell-px)');
+  });
+
+  test('TableShell.tsx 无残留硬编码 h-11 / h-14 / px-2', () => {
+    const src = readFileSync('src/components/pro/TableShell.tsx', 'utf8');
+    expect(src).not.toMatch(/\bh-11\b/);
+    expect(src).not.toMatch(/\bh-14\b/);
+    expect(src).not.toMatch(/px-2(?![\d.])/);
+  });
 });
