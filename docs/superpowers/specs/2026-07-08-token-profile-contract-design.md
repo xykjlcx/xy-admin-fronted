@@ -111,8 +111,9 @@ html:not([data-radius])[data-flavor='X']
 | 1 | 删 feishu dark 的 `--bg` | M2 | ✅ |
 | 2 | 删 shadcn 整个 dark 颜色块 | M1 | ✅(等价变异:块选择器改名) |
 | 3 | 删 claude 的 radius-factor 行 | M3 | 待实施 |
-| 4 | FLAVORS 删 'shadcn'(文件成孤儿) | M4 正向 | ✅ |
-| 5 | 新增 tokens.sera.css 但 FLAVORS 未注册 | M4 反向 | 待实施 |
+| 4 | FLAVORS 删 'shadcn'(文件成孤儿) | M4 文件未注册臂 | ✅ |
+| 5 | 新增 tokens.sera.css 但 FLAVORS 未注册 | M4 文件未注册臂(注入向) | ✅ |
+| 12 | FLAVORS 注册 sera 但文件不存在 | M4 缺文件臂(S5 逆场景) | ✅(验收时补,初稿表将 5 误标"反向"——4/5 实为同臂) |
 | 6 | claude 文件加 base 没有的 `--fake-token` | R1 | ✅ |
 | 7 | shadcn 文件写 `[data-flavor='claude']` 块 | R2 | ✅ |
 | 8 | base 加 `[data-flavor='claude']` 块 | R3 | ✅ |

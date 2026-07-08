@@ -338,12 +338,21 @@ describe('profile-contract 红灯组（§4 变异表 11 条）', () => {
     expect(hasRule(v, 'M4:')).toBe(true);
   });
 
-  test('变异5：新增 tokens.sera.css 但 FLAVORS 未注册 → M4 反向', () => {
+  test('变异5：新增 tokens.sera.css 但 FLAVORS 未注册 → M4（文件未注册臂）', () => {
     const files = realFiles();
     // sera 内容自身结构合规（token 在 base、选择器合法），只是没进 FLAVORS，故仅 M4 报红。
     files['tokens.sera.css'] = "[data-flavor='sera'][data-mode='light'] { --bg: #ffffff; }";
     const v = runContract(files);
     expect(hasRule(v, 'M4:')).toBe(true);
+  });
+
+  test('变异12：FLAVORS 注册 sera 但文件不存在 → M4（缺文件臂）', () => {
+    // S5 逆场景红灯：先注册后建文件时，中间态必须被拦（M1 也会红——检查域退化到 base 找不到 sera 块）。
+    const v = runContract(realFiles(), {
+      ...DEFAULT_CONFIG,
+      flavors: ['feishu', 'claude', 'shadcn', 'sera'],
+    });
+    expect(v).toContain('M4:sera 已注册但缺 tokens.sera.css 文件');
   });
 
   test('变异6：claude 文件加 base 没有的 --fake-token → R1', () => {
