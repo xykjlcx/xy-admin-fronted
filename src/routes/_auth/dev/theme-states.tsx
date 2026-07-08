@@ -9,6 +9,7 @@ import { useAppearance } from '@/stores/appearance';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -79,6 +80,16 @@ const buttonVariantLabelKeys: Record<(typeof buttonVariantsForThemeStates)[numbe
   danger: 'dev.themeStates.buttonDanger',
   destructive: 'dev.themeStates.buttonDestructive',
   'danger-ghost': 'dev.themeStates.buttonDangerGhost',
+};
+const badgeVariantsForThemeStates = ['neutral', 'primary', 'success', 'warning', 'danger', 'purple', 'teal'] as const;
+const badgeVariantLabelKeys: Record<(typeof badgeVariantsForThemeStates)[number], string> = {
+  neutral: 'dev.themeStates.badgeNeutral',
+  primary: 'dev.themeStates.badgePrimary',
+  success: 'dev.themeStates.badgeSuccess',
+  warning: 'dev.themeStates.badgeWarning',
+  danger: 'dev.themeStates.badgeDanger',
+  purple: 'dev.themeStates.badgePurple',
+  teal: 'dev.themeStates.badgeTeal',
 };
 const step7GridTemplate = '1.2fr 1fr calc(120px * var(--app-scale))';
 const tableTokenRows = ['selected', 'normal', 'expanded'] as const;
@@ -302,6 +313,35 @@ function ThemeStatesRoute() {
           <Button variant="ghost" size="icon" aria-label={t('dev.themeStates.buttonIcon')}>
             <span data-icon="theme-states" className="font-semibold">i</span>
           </Button>
+        </div>
+      </section>
+
+      <section data-testid="badgeMatrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.badgeMatrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.badgeMatrixDesc')}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-md border border-border bg-surface-2 p-4">
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.badgeNoDot')}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {badgeVariantsForThemeStates.map((variant) => (
+                <Badge key={variant} variant={variant}>
+                  {t(badgeVariantLabelKeys[variant])}
+                </Badge>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-md border border-border bg-surface-2 p-4">
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.badgeWithDot')}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {badgeVariantsForThemeStates.map((variant) => (
+                <Badge key={variant} variant={variant} dot dotTestId={`badge-dot-${variant}`}>
+                  {t(badgeVariantLabelKeys[variant])}
+                </Badge>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

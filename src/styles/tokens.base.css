@@ -142,6 +142,13 @@
   --table-cell-px: var(--field-px);
   --table-row-h: calc(44px * var(--app-scale));
   --table-header-h: calc(48px * var(--app-scale));
+  /* Badge 几何/排印（挂点，值=现状，零视觉变化）。radius 走 --radius-5、px/py = 现状 px-2/py-0.5、
+     字号 text-xs、字重 medium 500；三 flavor 全同，随 --app-scale 缩放。sera(S5) 才兑现型差异。 */
+  --badge-radius: var(--radius-5);
+  --badge-px: calc(8px * var(--app-scale));
+  --badge-py: calc(2px * var(--app-scale));
+  --badge-font-size: var(--text-xs);
+  --badge-font-weight: 500;
   --accent-emphasis: var(--pri);
   --accent-emphasis-soft: var(--fill-selected);
   --pro-page-bg: var(--bg);

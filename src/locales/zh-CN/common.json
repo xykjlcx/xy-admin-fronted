@@ -193,7 +193,18 @@
       "paginationRefreshing": "刷新中",
       "paginationPrev": "上一页",
       "paginationNext": "下一页",
-      "paginationCurrent": "当前第 2 页"
+      "paginationCurrent": "当前第 2 页",
+      "badgeMatrix": "徽章",
+      "badgeMatrixDesc": "7 个语义色徽章，分别展示带圆点与不带圆点两种；几何与排印走 --badge-* 挂点，三 flavor 统一。",
+      "badgeNoDot": "无圆点",
+      "badgeWithDot": "带圆点",
+      "badgeNeutral": "中性",
+      "badgePrimary": "主色",
+      "badgeSuccess": "成功",
+      "badgeWarning": "警告",
+      "badgeDanger": "危险",
+      "badgePurple": "紫色",
+      "badgeTeal": "青色"
     }
   },
   "shell": {

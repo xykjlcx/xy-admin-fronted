@@ -193,7 +193,18 @@
       "paginationRefreshing": "Refreshing",
       "paginationPrev": "Previous page",
       "paginationNext": "Next page",
-      "paginationCurrent": "Current page 2"
+      "paginationCurrent": "Current page 2",
+      "badgeMatrix": "Badge",
+      "badgeMatrixDesc": "Seven semantic variants shown with and without the status dot; geometry and typography are token-driven and uniform across flavors.",
+      "badgeNoDot": "Without dot",
+      "badgeWithDot": "With dot",
+      "badgeNeutral": "Neutral",
+      "badgePrimary": "Primary",
+      "badgeSuccess": "Success",
+      "badgeWarning": "Warning",
+      "badgeDanger": "Danger",
+      "badgePurple": "Purple",
+      "badgeTeal": "Teal"
     }
   },
   "shell": {

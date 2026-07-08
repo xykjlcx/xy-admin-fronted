@@ -131,6 +131,12 @@ const MUST_CONTAIN = [
   '--table-cell-px: var(--field-px);',
   '--table-row-h: calc(44px * var(--app-scale));',
   '--table-header-h: calc(48px * var(--app-scale));',
+  // Badge 几何/排印挂点（S3，值=现状，零视觉变化）：radius/px/py/font-size/font-weight
+  '--badge-radius: var(--radius-5);',
+  '--badge-px: calc(8px * var(--app-scale));',
+  '--badge-py: calc(2px * var(--app-scale));',
+  '--badge-font-size: var(--text-xs);',
+  '--badge-font-weight: 500;',
 ];
 test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain(t));
 

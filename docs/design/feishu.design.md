@@ -108,6 +108,9 @@ components:
   sidebar:
     backgroundColor: "{colors.sidebar}"
     textColor: "{colors.body}"
+  badge:
+    rounded: 5px
+    padding: 2px 8px
 ---
 
 ## Overview
@@ -176,6 +179,7 @@ divider N900@15%。主蓝保留 admin 实测 `#3370FF`（主应用当代蓝 `#14
 - **`select-option-highlighted`**：`{colors.primary-soft}` 浅蓝底 + `{colors.primary}` 蓝字。
 - **`nav-item-current`**：同 option 选中语义（浅蓝底 + 蓝字）。
 - **`table-header`**：**透明底**（不是灰底表头）、`{colors.ink}` 文字、字重 400。
+- **`badge`**：5px 圆角（走 `--radius-5`）、内距 2px/8px、12px 字号、medium 500 字重；7 语义色（neutral/primary/success/warning/danger/purple/teal）各走软底 + 前景，几何/排印三 flavor 统一（挂点 `--badge-*`）。原型无 badge，值 = 脚手架现状；官方 registry 对照见 `research/registry-badge-card-values.md`。
 
 ## Do's and Don'ts
 
