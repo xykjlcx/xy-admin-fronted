@@ -160,6 +160,7 @@ accent 默认 = shadcn 中性黑；差异化不靠颜色，靠几何 / 排印。
 - **`text-input`**：**透明底** + 仅底边 `{colors.hairline}` 线、40px 高、直角（无圆角）。
   聚焦 `text-input-focused` 只把底边变主色（`--field-border-focus` = primary），**无 ring**；
   校验错误只把底边变红（`aria-invalid` → `border-b-destructive`），**红 ring 关闭**（`--field-ring-invalid: transparent`）。
+  **disabled/readonly 同为透明底**（`--field-bg-disabled/--field-bg-readonly: transparent`）——base 默认灰块在无底输入族里会呈"假四边框"（2026-07-08 菜单弹窗实测）；不可用态区分靠文字降级 + cursor。
 - **`button-primary`**：墨黑底 + `{colors.on-primary}` 字、40px 高、直角、`uppercase` + `0.1em` 字距、无阴影。
 - **`button-secondary` / `button-outline`**：surface-muted / canvas 底、`{colors.ink}` 字，其余同 primary 几何。
 - **`table-header`**：canvas 底 + `{colors.muted}` 小号文字、48px 高、`uppercase` + `0.05em` 字距。

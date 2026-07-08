@@ -24,6 +24,10 @@
      对抗审 V2）。--field-border-focus / --field-ring-focus 用 base 默认（pri 底边 / 无 ring，D4 天然工作）。 */
   --field-bg: transparent;
   --field-bg-focus: transparent;
+  /* disabled/readonly 同为透明底：base 默认 var(--surface-2) 灰块在 sera 的无底输入族里
+     会呈现"假四边框"（灰块边缘），实测踩过（0708 菜单弹窗 disabled 控件）。区分度靠文字降级 + cursor。 */
+  --field-bg-disabled: transparent;
+  --field-bg-readonly: transparent;
   --field-border: var(--border);
   --field-ring-invalid: transparent;
   /* 几何（量）：直角起步的疏朗版式。 */

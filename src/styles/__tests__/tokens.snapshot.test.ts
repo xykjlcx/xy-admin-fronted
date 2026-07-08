@@ -340,6 +340,9 @@ test('sera 第四风格 profile 落地：直角/大写/下划线关键值', () =
   expect(css).toContain('--badge-font-size: calc(10px * var(--app-scale));');
   expect(css).toContain('--badge-font-weight: 600;');
   expect(css).toContain('--focus-ring: calc(2px * var(--app-scale));');
+  // 输入族全态透明底：disabled/readonly 不覆盖会回落 base 灰块，在无底输入族里呈"假四边框"（0708 实测）
+  expect(css).toContain('--field-bg-disabled: transparent;');
+  expect(css).toContain('--field-bg-readonly: transparent;');
   // 排印（型）：uppercase + tracking em 原值（不乘 --app-scale）
   expect(css).toContain('--button-transform: uppercase;');
   expect(css).toContain('--button-tracking: 0.1em;');
