@@ -59,7 +59,6 @@ export interface DataTableProps<T> {
   rowState?: (row: T) => 'selected' | undefined;
 }
 
-const bodyCellClassName = 'py-[calc(12.5px*var(--app-scale))]';
 const emptyRowSelection: RowSelectionState = {};
 const rowSelectionColumnId = '__row_selection__';
 const checkboxCellContentClassName = 'flex items-center justify-center leading-none';
@@ -197,7 +196,7 @@ export function DataTable<T>({
                       return (
                         <TableCell
                           key={cell.id}
-                          className={cn(alignClass(cell.column.columnDef.meta?.align), bodyCellClassName)}
+                          className={alignClass(cell.column.columnDef.meta?.align)}
                           onClick={stopRowClick ? (event) => event.stopPropagation() : undefined}
                         >
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}

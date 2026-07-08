@@ -166,7 +166,7 @@ test('DataTable selection column uses ordinary cells and does not trigger row cl
   expect(firstRowCheckbox?.closest('[data-slot="checkbox"]')).toHaveClass(
     'size-[calc(18px*var(--app-scale))]',
   );
-  expect(firstNameCell).toHaveClass('px-3');
+  expect(firstNameCell).toHaveClass('px-(--table-cell-px)');
   expect(firstNameCell).not.toHaveClass('p-0');
 
   await userEvent.click(firstRowCheckbox!);

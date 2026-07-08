@@ -70,7 +70,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        'h-11 px-3 text-left align-middle text-[calc(13px*var(--app-scale))] font-medium whitespace-nowrap text-(--table-header-fg)',
+        'h-(--table-header-h) px-(--table-cell-px) text-left align-middle text-[calc(13px*var(--app-scale))] font-medium whitespace-nowrap text-(--table-header-fg)',
         className,
       )}
       {...props}
@@ -83,7 +83,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        'px-3 py-[calc(10px*var(--app-scale))] align-middle whitespace-nowrap',
+        'h-(--table-row-h) px-(--table-cell-px) align-middle whitespace-nowrap',
         className,
       )}
       {...props}
