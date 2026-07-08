@@ -204,7 +204,14 @@
       "badgeWarning": "警告",
       "badgeDanger": "危险",
       "badgePurple": "紫色",
-      "badgeTeal": "青色"
+      "badgeTeal": "青色",
+      "cardMatrix": "卡片",
+      "cardMatrixDesc": "Card 全结构（Header/Title/Description/Action/Content/Footer）演示；几何走 --card-* 挂点，三 flavor 统一。",
+      "cardTitle": "卡片标题",
+      "cardDescription": "卡片描述文案，走次级文字色。",
+      "cardActionBadge": "操作位",
+      "cardContent": "卡片正文区，内距与圆角走 --card-spacing / --card-radius 挂点。",
+      "cardFooter": "卡片页脚区"
     }
   },
   "shell": {

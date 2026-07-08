@@ -137,6 +137,10 @@ const MUST_CONTAIN = [
   '--badge-py: calc(2px * var(--app-scale));',
   '--badge-font-size: var(--text-xs);',
   '--badge-font-weight: 500;',
+  // Card 几何挂点（S4，值=统一档，零视觉变化）：spacing/radius/shadow
+  '--card-spacing: calc(24px * var(--app-scale));',
+  '--card-radius: var(--radius-12);',
+  '--card-shadow: var(--shadow-card);',
 ];
 test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain(t));
 
@@ -533,6 +537,11 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
 test('主题状态页暴露 Badge 可截图矩阵（S3 挂点验收载体，防误删）', () => {
   expect(themeStatesSource).toContain('badgeVariantsForThemeStates');
   expect(themeStatesSource).toContain("import { Badge } from '@/components/ui/badge'");
+});
+
+test('主题状态页暴露 Card 可截图矩阵（S4 挂点验收载体，防误删）', () => {
+  expect(themeStatesSource).toContain('data-testid="cardMatrix"');
+  expect(themeStatesSource).toContain("from '@/components/ui/card'");
 });
 
 test('主题状态页暴露 Overlay / Option / Menu 可截图矩阵', () => {

@@ -10,6 +10,15 @@ import { NativeSelect } from '@/components/ui/native-select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -342,6 +351,30 @@ function ThemeStatesRoute() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section data-testid="cardMatrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.cardMatrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.cardMatrixDesc')}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card data-testid="card-full">
+            <CardHeader>
+              <CardTitle>{t('dev.themeStates.cardTitle')}</CardTitle>
+              <CardDescription>{t('dev.themeStates.cardDescription')}</CardDescription>
+              <CardAction>
+                <Badge variant="primary">{t('dev.themeStates.cardActionBadge')}</Badge>
+              </CardAction>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-text-2">{t('dev.themeStates.cardContent')}</p>
+            </CardContent>
+            <CardFooter className="border-t">
+              <span className="text-sm text-text-3">{t('dev.themeStates.cardFooter')}</span>
+            </CardFooter>
+          </Card>
         </div>
       </section>
 

@@ -149,6 +149,12 @@
   --badge-py: calc(2px * var(--app-scale));
   --badge-font-size: var(--text-xs);
   --badge-font-weight: 500;
+  /* Card 几何（挂点，值=统一档，零视觉变化）。spacing 24（=现状主流 p-6；dashboard p-5 属散写不齐，不追随）、
+     radius 走 --radius-12、shadow 走 --shadow-card；三 flavor 全同，spacing 随 --app-scale 缩放。
+     flavor 档差（claude 宽松 / sera 32+shadow-sm）S5 sera 激活。 */
+  --card-spacing: calc(24px * var(--app-scale));
+  --card-radius: var(--radius-12);
+  --card-shadow: var(--shadow-card);
   --accent-emphasis: var(--pri);
   --accent-emphasis-soft: var(--fill-selected);
   --pro-page-bg: var(--bg);

@@ -204,7 +204,14 @@
       "badgeWarning": "Warning",
       "badgeDanger": "Danger",
       "badgePurple": "Purple",
-      "badgeTeal": "Teal"
+      "badgeTeal": "Teal",
+      "cardMatrix": "Card",
+      "cardMatrixDesc": "Full Card structure (Header/Title/Description/Action/Content/Footer); geometry is token-driven and uniform across flavors.",
+      "cardTitle": "Card title",
+      "cardDescription": "Card description copy rendered in the secondary text color.",
+      "cardActionBadge": "Action",
+      "cardContent": "Card body region; padding and radius follow the --card-spacing / --card-radius hooks.",
+      "cardFooter": "Card footer region"
     }
   },
   "shell": {

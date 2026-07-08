@@ -111,6 +111,9 @@ components:
   badge:
     rounded: 5px
     padding: 2px 8px
+  card:
+    rounded: 12px
+    padding: 24px
 ---
 
 ## Overview
@@ -180,6 +183,7 @@ divider N900@15%。主蓝保留 admin 实测 `#3370FF`（主应用当代蓝 `#14
 - **`nav-item-current`**：同 option 选中语义（浅蓝底 + 蓝字）。
 - **`table-header`**：**透明底**（不是灰底表头）、`{colors.ink}` 文字、字重 400。
 - **`badge`**：5px 圆角（走 `--radius-5`）、内距 2px/8px、12px 字号、medium 500 字重；7 语义色（neutral/primary/success/warning/danger/purple/teal）各走软底 + 前景，几何/排印三 flavor 统一（挂点 `--badge-*`）。原型无 badge，值 = 脚手架现状；官方 registry 对照见 `research/registry-badge-card-values.md`。
+- **`card`**：12px 圆角（走 `--radius-12`）、内距 24px（=现状主流 p-6）、`--shadow-card` 投影；`border` + surface 底，标题走页面卡片惯例（text-base/semibold）；几何走挂点 `--card-*` 三 flavor 统一。dashboard 现存 p-5/p-6 为散写遗留，纵切迁移时收敛到 `--card-spacing`；flavor 档差（claude 宽松 / sera 32+shadow-sm）S5 激活。官方 registry 对照见 `research/registry-badge-card-values.md`。
 
 ## Do's and Don'ts
 
