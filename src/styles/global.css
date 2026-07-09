@@ -236,7 +236,7 @@
     --table-shell-border: transparent;
     --table-row-border: color-mix(in srgb, var(--table-border) 72%, transparent);
     --tabs-line-border: color-mix(in srgb, var(--border) 70%, transparent);
-    --page-tabs-px: calc(18px * var(--app-scale));
+    --page-tabs-px: var(--page-side-px);
     --page-tabs-pt: calc(12px * var(--app-scale));
     --page-tabs-gap: calc(24px * var(--app-scale));
     --page-scene-px: calc(18px * var(--app-scale));

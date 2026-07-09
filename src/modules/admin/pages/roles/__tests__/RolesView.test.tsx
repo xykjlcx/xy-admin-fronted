@@ -130,6 +130,8 @@ test('业务角色页固定页面高度，只让 Tabs 下方内容区滚动', ()
   expect(workspace).toHaveClass('overflow-hidden');
   expect(detailShell).toBeInTheDocument();
   expect(detailShell).toHaveClass('overflow-hidden');
+  expect(detailShell).toHaveClass('border-l');
+  expect(detailShell).toHaveClass('border-(--page-section-divider)');
   expect(contentScroll).toBeInTheDocument();
   expect(contentScroll).toHaveClass('min-h-0');
   expect(contentScroll).toHaveClass('overflow-y-auto');

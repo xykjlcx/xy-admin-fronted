@@ -69,6 +69,7 @@ test('members scene owns controlled row selection and clears it with search chan
   const sceneSource = readFileSync('src/modules/admin/users/list/MembersScene.tsx', 'utf8');
   const tableSource = readFileSync('src/modules/admin/users/list/MembersTable.tsx', 'utf8');
 
+  expect(sceneSource).toContain('border-l border-(--page-section-divider)');
   expect(sceneSource).toContain('useState<RowSelectionState>({})');
   expect(sceneSource).toContain('handleRowSelectionChange');
   expect(sceneSource).toContain(
@@ -135,6 +136,7 @@ test('department scene uses department-specific empty and loading labels', () =>
   const zh = readFileSync('src/locales/zh-CN/admin.json', 'utf8');
   const en = readFileSync('src/locales/en-US/admin.json', 'utf8');
 
+  expect(source).toContain('border-l border-(--page-section-divider)');
   expect(source).toContain("t('users.deptList.empty')");
   expect(source).toContain("t('users.deptList.loading')");
   expect(zh).toContain('"empty": "暂无部门"');

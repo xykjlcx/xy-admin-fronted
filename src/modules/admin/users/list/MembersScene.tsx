@@ -70,7 +70,7 @@ export function MembersScene({
           onSelect={(deptId) => handleSearchChange({ deptId, page: 1 })}
         />
 
-        <main className="flex min-w-0 flex-1 flex-col px-(--page-scene-px) py-(--page-scene-py)">
+        <main className="flex min-w-0 flex-1 flex-col border-l border-(--page-section-divider) px-(--page-scene-px) py-(--page-scene-py)">
           <MembersTable
             variant={variant}
             permissions={permissions}

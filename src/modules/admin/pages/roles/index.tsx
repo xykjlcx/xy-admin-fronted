@@ -189,7 +189,7 @@ export function RolesView({
             />
             <main
               data-role-detail-shell
-              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-7 py-[calc(22px*var(--app-scale))]"
+              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-l border-(--page-section-divider) px-7 py-[calc(22px*var(--app-scale))]"
             >
               <RoleDetailsPanel
                 activeRole={activeRole}

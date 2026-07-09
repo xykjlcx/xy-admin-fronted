@@ -8,6 +8,7 @@ import {
   createRouter,
 } from '@tanstack/react-router';
 import { act, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeAll, afterEach } from 'vitest';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { PageFrame, PageSurface } from '@/components/pro/PageScaffold';
@@ -28,9 +29,9 @@ afterEach(() => {
   });
 });
 
-function renderShellWithInsetLayout() {
+function renderShellWithInsetLayout({ collapsed = false }: { collapsed?: boolean } = {}) {
   act(() => {
-    useAppearance.setState({ layout: 'inset', collapsed: { inset: false } });
+    useAppearance.setState({ layout: 'inset', collapsed: { inset: collapsed } });
   });
 
   const queryClient = new QueryClient({
@@ -95,4 +96,22 @@ test('Inset 布局把全局动作和用户入口放在侧栏底部', async () =>
   expect(within(footer).getByRole('button', { name: '消息通知' })).toBeInTheDocument();
   expect(within(footer).getByRole('button', { name: '外观设置' })).toBeInTheDocument();
   expect(within(footer).getByText('测试用户')).toBeInTheDocument();
+});
+
+test('Inset 折叠侧栏把全局动作收进单个快捷入口', async () => {
+  renderShellWithInsetLayout({ collapsed: true });
+
+  expect(await screen.findByText('Users content')).toBeInTheDocument();
+  const footer = await screen.findByTestId('inset-sidebar-footer');
+
+  expect(within(footer).getByRole('button', { name: '快捷操作' })).toBeInTheDocument();
+  expect(within(footer).queryByRole('button', { name: '消息通知' })).not.toBeInTheDocument();
+  expect(within(footer).queryByRole('button', { name: '外观设置' })).not.toBeInTheDocument();
+
+  await userEvent.click(within(footer).getByRole('button', { name: '快捷操作' }));
+
+  expect(await screen.findByRole('button', { name: '消息通知' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '外观设置' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '深色模式' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '语言 / Language' })).toBeInTheDocument();
 });

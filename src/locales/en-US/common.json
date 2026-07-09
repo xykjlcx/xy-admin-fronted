@@ -245,6 +245,7 @@
     },
     "notification": "Notifications",
     "appearance": "Appearance",
+    "quickActions": "Quick actions",
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "language": "Language",

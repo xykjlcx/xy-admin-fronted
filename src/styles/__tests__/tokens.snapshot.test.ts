@@ -45,6 +45,7 @@ const membersSceneSource = readFileSync('src/modules/admin/users/list/MembersSce
 const deptSceneSource = readFileSync('src/modules/admin/users/list/DeptScene.tsx', 'utf8');
 const deptTreeSource = readFileSync('src/modules/admin/users/list/DeptTree.tsx', 'utf8');
 const usersModelSource = readFileSync('src/modules/admin/users/model.ts', 'utf8');
+const rolesPageSource = readFileSync('src/modules/admin/pages/roles/index.tsx', 'utf8');
 const roleListPanelSource = readFileSync('src/modules/admin/pages/roles/RoleListPanel.tsx', 'utf8');
 const rolesModelSource = readFileSync('src/modules/admin/pages/roles/model.ts', 'utf8');
 const roleDetailsPanelSource = readFileSync('src/modules/admin/pages/roles/RoleDetailsPanel.tsx', 'utf8');
@@ -1026,7 +1027,7 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(globalCss).toContain('--page-breadcrumb-mb: calc(12px * var(--app-scale));');
   expect(globalCss).toContain('--page-surface-flex: 1 1 auto;');
   expect(globalCss).toContain('--page-surface-min-h: 0px;');
-  expect(globalCss).toContain('--page-tabs-px: calc(18px * var(--app-scale));');
+  expect(globalCss).toContain('--page-tabs-px: var(--page-side-px);');
   expect(globalCss).toContain('--page-tabs-pt: calc(12px * var(--app-scale));');
   expect(globalCss).toContain('--page-tabs-gap: calc(24px * var(--app-scale));');
   expect(globalCss).toContain('--page-scene-px: calc(18px * var(--app-scale));');
@@ -1047,6 +1048,9 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(dataTableSource).toContain('border-(--table-row-border)');
   expect(deptTreeSource).toContain('border-(--page-pane-divider)');
   expect(roleListPanelSource).toContain('border-(--page-pane-divider)');
+  expect(rolesPageSource).toContain('border-(--page-section-divider)');
+  expect(membersSceneSource).toContain('border-(--page-section-divider)');
+  expect(deptSceneSource).toContain('border-(--page-section-divider)');
   expect(menusPageSource).toContain('border-(--page-pane-divider)');
   expect(menusPageSource).toContain('border-(--page-section-divider)');
   expect(navMenuInsetSource).not.toContain("aria-label={t('shell.nav.collapse')}");

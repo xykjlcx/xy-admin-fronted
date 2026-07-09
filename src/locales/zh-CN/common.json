@@ -245,6 +245,7 @@
     },
     "notification": "消息通知",
     "appearance": "界面定制",
+    "quickActions": "快捷操作",
     "darkMode": "深色模式",
     "lightMode": "浅色模式",
     "language": "语言 / Language",
