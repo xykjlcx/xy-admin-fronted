@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
-import { ChevronsDown, ChevronsUp, Edit3, Grid2X2, Plus } from 'lucide-react';
+import { ChevronsDown, ChevronsUp, Edit3, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
@@ -72,6 +72,12 @@ const DEFAULT_SUBSYSTEM_ICON = 'layout-grid';
 const DEFAULT_SUBSYSTEM_COLOR = 'var(--accent-emphasis)';
 const DEFAULT_SUBSYSTEM_HOME = '/admin/dashboard';
 const subsystemKeyPattern = /^[a-z][a-z0-9-]*$/;
+
+const menuTypeToneClass: Record<MenuRecord['type'], string> = {
+  dir: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)',
+  menu: 'bg-success-soft text-success',
+  action: 'bg-warning-soft text-warning',
+};
 
 const subsystemIconOptions = [
   { value: 'layout-grid', labelKey: 'menus.iconOptions.default' },
@@ -305,9 +311,9 @@ function SubsystemFormDialog({
 
 function MenuInspectorRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="space-y-1">
+    <div className="rounded-10 bg-(--table-header-bg) px-3 py-2">
       <dt className="text-xs text-text-3">{label}</dt>
-      <dd className="truncate text-sm text-text">{value}</dd>
+      <dd className="mt-1 truncate text-sm text-text">{value}</dd>
     </div>
   );
 }
@@ -347,9 +353,9 @@ function MenuNodeInspector({
     return (
       <aside
         aria-label={t('menus.inspector.label')}
-        className="hidden w-[calc(286px*var(--app-scale))] shrink-0 flex-col border-l border-(--page-section-divider) px-5 py-5 2xl:flex"
+        className="hidden w-[calc(286px*var(--app-scale))] shrink-0 flex-col border-l border-(--page-section-divider) px-4 py-5 2xl:flex"
       >
-        <div className="text-base font-bold text-text">{t('menus.inspector.title')}</div>
+        <div className="text-sm font-semibold text-text">{t('menus.inspector.title')}</div>
         <p className="mt-2 text-sm leading-6 text-text-3">{t('menus.inspector.empty')}</p>
       </aside>
     );
@@ -357,32 +363,32 @@ function MenuNodeInspector({
 
   const name = menuLabel(menu, locale);
   const parentName = parent ? menuLabel(parent, locale) : t('menus.form.rootParent');
+  const typeTone = menuTypeToneClass[menu.type];
 
   return (
     <aside
       aria-label={t('menus.inspector.label')}
-      className="hidden w-[calc(286px*var(--app-scale))] shrink-0 flex-col border-l border-(--page-section-divider) px-5 py-5 2xl:flex"
+      className="hidden w-[calc(286px*var(--app-scale))] shrink-0 flex-col border-l border-(--page-section-divider) px-4 py-5 2xl:flex"
     >
       <div className="min-w-0">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-base font-bold text-text">{t('menus.inspector.title')}</div>
-            <div className="mt-3 flex min-w-0 items-center gap-2">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-10 bg-(--accent-emphasis-soft) text-(--accent-emphasis)">
+        <div className="rounded-12 bg-(--table-header-bg) p-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-10', typeTone)}>
                 <Icon name={menu.icon} className="size-4" />
               </span>
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold text-text">{name}</div>
-                <div className="truncate text-xs text-text-3">{menu.id}</div>
+                <div className="mt-0.5 truncate text-xs text-text-3">{menu.id}</div>
               </div>
             </div>
+            <span className={cn('inline-flex shrink-0 rounded-5 px-2 py-0.5 text-xs', typeTone)}>
+              {t(`menus.types.${menu.type}`)}
+            </span>
           </div>
-          <span className="inline-flex shrink-0 rounded-5 bg-(--table-header-bg) px-2 py-0.5 text-xs text-text-2">
-            {t(`menus.types.${menu.type}`)}
-          </span>
         </div>
 
-        <dl className="mt-5 space-y-4">
+        <dl className="mt-3 space-y-2">
           <MenuInspectorRow label={t('menus.columns.path')} value={menuValue(menu.path, emptyValue)} />
           <MenuInspectorRow label={t('menus.columns.permission')} value={menuValue(menu.permission, emptyValue)} />
           <MenuInspectorRow label={t('menus.form.parent')} value={parentName} />
@@ -405,21 +411,40 @@ function MenuNodeInspector({
           </div>
         </dl>
 
-        <div className="mt-5 grid gap-2">
+        <div className="mt-4 grid gap-2">
           {canUpdate && (
-            <Button type="button" size="sm" variant="outline" onClick={() => onEdit(menu)}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              aria-label={t('menus.actions.editName', { name })}
+              onClick={() => onEdit(menu)}
+            >
               <Edit3 data-icon="inline-start" />
               {t('menus.actions.edit')}
             </Button>
           )}
           {canCreate && menu.type !== 'action' && (
-            <Button type="button" size="sm" variant="outline" onClick={() => onAddChild(menu)}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              aria-label={t('menus.actions.addChildName', { name })}
+              onClick={() => onAddChild(menu)}
+            >
               <Plus data-icon="inline-start" />
               {t('menus.actions.addChild')}
             </Button>
           )}
           {canDelete && !hasChildren && (
-            <Button type="button" size="sm" variant="outline" onClick={() => onDelete(menu)}>
+            <Button
+              type="button"
+              size="sm"
+              variant="danger-ghost"
+              aria-label={t('menus.actions.deleteName', { name })}
+              onClick={() => onDelete(menu)}
+            >
+              <Trash2 data-icon="inline-start" />
               {t('menus.actions.delete')}
             </Button>
           )}
@@ -617,19 +642,9 @@ export function MenusView({
         <div className="flex min-h-0 flex-1">
           <aside
             aria-label={t('menus.subsystems.listLabel')}
-            className="flex min-h-0 w-[calc(280px*var(--app-scale))] shrink-0 flex-col border-r border-(--page-pane-divider) bg-(--side-list-bg) px-3 py-4"
+            className="flex min-h-0 w-[calc(248px*var(--app-scale))] shrink-0 flex-col border-r border-(--page-pane-divider) bg-(--side-list-bg) px-3 py-4"
           >
-            <div className="mb-4 flex items-start gap-3 px-1">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-10 bg-(--nav-item-bg-current) text-(--nav-item-fg-current)">
-                <Grid2X2 className="size-5" />
-              </span>
-              <div className="min-w-0">
-                <h1 className="text-base font-bold text-text">{t('menus.subsystems.title')}</h1>
-                <p className="mt-1 text-xs leading-5 text-text-3">{t('menus.subsystems.desc')}</p>
-              </div>
-            </div>
-
-            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
+            <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto">
               {subsystems.map((subsystem) => {
                 const active = subsystem.key === activeKey;
                 const label = subsystemLabel(subsystem, locale);
@@ -637,17 +652,17 @@ export function MenusView({
                   <div
                     key={subsystem.key}
                     className={cn(
-                      'group relative rounded-10 transition-colors',
+                      'group relative rounded-10 border transition-colors',
                       active
-                        ? 'bg-(--nav-item-bg-current)'
-                        : 'bg-transparent hover:bg-(--side-list-item-bg-hover)',
+                        ? 'border-(--nav-item-border-current) bg-(--nav-item-bg-current)'
+                        : 'border-transparent bg-transparent hover:border-(--page-section-divider) hover:bg-(--side-list-item-bg-hover)',
                     )}
                   >
                     <button
                       type="button"
                       aria-current={active ? 'page' : undefined}
                       aria-label={t('menus.actions.selectSubsystem', { name: label })}
-                      className="flex min-h-[calc(82px*var(--app-scale))] w-full items-start gap-3 rounded-10 px-3 py-3 pr-10 text-left"
+                      className="flex min-h-[calc(60px*var(--app-scale))] w-full items-center gap-2.5 rounded-10 px-3 py-2 pr-9 text-left"
                       onClick={() => onActiveSubsystemChange(subsystem.key)}
                     >
                       <span
@@ -664,10 +679,7 @@ export function MenusView({
                         <span className={cn('block truncate text-sm font-semibold', active ? 'text-(--nav-item-fg-current)' : 'text-text')}>
                           {label}
                         </span>
-                        <span className="mt-1 line-clamp-2 block text-xs leading-5 text-text-3">
-                          {lv(subsystem.desc, locale)}
-                        </span>
-                        <span className="mt-2 flex items-center gap-2 text-xs text-text-3">
+                        <span className="mt-1 flex items-center gap-1.5 text-xs text-text-3">
                           <span>{subsystem.builtin ? t('menus.subsystems.builtin') : t('menus.subsystems.custom')}</span>
                           <span>·</span>
                           <span>{subsystem.enabled ? t('menus.subsystems.enabled') : t('menus.subsystems.disabled')}</span>
@@ -678,7 +690,7 @@ export function MenusView({
                       type="button"
                       variant="ghost"
                       size="icon-xs"
-                      className="absolute right-2 top-2 opacity-70 hover:opacity-100"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100"
                       aria-label={t('menus.actions.editSubsystem', { name: label })}
                       title={t('menus.actions.edit')}
                       onClick={() => setSubsystemFormState({ mode: 'edit', subsystem })}
@@ -709,22 +721,15 @@ export function MenusView({
             className="flex min-w-0 flex-1 border-l border-(--page-section-divider)"
           >
             <div className="flex min-w-0 flex-1 flex-col px-6 py-[calc(20px*var(--app-scale))]">
-              <div className="mb-3 flex items-start gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-bold text-text">
-                      {t('menus.treeTitle', { subsystem: activeSubsystemName })}
-                    </span>
-                    {refreshing && <span className="text-xs text-text-3">{t('menus.refreshing')}</span>}
-                  </div>
-                  <div className="mt-1 text-[calc(13px*var(--app-scale))] text-text-3">
-                    {t('menus.stats', {
-                      dirs: stats.dirCount,
-                      menus: stats.menuCount,
-                      actions: stats.actionCount,
-                      hidden: stats.hiddenCount,
-                    })}
-                  </div>
+              <div className="mb-3 flex items-center gap-3">
+                <div className="min-w-0 text-[calc(13px*var(--app-scale))] text-text-3">
+                  {t('menus.stats', {
+                    dirs: stats.dirCount,
+                    menus: stats.menuCount,
+                    actions: stats.actionCount,
+                    hidden: stats.hiddenCount,
+                  })}
+                  {refreshing && <span className="ml-2">{t('menus.refreshing')}</span>}
                 </div>
                 <div className="flex-1" />
                 <Button
@@ -765,15 +770,9 @@ export function MenusView({
                   selectedMenuId={selectedMenu?.id ?? null}
                   locale={locale}
                   t={t}
-                  canCreate={canCreate}
-                  canUpdate={canUpdate}
-                  canDelete={canDelete}
                   canToggle={canToggle}
                   onSelect={(menu) => setSelectedMenuId(menu.id)}
                   onToggleCollapse={toggleCollapse}
-                  onAddChild={openAddChild}
-                  onEdit={(menu) => setFormState({ mode: 'edit', menu })}
-                  onDelete={setDeleteTarget}
                   onSetVisibility={(id, visible) => {
                     void onSetMenuVisibility(id, visible);
                   }}

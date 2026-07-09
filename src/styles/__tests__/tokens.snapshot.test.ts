@@ -1124,7 +1124,9 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(menuTreeTableSource).toContain('grid-rows-[1fr] opacity-100');
   expect(menuTreeTableSource).not.toContain('data-[state=checked]:bg-success');
   expect(menuFormDialogSource).not.toContain('data-[state=checked]:bg-success');
-  expect(menuTreeTableSource).toContain('text-(--table-action-fg)');
+  expect(menuTreeTableSource).not.toContain('text-(--table-action-fg)');
+  expect(menuTreeTableSource).not.toContain('menus.columns.actions');
+  expect(menusPageSource).toContain('variant="danger-ghost"');
   expect(menusPageSource).toContain('PageFrame');
   expect(menusPageSource).toContain('PageSurface');
 

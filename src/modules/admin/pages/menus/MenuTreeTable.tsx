@@ -1,22 +1,14 @@
-import {
-  ChevronRight,
-  Edit3,
-  Eye,
-  EyeOff,
-  Plus,
-  Trash2,
-} from 'lucide-react';
+import { ChevronRight, Eye, EyeOff } from 'lucide-react';
 import type { TFunction } from 'i18next';
 import { Icon } from '@/lib/icon-registry';
 import { lv } from '@/lib/localized';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import type { ManagedMenuRow } from './menu-management-model';
 import type { MenuRecord } from '@/modules/types';
 
 const gridTemplate =
-  'minmax(calc(220px * var(--app-scale)), 1fr) minmax(calc(160px * var(--app-scale)), 0.75fr) calc(72px * var(--app-scale)) calc(92px * var(--app-scale))';
+  'minmax(calc(220px * var(--app-scale)), 1fr) minmax(calc(180px * var(--app-scale)), 0.85fr) calc(72px * var(--app-scale))';
 
 const typeClass: Record<MenuRecord['type'], string> = {
   dir: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)',
@@ -30,15 +22,9 @@ export interface MenuTreeTableProps {
   selectedMenuId: string | null;
   locale: string;
   t: TFunction<'admin'>;
-  canCreate: boolean;
-  canUpdate: boolean;
-  canDelete: boolean;
   canToggle: boolean;
   onSelect: (menu: MenuRecord) => void;
   onToggleCollapse: (id: string) => void;
-  onAddChild: (menu: MenuRecord) => void;
-  onEdit: (menu: MenuRecord) => void;
-  onDelete: (menu: MenuRecord) => void;
   onSetVisibility: (id: string, visible: boolean) => void;
 }
 
@@ -66,15 +52,9 @@ export function MenuTreeTable({
   selectedMenuId,
   locale,
   t,
-  canCreate,
-  canUpdate,
-  canDelete,
   canToggle,
   onSelect,
   onToggleCollapse,
-  onAddChild,
-  onEdit,
-  onDelete,
   onSetVisibility,
 }: MenuTreeTableProps) {
   const collapsed = new Set(collapsedIds);
@@ -90,7 +70,7 @@ export function MenuTreeTable({
   }
 
   return (
-    <div className="min-w-[calc(560px*var(--app-scale))]">
+    <div className="min-w-[calc(500px*var(--app-scale))]">
       <div
         className="mb-2 grid px-3 text-xs font-medium text-(--table-header-fg)"
         style={{ gridTemplateColumns: gridTemplate }}
@@ -98,7 +78,6 @@ export function MenuTreeTable({
         <div>{t('menus.columns.name')}</div>
         <div>{t('menus.columns.meta')}</div>
         <div>{t('menus.columns.visible')}</div>
-        <div>{t('menus.columns.actions')}</div>
       </div>
       <div className="overflow-hidden rounded-12 bg-(--table-bg)">
         {rows.map(({ menu, depth, hasChildren, hiddenByCollapse }) => {
@@ -193,54 +172,6 @@ export function MenuTreeTable({
                       />
                     ) : (
                       <VisibilityStatus menu={menu} t={t} />
-                    )}
-                  </div>
-                  <div
-                    className={cn(
-                      'flex items-center gap-1 transition-opacity',
-                      selected
-                        ? 'opacity-100'
-                        : 'opacity-0 group-hover/menu-row:opacity-100 group-focus-within/menu-row:opacity-100',
-                    )}
-                  >
-                    {canCreate && menu.type !== 'action' && (
-                      <Button
-                        type="button"
-                        size="icon-xs"
-                        variant="ghost"
-                        className="text-(--table-action-fg)"
-                        title={t('menus.actions.addChild')}
-                        aria-label={t('menus.actions.addChildName', { name })}
-                        onClick={() => onAddChild(menu)}
-                      >
-                        <Plus className="size-3.5" />
-                      </Button>
-                    )}
-                    {canUpdate && (
-                      <Button
-                        type="button"
-                        size="icon-xs"
-                        variant="ghost"
-                        className="text-(--table-action-fg)"
-                        title={t('menus.actions.edit')}
-                        aria-label={t('menus.actions.editName', { name })}
-                        onClick={() => onEdit(menu)}
-                      >
-                        <Edit3 className="size-3.5" />
-                      </Button>
-                    )}
-                    {canDelete && !hasChildren && (
-                      <Button
-                        type="button"
-                        size="icon-xs"
-                        variant="ghost"
-                        className="text-(--table-action-fg)"
-                        title={t('menus.actions.delete')}
-                        aria-label={t('menus.actions.deleteName', { name })}
-                        onClick={() => onDelete(menu)}
-                      >
-                        <Trash2 className="size-3.5" />
-                      </Button>
                     )}
                   </div>
                 </div>

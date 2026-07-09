@@ -13,6 +13,16 @@ async function chooseSelectOption(label: string, optionName: string) {
   await userEvent.click(await screen.findByRole('option', { name: optionName }));
 }
 
+function getTreeNodeButton(name: string) {
+  const node = screen
+    .getAllByRole('button', { name: new RegExp(name) })
+    .find((button) => button.getAttribute('aria-pressed') !== null);
+  if (!node) {
+    throw new Error(`Menu tree node not found: ${name}`);
+  }
+  return node;
+}
+
 const subsystemsFixture = [
   {
     key: 'admin',
@@ -138,8 +148,8 @@ function renderMenusView(props: Partial<MenusViewProps> = {}) {
 test('viewer 能看子系统区和菜单树，但看不到写操作', () => {
   renderMenusView();
 
-  expect(screen.getByText('子系统管理')).toBeInTheDocument();
-  expect(screen.getByText('后台管理 · 菜单树')).toBeInTheDocument();
+  expect(screen.getByRole('complementary', { name: '子系统列表' })).toBeInTheDocument();
+  expect(screen.getByRole('region', { name: '后台管理菜单树' })).toBeInTheDocument();
   expect(screen.getByText('企业概览')).toBeInTheDocument();
   expect(screen.getByText('导出成员')).toBeInTheDocument();
   expect(screen.getByText('菜单名称')).toBeInTheDocument();
@@ -156,7 +166,7 @@ test('菜单管理采用左侧子系统列表、中间菜单树和右侧节点�
   const menuTreePanel = screen.getByRole('region', { name: '后台管理菜单树' });
   const inspector = screen.getByRole('complementary', { name: '节点详情' });
 
-  expect(subsystemList).toHaveClass('w-[calc(280px*var(--app-scale))]');
+  expect(subsystemList).toHaveClass('w-[calc(248px*var(--app-scale))]');
   expect(subsystemList).toHaveClass('border-r');
   expect(menuTreePanel).toHaveClass('min-w-0');
   expect(menuTreePanel).toHaveClass('flex-1');
@@ -168,7 +178,9 @@ test('菜单管理采用左侧子系统列表、中间菜单树和右侧节点�
   expect(within(subsystemList).getByRole('button', { name: '选择仓储系统子系统' })).toBeInTheDocument();
   expect(within(subsystemList).getByRole('button', { name: '新增子系统' })).toBeInTheDocument();
   expect(within(menuTreePanel).getByText('菜单名称')).toBeInTheDocument();
+  expect(within(menuTreePanel).queryByText('操作')).not.toBeInTheDocument();
   expect(within(inspector).getByText('工作台')).toBeInTheDocument();
+  expect(within(inspector).getByText('目录')).toHaveClass('bg-(--accent-emphasis-soft)');
 
   expect(screen.getByTestId('menu-management-surface')).toHaveClass('min-h-[calc(100dvh-138px)]');
 });
@@ -176,17 +188,13 @@ test('菜单管理采用左侧子系统列表、中间菜单树和右侧节点�
 test('点击菜单树节点后右侧详情面板展示该节点配置', async () => {
   renderMenusView({ permissions: ['*:*:*'] });
 
-  const roleNode = screen
-    .getAllByRole('button', { name: /角色与权限/ })
-    .find((button) => button.getAttribute('aria-pressed') !== null);
-
-  expect(roleNode).toBeDefined();
-  await userEvent.click(roleNode!);
+  await userEvent.click(getTreeNodeButton('角色与权限'));
 
   const inspector = screen.getByRole('complementary', { name: '节点详情' });
   expect(within(inspector).getByText('角色与权限')).toBeInTheDocument();
   expect(within(inspector).getByText('/admin/roles')).toBeInTheDocument();
   expect(within(inspector).getByText('iam:role:view')).toBeInTheDocument();
+  expect(within(inspector).getByText('菜单')).toHaveClass('bg-success-soft');
 });
 
 test('admin 可以从子系统卡片编辑入口保存子系统显示信息', async () => {
@@ -261,19 +269,18 @@ test('菜单树批量折叠按钮根据全局折叠状态自动切换', async ()
 
   expect(screen.getByRole('button', { name: '折叠' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '展开' })).not.toBeInTheDocument();
-  expect(screen.getByRole('button', { name: '编辑企业概览' })).toBeInTheDocument();
+  expect(screen.getByText('企业概览')).toBeInTheDocument();
 
   await userEvent.click(screen.getByRole('button', { name: '折叠' }));
 
   expect(screen.getByRole('button', { name: '展开' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '折叠' })).not.toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: '编辑企业概览' })).not.toBeInTheDocument();
 
   await userEvent.click(screen.getByRole('button', { name: '展开' }));
 
   expect(screen.getByRole('button', { name: '折叠' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '展开' })).not.toBeInTheDocument();
-  expect(screen.getByRole('button', { name: '编辑企业概览' })).toBeInTheDocument();
+  expect(screen.getByText('企业概览')).toBeInTheDocument();
 });
 
 test('admin 可以新增菜单节点', async () => {
@@ -322,6 +329,7 @@ test('admin 可以编辑已有菜单', async () => {
   const onUpdateMenu = vi.fn();
   renderMenusView({ permissions: ['*:*:*'], onUpdateMenu });
 
+  await userEvent.click(getTreeNodeButton('企业概览'));
   await userEvent.click(screen.getByRole('button', { name: '编辑企业概览' }));
   const dialog = screen.getByRole('dialog', { name: '编辑菜单' });
   await userEvent.clear(within(dialog).getByLabelText('菜单名称'));
@@ -341,6 +349,7 @@ test('admin 可以编辑已有菜单', async () => {
 test('菜单表单弹窗底部操作按钮使用表单控件尺寸', async () => {
   renderMenusView({ permissions: ['*:*:*'] });
 
+  await userEvent.click(getTreeNodeButton('企业概览'));
   await userEvent.click(screen.getByRole('button', { name: '编辑企业概览' }));
   const dialog = screen.getByRole('dialog', { name: '编辑菜单' });
   const cancelButton = within(dialog).getByRole('button', { name: '取消' });
@@ -373,21 +382,22 @@ test('菜单树折叠用动画容器隐藏子节点', async () => {
   expect(childRow).toBeInTheDocument();
   expect(childRow?.className).toContain('grid-rows-[1fr]');
   expect(childRow?.className).toContain('opacity-100');
-  expect(screen.getByRole('button', { name: '编辑成员与部门' })).toBeInTheDocument();
 
   await userEvent.click(screen.getByRole('button', { name: '展开或折叠组织与权限' }));
 
   expect(childRow?.className).toContain('grid-rows-[0fr]');
   expect(childRow?.className).toContain('opacity-0');
   expect(childRow?.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: '编辑成员与部门' })).not.toBeInTheDocument();
 });
 
 test('admin 可以删除叶子菜单，非叶子目录不显示删除入口', async () => {
   const onDeleteMenu = vi.fn();
   renderMenusView({ permissions: ['*:*:*'], onDeleteMenu });
 
+  await userEvent.click(getTreeNodeButton('组织与权限'));
   expect(screen.queryByRole('button', { name: '删除组织与权限' })).not.toBeInTheDocument();
+  await userEvent.click(getTreeNodeButton('企业概览'));
+  expect(screen.getByRole('button', { name: '删除企业概览' })).toHaveAttribute('data-variant', 'danger-ghost');
   await userEvent.click(screen.getByRole('button', { name: '删除企业概览' }));
   await userEvent.click(screen.getByRole('button', { name: '确认删除' }));
 
