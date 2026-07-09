@@ -32,6 +32,10 @@
   --option-bg-selected: var(--fill-selected);
   --option-fg-selected: var(--text);
   --option-check: var(--text);
+  --nav-item-bg-current: var(--surface);
+  --nav-item-fg-current: var(--text);
+  --nav-item-border-current: var(--border);
+  --nav-item-shadow-current: var(--shadow-card-sm);
   --table-header-h: calc(44px * var(--app-scale));
 }
 [data-flavor='shadcn'][data-mode='dark'] {

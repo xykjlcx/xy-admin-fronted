@@ -12,7 +12,11 @@ test('PageFrame 和 PageSurface 暴露稳定 class 供 shell 布局降噪', () =
   const surface = screen.getByText('成员列表');
 
   expect(frame).toHaveClass('ui-page-frame');
+  expect(frame).toHaveClass('bg-(--page-frame-bg)');
+  expect(frame).toHaveClass('px-(--page-frame-px)');
+  expect(frame).toHaveClass('py-(--page-frame-py)');
   expect(surface).toHaveClass('ui-page-surface');
-  expect(surface).toHaveClass('border-(--pro-panel-border)');
-  expect(surface).toHaveClass('bg-(--pro-panel-bg)');
+  expect(surface).toHaveClass('border-(--page-surface-border)');
+  expect(surface).toHaveClass('bg-(--page-surface-bg)');
+  expect(surface).toHaveClass('shadow-(--page-surface-shadow)');
 });

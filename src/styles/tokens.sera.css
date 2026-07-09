@@ -53,6 +53,10 @@
   --label-transform: uppercase;     --label-tracking: 0.025em;
   --table-header-transform: uppercase; --table-header-tracking: 0.05em;
   --title-transform: uppercase;     --title-tracking: 0.05em;
+  --nav-item-bg-current: var(--surface);
+  --nav-item-fg-current: var(--text);
+  --nav-item-border-current: var(--border);
+  --nav-item-shadow-current: var(--shadow-card-sm);
 }
 
 html:not([data-radius])[data-flavor='sera'] { --radius-factor: 0; }

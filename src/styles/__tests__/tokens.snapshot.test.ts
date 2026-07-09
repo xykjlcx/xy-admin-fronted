@@ -957,9 +957,24 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-selected);');
   expect(globalCss).not.toContain(':has([aria-expanded');
 
-  expect(pageScaffoldSource).toContain('bg-(--pro-page-bg)');
-  expect(pageScaffoldSource).toContain('border-(--pro-panel-border)');
-  expect(pageScaffoldSource).toContain('bg-(--pro-panel-bg)');
+  expect(pageScaffoldSource).toContain('bg-(--page-frame-bg)');
+  expect(pageScaffoldSource).toContain('px-(--page-frame-px)');
+  expect(pageScaffoldSource).toContain('py-(--page-frame-py)');
+  expect(pageScaffoldSource).toContain('border-(--page-surface-border)');
+  expect(pageScaffoldSource).toContain('bg-(--page-surface-bg)');
+  expect(pageScaffoldSource).toContain('shadow-(--page-surface-shadow)');
+  expect(css).toContain('--page-frame-px: calc(28px * var(--app-scale));');
+  expect(css).toContain('--page-frame-py: calc(20px * var(--app-scale));');
+  expect(css).toContain('--page-frame-bg: var(--pro-page-bg);');
+  expect(css).toContain('--page-surface-bg: var(--pro-panel-bg);');
+  expect(css).toContain('--page-surface-border: var(--pro-panel-border);');
+  expect(css).toContain('--page-surface-shadow: var(--shadow-card);');
+  expect(globalCss).toContain("[data-shell-layout='inset']");
+  expect(globalCss).toContain('--page-frame-px: calc(24px * var(--app-scale));');
+  expect(globalCss).toContain('--page-frame-bg: transparent;');
+  expect(globalCss).toContain('--page-surface-bg: transparent;');
+  expect(globalCss).toContain('--page-surface-border: transparent;');
+  expect(globalCss).toContain('--page-surface-shadow: none;');
   expect(sideListSource).toContain('bg-(--side-list-bg)');
   expect(sideListSource).toContain('border-(--side-list-border)');
   expect(sideListSource).toContain('hover:bg-(--side-list-item-bg-hover)');
@@ -980,7 +995,19 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   ]) {
     expect(source).toContain('bg-(--nav-item-bg-current)');
     expect(source).toContain('text-(--nav-item-fg-current)');
+    expect(source).toContain('border-(--nav-item-border-current)');
   }
+  expect(navMenuSidebarSource).toContain('shadow-(--nav-item-shadow-current)');
+  expect(navMenuRailSource).toContain('shadow-(--nav-item-shadow-current)');
+  expect(navMenuInsetSource).toContain('shadow-(--nav-item-shadow-current)');
+  expect(css).toContain('--nav-item-border-current: transparent;');
+  expect(css).toContain('--nav-item-shadow-current: none;');
+  expect(css).toContain("[data-flavor='shadcn'] {");
+  expect(css).toContain('--nav-item-bg-current: var(--surface);');
+  expect(css).toContain('--nav-item-fg-current: var(--text);');
+  expect(css).toContain('--nav-item-border-current: var(--border);');
+  expect(css).toContain('--nav-item-shadow-current: var(--shadow-card-sm);');
+  expect(css).toContain("[data-flavor='sera'] {");
   expect(appearanceDrawerSource).toContain('bg-(--nav-item-bg-current)');
   expect(appearanceDrawerSource).toContain('text-(--nav-item-fg-current)');
 

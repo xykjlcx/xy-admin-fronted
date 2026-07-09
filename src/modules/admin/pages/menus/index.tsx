@@ -498,9 +498,9 @@ export function MenusView({
                   <div
                     key={subsystem.key}
                     className={cn(
-                      'group relative rounded-10 border transition-colors',
+                      'group relative rounded-10 border transition-colors shadow-(--nav-item-shadow-current)',
                       active
-                        ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current)'
+                        ? 'border-(--nav-item-border-current) bg-(--nav-item-bg-current)'
                         : 'border-transparent bg-transparent hover:bg-(--side-list-item-bg-hover)',
                     )}
                   >

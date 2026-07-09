@@ -207,14 +207,13 @@
   }
 
   /* Inset shell 的主 surface 已经负责外层卡片感，页面级 PageSurface 只保留业务结构。 */
-  [data-shell-layout='inset'] .ui-page-frame {
-    background: transparent;
-  }
-
-  [data-shell-layout='inset'] .ui-page-surface {
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
+  [data-shell-layout='inset'] {
+    --page-frame-px: calc(24px * var(--app-scale));
+    --page-frame-py: calc(18px * var(--app-scale));
+    --page-frame-bg: transparent;
+    --page-surface-bg: transparent;
+    --page-surface-border: transparent;
+    --page-surface-shadow: none;
   }
 
   /* Table 行状态机。顺序即优先级：selected/expanded > hover > base。

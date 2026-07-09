@@ -21,8 +21,11 @@ export function PageFrame({
   return (
     <section
       {...props}
-      className={cn('ui-page-frame flex min-h-0 flex-col bg-(--pro-page-bg) text-text', className)}
-      style={{ padding: 'calc(20px * var(--app-scale)) calc(28px * var(--app-scale))', ...style }}
+      className={cn(
+        'ui-page-frame flex min-h-0 flex-col bg-(--page-frame-bg) px-(--page-frame-px) py-(--page-frame-py) text-text',
+        className,
+      )}
+      style={style}
     >
       <div className="mb-4 flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
         {breadcrumbs.map((item, index) => (
@@ -50,7 +53,7 @@ export function PageSurface({
     <div
       {...props}
       className={cn(
-        'ui-page-surface flex min-h-[calc(640px*var(--app-scale))] flex-col overflow-hidden rounded-12 border border-(--pro-panel-border) bg-(--pro-panel-bg) shadow-xs',
+        'ui-page-surface flex min-h-[calc(640px*var(--app-scale))] flex-col overflow-hidden rounded-12 border border-(--page-surface-border) bg-(--page-surface-bg) shadow-(--page-surface-shadow)',
         className,
       )}
     >

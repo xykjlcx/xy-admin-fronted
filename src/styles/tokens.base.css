@@ -194,10 +194,18 @@
   --side-list-item-bg-active: var(--fill-selected);
   --side-list-item-fg-active: var(--pri);
   --side-list-item-meta-fg-active: var(--pri);
+  --page-frame-px: calc(28px * var(--app-scale));
+  --page-frame-py: calc(20px * var(--app-scale));
+  --page-frame-bg: var(--pro-page-bg);
+  --page-surface-bg: var(--pro-panel-bg);
+  --page-surface-border: var(--pro-panel-border);
+  --page-surface-shadow: var(--shadow-card);
   --shell-header-bg: var(--chrome);
   --nav-item-bg-hover: var(--fill-hover);
   --nav-item-bg-current: var(--fill-selected);
   --nav-item-fg-current: var(--pri);
+  --nav-item-border-current: transparent;
+  --nav-item-shadow-current: none;
   --pagination-current-bg: var(--fill-selected);
   --pagination-current-fg: var(--pri);
   --pagination-current-border: var(--pri);

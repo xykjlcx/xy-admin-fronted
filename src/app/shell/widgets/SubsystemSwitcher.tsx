@@ -100,9 +100,9 @@ export function SubsystemSwitcher({
                 disabled={soon}
                 onClick={() => select(s)}
                 className={cn(
-                  'relative flex items-center gap-3 rounded-12 border p-3 text-left transition-colors',
+                  'relative flex items-center gap-3 rounded-12 border p-3 text-left transition-colors shadow-(--nav-item-shadow-current)',
                   isActive
-                    ? 'border-(--nav-item-fg-current) bg-(--nav-item-bg-current)'
+                    ? 'border-(--nav-item-border-current) bg-(--nav-item-bg-current)'
                     : 'border-border bg-surface hover:border-(--nav-item-fg-current)',
                   soon && 'cursor-not-allowed opacity-60 hover:border-border',
                 )}
