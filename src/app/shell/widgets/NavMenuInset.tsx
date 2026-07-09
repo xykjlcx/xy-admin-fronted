@@ -77,11 +77,11 @@ export function NavMenuInset({
                   to={p.path}
                   title={collapsed ? lv(p.label, i18n.language) : undefined}
                   className={cn(
-                    'my-0.5 flex h-[calc(38px*var(--app-scale))] items-center gap-2.5 rounded-9 border text-sm shadow-(--nav-item-shadow-current)',
+                    'my-0.5 flex h-[calc(38px*var(--app-scale))] items-center gap-2.5 rounded-9 text-sm',
                     collapsed ? 'justify-center px-0' : 'px-3',
                     pathname === p.path
-                      ? 'border-(--nav-item-border-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current)'
-                      : 'border-transparent text-text-2 hover:bg-(--nav-item-bg-hover)',
+                      ? 'border border-(--nav-item-border-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current) shadow-(--nav-item-shadow-current)'
+                      : 'text-text-2 hover:bg-(--nav-item-bg-hover)',
                   )}
                 >
                   <Icon name={p.icon ?? g.node.icon} className="size-[calc(18px*var(--app-scale))] shrink-0" />

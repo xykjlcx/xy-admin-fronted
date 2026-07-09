@@ -1006,7 +1006,7 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(css).toContain('--nav-item-bg-current: var(--surface);');
   expect(css).toContain('--nav-item-fg-current: var(--text);');
   expect(css).toContain('--nav-item-border-current: var(--border);');
-  expect(css).toContain('--nav-item-shadow-current: var(--shadow-card-sm);');
+  expect(css).toContain('--nav-item-shadow-current: 0 1px 2px rgba(0, 0, 0, 0.05);');
   expect(css).toContain("[data-flavor='sera'] {");
   expect(appearanceDrawerSource).toContain('bg-(--nav-item-bg-current)');
   expect(appearanceDrawerSource).toContain('text-(--nav-item-fg-current)');

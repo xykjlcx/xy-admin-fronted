@@ -25,10 +25,10 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
               key={g.node.id}
               onClick={() => first?.path && nav({ to: first.path })}
               className={cn(
-                'flex w-[calc(60px*var(--app-scale))] flex-col items-center gap-[calc(5px*var(--app-scale))] rounded-10 border py-2.5 shadow-(--nav-item-shadow-current)',
+                'flex w-[calc(60px*var(--app-scale))] flex-col items-center gap-[calc(5px*var(--app-scale))] rounded-10 py-2.5',
                 active
-                  ? 'border-(--nav-item-border-current) bg-(--nav-item-bg-current) text-(--nav-item-fg-current)'
-                  : 'border-transparent text-text-3 hover:bg-(--nav-item-bg-hover)',
+                  ? 'border border-(--nav-item-border-current) bg-(--nav-item-bg-current) text-(--nav-item-fg-current) shadow-(--nav-item-shadow-current)'
+                  : 'text-text-3 hover:bg-(--nav-item-bg-hover)',
               )}
             >
               <Icon name={g.node.icon} className="size-5" />
@@ -50,10 +50,10 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
                 key={p.id}
                 to={p.path}
                 className={cn(
-                  'my-0.5 flex h-[calc(38px*var(--app-scale))] items-center rounded-8 border px-3.5 text-sm shadow-(--nav-item-shadow-current)',
+                  'my-0.5 flex h-[calc(38px*var(--app-scale))] items-center rounded-8 px-3.5 text-sm',
                   pathname === p.path
-                    ? 'border-(--nav-item-border-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current)'
-                    : 'border-transparent text-text-2 hover:bg-(--nav-item-bg-hover)',
+                    ? 'border border-(--nav-item-border-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current) shadow-(--nav-item-shadow-current)'
+                    : 'text-text-2 hover:bg-(--nav-item-bg-hover)',
                 )}
               >
                 <span className="truncate">{lv(p.label, i18n.language)}</span>

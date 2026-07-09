@@ -25,10 +25,10 @@ export function NavMenuSidebar({
 
   const leafClass = (active: boolean) =>
     cn(
-      'mx-2 my-px flex h-[calc(38px*var(--app-scale))] items-center rounded-8 border pl-11 pr-3 text-sm shadow-(--nav-item-shadow-current)',
+      'mx-2 my-px flex h-[calc(38px*var(--app-scale))] items-center rounded-8 pl-11 pr-3 text-sm',
       active
-        ? 'border-(--nav-item-border-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current)'
-        : 'border-transparent text-text-2 hover:bg-(--nav-item-bg-hover)',
+        ? 'border border-(--nav-item-border-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current) shadow-(--nav-item-shadow-current)'
+        : 'text-text-2 hover:bg-(--nav-item-bg-hover)',
     );
 
   return (
@@ -45,10 +45,10 @@ export function NavMenuSidebar({
                 key={node.id}
                 to={node.path}
                 className={cn(
-                  'mx-2 mb-0.5 flex h-[calc(42px*var(--app-scale))] items-center gap-2.5 rounded-8 border px-4 text-sm font-medium shadow-(--nav-item-shadow-current)',
+                  'mx-2 mb-0.5 flex h-[calc(42px*var(--app-scale))] items-center gap-2.5 rounded-8 px-4 text-sm font-medium',
                   active
-                    ? 'border-(--nav-item-border-current) bg-(--nav-item-bg-current) text-(--nav-item-fg-current)'
-                    : 'border-transparent text-text-2 hover:bg-(--nav-item-bg-hover)',
+                    ? 'border border-(--nav-item-border-current) bg-(--nav-item-bg-current) text-(--nav-item-fg-current) shadow-(--nav-item-shadow-current)'
+                    : 'text-text-2 hover:bg-(--nav-item-bg-hover)',
                   collapsed && 'justify-center px-0',
                 )}
                 title={collapsed ? lv(node.label, i18n.language) : undefined}

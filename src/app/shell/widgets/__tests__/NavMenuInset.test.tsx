@@ -52,6 +52,17 @@ const tree = [
         visible: true,
         sort: 1,
       },
+      {
+        id: 'm-roles',
+        parentId: 'm-home',
+        subsystemKey: 'admin',
+        type: 'menu',
+        label: { 'zh-CN': '角色与权限' },
+        path: '/admin/roles',
+        permission: 'iam:role:view',
+        visible: true,
+        sort: 2,
+      },
     ],
   },
 ] satisfies MenuNode[];
@@ -72,8 +83,13 @@ function renderInsetNav() {
     path: '/admin/dashboard',
     component: () => null,
   });
+  const rolesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/admin/roles',
+    component: () => null,
+  });
   const router = createRouter({
-    routeTree: rootRoute.addChildren([dashboardRoute]),
+    routeTree: rootRoute.addChildren([dashboardRoute, rolesRoute]),
     history: createMemoryHistory({ initialEntries: ['/admin/dashboard'] }),
   });
 
@@ -92,4 +108,18 @@ test('Inset 侧栏内置轻量搜索入口', async () => {
   renderInsetNav();
 
   expect(await screen.findByRole('searchbox', { name: '搜索功能导航、组织数据、角色详情等' })).toBeInTheDocument();
+});
+
+test('Inset 侧栏只有 active 菜单项有边框和阴影', async () => {
+  renderInsetNav();
+
+  const active = await screen.findByRole('link', { name: '企业概览' });
+  const inactive = screen.getByRole('link', { name: '角色与权限' });
+
+  expect(active).toHaveClass('border');
+  expect(active).toHaveClass('border-(--nav-item-border-current)');
+  expect(active).toHaveClass('shadow-(--nav-item-shadow-current)');
+  expect(inactive).not.toHaveClass('border');
+  expect(inactive).not.toHaveClass('border-transparent');
+  expect(inactive).not.toHaveClass('shadow-(--nav-item-shadow-current)');
 });

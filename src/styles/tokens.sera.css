@@ -56,7 +56,7 @@
   --nav-item-bg-current: var(--surface);
   --nav-item-fg-current: var(--text);
   --nav-item-border-current: var(--border);
-  --nav-item-shadow-current: var(--shadow-card-sm);
+  --nav-item-shadow-current: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 html:not([data-radius])[data-flavor='sera'] { --radius-factor: 0; }
