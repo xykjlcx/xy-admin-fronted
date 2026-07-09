@@ -193,6 +193,8 @@
   --side-list-bg: var(--surface);
   --side-list-border: var(--border);
   --page-pane-divider: var(--side-list-border);
+  --page-section-divider: var(--border);
+  --page-breadcrumb-divider: var(--border);
   --side-list-item-bg-hover: var(--fill-hover);
   --side-list-item-bg-active: var(--fill-selected);
   --side-list-item-fg-active: var(--pri);

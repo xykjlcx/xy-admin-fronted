@@ -5,12 +5,14 @@ import { cn } from '@/lib/utils';
 
 export interface SearchFieldProps extends Omit<ComponentProps<typeof InputGroupInput>, 'type'> {
   containerClassName?: string;
+  variant?: 'default' | 'sidebar';
 }
 
-export function SearchField({ className, containerClassName, ...props }: SearchFieldProps) {
+export function SearchField({ className, containerClassName, variant = 'default', ...props }: SearchFieldProps) {
   return (
     <InputGroup
       inputSize="sm"
+      data-variant={variant === 'default' ? undefined : variant}
       className={cn(
         'h-[calc(34px*var(--app-scale))]',
         containerClassName,

@@ -134,6 +134,12 @@
     box-shadow: var(--field-shadow);
   }
 
+  .ui-field[data-variant='sidebar'] {
+    --_field-bg: var(--surface);
+    --_field-border: color-mix(in srgb, var(--control-border) 72%, transparent);
+    box-shadow: var(--shadow-card-sm);
+  }
+
   /* D4（S5 sera 唯一型分支）：输入族收窄为「仅底边着色」。分边 border-color 四值语义无法优雅 token 化，
      故在状态机层加这一条 flavor 分支——三边 transparent、底边吃状态机中间态 --_field-border
      （base/hover/focus/invalid 均自动生效，无需再列状态）。仅 sera 激活时命中，其余 flavor 零影响。 */
@@ -179,6 +185,11 @@
     box-shadow: 0 0 0 var(--focus-ring) var(--_field-ring-color);
   }
 
+  .ui-field.ui-field[data-variant='sidebar']:focus-within,
+  .ui-field.ui-field[data-variant='sidebar'][data-state='open'] {
+    --_field-bg: var(--surface);
+  }
+
   .ui-field.ui-field[readonly] {
     --_field-bg: var(--field-bg-readonly);
   }
@@ -220,6 +231,8 @@
     --page-surface-border: transparent;
     --page-surface-shadow: none;
     --page-pane-divider: transparent;
+    --page-section-divider: color-mix(in srgb, var(--border) 70%, transparent);
+    --page-breadcrumb-divider: color-mix(in srgb, var(--border) 70%, transparent);
     --table-shell-border: transparent;
     --table-row-border: color-mix(in srgb, var(--table-border) 72%, transparent);
     --tabs-line-border: color-mix(in srgb, var(--border) 70%, transparent);

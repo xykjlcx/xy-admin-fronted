@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { PageFrame, PageSurface } from '@/components/pro/PageScaffold';
+import { PageFrame, PageFrameChromeProvider, PageSurface } from '@/components/pro/PageScaffold';
 
 test('PageFrame 和 PageSurface 暴露稳定 class 供 shell 布局降噪', () => {
   const { container } = render(
@@ -23,4 +23,21 @@ test('PageFrame 和 PageSurface 暴露稳定 class 供 shell 布局降噪', () =
   expect(surface).toHaveClass('border-(--page-surface-border)');
   expect(surface).toHaveClass('bg-(--page-surface-bg)');
   expect(surface).toHaveClass('shadow-(--page-surface-shadow)');
+});
+
+test('PageFrame 支持 shell 注入面包屑前置操作和分割线', () => {
+  const { container } = render(
+    <PageFrameChromeProvider value={{ breadcrumbPrefix: <button type="button">收起导航</button> }}>
+      <PageFrame breadcrumbs={[{ label: '组织与权限' }, { label: '菜单管理' }]}>
+        <PageSurface>菜单树</PageSurface>
+      </PageFrame>
+    </PageFrameChromeProvider>,
+  );
+
+  const breadcrumb = container.querySelector('[data-slot="page-breadcrumb"]');
+  const divider = container.querySelector('[data-slot="page-breadcrumb-divider"]');
+
+  expect(breadcrumb).toContainElement(screen.getByRole('button', { name: '收起导航' }));
+  expect(divider).toHaveClass('bg-(--page-breadcrumb-divider)');
+  expect(screen.getByText('菜单管理')).toBeInTheDocument();
 });

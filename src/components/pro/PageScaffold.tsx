@@ -1,9 +1,25 @@
-import { Fragment, type ComponentProps, type ReactNode } from 'react';
+import { createContext, Fragment, useContext, type ComponentProps, type ReactNode } from 'react';
 import { AnimatedTabs } from '@/components/pro/AnimatedTabs';
 import { cn } from '@/lib/utils';
 
 export interface PageBreadcrumbItem {
   label: ReactNode;
+}
+
+interface PageFrameChromeValue {
+  breadcrumbPrefix?: ReactNode;
+}
+
+const PageFrameChromeContext = createContext<PageFrameChromeValue>({});
+
+export function PageFrameChromeProvider({
+  value,
+  children,
+}: {
+  value: PageFrameChromeValue;
+  children: ReactNode;
+}) {
+  return <PageFrameChromeContext.Provider value={value}>{children}</PageFrameChromeContext.Provider>;
 }
 
 type PageFrameProps = Omit<ComponentProps<'section'>, 'children'> & {
@@ -18,6 +34,8 @@ export function PageFrame({
   style,
   ...props
 }: PageFrameProps) {
+  const { breadcrumbPrefix } = useContext(PageFrameChromeContext);
+
   return (
     <section
       {...props}
@@ -27,7 +45,20 @@ export function PageFrame({
       )}
       style={style}
     >
-      <div className="mb-(--page-breadcrumb-mb) flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
+      <div
+        data-slot="page-breadcrumb"
+        className="mb-(--page-breadcrumb-mb) flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3"
+      >
+        {breadcrumbPrefix && (
+          <>
+            {breadcrumbPrefix}
+            <span
+              aria-hidden="true"
+              data-slot="page-breadcrumb-divider"
+              className="h-4 w-px bg-(--page-breadcrumb-divider)"
+            />
+          </>
+        )}
         {breadcrumbs.map((item, index) => (
           <Fragment key={index}>
             {index > 0 && <span>›</span>}

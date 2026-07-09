@@ -1,9 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
-import { PanelLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 import { SearchField } from '@/components/pro/SearchField';
 import { featuresConfig } from '@/config';
 import { cn } from '@/lib/utils';
@@ -19,13 +17,11 @@ export function NavMenuInset({
   tree,
   subsystems,
   collapsed,
-  onToggle,
   footer,
 }: {
   tree: MenuNode[];
   subsystems: Subsystem[];
   collapsed: boolean;
-  onToggle: () => void;
   footer?: ReactNode;
 }) {
   const { t, i18n } = useTranslation();
@@ -40,25 +36,17 @@ export function NavMenuInset({
       )}
     >
       <div className={cn('mb-3 flex gap-1.5', collapsed ? 'flex-col items-center' : 'items-center')}>
-        <div className={cn('min-w-0', !collapsed && 'flex-1')}>
+        <div className="min-w-0 flex-1">
           <SubsystemSwitcher subsystems={subsystems} variant="brand" collapsed={collapsed} />
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-8 shrink-0 text-text-3 hover:text-text"
-          onClick={onToggle}
-          aria-label={t('shell.nav.collapse')}
-        >
-          <PanelLeft className="size-4" />
-        </Button>
       </div>
       {!collapsed && featuresConfig.showStubChrome && (
         <SearchField
+          variant="sidebar"
           readOnly
           aria-label={t('shell.search')}
           placeholder={t('shell.search')}
-          containerClassName="mb-3 h-9 w-full bg-surface"
+          containerClassName="mb-3 h-9 w-full"
           onFocus={(event) => {
             event.currentTarget.blur();
             toast(t('shell.toast.search'));

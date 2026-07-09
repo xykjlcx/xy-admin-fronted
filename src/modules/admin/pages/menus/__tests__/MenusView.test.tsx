@@ -159,6 +159,8 @@ test('菜单管理采用左侧子系统列表、右侧菜单树的单层结构',
   expect(subsystemList).toHaveClass('border-r');
   expect(menuTreePanel).toHaveClass('min-w-0');
   expect(menuTreePanel).toHaveClass('flex-1');
+  expect(menuTreePanel).toHaveClass('border-l');
+  expect(menuTreePanel).toHaveClass('border-(--page-section-divider)');
   expect(within(subsystemList).getByRole('button', { name: '选择后台管理子系统' })).toBeInTheDocument();
   expect(within(subsystemList).getByRole('button', { name: '选择仓储系统子系统' })).toBeInTheDocument();
   expect(within(subsystemList).getByRole('button', { name: '新增子系统' })).toBeInTheDocument();

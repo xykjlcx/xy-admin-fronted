@@ -28,6 +28,7 @@ const tabsSource = readFileSync('src/components/ui/tabs.tsx', 'utf8');
 const tableSource = readFileSync('src/components/ui/table.tsx', 'utf8');
 const animatedTabsSource = readFileSync('src/components/pro/AnimatedTabs.tsx', 'utf8');
 const dataTableSource = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
+const searchFieldSource = readFileSync('src/components/pro/SearchField.tsx', 'utf8');
 const tableShellSource = readFileSync('src/components/pro/TableShell.tsx', 'utf8');
 const pageScaffoldSource = readFileSync('src/components/pro/PageScaffold.tsx', 'utf8');
 const pageTransitionSource = readFileSync('src/components/pro/PageTransition.tsx', 'utf8');
@@ -306,6 +307,11 @@ test('ui-field 状态机消费中间态 token，并保持 disabled > invalid > f
   expect(globalCss).toContain('background: var(--_field-bg);');
   expect(globalCss).toContain('border-color: var(--_field-border);');
   expect(globalCss).toContain('box-shadow: var(--field-shadow);');
+  expect(globalCss).toContain(".ui-field[data-variant='sidebar'] {");
+  expect(globalCss).toContain('--_field-bg: var(--surface);');
+  expect(globalCss).toContain('box-shadow: var(--shadow-card-sm);');
+  expect(searchFieldSource).toContain("variant?: 'default' | 'sidebar';");
+  expect(searchFieldSource).toContain("data-variant={variant === 'default' ? undefined : variant}");
   expect(globalCss).toContain('.ui-field.ui-field[data-placeholder] {');
   expect(globalCss).toContain('.ui-field.ui-field:hover {');
   expect(globalCss).toContain('--_field-border: var(--field-border-hover);');
@@ -920,6 +926,8 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
     '--side-list-bg: var(--surface);',
     '--side-list-border: var(--border);',
     '--page-pane-divider: var(--side-list-border);',
+    '--page-section-divider: var(--border);',
+    '--page-breadcrumb-divider: var(--border);',
     '--side-list-item-bg-hover: var(--fill-hover);',
     '--side-list-item-bg-active: var(--fill-selected);',
     '--side-list-item-fg-active: var(--pri);',
@@ -971,6 +979,10 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(pageScaffoldSource).toContain('py-(--page-frame-py)');
   expect(pageScaffoldSource).toContain('flex-(--page-frame-flex)');
   expect(pageScaffoldSource).toContain('min-h-(--page-frame-min-h)');
+  expect(pageScaffoldSource).toContain('PageFrameChromeProvider');
+  expect(pageScaffoldSource).toContain('data-slot="page-breadcrumb"');
+  expect(pageScaffoldSource).toContain('data-slot="page-breadcrumb-divider"');
+  expect(pageScaffoldSource).toContain('bg-(--page-breadcrumb-divider)');
   expect(pageScaffoldSource).toContain('mb-(--page-breadcrumb-mb)');
   expect(pageScaffoldSource).toContain('flex-(--page-surface-flex)');
   expect(pageScaffoldSource).toContain('min-h-(--page-surface-min-h)');
@@ -1026,6 +1038,8 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(globalCss).toContain('--page-surface-border: transparent;');
   expect(globalCss).toContain('--page-surface-shadow: none;');
   expect(globalCss).toContain('--page-pane-divider: transparent;');
+  expect(globalCss).toContain('--page-section-divider: color-mix(in srgb, var(--border) 70%, transparent);');
+  expect(globalCss).toContain('--page-breadcrumb-divider: color-mix(in srgb, var(--border) 70%, transparent);');
   expect(globalCss).toContain('--table-shell-border: transparent;');
   expect(globalCss).toContain('--table-row-border: color-mix(in srgb, var(--table-border) 72%, transparent);');
   expect(globalCss).toContain('--tabs-line-border: color-mix(in srgb, var(--border) 70%, transparent);');
@@ -1034,6 +1048,10 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(deptTreeSource).toContain('border-(--page-pane-divider)');
   expect(roleListPanelSource).toContain('border-(--page-pane-divider)');
   expect(menusPageSource).toContain('border-(--page-pane-divider)');
+  expect(menusPageSource).toContain('border-(--page-section-divider)');
+  expect(navMenuInsetSource).not.toContain("aria-label={t('shell.nav.collapse')}");
+  expect(navMenuInsetSource).toContain('variant="sidebar"');
+  expect(navMenuInsetSource).not.toContain('containerClassName="mb-3 h-9 w-full bg-surface"');
   expect(sideListSource).toContain('bg-(--side-list-bg)');
   expect(sideListSource).toContain('border-(--page-pane-divider)');
   expect(sideListSource).toContain('hover:bg-(--side-list-item-bg-hover)');

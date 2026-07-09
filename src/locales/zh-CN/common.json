@@ -249,7 +249,8 @@
     "lightMode": "浅色模式",
     "language": "语言 / Language",
     "nav": {
-      "collapse": "收起导航"
+      "collapse": "收起导航",
+      "expand": "展开导航"
     },
     "user": {
       "profile": "个人中心",

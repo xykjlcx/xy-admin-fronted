@@ -567,7 +567,7 @@ export function MenusView({
 
           <section
             aria-label={t('menus.treeRegionLabel', { subsystem: activeSubsystemName })}
-            className="flex min-w-0 flex-1 flex-col px-7 py-[calc(22px*var(--app-scale))]"
+            className="flex min-w-0 flex-1 flex-col border-l border-(--page-section-divider) px-7 py-[calc(22px*var(--app-scale))]"
           >
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <div>

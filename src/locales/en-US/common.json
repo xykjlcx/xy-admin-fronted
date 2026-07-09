@@ -249,7 +249,8 @@
     "lightMode": "Light mode",
     "language": "Language",
     "nav": {
-      "collapse": "Collapse navigation"
+      "collapse": "Collapse navigation",
+      "expand": "Expand navigation"
     },
     "user": {
       "profile": "Profile",
