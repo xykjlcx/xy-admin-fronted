@@ -22,12 +22,12 @@ export function PageFrame({
     <section
       {...props}
       className={cn(
-        'ui-page-frame flex min-h-0 flex-col bg-(--page-frame-bg) px-(--page-frame-px) py-(--page-frame-py) text-text',
+        'ui-page-frame flex flex-(--page-frame-flex) min-h-(--page-frame-min-h) flex-col bg-(--page-frame-bg) px-(--page-frame-px) py-(--page-frame-py) text-text',
         className,
       )}
       style={style}
     >
-      <div className="mb-4 flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
+      <div className="mb-(--page-breadcrumb-mb) flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3">
         {breadcrumbs.map((item, index) => (
           <Fragment key={index}>
             {index > 0 && <span>›</span>}
@@ -53,7 +53,7 @@ export function PageSurface({
     <div
       {...props}
       className={cn(
-        'ui-page-surface flex min-h-[calc(640px*var(--app-scale))] flex-col overflow-hidden rounded-12 border border-(--page-surface-border) bg-(--page-surface-bg) shadow-(--page-surface-shadow)',
+        'ui-page-surface flex flex-(--page-surface-flex) min-h-(--page-surface-min-h) flex-col overflow-hidden rounded-12 border border-(--page-surface-border) bg-(--page-surface-bg) shadow-(--page-surface-shadow)',
         className,
       )}
     >

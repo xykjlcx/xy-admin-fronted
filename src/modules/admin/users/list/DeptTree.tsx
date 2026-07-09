@@ -51,7 +51,7 @@ export function DeptTree({ selectedId, onSelect }: DeptTreeProps): JSX.Element {
   ] satisfies TreeNode[];
 
   return (
-    <aside className="w-[calc(248px*var(--app-scale))] shrink-0 border-r border-(--side-list-border) bg-(--side-list-bg) px-3 py-4">
+    <aside className="w-[calc(248px*var(--app-scale))] shrink-0 border-r border-(--side-list-border) bg-(--side-list-bg) px-(--page-side-px) py-(--page-side-py)">
       <div className="mb-3">
         <SearchField
           placeholder={t('users.deptSearchPlaceholder')}

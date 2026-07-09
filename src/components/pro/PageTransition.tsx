@@ -34,7 +34,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
   }, [animation, pathname]);
 
   return (
-    <div ref={frameRef} style={{ animation: animation || undefined }}>
+    <div ref={frameRef} className="flex min-h-full flex-col" style={{ animation: animation || undefined }}>
       {children}
     </div>
   );

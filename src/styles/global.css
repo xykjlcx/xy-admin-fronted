@@ -208,12 +208,24 @@
 
   /* Inset shell 的主 surface 已经负责外层卡片感，页面级 PageSurface 只保留业务结构。 */
   [data-shell-layout='inset'] {
-    --page-frame-px: calc(24px * var(--app-scale));
-    --page-frame-py: calc(18px * var(--app-scale));
+    --page-frame-px: calc(20px * var(--app-scale));
+    --page-frame-py: calc(14px * var(--app-scale));
+    --page-frame-flex: 1 1 auto;
+    --page-frame-min-h: 100%;
+    --page-breadcrumb-mb: calc(12px * var(--app-scale));
     --page-frame-bg: transparent;
+    --page-surface-flex: 1 1 auto;
+    --page-surface-min-h: 0px;
     --page-surface-bg: transparent;
     --page-surface-border: transparent;
     --page-surface-shadow: none;
+    --page-tabs-px: calc(18px * var(--app-scale));
+    --page-tabs-pt: calc(12px * var(--app-scale));
+    --page-tabs-gap: calc(24px * var(--app-scale));
+    --page-scene-px: calc(18px * var(--app-scale));
+    --page-scene-py: calc(14px * var(--app-scale));
+    --page-side-px: calc(10px * var(--app-scale));
+    --page-side-py: calc(12px * var(--app-scale));
   }
 
   /* Table 行状态机。顺序即优先级：selected/expanded > hover > base。

@@ -48,6 +48,9 @@ test('路由切换时保留内容区 transition 容器，只替换 route 内容'
 
   const firstFrame = (await screen.findByText('A content')).parentElement;
   expect(firstFrame).toBeTruthy();
+  expect(firstFrame).toHaveClass('min-h-full');
+  expect(firstFrame).toHaveClass('flex');
+  expect(firstFrame).toHaveClass('flex-col');
   firstFrame?.setAttribute('data-stability-probe', 'stable');
 
   await userEvent.click(screen.getByRole('link', { name: 'B' }));

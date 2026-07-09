@@ -106,7 +106,7 @@ export function AnimatedTabs<TValue extends string>({
       data-variant={variant}
       className={cn(
         'flex items-end border-b border-(--tabs-line-border)',
-        variant === 'page' && 'px-6 pt-[calc(18px*var(--app-scale))]',
+        variant === 'page' && 'px-(--page-tabs-px) pt-(--page-tabs-pt)',
         variant === 'content' && 'px-0',
         className,
       )}
@@ -117,7 +117,7 @@ export function AnimatedTabs<TValue extends string>({
         aria-label={ariaLabel}
         className={cn(
           'relative flex items-end',
-          variant === 'page' && 'gap-7',
+          variant === 'page' && 'gap-(--page-tabs-gap)',
           variant === 'content' && 'gap-6',
         )}
       >

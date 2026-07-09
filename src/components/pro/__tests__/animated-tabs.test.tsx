@@ -21,6 +21,8 @@ test('AnimatedTabs 渲染可访问 tab 并提供动画指示条', () => {
     'transition-[transform,width,opacity]',
   );
   expect(document.querySelector('[data-slot="animated-tabs"]')).toHaveClass('border-(--tabs-line-border)');
+  expect(document.querySelector('[data-slot="animated-tabs"]')).toHaveClass('px-(--page-tabs-px)');
+  expect(document.querySelector('[data-slot="animated-tabs"]')).toHaveClass('pt-(--page-tabs-pt)');
   expect(document.querySelector('[data-slot="animated-tabs-indicator"]')).toHaveClass('bg-(--tabs-line-indicator)');
   expect(screen.getByRole('tab', { name: '角色与权限' })).not.toHaveClass('border-(--tabs-line-indicator)');
   expect(screen.getByRole('tab', { name: '角色与权限' })).toHaveClass('ui-tabs-line-trigger');

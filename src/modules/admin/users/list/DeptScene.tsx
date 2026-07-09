@@ -59,7 +59,7 @@ export function DeptScene({
         selectedId={search.deptId}
         onSelect={(deptId) => onSearchChange({ deptId, page: 1 })}
       />
-      <main className="flex min-w-0 flex-1 flex-col px-6 py-[calc(18px*var(--app-scale))]">
+      <main className="flex min-w-0 flex-1 flex-col px-(--page-scene-px) py-(--page-scene-py)">
         <div className="mb-4 flex items-center">
           <span className="text-base font-bold">{t('users.deptList.title')}</span>
           <span className="ml-3 text-[calc(13px*var(--app-scale))] text-text-3">
