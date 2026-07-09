@@ -27,13 +27,14 @@ import { meQuery, authApi } from '@/modules/admin/api/auth.api';
 import { resetAuth } from '@/lib/reset-auth';
 import { appConfig } from '@/config';
 
-export function UserMenu() {
+export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar' | 'icon' } = {}) {
   const { t } = useTranslation();
   const nav = useNavigate();
   const { data: me } = useSuspenseQuery(meQuery);
   const [open, setOpen] = useState(false);
   const initial = me.user.name.slice(0, 1);
   const roleLabel = me.roles[0] ? t(`shell.roles.${me.roles[0]}`, me.roles[0]) : '';
+  const compact = variant === 'icon';
 
   const stub = () => toast(t('shell.toast.stub'));
 
@@ -51,22 +52,39 @@ export function UserMenu() {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2.5 rounded-8 px-2 py-1 hover:bg-(--nav-item-bg-hover)">
+        <button
+          aria-label={compact ? `${me.user.name} ${roleLabel}` : undefined}
+          className={cn(
+            'flex items-center gap-2.5 rounded-8 hover:bg-(--nav-item-bg-hover)',
+            variant === 'header' && 'px-2 py-1',
+            variant === 'sidebar' && 'w-full rounded-12 bg-surface px-2.5 py-2 text-left shadow-card-sm',
+            variant === 'icon' && 'size-9 justify-center p-0',
+          )}
+        >
           <Avatar className="size-[calc(30px*var(--app-scale))] rounded-8">
             <AvatarFallback className="rounded-8 bg-(--nav-item-fg-current) text-[calc(13px*var(--app-scale))] font-semibold text-white">
               {initial}
             </AvatarFallback>
           </Avatar>
-          <div className="text-left leading-tight">
-            <div className="text-[calc(13px*var(--app-scale))] font-semibold text-text">{me.user.name}</div>
-            <div className="text-[calc(11px*var(--app-scale))] text-text-3">{roleLabel}</div>
-          </div>
-          <ChevronDown
-            className={cn('size-3.5 text-text-3 transition-transform', open && 'rotate-180')}
-          />
+          {!compact && (
+            <>
+              <div className="min-w-0 flex-1 text-left leading-tight">
+                <div className="truncate text-[calc(13px*var(--app-scale))] font-semibold text-text">{me.user.name}</div>
+                <div className="truncate text-[calc(11px*var(--app-scale))] text-text-3">{roleLabel}</div>
+              </div>
+              <ChevronDown
+                className={cn('size-3.5 shrink-0 text-text-3 transition-transform', open && 'rotate-180')}
+              />
+            </>
+          )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(280px*var(--app-scale))] overflow-hidden p-0">
+      <DropdownMenuContent
+        align={variant === 'header' ? 'end' : 'start'}
+        side={variant === 'header' ? 'bottom' : 'right'}
+        sideOffset={8}
+        className="w-[calc(280px*var(--app-scale))] overflow-hidden p-0"
+      >
         <div className="flex items-center gap-3 p-[calc(18px*var(--app-scale))] pb-4">
           <Avatar className="size-11 rounded-11">
             <AvatarFallback className="rounded-11 bg-(--nav-item-fg-current) text-base font-semibold text-white">

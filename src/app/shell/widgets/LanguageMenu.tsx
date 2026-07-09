@@ -16,7 +16,13 @@ const LANGS = [
   { code: 'en-US', flag: '🇬🇧', label: 'English', sub: '英语' },
 ] as const;
 
-export function LanguageMenu() {
+export function LanguageMenu({
+  side = 'bottom',
+  align = 'end',
+}: {
+  side?: 'top' | 'right' | 'bottom' | 'left';
+  align?: 'start' | 'center' | 'end';
+} = {}) {
   const { t, i18n } = useTranslation();
   const current = i18n.language;
   const choose = (code: string) => {
@@ -30,7 +36,7 @@ export function LanguageMenu() {
           <Globe className="size-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(200px*var(--app-scale))] rounded-12 p-1.5">
+      <DropdownMenuContent side={side} align={align} sideOffset={8} className="w-[calc(200px*var(--app-scale))] rounded-12 p-1.5">
         <div className="px-2.5 pb-1.5 pt-2 text-[calc(11px*var(--app-scale))] font-semibold text-text-3">
           {t('shell.language')}
         </div>

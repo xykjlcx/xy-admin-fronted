@@ -67,7 +67,7 @@ const tree = [
   },
 ] satisfies MenuNode[];
 
-function renderInsetNav() {
+function renderInsetNav(footer?: React.ReactNode) {
   const rootRoute = createRootRoute({
     component: () => (
       <NavMenuInset
@@ -75,6 +75,7 @@ function renderInsetNav() {
         subsystems={subsystems}
         collapsed={false}
         onToggle={vi.fn()}
+        footer={footer}
       />
     ),
   });
@@ -122,4 +123,14 @@ test('Inset 侧栏只有 active 菜单项有边框和阴影', async () => {
   expect(inactive).not.toHaveClass('border');
   expect(inactive).not.toHaveClass('border-transparent');
   expect(inactive).not.toHaveClass('shadow-(--nav-item-shadow-current)');
+});
+
+test('Inset 侧栏支持底部壳层动作槽位', async () => {
+  renderInsetNav(<button type="button">侧栏动作</button>);
+
+  const footer = await screen.findByTestId('inset-sidebar-footer');
+  expect(footer).toHaveClass('mt-3');
+  expect(footer).toHaveClass('shrink-0');
+  expect(footer).toHaveTextContent('侧栏动作');
+  expect(document.querySelector('aside')).toContainElement(footer);
 });

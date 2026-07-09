@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
 import { PanelLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -19,11 +20,13 @@ export function NavMenuInset({
   subsystems,
   collapsed,
   onToggle,
+  footer,
 }: {
   tree: MenuNode[];
   subsystems: Subsystem[];
   collapsed: boolean;
   onToggle: () => void;
+  footer?: ReactNode;
 }) {
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
@@ -62,7 +65,7 @@ export function NavMenuInset({
           }}
         />
       )}
-      <div className="flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         {groups.map((g) => (
           <div key={g.node.id}>
             {!collapsed && (
@@ -92,6 +95,11 @@ export function NavMenuInset({
           </div>
         ))}
       </div>
+      {footer && (
+        <div data-testid="inset-sidebar-footer" className="mt-3 shrink-0 pb-3">
+          {footer}
+        </div>
+      )}
     </aside>
   );
 }
