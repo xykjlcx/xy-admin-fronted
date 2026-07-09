@@ -4,6 +4,7 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { useForm } from 'react-hook-form';
 import { vi } from 'vitest';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,6 +25,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } fr
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
+import { ProgressBar } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { SelectControl } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
@@ -115,6 +117,32 @@ test('SheetContent 使用 overlay token 而不是页面背景', () => {
   expect(content).not.toHaveClass('bg-background');
 });
 
+test('SheetContent 各方向使用本地抽屉动画而不是 shadcn 默认 slide 类', () => {
+  const sides = [
+    ['right', 'anim-sheet-in-right'],
+    ['left', 'anim-sheet-in-left'],
+    ['top', 'anim-sheet-in-top'],
+    ['bottom', 'anim-sheet-in-bottom'],
+  ] as const;
+
+  for (const [side, animationClass] of sides) {
+    const { unmount } = render(
+      <Sheet open>
+        <SheetContent side={side}>
+          <SheetTitle>{`${side} sheet`}</SheetTitle>
+          <div>{`${side} body`}</div>
+        </SheetContent>
+      </Sheet>,
+    );
+
+    const content = screen.getByText(`${side} body`).closest('[data-slot="sheet-content"]');
+    expect(content).toHaveClass(animationClass);
+    expect(content?.className).not.toContain('animate-in');
+    expect(content?.className).not.toContain('slide-in-from');
+    unmount();
+  }
+});
+
 test('DialogContent 和 SheetContent 使用统一关闭按钮视觉', () => {
   const { unmount } = render(
     <Dialog open>
@@ -175,7 +203,12 @@ test('Button 使用后台设计体系变体并兼容 loading 状态', () => {
       <Button variant="ghost" size="icon" aria-label="图标按钮">
         <span data-icon="test" />
       </Button>
-      <Button variant="ghost" size="icon" className="text-text-2 hover:text-text-2" aria-label="自定义图标按钮">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="text-text-2 hover:text-text-2"
+        aria-label="自定义图标按钮"
+      >
         <span data-icon="test" />
       </Button>
     </>,
@@ -196,7 +229,9 @@ test('Button 使用后台设计体系变体并兼容 loading 状态', () => {
   expect(screen.getByRole('button', { name: '链接按钮' })).toHaveClass('text-(--button-link-fg)');
   expect(screen.getByRole('button', { name: '危险按钮' })).toHaveClass('bg-(--button-danger-bg)');
   expect(screen.getByRole('button', { name: '破坏按钮' })).toHaveClass('bg-(--button-danger-bg)');
-  expect(screen.getByRole('button', { name: '危险描边' })).toHaveClass('border-(--button-danger-ghost-border)');
+  expect(screen.getByRole('button', { name: '危险描边' })).toHaveClass(
+    'border-(--button-danger-ghost-border)',
+  );
   expect(screen.getByRole('button', { name: '图标按钮' })).not.toHaveAttribute('data-icon-button');
   expect(screen.getByRole('button', { name: '图标按钮' })).toHaveClass('text-(--button-icon-fg)');
   expect(screen.getByRole('button', { name: '图标按钮' })).toHaveClass('hover:bg-(--button-icon-bg-hover)');
@@ -219,10 +254,14 @@ test('非 Field 交互组件统一使用设计体系 focus ring token', () => {
     </>,
   );
 
-  expect(screen.getByRole('button', { name: '保存' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('button', { name: '保存' })).toHaveClass(
+    'focus-visible:ring-[length:var(--focus-ring)]',
+  );
   expect(screen.getByRole('radio', { name: '启用' })).toHaveClass('ui-choice');
   expect(screen.getByRole('radio', { name: '启用' })).not.toHaveClass('focus-visible:ring-(--choice-ring)');
-  expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('focus-visible:ring-[length:var(--focus-ring)]');
+  expect(screen.getByRole('tab', { name: '概览' })).toHaveClass(
+    'focus-visible:ring-[length:var(--focus-ring)]',
+  );
   expect(screen.getByRole('tab', { name: '概览' })).toHaveClass('focus-visible:ring-(--tabs-ring)');
 });
 
@@ -373,7 +412,9 @@ test('SelectItem 与 DropdownMenuItem 分别消费 Option/Menu token', async () 
   expect(selectedOption).toHaveClass('data-[highlighted]:text-(--option-fg-highlighted)');
   expect(selectedOption).toHaveClass('data-[state=checked]:bg-(--option-bg-selected)');
   expect(selectedOption).toHaveClass('data-[state=checked]:text-(--option-fg-selected)');
-  expect(selectedOption.querySelector('[data-slot="select-item-indicator"]')).toHaveClass('text-(--option-check)');
+  expect(selectedOption.querySelector('[data-slot="select-item-indicator"]')).toHaveClass(
+    'text-(--option-check)',
+  );
 
   unmount();
 
@@ -405,39 +446,71 @@ test('SelectItem 与 DropdownMenuItem 分别消费 Option/Menu token', async () 
 
   const destructiveItem = screen.getByText('删除').closest('[data-slot="dropdown-menu-item"]');
   expect(destructiveItem).toHaveClass('data-[variant=destructive]:text-(--menu-item-fg-danger)');
-  expect(destructiveItem).toHaveClass('data-[variant=destructive]:focus:bg-(--menu-item-bg-danger-highlighted)');
-  expect(destructiveItem).toHaveClass('data-[variant=destructive]:data-[highlighted]:bg-(--menu-item-bg-danger-highlighted)');
+  expect(destructiveItem).toHaveClass(
+    'data-[variant=destructive]:focus:bg-(--menu-item-bg-danger-highlighted)',
+  );
+  expect(destructiveItem).toHaveClass(
+    'data-[variant=destructive]:data-[highlighted]:bg-(--menu-item-bg-danger-highlighted)',
+  );
 
   const checkboxItem = screen.getByText('显示隐藏节点').closest('[data-slot="dropdown-menu-checkbox-item"]');
   expect(checkboxItem).toHaveClass('text-(--menu-item-fg)');
+  expect(checkboxItem).toHaveClass('rounded-8');
   expect(checkboxItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
   expect(checkboxItem).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
 
   const radioItem = screen.getByText('紧凑').closest('[data-slot="dropdown-menu-radio-item"]');
   expect(radioItem).toHaveClass('text-(--menu-item-fg)');
+  expect(radioItem).toHaveClass('rounded-8');
   expect(radioItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
   expect(radioItem).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
 
   const subTrigger = screen.getByText('更多').closest('[data-slot="dropdown-menu-sub-trigger"]');
   expect(subTrigger).toHaveClass('text-(--menu-item-fg)');
+  expect(subTrigger).toHaveClass('rounded-8');
   expect(subTrigger).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
   expect(subTrigger).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
   expect(subTrigger).toHaveClass('data-[state=open]:bg-(--menu-item-bg-highlighted)');
 });
 
-test('Badge、Skeleton、Empty 提供基础展示原子件', () => {
+test('Badge、Progress、Avatar、Skeleton、Empty 提供基础展示原子件', () => {
   render(
     <>
       <Badge variant="success" dot dotTestId="badge-dot">
         正常
       </Badge>
+      <ProgressBar value={40} data-testid="progress" />
+      <Avatar>
+        <AvatarFallback data-testid="avatar-fallback">AB</AvatarFallback>
+        <AvatarBadge data-testid="avatar-badge" />
+      </Avatar>
+      <AvatarGroup data-testid="avatar-group">
+        <Avatar>
+          <AvatarFallback>A</AvatarFallback>
+        </Avatar>
+        <AvatarGroupCount data-testid="avatar-count">+2</AvatarGroupCount>
+      </AvatarGroup>
       <Skeleton data-testid="skeleton" />
       <Empty title="暂无数据" description="请调整筛选条件" />
     </>,
   );
 
-  expect(screen.getByText('正常')).toHaveClass('bg-success-bg');
+  expect(screen.getByText('正常')).toHaveClass('bg-(--badge-bg)');
+  expect(screen.getByText('正常')).toHaveClass('text-(--badge-fg)');
   expect(screen.getByTestId('badge-dot')).toBeInTheDocument();
+  expect(screen.getByTestId('progress')).toHaveClass('bg-(--progress-bg)');
+  expect(screen.getByTestId('progress').querySelector('[data-slot="progress-indicator"]')).toHaveClass(
+    'bg-(--progress-indicator-bg)',
+  );
+  expect(screen.getByTestId('avatar-fallback')).toHaveClass('bg-(--avatar-bg)');
+  expect(screen.getByTestId('avatar-fallback')).toHaveClass('text-(--avatar-fg)');
+  expect(screen.getByTestId('avatar-badge')).toHaveClass('bg-(--avatar-badge-bg)');
+  expect(screen.getByTestId('avatar-badge')).toHaveClass('text-(--avatar-badge-fg)');
+  expect(screen.getByTestId('avatar-badge')).toHaveClass('ring-(--avatar-ring)');
+  expect(screen.getByTestId('avatar-group')).toHaveClass('*:data-[slot=avatar]:ring-(--avatar-ring)');
+  expect(screen.getByTestId('avatar-count')).toHaveClass('bg-(--avatar-bg)');
+  expect(screen.getByTestId('avatar-count')).toHaveClass('text-(--avatar-fg)');
+  expect(screen.getByTestId('avatar-count')).toHaveClass('ring-(--avatar-ring)');
   expect(screen.getByTestId('skeleton')).toHaveAttribute('data-slot', 'skeleton');
   expect(screen.getByTestId('skeleton')).toHaveClass('bg-(--skeleton-bg)');
   expect(screen.getByText('暂无数据')).toBeInTheDocument();
@@ -537,8 +610,12 @@ test('Tabs 分结构消费 Step 6 token 并保留 line 指示条动画', () => {
   expect(lineList).toHaveClass('border-(--tabs-line-border)');
   expect(lineTrigger).toHaveClass('ui-tabs-line-trigger');
   expect(lineTrigger).not.toHaveClass('group-data-[variant=line]/tabs-list:text-(--tabs-line-trigger-fg)');
-  expect(lineTrigger).not.toHaveClass('group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)');
-  expect(lineTrigger).not.toHaveClass('group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)');
+  expect(lineTrigger).not.toHaveClass(
+    'group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)',
+  );
+  expect(lineTrigger).not.toHaveClass(
+    'group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)',
+  );
   expect(lineTrigger).toHaveClass('after:bg-(--tabs-line-indicator)');
   expect(lineTrigger).toHaveClass('after:transition-[opacity,transform]');
 });

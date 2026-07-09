@@ -141,14 +141,6 @@
     border-color: transparent transparent var(--_field-border) transparent;
   }
 
-  /* S5 sera 第二条（也是最后一条）允许的型分支：badge 裸文字。badge 的 7 个 variant 底色是组件族
-     硬编码 class（无统一 --badge-bg token 挂点，故量层 token 无法归零底色），只能在型层拦。
-     与官方 base-sera 一致——sera 下 badge 呈裸文字（无底色 / 无内距，内距已由 --badge-px/py: 0 归零）。
-     文字色仍走各 variant 的语义 class（text-pri/text-success…），不受影响。仅 sera 激活时命中。 */
-  [data-flavor='sera'] [data-slot='badge'] {
-    background-color: transparent;
-  }
-
   .ui-field::placeholder,
   .ui-field [data-slot='input-group-input']::placeholder {
     color: var(--field-placeholder);
@@ -214,7 +206,8 @@
     box-shadow: var(--field-shadow);
   }
 
-  /* Table 行状态机。顺序即优先级：selected/expanded > hover > base。 */
+  /* Table 行状态机。顺序即优先级：selected/expanded > hover > base。
+     只有行自身标记 expanded 才上色，行内展开按钮不改变整行背景。 */
   .ui-table-row {
     --_table-row-bg: var(--table-row-bg);
     background: var(--_table-row-bg);
@@ -225,8 +218,7 @@
     --_table-row-bg: var(--table-row-bg-hover);
   }
 
-  .ui-table-row.ui-table-row[aria-expanded='true'],
-  .ui-table-row.ui-table-row:has([aria-expanded='true']) {
+  .ui-table-row.ui-table-row[aria-expanded='true'] {
     --_table-row-bg: var(--table-row-bg-expanded);
   }
 
@@ -313,7 +305,9 @@
   }
 }
 
-html { font-family: var(--font-sans); }
+html {
+  font-family: var(--font-sans);
+}
 
 /* 显示比例 token 乘法（取代 CSS zoom，机制见 tokens.base.css --app-scale 注释）：
    盖写 Tailwind v4 内置主题变量，使 spacing 与 text 工具类随显示比例档等比缩放。
@@ -331,26 +325,138 @@ html { font-family: var(--font-sans); }
   --text-2xl: calc(1.5rem * var(--app-scale));
   --text-3xl: calc(1.875rem * var(--app-scale));
 }
-body { margin: 0; background: var(--bg); color: var(--text);
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
   font-size: calc(14px * var(--app-scale));
-  -webkit-font-smoothing: antialiased; }
-.tabular-nums { font-variant-numeric: tabular-nums; }
+  -webkit-font-smoothing: antialiased;
+}
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
 
-@keyframes ovl-fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes sheet-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes modal-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes pg-fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pg-slide { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes pg-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes pg-scale { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
+@keyframes ovl-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes sheet-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes sheet-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes sheet-in-top {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes sheet-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes pg-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pg-slide {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes pg-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pg-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
 
 /* 弹层/抽屉进场动效（原型 keyframes L19-25 + 时长缓动 L185/L266/L2652 逐字提取）。
    只做进场（enter）：原型无退场动画，关闭即卸载。shadcn 基元用这些类替换其默认 animate-in/zoom/slide。 */
-.anim-ovl-fade { animation: ovl-fade 0.2s ease; }
-.anim-sheet-in-right { animation: sheet-in-right 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
-.anim-modal-in { animation: modal-in 0.18s cubic-bezier(0.4, 0, 0.2, 1); }
-.anim-modal-in-lg { animation: modal-in 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
+.anim-ovl-fade {
+  animation: ovl-fade 0.2s ease;
+}
+.anim-sheet-in-right {
+  animation: sheet-in-right 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.anim-sheet-in-left {
+  animation: sheet-in-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.anim-sheet-in-top {
+  animation: sheet-in-top 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.anim-sheet-in-bottom {
+  animation: sheet-in-bottom 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.anim-modal-in {
+  animation: modal-in 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.anim-modal-in-lg {
+  animation: modal-in 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}

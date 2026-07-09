@@ -1,57 +1,48 @@
-import * as React from "react"
-import { XIcon } from "lucide-react"
-import { Dialog as SheetPrimitive } from "radix-ui"
+import * as React from 'react';
+import { XIcon } from 'lucide-react';
+import { Dialog as SheetPrimitive } from 'radix-ui';
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils';
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-  return <SheetPrimitive.Root data-slot="sheet" {...props} />
+  return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }
 
-function SheetTrigger({
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
-  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
+function SheetTrigger({ ...props }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
+  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
 }
 
-function SheetClose({
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Close>) {
-  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
+function SheetClose({ ...props }: React.ComponentProps<typeof SheetPrimitive.Close>) {
+  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
 }
 
-function SheetPortal({
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Portal>) {
-  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />
+function SheetPortal({ ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
+  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
 }
 
-function SheetOverlay({
-  className,
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
+function SheetOverlay({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
   return (
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
         // 原型遮罩（L2651）：rgba(0,0,0,.22) + backdrop-blur(6px) + ovl-fade .2s
-        "anim-ovl-fade fixed inset-0 z-50 bg-(--overlay-mask-bg) backdrop-blur-[var(--overlay-mask-blur)]",
-        className
+        'anim-ovl-fade fixed inset-0 z-50 bg-(--overlay-mask-bg) backdrop-blur-[var(--overlay-mask-blur)]',
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function SheetContent({
   className,
   children,
-  side = "right",
+  side = 'right',
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
-  side?: "top" | "right" | "bottom" | "left"
-  showCloseButton?: boolean
+  side?: 'top' | 'right' | 'bottom' | 'left';
+  showCloseButton?: boolean;
 }) {
   return (
     <SheetPortal>
@@ -59,17 +50,16 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-(--overlay-bg) text-(--overlay-fg)",
+          'fixed z-50 flex flex-col gap-4 bg-(--overlay-bg) text-(--overlay-fg)',
           // 右抽屉使用方向性投影，保持从右侧覆盖的视觉来源。
-          side === "right" &&
-            "anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-(--overlay-border) shadow-(--shadow-drawer) sm:max-w-sm",
-          side === "left" &&
-            "inset-y-0 left-0 h-full w-3/4 border-r border-(--overlay-border) data-[state=open]:animate-in data-[state=open]:slide-in-from-left data-[state=open]:duration-300 sm:max-w-sm",
-          side === "top" &&
-            "inset-x-0 top-0 h-auto border-b border-(--overlay-border) data-[state=open]:animate-in data-[state=open]:slide-in-from-top data-[state=open]:duration-300",
-          side === "bottom" &&
-            "inset-x-0 bottom-0 h-auto border-t border-(--overlay-border) data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300",
-          className
+          side === 'right' &&
+            'anim-sheet-in-right inset-y-0 right-0 h-full w-3/4 border-l border-(--overlay-border) shadow-(--shadow-drawer) sm:max-w-sm',
+          side === 'left' &&
+            'anim-sheet-in-left inset-y-0 left-0 h-full w-3/4 border-r border-(--overlay-border) sm:max-w-sm',
+          side === 'top' && 'anim-sheet-in-top inset-x-0 top-0 h-auto border-b border-(--overlay-border)',
+          side === 'bottom' &&
+            'anim-sheet-in-bottom inset-x-0 bottom-0 h-auto border-t border-(--overlay-border)',
+          className,
         )}
         {...props}
       >
@@ -86,53 +76,37 @@ function SheetContent({
         )}
       </SheetPrimitive.Content>
     </SheetPortal>
-  )
+  );
 }
 
-function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
+function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
+  return <div data-slot="sheet-header" className={cn('flex flex-col gap-1.5 p-4', className)} {...props} />;
+}
+
+function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div
-      data-slot="sheet-header"
-      className={cn("flex flex-col gap-1.5 p-4", className)}
-      {...props}
-    />
-  )
+    <div data-slot="sheet-footer" className={cn('mt-auto flex flex-col gap-2 p-4', className)} {...props} />
+  );
 }
 
-function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="sheet-footer"
-      className={cn("mt-auto flex flex-col gap-2 p-4", className)}
-      {...props}
-    />
-  )
-}
-
-function SheetTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Title>) {
+function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Title>) {
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn("font-semibold text-foreground", className)}
+      className={cn('font-semibold text-(--overlay-fg)', className)}
       {...props}
     />
-  )
+  );
 }
 
-function SheetDescription({
-  className,
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Description>) {
+function SheetDescription({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Description>) {
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn('text-sm text-(--overlay-muted-fg)', className)}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -144,4 +118,4 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-}
+};

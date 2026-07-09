@@ -1,23 +1,19 @@
-import * as React from "react"
-import { Popover as PopoverPrimitive } from "radix-ui"
+import * as React from 'react';
+import { Popover as PopoverPrimitive } from 'radix-ui';
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils';
 
-function Popover({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Root>) {
-  return <PopoverPrimitive.Root data-slot="popover" {...props} />
+function Popover({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
+  return <PopoverPrimitive.Root data-slot="popover" {...props} />;
 }
 
-function PopoverTrigger({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
+function PopoverTrigger({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
+  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
 }
 
 function PopoverContent({
   className,
-  align = "center",
+  align = 'center',
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
@@ -29,52 +25,33 @@ function PopoverContent({
         sideOffset={sideOffset}
         className={cn(
           // 原型弹层规格：rounded-14 + shadow 0 12px 40px .16 + modal-in .18s（替换 shadcn 默认 zoom/slide）
-          "anim-modal-in z-50 w-72 rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-4 text-(--overlay-fg) shadow-(--overlay-shadow-popover) outline-hidden",
-          className
+          'anim-modal-in z-50 w-72 rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-4 text-(--overlay-fg) shadow-(--overlay-shadow-popover) outline-hidden',
+          className,
         )}
         {...props}
       />
     </PopoverPrimitive.Portal>
-  )
+  );
 }
 
-function PopoverAnchor({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
-  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />
+function PopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
+  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
 }
 
-function PopoverHeader({ className, ...props }: React.ComponentProps<"div">) {
+function PopoverHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div
-      data-slot="popover-header"
-      className={cn("flex flex-col gap-1 text-sm", className)}
-      {...props}
-    />
-  )
+    <div data-slot="popover-header" className={cn('flex flex-col gap-1 text-sm', className)} {...props} />
+  );
 }
 
-function PopoverTitle({ className, ...props }: React.ComponentProps<"h2">) {
-  return (
-    <div
-      data-slot="popover-title"
-      className={cn("font-medium", className)}
-      {...props}
-    />
-  )
+function PopoverTitle({ className, ...props }: React.ComponentProps<'h2'>) {
+  return <div data-slot="popover-title" className={cn('font-medium', className)} {...props} />;
 }
 
-function PopoverDescription({
-  className,
-  ...props
-}: React.ComponentProps<"p">) {
+function PopoverDescription({ className, ...props }: React.ComponentProps<'p'>) {
   return (
-    <p
-      data-slot="popover-description"
-      className={cn("text-muted-foreground", className)}
-      {...props}
-    />
-  )
+    <p data-slot="popover-description" className={cn('text-(--overlay-muted-fg)', className)} {...props} />
+  );
 }
 
 export {
@@ -85,4 +62,4 @@ export {
   PopoverHeader,
   PopoverTitle,
   PopoverDescription,
-}
+};

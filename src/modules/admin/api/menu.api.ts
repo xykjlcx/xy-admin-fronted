@@ -38,6 +38,7 @@ const MenuRecordSchema: z.ZodType<MenuRecord> = z.object({
 const NullSchema = z.null();
 
 const subsystemsContract = defineApiContract({ response: z.array(SubsystemSchema) });
+const subsystemContract = defineApiContract({ response: SubsystemSchema });
 const menusContract = defineApiContract({ response: z.array(MenuRecordSchema) });
 const menuContract = defineApiContract({ response: MenuRecordSchema });
 const nullContract = defineApiContract({ response: NullSchema });
@@ -61,6 +62,14 @@ export interface SetMenuVisibilityInput {
   visible: boolean;
 }
 
+export type UpdateSubsystemInput = Pick<Subsystem, 'label' | 'desc' | 'icon' | 'color' | 'home' | 'enabled'>;
+
+export interface CreateSubsystemInput extends UpdateSubsystemInput {
+  key: string;
+  builtin: boolean;
+  sort: number;
+}
+
 export const subsystemsQuery = queryOptions({
   queryKey: ['nav', 'subsystems'],
   staleTime: Infinity,
@@ -75,6 +84,9 @@ export const menusQuery = (subsystem: string) =>
   });
 
 export const menuApi = {
+  createSubsystem: (dto: CreateSubsystemInput) => http.post('/api/subsystems', dto, subsystemContract),
+  updateSubsystem: (key: string, dto: UpdateSubsystemInput) =>
+    http.put(`/api/subsystems/${key}`, dto, subsystemContract),
   createMenu: (dto: CreateMenuInput) => http.post('/api/menus', dto, menuContract),
   updateMenu: (id: string, dto: UpdateMenuInput) => http.put(`/api/menus/${id}`, dto, menuContract),
   deleteMenu: (id: string) => http.del(`/api/menus/${id}`, nullContract),

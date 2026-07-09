@@ -37,7 +37,7 @@ export function AdminRolesPanel({
 
       <TableShell
         header={
-          <TableShellHeader gridTemplateColumns={adminGridTemplate} className="px-4">
+          <TableShellHeader gridTemplateColumns={adminGridTemplate}>
             <div>{t('roles.columns.adminRole')}</div>
             <div>{t('roles.columns.admin')}</div>
             <div>{t('roles.columns.scope')}</div>
@@ -50,7 +50,6 @@ export function AdminRolesPanel({
           <TableShellRow
             key={role.id}
             gridTemplateColumns={adminGridTemplate}
-            className="h-[calc(60px*var(--app-scale))] px-4"
           >
             <div className="flex min-w-0 items-center gap-2">
               <span className="truncate text-sm font-medium text-text">{role.name}</span>

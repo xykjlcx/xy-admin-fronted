@@ -3,7 +3,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 // Card 原语：结构照 shadcn 官方惯例（data-slot 齐全），几何全走 --card-* 挂点。
-// spacing/radius/shadow 三 flavor 统一（S4 值=统一档），flavor 档差 S5 sera 激活。
+// spacing/radius/shadow 默认旧三套 flavor 统一（S4 值=统一档），flavor 档差 S5 sera 激活。
 // 局部 [--card-spacing:...] 变量模式不采用——直接消费全局 token，更简单。
 
 function Card({ className, ...props }: React.ComponentProps<'div'>) {

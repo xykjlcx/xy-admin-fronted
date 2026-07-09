@@ -10,6 +10,7 @@ import { NativeSelect } from '@/components/ui/native-select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount } from '@/components/ui/avatar';
 import {
   Card,
   CardAction,
@@ -23,13 +24,12 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/c
 import { dialogTitleClassName } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  SelectControl,
-} from '@/components/ui/select';
+import { SelectControl } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
+import { ProgressBar } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
@@ -93,7 +93,15 @@ const buttonVariantLabelKeys: Record<(typeof buttonVariantsForThemeStates)[numbe
   destructive: 'dev.themeStates.buttonDestructive',
   'danger-ghost': 'dev.themeStates.buttonDangerGhost',
 };
-const badgeVariantsForThemeStates = ['neutral', 'primary', 'success', 'warning', 'danger', 'purple', 'teal'] as const;
+const badgeVariantsForThemeStates = [
+  'neutral',
+  'primary',
+  'success',
+  'warning',
+  'danger',
+  'purple',
+  'teal',
+] as const;
 const badgeVariantLabelKeys: Record<(typeof badgeVariantsForThemeStates)[number], string> = {
   neutral: 'dev.themeStates.badgeNeutral',
   primary: 'dev.themeStates.badgePrimary',
@@ -121,12 +129,28 @@ interface TreeThemeNode {
 }
 
 const dataTableRows: DataTableThemeRow[] = [
-  { id: 'selected', nameKey: 'dev.themeStates.dataTableSelected', statusKey: 'dev.themeStates.tableStatusEnabled' },
-  { id: 'normal', nameKey: 'dev.themeStates.dataTableNormal', statusKey: 'dev.themeStates.tableStatusEnabled' },
-  { id: 'disabled', nameKey: 'dev.themeStates.dataTableDisabled', statusKey: 'dev.themeStates.fieldInactive' },
+  {
+    id: 'selected',
+    nameKey: 'dev.themeStates.dataTableSelected',
+    statusKey: 'dev.themeStates.tableStatusEnabled',
+  },
+  {
+    id: 'normal',
+    nameKey: 'dev.themeStates.dataTableNormal',
+    statusKey: 'dev.themeStates.tableStatusEnabled',
+  },
+  {
+    id: 'disabled',
+    nameKey: 'dev.themeStates.dataTableDisabled',
+    statusKey: 'dev.themeStates.fieldInactive',
+  },
 ];
 const dataTableSingleRows: DataTableThemeRow[] = [
-  { id: 'single', nameKey: 'dev.themeStates.dataTableSelected', statusKey: 'dev.themeStates.tableStatusEnabled' },
+  {
+    id: 'single',
+    nameKey: 'dev.themeStates.dataTableSelected',
+    statusKey: 'dev.themeStates.tableStatusEnabled',
+  },
 ];
 const dataTablePartialRowSelection: RowSelectionState = { selected: true };
 const dataTableAllRowSelection: RowSelectionState = { selected: true, normal: true, disabled: true };
@@ -147,7 +171,11 @@ const dataTableSelectionStates = [
     rows: dataTableSingleRows,
     rowSelection: dataTableSingleRowSelection,
   },
-] satisfies { id: 'partial' | 'all' | 'single'; rows: DataTableThemeRow[]; rowSelection: RowSelectionState }[];
+] satisfies {
+  id: 'partial' | 'all' | 'single';
+  rows: DataTableThemeRow[];
+  rowSelection: RowSelectionState;
+}[];
 const noopDataTableRowSelectionChange: OnChangeFn<RowSelectionState> = () => undefined;
 const treeThemeNodes: TreeThemeNode[] = [
   { id: 'all', labelKey: 'dev.themeStates.treeNodes.all', depth: 0, meta: '42' },
@@ -200,7 +228,11 @@ function ThemeStatesRoute() {
       header: t('dev.themeStates.tableAction'),
       meta: { width: '20%', align: 'end' },
       enableSorting: false,
-      cell: () => <Button variant="link" size="xs">{t('dev.themeStates.tableActionView')}</Button>,
+      cell: () => (
+        <Button variant="link" size="xs">
+          {t('dev.themeStates.tableActionView')}
+        </Button>
+      ),
     },
   ];
 
@@ -211,9 +243,7 @@ function ThemeStatesRoute() {
           {t('dev.themeStates.eyebrow')}
         </p>
         <h1 className="ui-page-title text-xl font-semibold text-text">{t('dev.themeStates.title')}</h1>
-        <p className="max-w-[720px] text-sm text-text-2">
-          {t('dev.themeStates.description')}
-        </p>
+        <p className="max-w-[720px] text-sm text-text-2">{t('dev.themeStates.description')}</p>
       </header>
 
       <section className="grid gap-3 rounded-lg border border-border bg-surface p-4 shadow-card-sm md:grid-cols-5">
@@ -323,12 +353,17 @@ function ThemeStatesRoute() {
           <Button loading>{t('dev.themeStates.buttonLoading')}</Button>
           <Button disabled>{t('dev.themeStates.buttonDisabled')}</Button>
           <Button variant="ghost" size="icon" aria-label={t('dev.themeStates.buttonIcon')}>
-            <span data-icon="theme-states" className="font-semibold">i</span>
+            <span data-icon="theme-states" className="font-semibold">
+              i
+            </span>
           </Button>
         </div>
       </section>
 
-      <section data-testid="badgeMatrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+      <section
+        data-testid="badgeMatrix"
+        className="rounded-lg border border-border bg-surface p-4 shadow-card-sm"
+      >
         <div className="mb-4 flex flex-col gap-1">
           <h2 className="text-base font-semibold text-text">{t('dev.themeStates.badgeMatrix')}</h2>
           <p className="text-sm text-text-2">{t('dev.themeStates.badgeMatrixDesc')}</p>
@@ -357,7 +392,41 @@ function ThemeStatesRoute() {
         </div>
       </section>
 
-      <section data-testid="cardMatrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+      <section
+        data-testid="avatarMatrix"
+        className="rounded-lg border border-border bg-surface p-4 shadow-card-sm"
+      >
+        <div className="mb-4 flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-text">{t('dev.themeStates.avatarMatrix')}</h2>
+          <p className="text-sm text-text-2">{t('dev.themeStates.avatarMatrixDesc')}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-md border border-border bg-surface-2 p-4">
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.avatarSingle')}</p>
+            <Avatar size="lg">
+              <AvatarFallback>{t('dev.themeStates.avatarInitials')}</AvatarFallback>
+              <AvatarBadge aria-label={t('dev.themeStates.avatarStatus')} />
+            </Avatar>
+          </div>
+          <div className="rounded-md border border-border bg-surface-2 p-4">
+            <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.avatarGroup')}</p>
+            <AvatarGroup>
+              <Avatar>
+                <AvatarFallback>{t('dev.themeStates.avatarInitials')}</AvatarFallback>
+              </Avatar>
+              <Avatar size="sm">
+                <AvatarFallback>{t('dev.themeStates.avatarSecondaryInitials')}</AvatarFallback>
+              </Avatar>
+              <AvatarGroupCount>{t('dev.themeStates.avatarCount')}</AvatarGroupCount>
+            </AvatarGroup>
+          </div>
+        </div>
+      </section>
+
+      <section
+        data-testid="cardMatrix"
+        className="rounded-lg border border-border bg-surface p-4 shadow-card-sm"
+      >
         <div className="mb-4 flex flex-col gap-1">
           <h2 className="text-base font-semibold text-text">{t('dev.themeStates.cardMatrix')}</h2>
           <p className="text-sm text-text-2">{t('dev.themeStates.cardMatrixDesc')}</p>
@@ -381,7 +450,10 @@ function ThemeStatesRoute() {
         </div>
       </section>
 
-      <section data-testid="dialogTitleMatrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+      <section
+        data-testid="dialogTitleMatrix"
+        className="rounded-lg border border-border bg-surface p-4 shadow-card-sm"
+      >
         <div className="mb-4 flex flex-col gap-1">
           <h2 className="text-base font-semibold text-text">{t('dev.themeStates.dialogMatrix')}</h2>
           <p className="text-sm text-text-2">{t('dev.themeStates.dialogMatrixDesc')}</p>
@@ -396,10 +468,7 @@ function ThemeStatesRoute() {
             className="grid gap-4 rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-6 text-(--overlay-fg) shadow-(--overlay-shadow-modal)"
           >
             <div className="flex flex-col gap-2">
-              <div
-                data-slot="dialog-title"
-                className={dialogTitleClassName}
-              >
+              <div data-slot="dialog-title" className={dialogTitleClassName}>
                 {t('dev.themeStates.dialogTitle')}
               </div>
               <p data-slot="dialog-description" className="text-sm text-text-2">
@@ -414,7 +483,10 @@ function ThemeStatesRoute() {
         </div>
       </section>
 
-      <section data-testid="labelPeerMatrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+      <section
+        data-testid="labelPeerMatrix"
+        className="rounded-lg border border-border bg-surface p-4 shadow-card-sm"
+      >
         <div className="mb-4 flex flex-col gap-1">
           <h2 className="text-base font-semibold text-text">{t('dev.themeStates.labelMatrix')}</h2>
           <p className="text-sm text-text-2">{t('dev.themeStates.labelMatrixDesc')}</p>
@@ -473,13 +545,22 @@ function ThemeStatesRoute() {
 
           <Field data-disabled>
             <FieldLabel htmlFor="theme-field-disabled">{t('dev.themeStates.fieldDisabled')}</FieldLabel>
-            <Input id="theme-field-disabled" disabled defaultValue={t('dev.themeStates.fieldDisabledValue')} readOnly />
+            <Input
+              id="theme-field-disabled"
+              disabled
+              defaultValue={t('dev.themeStates.fieldDisabledValue')}
+              readOnly
+            />
             <FieldDescription>{t('dev.themeStates.fieldDisabledDesc')}</FieldDescription>
           </Field>
 
           <Field>
             <FieldLabel htmlFor="theme-field-readonly">{t('dev.themeStates.fieldReadonly')}</FieldLabel>
-            <Input id="theme-field-readonly" readOnly defaultValue={t('dev.themeStates.fieldReadonlyValue')} />
+            <Input
+              id="theme-field-readonly"
+              readOnly
+              defaultValue={t('dev.themeStates.fieldReadonlyValue')}
+            />
           </Field>
 
           <Field>
@@ -488,7 +569,9 @@ function ThemeStatesRoute() {
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="theme-field-native-select">{t('dev.themeStates.fieldNativeSelect')}</FieldLabel>
+            <FieldLabel htmlFor="theme-field-native-select">
+              {t('dev.themeStates.fieldNativeSelect')}
+            </FieldLabel>
             <NativeSelect id="theme-field-native-select" defaultValue="active">
               <option value="active">{t('dev.themeStates.fieldActive')}</option>
               <option value="disabled">{t('dev.themeStates.fieldInactive')}</option>
@@ -517,7 +600,10 @@ function ThemeStatesRoute() {
         </FieldGroup>
       </section>
 
-      <section data-testid="step6Matrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+      <section
+        data-testid="step6Matrix"
+        className="rounded-lg border border-border bg-surface p-4 shadow-card-sm"
+      >
         <div className="mb-4 flex flex-col gap-1">
           <h2 className="text-base font-semibold text-text">{t('dev.themeStates.step6Matrix')}</h2>
           <p className="text-sm text-text-2">{t('dev.themeStates.step6MatrixDesc')}</p>
@@ -584,7 +670,11 @@ function ThemeStatesRoute() {
                   <span>{t('dev.themeStates.radioEnabled')}</span>
                 </label>
                 <label className="flex cursor-pointer items-center gap-2">
-                  <RadioGroupItem value="invalid" aria-label={t('dev.themeStates.radioInvalid')} aria-invalid />
+                  <RadioGroupItem
+                    value="invalid"
+                    aria-label={t('dev.themeStates.radioInvalid')}
+                    aria-invalid
+                  />
                   <span>{t('dev.themeStates.radioInvalid')}</span>
                 </label>
               </RadioGroup>
@@ -603,10 +693,20 @@ function ThemeStatesRoute() {
             </div>
           </div>
 
-          <div className="grid gap-4 rounded-md border border-border bg-surface-2 p-4 xl:col-span-2 md:grid-cols-2">
+          <div className="grid gap-4 rounded-md border border-border bg-surface-2 p-4 xl:col-span-2 md:grid-cols-3">
+            <div data-testid="progressMatrix">
+              <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.progressMatrix')}</p>
+              <div className="grid gap-4 rounded-md border border-border bg-surface p-4">
+                <ProgressBar value={32} aria-label={t('dev.themeStates.progressLow')} />
+                <ProgressBar value={76} aria-label={t('dev.themeStates.progressHigh')} />
+              </div>
+            </div>
             <div>
               <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.skeletonMatrix')}</p>
-              <div data-testid="skeletonPreview" className="grid gap-3 rounded-md border border-border bg-surface p-4">
+              <div
+                data-testid="skeletonPreview"
+                className="grid gap-3 rounded-md border border-border bg-surface p-4"
+              >
                 <Skeleton className="h-[calc(18px*var(--app-scale))] w-2/5" />
                 <Skeleton className="h-[calc(14px*var(--app-scale))] w-full" />
                 <Skeleton className="h-[calc(14px*var(--app-scale))] w-4/5" />
@@ -621,7 +721,10 @@ function ThemeStatesRoute() {
         </div>
       </section>
 
-      <section data-testid="step7Matrix" className="rounded-lg border border-border bg-surface p-4 shadow-card-sm">
+      <section
+        data-testid="step7Matrix"
+        className="rounded-lg border border-border bg-surface p-4 shadow-card-sm"
+      >
         <div className="mb-4 flex flex-col gap-1">
           <h2 className="text-base font-semibold text-text">{t('dev.themeStates.step7Matrix')}</h2>
           <p className="text-sm text-text-2">{t('dev.themeStates.step7MatrixDesc')}</p>
@@ -706,7 +809,9 @@ function ThemeStatesRoute() {
               <TableShellRow gridTemplateColumns={step7GridTemplate} data-state="selected">
                 <div className="font-medium text-text">{t('dev.themeStates.tableSelected')}</div>
                 <div className="text-sm text-text-2">{t('dev.themeStates.tableStatusEnabled')}</div>
-                <Button variant="link" size="xs">{t('dev.themeStates.tableActionView')}</Button>
+                <Button variant="link" size="xs">
+                  {t('dev.themeStates.tableActionView')}
+                </Button>
               </TableShellRow>
               {tableTokenRows.slice(1).map((row) => (
                 <TableShellRow
@@ -716,7 +821,9 @@ function ThemeStatesRoute() {
                 >
                   <div className="font-medium text-text">{t(`dev.themeStates.tableRows.${row}`)}</div>
                   <div className="text-sm text-text-2">{t('dev.themeStates.tableStatusEnabled')}</div>
-                  <Button variant="link" size="xs">{t('dev.themeStates.tableActionView')}</Button>
+                  <Button variant="link" size="xs">
+                    {t('dev.themeStates.tableActionView')}
+                  </Button>
                 </TableShellRow>
               ))}
             </TableShell>
@@ -755,7 +862,10 @@ function ThemeStatesRoute() {
         </div>
       </section>
 
-      <section data-testid="step8OverlayOptionMatrix" className="rounded-lg border border-border bg-surface p-4 pb-36 shadow-card-sm">
+      <section
+        data-testid="step8OverlayOptionMatrix"
+        className="rounded-lg border border-border bg-surface p-4 pb-36 shadow-card-sm"
+      >
         <div className="mb-4 flex flex-col gap-1">
           <h2 className="text-base font-semibold text-text">{t('dev.themeStates.step8Matrix')}</h2>
           <p className="text-sm text-text-2">{t('dev.themeStates.step8MatrixDesc')}</p>
@@ -805,7 +915,10 @@ function ThemeStatesRoute() {
                     data-slot="select-item-indicator"
                     className="absolute right-2 flex size-3.5 items-center justify-center text-(--option-check)"
                   >
-                    <CheckIcon data-icon="inline-start" className="size-[calc(15px*var(--app-scale))] stroke-[3px]" />
+                    <CheckIcon
+                      data-icon="inline-start"
+                      className="size-[calc(15px*var(--app-scale))] stroke-[3px]"
+                    />
                   </span>
                   {t('dev.themeStates.fieldResearch')}
                 </div>

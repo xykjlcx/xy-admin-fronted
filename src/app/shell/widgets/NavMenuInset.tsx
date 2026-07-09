@@ -1,6 +1,5 @@
 import { Link, useLocation } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { PanelLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { lv } from '@/lib/localized';
 import { Icon } from '@/lib/icon-registry';
@@ -8,20 +7,18 @@ import type { MenuNode } from '@/lib/menu-tree';
 import type { Subsystem } from '@/modules/types';
 import { SubsystemSwitcher } from './SubsystemSwitcher';
 
-// Inset 导航（原型 L167-219）：通顶侧栏在 canvas 上，顶部品牌位（切换器 brand 变体）+ 分组平铺 + 底部折叠开关。
+// Inset 导航（原型 L167-219）：通顶侧栏在 canvas 上，顶部品牌位（切换器 brand 变体）+ 分组平铺。
 // 激活项浮起为白卡（bg-surface + 阴影）。collapsed 时只剩图标。
 export function NavMenuInset({
   tree,
   subsystems,
   collapsed,
-  onToggle,
 }: {
   tree: MenuNode[];
   subsystems: Subsystem[];
   collapsed: boolean;
-  onToggle: () => void;
 }) {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { pathname } = useLocation();
   const groups = tree.map((n) => ({ node: n, pages: n.children?.length ? n.children : [n] }));
 
@@ -65,16 +62,6 @@ export function NavMenuInset({
           </div>
         ))}
       </div>
-      <button
-        onClick={onToggle}
-        className={cn(
-          'mt-2 flex h-12 items-center gap-2.5 border-t border-border text-[calc(13px*var(--app-scale))] text-text-2 hover:text-(--nav-item-fg-current)',
-          collapsed ? 'justify-center px-0' : 'px-3',
-        )}
-      >
-        <PanelLeft className="size-[calc(18px*var(--app-scale))] shrink-0" />
-        {!collapsed && <span>{t('shell.nav.collapse')}</span>}
-      </button>
     </aside>
   );
 }

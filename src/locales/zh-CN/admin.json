@@ -240,11 +240,16 @@
     "searchLabel": "搜索菜单",
     "searchPlaceholder": "搜索菜单名称、路由、权限标识",
     "treeTitle": "{{subsystem}} · 菜单树",
+    "treeRegionLabel": "{{subsystem}}菜单树",
     "stats": "目录 {{dirs}} · 菜单 {{menus}} · 动作 {{actions}} · 隐藏 {{hidden}}",
     "subsystems": {
       "title": "子系统管理",
-      "desc": "菜单按子系统隔离；当前阶段子系统由代码注册",
+      "desc": "选择子系统后维护对应菜单树",
+      "listLabel": "子系统列表",
       "builtin": "内置",
+      "custom": "自定义",
+      "enabled": "已启用",
+      "disabled": "已停用",
       "menuCount": "{{count}} 个菜单节点"
     },
     "types": {
@@ -262,6 +267,7 @@
     },
     "actions": {
       "create": "新增菜单",
+      "createSubsystem": "新增子系统",
       "expand": "展开",
       "collapse": "折叠",
       "edit": "编辑",
@@ -272,16 +278,40 @@
       "deleteName": "删除{{name}}",
       "toggleNode": "展开或折叠{{name}}",
       "toggleVisible": "切换{{name}}显示状态",
+      "selectSubsystem": "选择{{name}}子系统",
+      "editSubsystem": "编辑{{name}}子系统",
       "cancel": "取消",
       "confirmCreate": "确定新增",
       "save": "保存菜单",
+      "saveSubsystem": "保存子系统",
       "confirmDelete": "确认删除"
     },
     "dialog": {
       "createTitle": "新增菜单",
+      "createSubsystemTitle": "新增子系统",
       "editTitle": "编辑菜单",
+      "editSubsystemTitle": "编辑子系统",
       "deleteTitle": "确认删除菜单",
       "deleteDesc": "删除后「{{name}}」会从当前菜单树移除。"
+    },
+    "subsystemForm": {
+      "key": "子系统标识",
+      "keyPlaceholder": "如：wms",
+      "keyHint": "用于路由和数据隔离，只能使用小写字母、数字和连字符",
+      "name": "子系统名称",
+      "namePlaceholder": "如：后台管理",
+      "desc": "子系统描述",
+      "descPlaceholder": "如：组织 · 权限 · 审计",
+      "icon": "图标",
+      "enabled": "是否启用",
+      "enabledHint": "停用后不会进入子系统切换入口",
+      "errors": {
+        "keyRequired": "子系统标识不能为空",
+        "keyInvalid": "子系统标识只能使用小写字母、数字和连字符",
+        "keyDuplicated": "子系统标识已存在",
+        "nameRequired": "子系统名称不能为空",
+        "descRequired": "子系统描述不能为空"
+      }
     },
     "form": {
       "type": "节点类型",
@@ -324,6 +354,8 @@
     "toast": {
       "created": "菜单已创建",
       "updated": "菜单已更新",
+      "subsystemCreated": "子系统已创建",
+      "subsystemUpdated": "子系统已更新",
       "deleted": "菜单已删除",
       "visibilityUpdated": "显示状态已更新",
       "failed": "操作失败"

@@ -1,7 +1,7 @@
 /* src/styles/tokens.base.css —— flavor 无关的共享 token 骨架。
    权威源：spec v4.1 §10.2b + docs/design/*.design.md。
    本文件含：:root 颜色兜底(=feishu light，FOUC 兜底) + 组件族默认 + 通用暗色 + radius/scale 档。
-   per-flavor 增量在 tokens.{feishu,claude,shadcn}.css。
+   per-flavor 增量在 tokens.<flavor>.css（当前 feishu/claude/shadcn/sera）。
    ⚠️ global.css 中本文件必须最先 @import：巨型 :root 与 [data-flavor=xxx] 同特异性，靠源顺序决胜。 */
 
 :root, [data-flavor='feishu'][data-mode='light'] {
@@ -80,6 +80,7 @@
   --overlay-mask-blur: 6px;
   --overlay-bg: var(--surface);
   --overlay-fg: var(--text);
+  --overlay-muted-fg: var(--text-2);
   --overlay-border: var(--border);
   --overlay-shadow-modal: var(--shadow-modal);
   --overlay-shadow-popover: var(--shadow-popover);
@@ -94,6 +95,7 @@
   --option-fg-selected: var(--pri);
   --option-check: var(--pri);
   --menu-item-fg: var(--text);
+  --menu-item-muted-fg: var(--text-3);
   --menu-item-bg-highlighted: var(--fill-hover);
   --menu-item-fg-highlighted: var(--text);
   --menu-item-fg-danger: var(--danger);
@@ -125,6 +127,13 @@
   --switch-bg-checked: var(--pri);
   --switch-thumb-bg: var(--surface);
   --skeleton-bg: var(--surface-2);
+  --progress-bg: var(--surface-2);
+  --progress-indicator-bg: var(--pri);
+  --avatar-bg: var(--surface-2);
+  --avatar-fg: var(--text-3);
+  --avatar-ring: var(--surface);
+  --avatar-badge-bg: var(--pri);
+  --avatar-badge-fg: var(--on-pri);
   --empty-fg: var(--text-3);
   --table-bg: var(--surface);
   --table-border: var(--border);
@@ -142,16 +151,25 @@
   --table-cell-px: var(--field-px);
   --table-row-h: calc(44px * var(--app-scale));
   --table-header-h: calc(48px * var(--app-scale));
-  /* Badge 几何/排印（挂点，值=现状，零视觉变化）。radius 走 --radius-5、px/py = 现状 px-2/py-0.5、
-     字号 text-xs、字重 medium 500；三 flavor 全同，随 --app-scale 缩放。sera(S5) 才兑现型差异。 */
+  /* Badge 几何/排印/语义色（挂点，值=现状，零视觉变化）。radius 走 --radius-5、px/py = 现状 px-2/py-0.5、
+     字号 text-xs、字重 medium 500；默认旧三套 flavor 全同，随 --app-scale 缩放。sera(S5) 覆盖型差异。 */
   --badge-radius: var(--radius-5);
   --badge-px: calc(8px * var(--app-scale));
   --badge-py: calc(2px * var(--app-scale));
   --badge-font-size: var(--text-xs);
   --badge-font-weight: 500;
+  --badge-bg: var(--badge-neutral-bg);
+  --badge-fg: var(--badge-neutral-fg);
+  --badge-neutral-bg: var(--surface-2); --badge-neutral-fg: var(--text-3);
+  --badge-primary-bg: var(--pri-soft); --badge-primary-fg: var(--pri);
+  --badge-success-bg: var(--success-bg); --badge-success-fg: var(--success);
+  --badge-warning-bg: var(--warning-bg); --badge-warning-fg: var(--warning);
+  --badge-danger-bg: var(--danger-bg); --badge-danger-fg: var(--danger);
+  --badge-purple-bg: var(--purple-bg); --badge-purple-fg: var(--purple);
+  --badge-teal-bg: var(--teal-bg); --badge-teal-fg: var(--teal);
   /* Card 几何（挂点，值=统一档，零视觉变化）。spacing 24（=现状主流 p-6；dashboard p-5 属散写不齐，不追随）、
-     radius 走 --radius-12、shadow 走 --shadow-card；三 flavor 全同，spacing 随 --app-scale 缩放。
-     flavor 档差（claude 宽松 / sera 32+shadow-sm）S5 sera 激活。 */
+     radius 走 --radius-12、shadow 走 --shadow-card；默认旧三套 flavor 全同，spacing 随 --app-scale 缩放。
+     flavor 档差（sera 32+shadow-sm）S5 sera 激活。 */
   --card-spacing: calc(24px * var(--app-scale));
   --card-radius: var(--radius-12);
   --card-shadow: var(--shadow-card);

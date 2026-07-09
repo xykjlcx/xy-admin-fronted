@@ -40,6 +40,13 @@
   --badge-py: 0;
   --badge-font-size: calc(10px * var(--app-scale));
   --badge-font-weight: 600;
+  --badge-neutral-bg: transparent;
+  --badge-primary-bg: transparent;
+  --badge-success-bg: transparent;
+  --badge-warning-bg: transparent;
+  --badge-danger-bg: transparent;
+  --badge-purple-bg: transparent;
+  --badge-teal-bg: transparent;
   --focus-ring: calc(2px * var(--app-scale));
   /* 排印（型）：uppercase + 加宽字距。tracking 用 em 原值不乘 --app-scale（em 相对 font-size 已天然等比）。 */
   --button-transform: uppercase;    --button-tracking: 0.1em;

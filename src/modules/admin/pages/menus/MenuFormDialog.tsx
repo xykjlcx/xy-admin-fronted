@@ -30,6 +30,8 @@ const iconOptions = [
   { value: 'chart', labelKey: 'menus.iconOptions.chart' },
 ] satisfies { value: string; labelKey: string }[];
 
+const formActionButtonClassName = 'h-[var(--control-md)]';
+
 interface DraftState {
   type: ManagedMenuType;
   parentId: string;
@@ -370,10 +372,11 @@ export function MenuFormDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={formActionButtonClassName} onClick={() => onOpenChange(false)}>
             {t('menus.actions.cancel')}
           </Button>
           <Button
+            className={formActionButtonClassName}
             onClick={() => {
               void submit();
             }}

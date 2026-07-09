@@ -25,7 +25,6 @@ export function InsetLayout({
         tree={menuTree}
         subsystems={subsystems}
         collapsed={collapsed}
-        onToggle={() => onCollapsedChange(!collapsed)}
       />
       <div className="relative m-2 ml-0 flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-inset-card">
         <ShellHeader

@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { FilterSelect } from '@/components/pro/FilterSelect';
+import { FilterButton, FilterSelect } from '@/components/pro/FilterSelect';
 import { Button } from '@/components/ui/button';
 import { statusOptions } from '../model';
 import type { MembersVariant, UsersSearch } from '../types';
@@ -14,20 +14,7 @@ interface UsersToolbarProps {
   onCreate?: () => void;
 }
 
-const filterControlClassName = [
-  'border-(--field-border) bg-(--field-bg) text-text-2 shadow-none',
-  'hover:border-(--field-border-hover) hover:bg-(--field-bg) hover:text-text',
-  'data-[state=open]:border-(--field-border-hover) data-[state=open]:bg-(--field-bg-focus) data-[state=open]:text-text',
-  'disabled:border-(--field-border) disabled:bg-(--field-bg-disabled) disabled:text-text-3',
-].join(' ');
-
-export function UsersToolbar({
-  variant,
-  search,
-  canCreate,
-  onSearchChange,
-  onCreate,
-}: UsersToolbarProps) {
+export function UsersToolbar({ variant, search, canCreate, onSearchChange, onCreate }: UsersToolbarProps) {
   const { t } = useTranslation('admin');
   const statusFilterOptions = statusOptions.map((item) => ({
     value: item.value,
@@ -42,22 +29,18 @@ export function UsersToolbar({
             label={t('users.filters.accountStatus')}
             value={search.status === 'left' ? 'all' : search.status}
             options={statusFilterOptions}
-            triggerClassName={filterControlClassName}
             onValueChange={(status) => onSearchChange({ status, page: 1 })}
           />
-          <Button
+          <FilterButton
             data-role-filter-control="toggle"
             data-state={search.directOnly ? 'open' : 'closed'}
             type="button"
-            variant="ghost"
-            size="sm"
-            className={filterControlClassName}
             aria-pressed={!!search.directOnly}
             disabled={!search.deptId}
             onClick={() => onSearchChange({ directOnly: !search.directOnly, page: 1 })}
           >
             {t('users.filters.directOnly')}
-          </Button>
+          </FilterButton>
         </>
       )}
       <div className="flex-1" />

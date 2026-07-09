@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
+import { FilterButton, FilterSelect } from '@/components/pro/FilterSelect';
 import { SearchField } from '@/components/pro/SearchField';
 import { StatusBadge } from '@/components/pro/StatusBadge';
 import { TableCheckbox, TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
@@ -107,6 +108,37 @@ test('SearchField 继承基础 InputGroup 的聚焦态', () => {
   expect(group).not.toHaveClass('focus-within:ring-0');
 });
 
+test('FilterSelect 与 FilterButton 在 Pro 层持有筛选控件状态样式', () => {
+  render(
+    <>
+      <FilterSelect
+        label="状态"
+        value="active"
+        options={[
+          { value: 'active', label: '正常' },
+          { value: 'inactive', label: '停用' },
+        ]}
+        onValueChange={vi.fn()}
+      />
+      <FilterButton data-state="open">直属成员</FilterButton>
+    </>,
+  );
+
+  const select = screen.getByRole('button', { name: '状态 正常' });
+  const toggle = screen.getByRole('button', { name: '直属成员' });
+
+  for (const control of [select, toggle]) {
+    expect(control).toHaveClass('border-(--field-border)');
+    expect(control).toHaveClass('bg-(--field-bg)');
+    expect(control).toHaveClass('text-(--field-fg)');
+    expect(control).toHaveClass('hover:border-(--field-border-hover)');
+    expect(control).toHaveClass('data-[state=open]:bg-(--field-bg-focus)');
+    expect(control).toHaveClass('disabled:bg-(--field-bg-disabled)');
+  }
+  expect(screen.getByText('状态')).toHaveClass('text-(--field-placeholder)');
+  expect(screen.getByText('正常')).toHaveClass('text-(--field-fg)');
+});
+
 test('ConfirmDialog 点击确认和取消时触发对应回调', async () => {
   const onOpenChange = vi.fn();
   const onConfirm = vi.fn();
@@ -143,9 +175,12 @@ test('TableCheckbox 使用自定义视觉而不是原生 checkbox 外观', async
   expect(onChange).toHaveBeenCalledWith(true);
 
   rerender(<TableCheckbox ariaLabel="选择成员" checked onCheckedChange={onChange} />);
-  expect(screen.getByRole('checkbox', { name: '选择成员' }).closest('[data-slot="checkbox"]')).toHaveAttribute(
-    'data-checked',
-    'true',
-  );
-  expect(screen.getByRole('checkbox', { name: '选择成员' }).parentElement?.querySelector('[data-slot="checkbox-indicator"]')).toBeInTheDocument();
+  expect(
+    screen.getByRole('checkbox', { name: '选择成员' }).closest('[data-slot="checkbox"]'),
+  ).toHaveAttribute('data-checked', 'true');
+  expect(
+    screen
+      .getByRole('checkbox', { name: '选择成员' })
+      .parentElement?.querySelector('[data-slot="checkbox-indicator"]'),
+  ).toBeInTheDocument();
 });

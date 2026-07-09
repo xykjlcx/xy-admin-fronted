@@ -17,12 +17,12 @@ function ProgressBar({ value, max = 100, className, ...props }: ProgressBarProps
       aria-valuemin={0}
       aria-valuemax={max}
       aria-valuenow={normalizedValue}
-      className={cn('h-1.5 overflow-hidden rounded-full bg-surface-2', className)}
+      className={cn('h-1.5 overflow-hidden rounded-full bg-(--progress-bg)', className)}
       {...props}
     >
       <div
         data-slot="progress-indicator"
-        className="h-full rounded-full bg-pri transition-[width] duration-200 ease-out motion-reduce:transition-none"
+        className="h-full rounded-full bg-(--progress-indicator-bg) transition-[width] duration-200 ease-out motion-reduce:transition-none"
         style={{ width: `${percent}%` }}
       />
     </div>

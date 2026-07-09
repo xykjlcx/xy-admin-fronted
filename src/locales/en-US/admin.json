@@ -240,11 +240,16 @@
     "searchLabel": "Search menus",
     "searchPlaceholder": "Search menu name, route, permission",
     "treeTitle": "{{subsystem}} · Menu tree",
+    "treeRegionLabel": "{{subsystem}} menu tree",
     "stats": "Dirs {{dirs}} · Menus {{menus}} · Actions {{actions}} · Hidden {{hidden}}",
     "subsystems": {
       "title": "Subsystems",
-      "desc": "Menus are isolated by subsystem; subsystems are code-registered now",
+      "desc": "Select a subsystem to maintain its menu tree",
+      "listLabel": "Subsystem list",
       "builtin": "Built-in",
+      "custom": "Custom",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
       "menuCount": "{{count}} menu nodes"
     },
     "types": {
@@ -262,6 +267,7 @@
     },
     "actions": {
       "create": "New menu",
+      "createSubsystem": "New subsystem",
       "expand": "Expand",
       "collapse": "Collapse",
       "edit": "Edit",
@@ -272,16 +278,40 @@
       "deleteName": "Delete {{name}}",
       "toggleNode": "Toggle {{name}}",
       "toggleVisible": "Toggle {{name}} visibility",
+      "selectSubsystem": "Select {{name}} subsystem",
+      "editSubsystem": "Edit {{name}} subsystem",
       "cancel": "Cancel",
       "confirmCreate": "Create",
       "save": "Save menu",
+      "saveSubsystem": "Save subsystem",
       "confirmDelete": "Confirm delete"
     },
     "dialog": {
       "createTitle": "New menu",
+      "createSubsystemTitle": "New subsystem",
       "editTitle": "Edit menu",
+      "editSubsystemTitle": "Edit subsystem",
       "deleteTitle": "Confirm delete menu",
       "deleteDesc": "\"{{name}}\" will be removed from this menu tree."
+    },
+    "subsystemForm": {
+      "key": "Subsystem key",
+      "keyPlaceholder": "e.g. wms",
+      "keyHint": "Used for routes and data isolation. Lowercase letters, numbers, and hyphens only",
+      "name": "Subsystem name",
+      "namePlaceholder": "e.g. Admin",
+      "desc": "Subsystem description",
+      "descPlaceholder": "e.g. Organization · Permissions · Audit",
+      "icon": "Icon",
+      "enabled": "Enabled",
+      "enabledHint": "Disabled subsystems are excluded from the subsystem switcher",
+      "errors": {
+        "keyRequired": "Subsystem key is required",
+        "keyInvalid": "Use lowercase letters, numbers, and hyphens only",
+        "keyDuplicated": "Subsystem key already exists",
+        "nameRequired": "Subsystem name is required",
+        "descRequired": "Subsystem description is required"
+      }
     },
     "form": {
       "type": "Node type",
@@ -324,6 +354,8 @@
     "toast": {
       "created": "Menu created",
       "updated": "Menu updated",
+      "subsystemCreated": "Subsystem created",
+      "subsystemUpdated": "Subsystem updated",
       "deleted": "Menu deleted",
       "visibilityUpdated": "Visibility updated",
       "failed": "Action failed"

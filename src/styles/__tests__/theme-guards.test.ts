@@ -4,13 +4,14 @@ import { resolve } from 'node:path';
 const projectRoot = resolve(__dirname, '../../..');
 const baselinePath = resolve(__dirname, 'theme-token-violations-baseline.json');
 
-const tokenDeclarationFiles = [
-  'src/styles/tokens.base.css',
-  'src/styles/tokens.feishu.css',
-  'src/styles/tokens.claude.css',
-  'src/styles/tokens.shadcn.css',
-  'src/styles/global.css',
-];
+function tokenProfileFiles() {
+  return readdirSync(resolve(projectRoot, 'src/styles'))
+    .filter((name) => /^tokens\.[a-z]+\.css$/.test(name))
+    .sort()
+    .map((name) => `src/styles/${name}`);
+}
+
+const tokenDeclarationFiles = [...tokenProfileFiles(), 'src/styles/global.css'];
 const tokenReferenceRoots = [
   'src/styles',
   'src/components/ui',
@@ -53,6 +54,7 @@ const fieldFamilyFiles = [
   'src/components/ui/textarea.tsx',
   'src/components/ui/native-select.tsx',
   'src/components/pro/SearchField.tsx',
+  'src/components/pro/FilterSelect.tsx',
 ];
 
 const forbiddenClasses = [
@@ -113,13 +115,19 @@ const forbiddenFieldPrimitiveClasses = [
   'aria-invalid:border-[var(--field-border-invalid)]',
   'aria-invalid:ring-[var(--field-ring-invalid)]',
 ];
+const forbiddenShadcnSemanticClasses = [
+  'text-muted-foreground',
+  'text-foreground',
+  'bg-muted',
+  'bg-background',
+  'bg-primary',
+  'text-primary-foreground',
+  'ring-background',
+  'bg-accent',
+  'text-accent-foreground',
+];
 
-const baselineNotes: Record<string, string> = {
-  'src/components/ui/badge.tsx': '§6.2 语义色直接消费，合法保留。',
-  'src/components/ui/progress.tsx': '§6.2 语义色直接消费，合法保留。',
-  'src/modules/admin/pages/dashboard/index.tsx': 'Step 3-8 范围外，待后续切片。',
-  'src/routes/login.tsx': 'Step 3-8 范围外，待后续切片。',
-};
+const baselineNotes: Record<string, string> = {};
 
 function readProjectFile(path: string) {
   return readFileSync(resolve(projectRoot, path), 'utf8');
@@ -219,6 +227,38 @@ test('CSS 变量引用必须有定义或明确运行时白名单', () => {
   expect(missing).toEqual([]);
 });
 
+test('token 声明文件清单必须覆盖所有 profile 文件', () => {
+  const actual = tokenDeclarationFiles.filter((file) => file.includes('/tokens.')).sort();
+  const expected = readdirSync(resolve(projectRoot, 'src/styles'))
+    .filter((name) => /^tokens\.[a-z]+\.css$/.test(name))
+    .map((name) => `src/styles/${name}`)
+    .sort();
+
+  expect(actual).toEqual(expected);
+});
+
+test('TableShellHeader/TableShellRow 消费方不得覆盖表格几何 token', () => {
+  const offenders: string[] = [];
+  const tagRe = /<TableShell(?:Header|Row)\b[\s\S]*?>/g;
+  const classNameRe = /className=(?:"([^"]*)"|\{cn\(([\s\S]*?)\)\})/;
+  const forbiddenGeometryRe = /(?:^|[\s'"`])(?:h|px|py|pl|pr)-(?:\[|\(|\d)/;
+
+  for (const file of collectScopedFiles([
+    'src/modules/admin/pages',
+    'src/modules/admin/users',
+    'src/routes',
+  ])) {
+    if (!/\.tsx$/.test(file)) continue;
+    const source = readProjectFile(file);
+    for (const tag of source.matchAll(tagRe)) {
+      const classNameSource = classNameRe.exec(tag[0])?.[0] ?? '';
+      if (forbiddenGeometryRe.test(classNameSource)) offenders.push(`${file}: ${classNameSource}`);
+    }
+  }
+
+  expect(offenders).toEqual([]);
+});
+
 test('基础状态 class 命中数必须受 baseline 棘轮约束', () => {
   expect(existsSync(baselinePath), 'theme-token-violations-baseline.json must exist').toBe(true);
   const baseline = JSON.parse(readFileSync(baselinePath, 'utf8')) as Record<string, number>;
@@ -249,11 +289,49 @@ test('已完成 token 化的 UI/Pro/Shell/样板页不得回退到 primitive 状
   expect(offenders).toEqual([]);
 });
 
+test('UI/Pro/Shell/样板页不得回退到 shadcn 默认语义 class', () => {
+  const offenders: string[] = [];
+
+  for (const file of collectScopedFiles(violationRoots)) {
+    if (!/\.(ts|tsx)$/.test(file)) continue;
+    if (file.includes('/__tests__/')) continue;
+    const source = readProjectFile(file);
+
+    for (const className of forbiddenShadcnSemanticClasses) {
+      if (source.includes(className)) offenders.push(`${file}: ${className}`);
+    }
+  }
+
+  expect(offenders).toEqual([]);
+});
+
 test('Field 族基础控件不得绕过 --field-* token 直接消费 primitive 状态 class', () => {
   const offenders: string[] = [];
 
   for (const { file, source } of fieldFamilySources()) {
     for (const className of forbiddenFieldPrimitiveClasses) {
+      if (source.includes(className)) offenders.push(`${file}: ${className}`);
+    }
+  }
+
+  expect(offenders).toEqual([]);
+});
+
+test('业务层不得为筛选控件注入 field 状态样式', () => {
+  const offenders: string[] = [];
+  const forbiddenBusinessFilterStyles = [
+    'triggerClassName=',
+    'hover:border-(--field-border-hover)',
+    'data-[state=open]:border-(--field-border-hover)',
+    'disabled:bg-(--field-bg-disabled)',
+  ];
+
+  for (const file of collectScopedFiles(['src/modules', 'src/routes'])) {
+    if (!/\.(ts|tsx)$/.test(file)) continue;
+    if (file.includes('/__tests__/')) continue;
+    const source = readProjectFile(file);
+
+    for (const className of forbiddenBusinessFilterStyles) {
       if (source.includes(className)) offenders.push(`${file}: ${className}`);
     }
   }

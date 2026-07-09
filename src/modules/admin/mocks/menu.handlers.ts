@@ -1,7 +1,7 @@
 import { http } from 'msw';
 import { biz, ok } from '@/mocks/http';
 import { createCollection, genId } from '@/mocks/db';
-import type { CreateMenuInput, UpdateMenuInput } from '@/modules/admin/api/menu.api';
+import type { CreateMenuInput, CreateSubsystemInput, UpdateMenuInput, UpdateSubsystemInput } from '@/modules/admin/api/menu.api';
 import { manifests } from '@/modules/registry';
 import type { MenuRecord, Subsystem } from '@/modules/types';
 
@@ -17,6 +17,39 @@ const menus = createCollection<MenuRecord, 'id'>(
 
 function labelText(label: MenuRecord['label'] | undefined) {
   return label?.['zh-CN']?.trim() || label?.['en-US']?.trim() || '';
+}
+
+function validateSubsystemInput(body: UpdateSubsystemInput): string | null {
+  if (!labelText(body.label)) return '子系统名称不能为空';
+  if (!labelText(body.desc)) return '子系统描述不能为空';
+  if (!body.icon?.trim()) return '子系统图标不能为空';
+  if (!body.home?.trim()) return '子系统首页不能为空';
+  if (typeof body.enabled !== 'boolean') return '子系统启用状态不合法';
+  return null;
+}
+
+function validateCreateSubsystemInput(body: CreateSubsystemInput): string | null {
+  const key = body.key?.trim();
+  if (!key) return '子系统标识不能为空';
+  if (!/^[a-z][a-z0-9-]*$/.test(key)) return '子系统标识只能使用小写字母、数字和连字符';
+  if (subsystems.find(key)) return '子系统标识已存在';
+  if (typeof body.builtin !== 'boolean') return '子系统内置状态不合法';
+  if (!Number.isFinite(body.sort)) return '子系统排序不合法';
+  return validateSubsystemInput(body);
+}
+
+function normalizeSubsystemCreate(body: CreateSubsystemInput): Subsystem {
+  return {
+    key: body.key.trim(),
+    label: body.label,
+    desc: body.desc,
+    icon: body.icon.trim(),
+    color: body.color,
+    home: body.home,
+    builtin: body.builtin,
+    enabled: body.enabled,
+    sort: body.sort,
+  };
 }
 
 function nextSort(subsystemKey: string, parentId: string | null) {
@@ -99,6 +132,31 @@ function normalizeUpdate(current: MenuRecord, body: UpdateMenuInput): Partial<Me
 
 export const menuHandlers = [
   http.get('/api/subsystems', () => ok(subsystems.all())),
+  http.post('/api/subsystems', async ({ request }) => {
+    const body = (await request.json()) as CreateSubsystemInput;
+    const error = validateCreateSubsystemInput(body);
+    if (error) return biz(4001, error);
+    return ok(subsystems.insert(normalizeSubsystemCreate(body)));
+  }),
+  http.put('/api/subsystems/:key', async ({ params, request }) => {
+    const key = String(params.key);
+    if (!subsystems.find(key)) return biz(4040, '子系统不存在');
+
+    const body = (await request.json()) as UpdateSubsystemInput;
+    const error = validateSubsystemInput(body);
+    if (error) return biz(4001, error);
+
+    return ok(
+      subsystems.update(key, {
+        label: body.label,
+        desc: body.desc,
+        icon: body.icon.trim(),
+        color: body.color,
+        home: body.home,
+        enabled: body.enabled,
+      }) as Subsystem,
+    );
+  }),
   http.get('/api/menus', ({ request }) => {
     const sub = new URL(request.url).searchParams.get('subsystem');
     return ok(menus.filter((m) => !sub || m.subsystemKey === sub));

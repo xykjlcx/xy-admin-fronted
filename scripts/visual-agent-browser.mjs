@@ -431,6 +431,49 @@ function assertNoHorizontalOverflow(session) {
   );
 }
 
+function assertSeraComputedContracts(session) {
+  evalIn(
+    session,
+    `
+    const isTransparent = (value) => value === 'transparent' || value === 'rgba(0, 0, 0, 0)';
+    const badge = document.querySelector('[data-testid="badgeMatrix"] [data-slot="badge"]');
+    const field = document.querySelector('#theme-field-default');
+    const button = document.querySelector('[data-slot="button"][data-variant="primary"]');
+    const card = document.querySelector('[data-testid="card-full"]');
+
+    if (!badge) throw new Error('sera computed contract failed: badge target not found');
+    if (!field) throw new Error('sera computed contract failed: field target not found');
+    if (!button) throw new Error('sera computed contract failed: primary button target not found');
+    if (!card) throw new Error('sera computed contract failed: card target not found');
+
+    const badgeStyle = getComputedStyle(badge);
+    const fieldStyle = getComputedStyle(field);
+    const buttonStyle = getComputedStyle(button);
+    const cardStyle = getComputedStyle(card);
+
+    if (!isTransparent(badgeStyle.backgroundColor)) {
+      throw new Error('sera computed contract failed: badge background expected transparent, got ' + badgeStyle.backgroundColor);
+    }
+    if (!isTransparent(fieldStyle.borderTopColor) || !isTransparent(fieldStyle.borderRightColor) || !isTransparent(fieldStyle.borderLeftColor)) {
+      throw new Error(
+        'sera computed contract failed: field side borders expected transparent, got ' +
+          [fieldStyle.borderTopColor, fieldStyle.borderRightColor, fieldStyle.borderLeftColor].join(' / '),
+      );
+    }
+    if (isTransparent(fieldStyle.borderBottomColor)) {
+      throw new Error('sera computed contract failed: field bottom border should be visible');
+    }
+    if (buttonStyle.textTransform !== 'uppercase') {
+      throw new Error('sera computed contract failed: button textTransform expected uppercase, got ' + buttonStyle.textTransform);
+    }
+    if (Number.parseFloat(cardStyle.paddingTop) < 28) {
+      throw new Error('sera computed contract failed: card paddingTop expected >= 28px, got ' + cardStyle.paddingTop);
+    }
+    true;
+    `,
+  );
+}
+
 function assertStatusPopover(session) {
   evalIn(
     session,
@@ -534,9 +577,9 @@ function assertMenuDialog(session) {
   evalIn(
     session,
     `
-    const createButton = [...document.querySelectorAll('button')].find((item) => item.textContent?.includes('新增菜单'));
-    if (!createButton) throw new Error('create menu button not found');
-    createButton.click();
+    const editButton = [...document.querySelectorAll('button')].find((item) => item.getAttribute('aria-label') === '编辑企业概览');
+    if (!editButton) throw new Error('edit overview menu button not found');
+    editButton.click();
     true;
     `,
   );
@@ -545,12 +588,79 @@ function assertMenuDialog(session) {
     session,
     `
     const dialog = document.querySelector('[role="dialog"]');
-    if (!dialog || !dialog.textContent?.includes('新增菜单')) throw new Error('menu dialog not found');
+    if (!dialog || !dialog.textContent?.includes('编辑菜单')) throw new Error('menu dialog not found');
     const rect = dialog.getBoundingClientRect();
     if (rect.left < -1 || rect.top < -1 || rect.right > window.innerWidth + 1 || rect.bottom > window.innerHeight + 1) {
       throw new Error('menu dialog out of viewport: ' + JSON.stringify(rect.toJSON()));
     }
-    rect.toJSON();
+    const normalize = (value) => value?.replace(/\\s+/g, '').trim() || '';
+    const measureButton = (name) => {
+      const button = [...document.querySelectorAll('[data-slot="button"]')].find((item) => normalize(item.textContent).includes(name));
+      if (!button) throw new Error('menu dialog button not found: ' + name);
+      const buttonRect = button.getBoundingClientRect();
+      const style = getComputedStyle(button);
+      return {
+        name,
+        dataSize: button.getAttribute('data-size'),
+        height: Number(buttonRect.height.toFixed(2)),
+        paddingLeft: Number.parseFloat(style.paddingLeft).toFixed(2),
+        paddingRight: Number.parseFloat(style.paddingRight).toFixed(2),
+        fontSize: Number.parseFloat(style.fontSize).toFixed(2),
+      };
+    };
+    const measureControl = (element, name) => {
+      const controlRect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        name,
+        height: Number(controlRect.height.toFixed(2)),
+        fontSize: Number.parseFloat(style.fontSize).toFixed(2),
+      };
+    };
+    const assertSameMetrics = (label, items, pick) => {
+      const comparable = items.map(pick);
+      const first = JSON.stringify(comparable[0]);
+      for (const item of comparable) {
+        if (JSON.stringify(item) !== first) {
+          throw new Error(label + ' metrics mismatch: ' + JSON.stringify(items));
+        }
+      }
+      return comparable[0];
+    };
+    const toolbar = [measureButton('展开'), measureButton('折叠'), measureButton('新增菜单')];
+    const dialogFooter = [measureButton('取消'), measureButton('保存菜单')];
+    const formControls = [
+      ...[...dialog.querySelectorAll('[data-slot="select-trigger"]')].map((item, index) => measureControl(item, 'select-' + index)),
+      ...[...dialog.querySelectorAll('[data-slot="input"]')].map((item, index) => measureControl(item, 'input-' + index)),
+    ];
+    if (formControls.length < 2) throw new Error('menu form controls not found for scale check');
+    const appScale = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-scale')) || 1;
+    const toolbarMetrics = assertSameMetrics('menu toolbar buttons', toolbar, ({ dataSize, height, paddingLeft, paddingRight, fontSize }) => ({
+      dataSize,
+      height,
+      paddingLeft,
+      paddingRight,
+      fontSize,
+    }));
+    const formMetrics = assertSameMetrics('menu form controls and actions', [...formControls, ...dialogFooter], ({ height, fontSize }) => ({
+      height,
+      fontSize,
+    }));
+    const expectedToolbarHeight = 30 * appScale;
+    const expectedFormHeight = 36 * appScale;
+    if (Math.abs(toolbarMetrics.height - expectedToolbarHeight) > 0.2) {
+      throw new Error(
+        'menu toolbar button height does not follow app scale: ' +
+          JSON.stringify({ appScale, expectedToolbarHeight, toolbar }),
+      );
+    }
+    if (Math.abs(formMetrics.height - expectedFormHeight) > 0.2) {
+      throw new Error(
+        'menu form control/action height does not follow app scale: ' +
+          JSON.stringify({ appScale, expectedFormHeight, formControls, dialogFooter }),
+      );
+    }
+    ({ rect: rect.toJSON(), toolbar, formControls, dialogFooter });
     `,
   );
 }
@@ -701,7 +811,7 @@ async function runThemeMatrix() {
   const server = await ensureDevServer();
   const cells = [];
   const expectedCells = 24;
-  const assertionLabel = 'page-ready / state-applied / no-horizontal-overflow';
+  const assertionLabel = 'page-ready / state-applied / no-horizontal-overflow / sera-computed-contracts';
   try {
     setViewport(appSession);
     loginAsAdmin(appSession);
@@ -718,6 +828,7 @@ async function runThemeMatrix() {
           agent(appSession, ['wait', '350']);
           assertMatrixStateApplied(appSession, { flavor, mode, scale });
           assertNoHorizontalOverflow(appSession);
+          if (flavor === 'sera') assertSeraComputedContracts(appSession);
           const file = path.join(matrixDir, `${flavor}-${mode}-${scale}.png`);
           agent(appSession, ['screenshot', file]);
           cells.push({
@@ -725,7 +836,9 @@ async function runThemeMatrix() {
             mode,
             scale,
             file: path.relative(root, file),
-            assertions: ['state applied', 'no horizontal overflow'],
+            assertions: flavor === 'sera'
+              ? ['state applied', 'no horizontal overflow', 'sera computed contracts']
+              : ['state applied', 'no horizontal overflow'],
           });
         }
       }

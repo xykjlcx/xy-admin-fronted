@@ -217,7 +217,7 @@ UI 状态住在「所有消费它的组件的最近公共父」，不多不少�
 
 约束：
 
-- token 定义入口是 `src/styles/tokens.base.css`（flavor 无关共享骨架，必须最先 @import）+ `tokens.{feishu,claude,shadcn}.css`（per-flavor profile）；组件只消费 token，不判断 `flavor`。
+- token 定义入口是 `src/styles/tokens.base.css`（flavor 无关共享骨架，必须最先 @import）+ `tokens.<flavor>.css`（当前为 feishu/claude/shadcn/sera，per-flavor profile）；组件只消费 token，不判断 `flavor`。
 - UI 组件族用组件状态 token：`--field-*`、`--button-*`、`--option-*`、`--overlay-*`、`--tabs-*`、`--choice-*`、`--table-*`。Pro/Shell 用组合 token：`--pro-*`、`--side-list-*`、`--nav-item-*`、`--pagination-*`。
 - 组件 token 不进 `@theme inline`，用 Tailwind v4 括号变量：`bg-(--token)`、`border-(--token)`、`text-(--token)`。状态优先级靠 `global.css` 声明顺序，不依赖 Tailwind 变体生成顺序。
 - 业务页面不得用 `bg-pri-soft`、`text-pri`、`border-pri`、`ring-soft`、`hover:bg-surface-2` 等 primitive class 表达控件状态（guard 会拦）。通用 hover/focus/active/selected/expanded/open 状态必须沉到 UI 或 Pro 组件。
@@ -232,7 +232,7 @@ UI 状态住在「所有消费它的组件的最近公共父」，不多不少�
 5. 组件只消费该族 token；不把 primitive 状态 class 写进组件或页面。
 6. 在 `/dev/theme-states` 补状态矩阵，覆盖默认、hover/focus 或 open、selected/active、disabled/invalid。
 7. 补 `tokens.snapshot.test.ts` 和 `theme-guards.test.ts`；完成 token 化文件加入强约束清单。
-8. 跑 `pnpm theme:guard`、`pnpm design:lint`、`tsc`、`vitest`、`eslint`，必要时用 Agent Browser 截三 flavor × light/dark。
+8. 跑 `pnpm theme:guard`、`pnpm design:lint`、`tsc`、`vitest`、`eslint`，必要时用 Agent Browser 截当前 flavor × light/dark × scale 矩阵。
 
 > 复杂度提醒：组件族 token + 状态矩阵体系是本架构维护成本最高处。语义 token（禁硬编码）是绝对收益、务必保留；「每组件族独立变量 + 强制状态矩阵」若成为负担，是第一个可重新评估的对象。
 
@@ -265,7 +265,7 @@ UI 状态住在「所有消费它的组件的最近公共父」，不多不少�
 主题门禁：
 
 - `pnpm theme:guard`：token 快照、悬空 CSS 变量、违规 class baseline、状态页矩阵、模块边界测试。
-- `pnpm design:lint`：校验三套 flavor 的 DESIGN.md；已知 warning 追溯 spec 白名单，新增 warning 不静默放过。
+- `pnpm design:lint`：校验当前 flavor 的 DESIGN.md；已知 warning 追溯 spec 白名单，新增 warning 不静默放过。
 - CI 已显式运行 `theme:guard` 和 `design:lint`；新增 token/组件族/flavor 不允许只靠全量 `vitest` 顺带覆盖。
 - `/dev/theme-states` 是主题验收入口；每个完成 token 化的组件族必须在此有可截图状态矩阵。
 

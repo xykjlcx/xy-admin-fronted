@@ -1,6 +1,6 @@
 import { setupServer } from 'msw/node';
 import { resetDb } from '@/mocks/db';
-import type { CreateMenuInput, UpdateMenuInput } from '@/modules/admin/api/menu.api';
+import type { CreateMenuInput, CreateSubsystemInput, UpdateMenuInput } from '@/modules/admin/api/menu.api';
 import { menuHandlers } from '@/modules/admin/mocks/menu.handlers';
 import type { MenuRecord } from '@/modules/types';
 
@@ -23,6 +23,60 @@ test('GET /api/subsystems 返回子系统种子', async () => {
   const res = await readEnv<{ key: string }[]>(await fetch('/api/subsystems'));
   expect(res.code).toBe(0);
   expect(res.data.map((s) => s.key)).toContain('admin');
+});
+
+test('PUT /api/subsystems/:key 编辑子系统显示信息后可读回', async () => {
+  const updated = await readEnv<{ key: string; label: Record<string, string>; desc: Record<string, string> }>(
+    await fetch('/api/subsystems/admin', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        label: { 'zh-CN': '基础后台' },
+        desc: { 'zh-CN': '组织权限与审计' },
+        icon: 'layout-grid',
+        color: '#3370ff',
+        home: '/admin/dashboard',
+        enabled: true,
+      }),
+    }),
+  );
+  expect(updated.code).toBe(0);
+  expect(updated.data.label).toEqual({ 'zh-CN': '基础后台' });
+  expect(updated.data.desc).toEqual({ 'zh-CN': '组织权限与审计' });
+
+  const list = await readEnv<{ key: string; label: Record<string, string> }[]>(await fetch('/api/subsystems'));
+  expect(list.data.find((subsystem) => subsystem.key === 'admin')?.label).toEqual({ 'zh-CN': '基础后台' });
+});
+
+test('POST /api/subsystems 新增子系统后可读回', async () => {
+  const dto: CreateSubsystemInput = {
+    key: 'wms',
+    label: { 'zh-CN': '仓储执行' },
+    desc: { 'zh-CN': '库存 · 波次 · 拣货' },
+    icon: 'layout-grid',
+    color: '#3370ff',
+    home: '/admin/dashboard',
+    builtin: false,
+    enabled: true,
+    sort: 9,
+  };
+
+  const created = await readEnv<{ key: string; label: Record<string, string>; sort: number }>(
+    await fetch('/api/subsystems', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dto),
+    }),
+  );
+  expect(created.code).toBe(0);
+  expect(created.data).toMatchObject({
+    key: 'wms',
+    label: { 'zh-CN': '仓储执行' },
+    sort: 9,
+  });
+
+  const list = await readEnv<{ key: string; label: Record<string, string> }[]>(await fetch('/api/subsystems'));
+  expect(list.data.find((subsystem) => subsystem.key === 'wms')?.label).toEqual({ 'zh-CN': '仓储执行' });
 });
 
 test('GET /api/menus?subsystem=admin 返回该子系统菜单', async () => {

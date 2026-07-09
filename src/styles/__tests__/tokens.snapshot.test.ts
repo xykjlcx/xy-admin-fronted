@@ -2,7 +2,13 @@
 import { readFileSync } from 'node:fs';
 
 // tokens.css 已拆分为 base + 三 flavor profile（S1）。拼接后断言不变——MUST_CONTAIN 逐值校验一律照旧。
-const css = ['tokens.base.css', 'tokens.feishu.css', 'tokens.claude.css', 'tokens.shadcn.css', 'tokens.sera.css']
+const css = [
+  'tokens.base.css',
+  'tokens.feishu.css',
+  'tokens.claude.css',
+  'tokens.shadcn.css',
+  'tokens.sera.css',
+]
   .map((f) => readFileSync(`src/styles/${f}`, 'utf8'))
   .join('\n');
 const globalCss = readFileSync('src/styles/global.css', 'utf8');
@@ -37,18 +43,24 @@ const usersModelSource = readFileSync('src/modules/admin/users/model.ts', 'utf8'
 const roleListPanelSource = readFileSync('src/modules/admin/pages/roles/RoleListPanel.tsx', 'utf8');
 const rolesModelSource = readFileSync('src/modules/admin/pages/roles/model.ts', 'utf8');
 const roleDetailsPanelSource = readFileSync('src/modules/admin/pages/roles/RoleDetailsPanel.tsx', 'utf8');
-const rolePermissionEditorSource = readFileSync('src/modules/admin/pages/roles/RolePermissionEditor.tsx', 'utf8');
+const rolePermissionEditorSource = readFileSync(
+  'src/modules/admin/pages/roles/RolePermissionEditor.tsx',
+  'utf8',
+);
 const menuTreeTableSource = readFileSync('src/modules/admin/pages/menus/MenuTreeTable.tsx', 'utf8');
 const menuFormDialogSource = readFileSync('src/modules/admin/pages/menus/MenuFormDialog.tsx', 'utf8');
 const menusPageSource = readFileSync('src/modules/admin/pages/menus/index.tsx', 'utf8');
 const checkboxSource = readFileSync('src/components/ui/checkbox.tsx', 'utf8');
 const radioGroupSource = readFileSync('src/components/ui/radio-group.tsx', 'utf8');
 const switchSource = readFileSync('src/components/ui/switch.tsx', 'utf8');
+const avatarSource = readFileSync('src/components/ui/avatar.tsx', 'utf8');
 const skeletonSource = readFileSync('src/components/ui/skeleton.tsx', 'utf8');
 const emptySource = readFileSync('src/components/ui/empty.tsx', 'utf8');
+const progressSource = readFileSync('src/components/ui/progress.tsx', 'utf8');
 const loginSource = readFileSync('src/routes/login.tsx', 'utf8');
 const languageMenuSource = readFileSync('src/app/shell/widgets/LanguageMenu.tsx', 'utf8');
 const themeStatesSource = readFileSync('src/routes/_auth/dev/theme-states.tsx', 'utf8');
+const visualScriptSource = readFileSync('scripts/visual-agent-browser.mjs', 'utf8');
 
 // 权威值表：原型 L4796-4805 逐字对照，全表逐值断言（tokens.css 全部变量声明，无抽样遗漏）。
 // 静态硬编码，非运行时从 tokens.css 提取——否则文件怎么改断言都跟着变，失去守护意义。
@@ -139,6 +151,15 @@ const MUST_CONTAIN = [
   '--badge-py: calc(2px * var(--app-scale));',
   '--badge-font-size: var(--text-xs);',
   '--badge-font-weight: 500;',
+  '--badge-primary-bg: var(--pri-soft);',
+  '--badge-primary-fg: var(--pri);',
+  '--progress-bg: var(--surface-2);',
+  '--progress-indicator-bg: var(--pri);',
+  '--avatar-bg: var(--surface-2);',
+  '--avatar-fg: var(--text-3);',
+  '--avatar-ring: var(--surface);',
+  '--avatar-badge-bg: var(--pri);',
+  '--avatar-badge-fg: var(--on-pri);',
   // Card 几何挂点（S4，值=统一档，零视觉变化）：spacing/radius/shadow
   '--card-spacing: calc(24px * var(--app-scale));',
   '--card-radius: var(--radius-12);',
@@ -163,10 +184,10 @@ test('field 水平内距分档：claude 覆盖为宽松档', () => {
 
 // table 密度分档（几何轴）：cell 内距链 field-px；行高 feishu/shadcn 44、claude 48；表头 feishu/claude 48、shadcn 44
 test('table 密度分档：claude 行高宽松、shadcn 表头收紧', () => {
-  expect(css).toContain('--table-cell-px: var(--field-px);');           // cell 内距链 field-px 单一真相源
-  expect(css).toContain('--table-row-h: calc(44px * var(--app-scale));');   // :root 数据行 44（feishu/shadcn）
+  expect(css).toContain('--table-cell-px: var(--field-px);'); // cell 内距链 field-px 单一真相源
+  expect(css).toContain('--table-row-h: calc(44px * var(--app-scale));'); // :root 数据行 44（feishu/shadcn）
   expect(css).toContain('--table-header-h: calc(48px * var(--app-scale));'); // :root 表头 48（feishu/claude）
-  expect(css).toContain('--table-row-h: calc(48px * var(--app-scale));');    // claude 覆盖：数据行 48
+  expect(css).toContain('--table-row-h: calc(48px * var(--app-scale));'); // claude 覆盖：数据行 48
   expect(css).toContain('--table-header-h: calc(44px * var(--app-scale));'); // shadcn 覆盖：表头 44
 });
 
@@ -221,9 +242,13 @@ test('Claude 设计身份文档、token fallback 与 accent runtime 主色保持
   expect(claudeDesignSource).toContain('primary-soft: "rgba(217, 119, 87, 0.12)"');
   expect(claudeDesignSource).toContain('on-primary: "#FFFFFF"');
   expect(claudeDesignSource).not.toContain('Step 9 精修候选');
-  expect(css).toContain("[data-flavor='claude'][data-mode='light'] {\n  --pri: #d97757; --pri-soft: rgba(217, 119, 87, 0.12);");
+  expect(css).toContain(
+    "[data-flavor='claude'][data-mode='light'] {\n  --pri: #d97757; --pri-soft: rgba(217, 119, 87, 0.12);",
+  );
   expect(css).toContain('--pri-active: #c6613f;');
-  expect(appearanceDomSource).toContain("{ key: 'claude', labelKey: 'accentClaude', pri: '#d97757', active: '#c6613f', soft: 'rgba(217,119,87,.12)', onPri: '#ffffff' }");
+  expect(appearanceDomSource).toContain(
+    "{ key: 'claude', labelKey: 'accentClaude', pri: '#d97757', active: '#c6613f', soft: 'rgba(217,119,87,.12)', onPri: '#ffffff' }",
+  );
   expect(appearanceConfigSource).toContain("customAccent: '#d97757'");
 });
 
@@ -318,8 +343,10 @@ test('shadcn flavor 提供官方中性基线 token', () => {
   expect(css).toContain("[data-flavor='shadcn'][data-mode='dark']");
   expect(css).toContain('--bg: #09090b; --canvas: #09090b; --surface: #18181b; --chrome: #09090b;');
   expect(css).toContain('--surface-2: #27272a; --surface-blur: rgba(24, 24, 27, 0.78);');
-  expect(css).toContain('--text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: oklch(1 0 0 / 10%);');
-  expect(css).toContain("--field-bg: oklch(1 0 0 / 4.5%);");
+  expect(css).toContain(
+    '--text: #fafafa; --text-2: #d4d4d8; --text-3: #a1a1aa; --border: oklch(1 0 0 / 10%);',
+  );
+  expect(css).toContain('--field-bg: oklch(1 0 0 / 4.5%);');
   expect(css).toContain('--field-ring-invalid: color-mix(in srgb, var(--danger) 20%, transparent);');
   expect(css).toContain('--field-ring-invalid: color-mix(in srgb, var(--danger) 40%, transparent);');
   expect(css).toContain('--pri-hover: color-mix(in srgb, var(--pri) 90%, transparent);');
@@ -339,6 +366,7 @@ test('sera 第四风格 profile 落地：直角/大写/下划线关键值', () =
   expect(css).toContain('--badge-py: 0;');
   expect(css).toContain('--badge-font-size: calc(10px * var(--app-scale));');
   expect(css).toContain('--badge-font-weight: 600;');
+  expect(css).toContain('--badge-primary-bg: transparent;');
   expect(css).toContain('--focus-ring: calc(2px * var(--app-scale));');
   // 输入族全态透明底：disabled/readonly 不覆盖会回落 base 灰块，在无底输入族里呈"假四边框"（0708 实测）
   expect(css).toContain('--field-bg-disabled: transparent;');
@@ -360,7 +388,17 @@ test('sera 第四风格 profile 落地：直角/大写/下划线关键值', () =
   // D4 唯一型分支（global.css）：输入族仅底边着色
   expect(globalCss).toContain("[data-flavor='sera'] .ui-field {");
   expect(globalCss).toContain('border-color: transparent transparent var(--_field-border) transparent;');
+  expect(globalCss).not.toContain("[data-flavor='sera'] [data-slot='badge']");
   expect(globalCss).toContain("@import './tokens.sera.css';");
+});
+
+test('visual matrix 必须执行 Sera computed style 合同', () => {
+  expect(visualScriptSource).toContain('function assertSeraComputedContracts');
+  expect(visualScriptSource).toContain("flavor === 'sera'");
+  expect(visualScriptSource).toContain('badgeStyle.backgroundColor');
+  expect(visualScriptSource).toContain('fieldStyle.borderTopColor');
+  expect(visualScriptSource).toContain('buttonStyle.textTransform');
+  expect(visualScriptSource).toContain('cardStyle.paddingTop');
 });
 
 test('圆角因子三档 + 四条 calc 公式', () => {
@@ -383,7 +421,10 @@ test('形态轴控制按钮高度与字重，按钮消费独立 button token', (
   expect(css).toContain('--control-btn-md: calc(36px * var(--app-scale));');
   expect(css).toContain("[data-flavor='shadcn'] {");
   expect(css).toContain('--field-bg: transparent;');
-  const shadcnBlock = css.slice(css.indexOf("[data-flavor='shadcn'] {"), css.indexOf("[data-flavor='shadcn'][data-mode='dark']"));
+  const shadcnBlock = css.slice(
+    css.indexOf("[data-flavor='shadcn'] {"),
+    css.indexOf("[data-flavor='shadcn'][data-mode='dark']"),
+  );
   expect(shadcnBlock).not.toContain('--control-md: calc(32px * var(--app-scale));');
   expect(shadcnBlock).not.toContain('--control-btn-md: calc(32px * var(--app-scale));');
   expect(css).toContain('--button-font-weight: 500;');
@@ -488,6 +529,7 @@ test('Overlay 族 token 与 Step 4 合同落地', () => {
     '--overlay-mask-blur: 6px;',
     '--overlay-bg: var(--surface);',
     '--overlay-fg: var(--text);',
+    '--overlay-muted-fg: var(--text-2);',
     '--overlay-border: var(--border);',
     '--overlay-shadow-modal: var(--shadow-modal);',
     '--overlay-shadow-popover: var(--shadow-popover);',
@@ -505,6 +547,7 @@ test('Overlay 族 token 与 Step 4 合同落地', () => {
   expect(dialogSource).toContain('border-(--overlay-border)');
   expect(dialogSource).toContain('bg-(--overlay-bg)');
   expect(dialogSource).toContain('text-(--overlay-fg)');
+  expect(dialogSource).toContain('text-(--overlay-muted-fg)');
   expect(dialogSource).toContain('shadow-(--overlay-shadow-modal)');
   expect(dialogSource).toContain('text-(--overlay-close-fg)');
   expect(dialogSource).toContain('hover:bg-(--overlay-close-bg-hover)');
@@ -514,15 +557,38 @@ test('Overlay 族 token 与 Step 4 合同落地', () => {
   expect(sheetSource).toContain('border-(--overlay-border)');
   expect(sheetSource).toContain('bg-(--overlay-bg)');
   expect(sheetSource).toContain('text-(--overlay-fg)');
+  expect(sheetSource).toContain('text-(--overlay-muted-fg)');
   expect(sheetSource).toContain('shadow-(--shadow-drawer)');
   expect(sheetSource).not.toContain('shadow-(--overlay-shadow-modal)');
   expect(sheetSource).toContain('text-(--overlay-close-fg)');
+  expect(sheetSource).not.toContain('text-foreground');
+  expect(sheetSource).toContain('anim-sheet-in-right');
+  expect(sheetSource).toContain('anim-sheet-in-left');
+  expect(sheetSource).toContain('anim-sheet-in-top');
+  expect(sheetSource).toContain('anim-sheet-in-bottom');
+  expect(sheetSource).not.toContain('animate-in');
+  expect(sheetSource).not.toContain('slide-in-from');
+  expect(globalCss).toContain('@keyframes sheet-in-left');
+  expect(globalCss).toContain('@keyframes sheet-in-top');
+  expect(globalCss).toContain('@keyframes sheet-in-bottom');
+  expect(globalCss).toContain('.anim-sheet-in-left');
+  expect(globalCss).toContain('.anim-sheet-in-top');
+  expect(globalCss).toContain('.anim-sheet-in-bottom');
 
   for (const source of [popoverSource, dropdownMenuSource, selectSource]) {
     expect(source).toContain('border-(--overlay-border)');
     expect(source).toContain('bg-(--overlay-bg)');
     expect(source).toContain('text-(--overlay-fg)');
     expect(source).toContain('shadow-(--overlay-shadow-popover)');
+  }
+  expect(popoverSource).toContain('text-(--overlay-muted-fg)');
+  expect(dropdownMenuSource).toContain('data-slot="dropdown-menu-sub-content"');
+  expect(dropdownMenuSource).toContain('anim-modal-in');
+  expect(dropdownMenuSource).toContain('rounded-14');
+  expect(dropdownMenuSource).not.toContain('zoom-in-95');
+  expect(dropdownMenuSource).not.toContain('animate-in');
+  for (const source of [dialogSource, sheetSource, popoverSource]) {
+    expect(source).not.toContain('text-muted-foreground');
   }
   expect(dropdownMenuSource).toContain('max-h-(--radix-dropdown-menu-content-available-height)');
   expect(selectSource).toContain('w-[var(--radix-select-trigger-width)]');
@@ -540,6 +606,7 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
     '--option-fg-selected: var(--pri);',
     '--option-check: var(--pri);',
     '--menu-item-fg: var(--text);',
+    '--menu-item-muted-fg: var(--text-3);',
     '--menu-item-bg-highlighted: var(--fill-hover);',
     '--menu-item-fg-highlighted: var(--text);',
     '--menu-item-fg-danger: var(--danger);',
@@ -550,10 +617,10 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
     expect(css).toContain(token);
   }
 
-  expect(css).toContain("--option-fg-highlighted: var(--pri-active);");
-  expect(css).toContain("--option-fg-selected: var(--pri-active);");
-  expect(css).toContain("--option-bg-highlighted: var(--fill-hover);");
-  expect(css).toContain("--option-bg-selected: var(--fill-selected);");
+  expect(css).toContain('--option-fg-highlighted: var(--pri-active);');
+  expect(css).toContain('--option-fg-selected: var(--pri-active);');
+  expect(css).toContain('--option-bg-highlighted: var(--fill-hover);');
+  expect(css).toContain('--option-bg-selected: var(--fill-selected);');
 
   expect(selectSource).toContain('text-(--option-fg)');
   expect(selectSource).toContain('focus:bg-(--option-bg-highlighted)');
@@ -570,12 +637,21 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
   expect(dropdownMenuSource).toContain('focus:text-(--menu-item-fg-highlighted)');
   expect(dropdownMenuSource).toContain('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
   expect(dropdownMenuSource).toContain('data-[highlighted]:text-(--menu-item-fg-highlighted)');
+  expect(dropdownMenuSource).toContain('rounded-8');
+  expect(dropdownMenuSource).toContain("[&_svg:not([class*='text-'])]:text-(--menu-item-muted-fg)");
+  expect(dropdownMenuSource).toContain('text-(--menu-item-muted-fg)');
   expect(dropdownMenuSource).toContain('data-[variant=destructive]:text-(--menu-item-fg-danger)');
-  expect(dropdownMenuSource).toContain('data-[variant=destructive]:focus:bg-(--menu-item-bg-danger-highlighted)');
-  expect(dropdownMenuSource).toContain('data-[variant=destructive]:data-[highlighted]:bg-(--menu-item-bg-danger-highlighted)');
+  expect(dropdownMenuSource).toContain(
+    'data-[variant=destructive]:focus:bg-(--menu-item-bg-danger-highlighted)',
+  );
+  expect(dropdownMenuSource).toContain(
+    'data-[variant=destructive]:data-[highlighted]:bg-(--menu-item-bg-danger-highlighted)',
+  );
   expect(dropdownMenuSource).not.toContain('focus:bg-accent');
   expect(dropdownMenuSource).not.toContain('focus:text-accent-foreground');
   expect(dropdownMenuSource).not.toContain('data-[state=open]:bg-accent');
+  expect(dropdownMenuSource).not.toContain('text-muted-foreground');
+  expect(dropdownMenuSource).not.toContain('rounded-sm');
 
   expect(languageMenuSource).toContain('bg-(--option-bg-selected)');
   expect(languageMenuSource).toContain('text-(--option-fg-selected)');
@@ -585,7 +661,21 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
 
 test('主题状态页暴露 Badge 可截图矩阵（S3 挂点验收载体，防误删）', () => {
   expect(themeStatesSource).toContain('badgeVariantsForThemeStates');
-  expect(themeStatesSource).toContain("import { Badge } from '@/components/ui/badge'");
+  expect(themeStatesSource).toContain('data-testid="badgeMatrix"');
+  expect(themeStatesSource).toContain('<Badge');
+});
+
+test('主题状态页暴露 Avatar 状态矩阵（P2 组件语义类收敛验收载体，防误删）', () => {
+  expect(themeStatesSource).toContain('data-testid="avatarMatrix"');
+  expect(themeStatesSource).toContain('<Avatar');
+  expect(themeStatesSource).toContain('<AvatarBadge');
+  expect(themeStatesSource).toContain('<AvatarFallback');
+  expect(themeStatesSource).toContain('<AvatarGroupCount');
+});
+
+test('主题状态页暴露 Progress 状态矩阵（P2 组件语义类收敛验收载体，防误删）', () => {
+  expect(themeStatesSource).toContain('data-testid="progressMatrix"');
+  expect(themeStatesSource).toContain('<ProgressBar');
 });
 
 test('主题状态页暴露 Card 可截图矩阵（S4 挂点验收载体，防误删）', () => {
@@ -603,7 +693,7 @@ test('主题状态页暴露 Dialog title 可截图矩阵（S5 批1 --title-* 载
 
 test('主题状态页暴露 Label peer 豁免可截图矩阵（S5 批1 --label-* 载体，防误删）', () => {
   expect(themeStatesSource).toContain('data-testid="labelPeerMatrix"');
-  expect(themeStatesSource).toContain("import { Label } from '@/components/ui/label'");
+  expect(themeStatesSource).toContain('<Label');
   // peer 锚点：checkbox 外层须带 .peer 才能命中 label 的 peer-data-[slot=checkbox] 豁免规则
   expect(themeStatesSource).toContain('<Checkbox className="peer"');
 });
@@ -645,7 +735,7 @@ test('主题状态页暴露 Overlay / Option / Menu 可截图矩阵', () => {
   expect(themeStatesSource).not.toContain('<DropdownMenu open');
 });
 
-test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () => {
+test('Tabs / Choice / Avatar / Progress / Skeleton / Empty 族 token 与 Step 6 合同落地', () => {
   const step6Tokens = [
     '--tabs-seg-list-bg: var(--surface-2);',
     '--tabs-seg-trigger-fg: var(--text-3);',
@@ -690,8 +780,12 @@ test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () =>
   expect(tabsSource).toContain('border-(--tabs-line-border)');
   expect(tabsSource).toContain('ui-tabs-line-trigger');
   expect(tabsSource).not.toContain('group-data-[variant=line]/tabs-list:text-(--tabs-line-trigger-fg)');
-  expect(tabsSource).not.toContain('group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)');
-  expect(tabsSource).not.toContain('group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)');
+  expect(tabsSource).not.toContain(
+    'group-data-[variant=line]/tabs-list:hover:text-(--tabs-line-trigger-fg-hover)',
+  );
+  expect(tabsSource).not.toContain(
+    'group-data-[variant=line]/tabs-list:data-[state=active]:text-(--tabs-line-trigger-fg-active)',
+  );
   expect(tabsSource).toContain('after:bg-(--tabs-line-indicator)');
   expect(tabsSource).toContain('focus-visible:ring-(--tabs-ring)');
 
@@ -707,10 +801,17 @@ test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () =>
   expect(globalCss).toContain('.ui-tabs-line-trigger');
   expect(globalCss).toContain('--_tabs-line-trigger-fg: var(--tabs-line-trigger-fg);');
   expect(globalCss).toContain('--_tabs-line-trigger-fg: var(--tabs-line-trigger-fg-hover);');
-  expect(globalCss).toContain("--_tabs-line-trigger-fg: var(--tabs-line-trigger-fg-active);");
+  expect(globalCss).toContain('--_tabs-line-trigger-fg: var(--tabs-line-trigger-fg-active);');
 
   for (const source of [tabsSource, animatedTabsSource]) {
-    for (const primitiveClass of ['text-pri', 'border-pri', 'bg-pri', 'ring-soft', 'bg-surface-2', 'shadow-card-sm']) {
+    for (const primitiveClass of [
+      'text-pri',
+      'border-pri',
+      'bg-pri',
+      'ring-soft',
+      'bg-surface-2',
+      'shadow-card-sm',
+    ]) {
       expect(source).not.toContain(primitiveClass);
     }
   }
@@ -773,6 +874,20 @@ test('Tabs / Choice / Skeleton / Empty 族 token 与 Step 6 合同落地', () =>
 
   expect(skeletonSource).toContain('bg-(--skeleton-bg)');
   expect(skeletonSource).not.toContain('bg-surface-2');
+  expect(progressSource).toContain('bg-(--progress-bg)');
+  expect(progressSource).toContain('bg-(--progress-indicator-bg)');
+  expect(progressSource).not.toContain('bg-pri');
+  expect(progressSource).not.toContain('bg-surface-2');
+  expect(avatarSource).toContain('bg-(--avatar-bg)');
+  expect(avatarSource).toContain('text-(--avatar-fg)');
+  expect(avatarSource).toContain('bg-(--avatar-badge-bg)');
+  expect(avatarSource).toContain('text-(--avatar-badge-fg)');
+  expect(avatarSource).toContain('ring-(--avatar-ring)');
+  expect(avatarSource).not.toContain('bg-primary');
+  expect(avatarSource).not.toContain('text-primary-foreground');
+  expect(avatarSource).not.toContain('bg-muted');
+  expect(avatarSource).not.toContain('text-muted-foreground');
+  expect(avatarSource).not.toContain('ring-background');
   expect(emptySource).toContain('text-(--empty-fg)');
   expect(emptySource).not.toContain('text-text-3');
 });
@@ -840,6 +955,7 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-hover);');
   expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-expanded);');
   expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-selected);');
+  expect(globalCss).not.toContain(':has([aria-expanded');
 
   expect(pageScaffoldSource).toContain('bg-(--pro-page-bg)');
   expect(pageScaffoldSource).toContain('border-(--pro-panel-border)');
@@ -856,14 +972,21 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(paginationSource).not.toContain('--nav-item');
   expect(shellHeaderSource).toContain('bg-(--shell-header-bg)');
 
-  for (const source of [navMenuSidebarSource, navMenuRailSource, navMenuInsetSource, subsystemSwitcherSource]) {
+  for (const source of [
+    navMenuSidebarSource,
+    navMenuRailSource,
+    navMenuInsetSource,
+    subsystemSwitcherSource,
+  ]) {
     expect(source).toContain('bg-(--nav-item-bg-current)');
     expect(source).toContain('text-(--nav-item-fg-current)');
   }
   expect(appearanceDrawerSource).toContain('bg-(--nav-item-bg-current)');
   expect(appearanceDrawerSource).toContain('text-(--nav-item-fg-current)');
 
-  expect(dataTableSource).toContain("const state = selectionEnabled && row.getIsSelected() ? 'selected' : rowState?.(row.original);");
+  expect(dataTableSource).toContain(
+    "const state = selectionEnabled && row.getIsSelected() ? 'selected' : rowState?.(row.original);",
+  );
   expect(dataTableSource).toContain('data-state={state}');
   expect(membersTableSource).toContain('bg-(--table-row-bg-selected)');
   expect(roleListPanelSource).toContain('bg-(--side-list-item-bg-active)');
@@ -930,8 +1053,12 @@ test('DataTable TanStack 迁移守卫：无旧状态机、无 checkbox 补丁、
   expect(dataTableSource).toContain('getSelectedRowModel');
   expect(dataTableSource).toContain('stopPropagation');
   expect(dataTableSource).not.toMatch(/selectedIds|toggleRow|toggleVisibleRows|resetSelectionKey/);
-  expect(dataTableSource).not.toMatch(/DataTableColumn|DataTableLegacySelection|legacyRowSelection|onSelectionChange/);
-  expect(dataTableSource).not.toMatch(/selectionColumnWidth|selectionCellClassName|bodyCellWithSelectionClassName/);
+  expect(dataTableSource).not.toMatch(
+    /DataTableColumn|DataTableLegacySelection|legacyRowSelection|onSelectionChange/,
+  );
+  expect(dataTableSource).not.toMatch(
+    /selectionColumnWidth|selectionCellClassName|bodyCellWithSelectionClassName/,
+  );
   expect(dataTableSource).not.toMatch(/selectionSlotClassName|selectionCheckboxClassName/);
   expect(dataTableSource).not.toContain("id: 'select'");
   expect(dataTableSource).not.toContain("cellIndex === 0 && 'mx-auto w-4'");
@@ -993,7 +1120,9 @@ test('弹层阴影 token 与原型精确值一致', () => {
   expect(css).toContain('--shadow-tooltip: 0 4px 14px rgba(0, 0, 0, 0.18);');
   expect(css).toContain('--shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);');
   expect(css).toContain('--shadow-card-sm: 0 1px 2px rgba(0, 0, 0, 0.06);');
-  expect(css).toContain('--shadow-inset-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.05);');
+  expect(css).toContain(
+    '--shadow-inset-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.05);',
+  );
   expect(css).toContain('--shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.08);');
   expect(css).toContain('--shadow-header: 0 1px 12px rgba(0, 0, 0, 0.06);');
 });
@@ -1020,5 +1149,11 @@ test('Tailwind source 限定在 src，避免 docs 里的示例 class 污染生�
 test('global.css 必须最先 @import tokens.base.css（flavor 覆盖与 base 默认同特异性，靠源顺序决胜）', () => {
   const imports = [...globalCss.matchAll(/@import '\.\/(tokens\.[a-z]+\.css)';/g)].map((m) => m[1]);
   // 新增 flavor 时同步此数组(tokens.base.css 必须保持第一位)
-  expect(imports).toEqual(['tokens.base.css', 'tokens.feishu.css', 'tokens.claude.css', 'tokens.shadcn.css', 'tokens.sera.css']);
+  expect(imports).toEqual([
+    'tokens.base.css',
+    'tokens.feishu.css',
+    'tokens.claude.css',
+    'tokens.shadcn.css',
+    'tokens.sera.css',
+  ]);
 });

@@ -7,7 +7,9 @@ test('menu queryOptions use stable nav query keys', () => {
 
 test('menu api exposes write operations required by the menu management page', () => {
   expect(typeof menuApi.createMenu).toBe('function');
+  expect(typeof menuApi.createSubsystem).toBe('function');
   expect(typeof menuApi.updateMenu).toBe('function');
+  expect(typeof menuApi.updateSubsystem).toBe('function');
   expect(typeof menuApi.deleteMenu).toBe('function');
   expect(typeof menuApi.setMenuVisibility).toBe('function');
 });
