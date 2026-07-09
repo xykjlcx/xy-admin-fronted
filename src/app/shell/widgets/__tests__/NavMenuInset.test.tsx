@@ -6,7 +6,7 @@ import {
   RouterProvider,
 } from '@tanstack/react-router';
 import { render, screen } from '@testing-library/react';
-import { beforeAll } from 'vitest';
+import { beforeAll, vi } from 'vitest';
 import { NavMenuInset } from '@/app/shell/widgets/NavMenuInset';
 import { i18nInit } from '@/lib/i18n';
 import type { MenuNode } from '@/lib/menu-tree';
@@ -63,6 +63,7 @@ function renderInsetNav() {
         tree={tree}
         subsystems={subsystems}
         collapsed={false}
+        onToggle={vi.fn()}
       />
     ),
   });
@@ -79,10 +80,16 @@ function renderInsetNav() {
   return render(<RouterProvider router={router} />);
 }
 
-test('Inset 侧栏不渲染底部收起导航入口', async () => {
+test('Inset 侧栏不渲染底部文字收起导航入口', async () => {
   renderInsetNav();
 
   expect(await screen.findByRole('link', { name: '企业概览' })).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: '收起导航' })).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '收起导航' })).toBeInTheDocument();
   expect(screen.queryByText('收起导航')).not.toBeInTheDocument();
+});
+
+test('Inset 侧栏内置轻量搜索入口', async () => {
+  renderInsetNav();
+
+  expect(await screen.findByRole('searchbox', { name: '搜索功能导航、组织数据、角色详情等' })).toBeInTheDocument();
 });

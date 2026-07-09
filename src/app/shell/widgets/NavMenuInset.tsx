@@ -1,5 +1,10 @@
 import { Link, useLocation } from '@tanstack/react-router';
+import { PanelLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { SearchField } from '@/components/pro/SearchField';
+import { featuresConfig } from '@/config';
 import { cn } from '@/lib/utils';
 import { lv } from '@/lib/localized';
 import { Icon } from '@/lib/icon-registry';
@@ -13,12 +18,14 @@ export function NavMenuInset({
   tree,
   subsystems,
   collapsed,
+  onToggle,
 }: {
   tree: MenuNode[];
   subsystems: Subsystem[];
   collapsed: boolean;
+  onToggle: () => void;
 }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
   const groups = tree.map((n) => ({ node: n, pages: n.children?.length ? n.children : [n] }));
 
@@ -29,9 +36,32 @@ export function NavMenuInset({
         collapsed ? 'w-16 px-3' : 'w-[calc(248px*var(--app-scale))] pl-3 pr-2.5',
       )}
     >
-      <div className="mb-3.5">
-        <SubsystemSwitcher subsystems={subsystems} variant="brand" collapsed={collapsed} />
+      <div className={cn('mb-3 flex gap-1.5', collapsed ? 'flex-col items-center' : 'items-center')}>
+        <div className={cn('min-w-0', !collapsed && 'flex-1')}>
+          <SubsystemSwitcher subsystems={subsystems} variant="brand" collapsed={collapsed} />
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8 shrink-0 text-text-3 hover:text-text"
+          onClick={onToggle}
+          aria-label={t('shell.nav.collapse')}
+        >
+          <PanelLeft className="size-4" />
+        </Button>
       </div>
+      {!collapsed && featuresConfig.showStubChrome && (
+        <SearchField
+          readOnly
+          aria-label={t('shell.search')}
+          placeholder={t('shell.search')}
+          containerClassName="mb-3 h-9 w-full bg-surface"
+          onFocus={(event) => {
+            event.currentTarget.blur();
+            toast(t('shell.toast.search'));
+          }}
+        />
+      )}
       <div className="flex-1 overflow-y-auto">
         {groups.map((g) => (
           <div key={g.node.id}>
