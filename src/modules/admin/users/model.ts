@@ -1,5 +1,24 @@
 import type { StatusBadgeTone } from '@/components/pro/StatusBadge';
+import { z } from 'zod';
 import type { DeptDto, UserDto, UsersQueryParams } from './api';
+
+export const UserFilterFieldSchema = z.enum(['name', 'phone', 'email', 'role', 'status']);
+export const UserFilterOperatorSchema = z.enum(['contains', 'eq']);
+export const UserFilterConditionSchema = z.object({
+  id: z.string(),
+  field: UserFilterFieldSchema,
+  operator: UserFilterOperatorSchema,
+  value: z.string(),
+});
+export const UserFilterConditionsSchema = z.array(UserFilterConditionSchema);
+
+export type UserFilterCondition = z.infer<typeof UserFilterConditionSchema>;
+export interface UserFilterDraftCondition {
+  id: string;
+  field: string;
+  operator: string;
+  value: string;
+}
 
 export const statusOptions = [
   { value: 'all' },
@@ -55,4 +74,42 @@ export function statusTone(status: UserDto['status']): StatusBadgeTone {
 
 export function initials(name: string) {
   return name.slice(-2);
+}
+
+export function parseUserFilters(raw: string | undefined): UserFilterCondition[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    const result = UserFilterConditionsSchema.safeParse(parsed);
+    return result.success ? result.data : [];
+  } catch {
+    return [];
+  }
+}
+
+export function stringifyUserFilters(filters: UserFilterCondition[]) {
+  return filters.length > 0 ? JSON.stringify(filters) : '';
+}
+
+export function sanitizeUserFilters(filters: UserFilterDraftCondition[]): UserFilterCondition[] {
+  return filters.flatMap((item) => {
+    const result = UserFilterConditionSchema.safeParse(item);
+    return result.success ? [result.data] : [];
+  });
+}
+
+function userFieldValue(user: UserDto, field: UserFilterCondition['field']) {
+  return user[field];
+}
+
+function matchCondition(user: UserDto, condition: UserFilterCondition) {
+  const expected = condition.value.trim();
+  if (!expected) return true;
+  const actual = userFieldValue(user, condition.field);
+  if (condition.operator === 'eq') return actual.toLowerCase() === expected.toLowerCase();
+  return actual.toLowerCase().includes(expected.toLowerCase());
+}
+
+export function userMatchesAdvancedFilters(user: UserDto, filters: UserFilterCondition[]) {
+  return filters.every((condition) => matchCondition(user, condition));
 }

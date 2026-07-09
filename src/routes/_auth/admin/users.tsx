@@ -26,6 +26,7 @@ const searchSchema = z.object({
   deptId: z.string().optional(),
   directOnly: booleanSearchParam,
   keyword: z.string().catch(''),
+  filters: z.string().optional(),
 });
 
 export const Route = createFileRoute('/_auth/admin/users')({
@@ -47,6 +48,7 @@ export const Route = createFileRoute('/_auth/admin/users')({
       { code: 'iam:user:del', labelKey: 'users.actions.delete' },
       { code: 'iam:user:resign', labelKey: 'users.actions.resign' },
       { code: 'iam:dept:create', labelKey: 'users.actions.createDept' },
+      { code: 'iam:dept:update', labelKey: 'users.actions.editDept' },
     ],
   },
   component: UsersRoute,
@@ -64,6 +66,7 @@ function UsersRoute() {
       delete next.directOnly;
     }
     if (!next.directOnly) delete next.directOnly;
+    if (!next.filters) delete next.filters;
     void navigate({ search: next });
   };
 

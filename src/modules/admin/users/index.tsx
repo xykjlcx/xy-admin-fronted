@@ -27,9 +27,18 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
 
   const switchTab = (next: TabKey) => {
     setTab(next);
-    if (next === 'left') onSearchChange({ status: 'left', page: 1 });
+    if (next === 'left') {
+      onSearchChange({ status: 'left', page: 1, deptId: undefined, directOnly: false });
+    }
     if (next === 'members') onSearchChange({ status: 'all', page: 1 });
-    if (next === 'depts' && search.status === 'left') onSearchChange({ status: 'all', page: 1 });
+    if (next === 'depts') {
+      onSearchChange({
+        status: search.status === 'left' ? 'all' : search.status,
+        page: 1,
+        deptId: undefined,
+        directOnly: false,
+      });
+    }
   };
 
   return (
@@ -38,7 +47,7 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
         <PageTabs value={activeTab} items={tabItems} onValueChange={switchTab} />
 
         {activeTab === 'depts' ? (
-          <DeptScene search={search} onSearchChange={onSearchChange} />
+          <DeptScene permissions={permissions} />
         ) : (
           <MembersScene
             key={activeTab}

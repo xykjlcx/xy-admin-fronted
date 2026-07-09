@@ -1,4 +1,4 @@
-import type { UserDto, UsersQueryParams } from './api';
+import type { DeptDto, UserDto, UsersQueryParams } from './api';
 
 export type TabKey = 'members' | 'depts' | 'left';
 
@@ -10,6 +10,12 @@ export type UserFormState =
   | { kind: 'closed' }
   | { kind: 'create' }
   | { kind: 'edit'; user: UserDto };
+
+export type DeptFormState =
+  | { kind: 'closed' }
+  | { kind: 'create' }
+  | { kind: 'createChild'; parent: DeptDto }
+  | { kind: 'edit'; dept: DeptDto };
 
 /** 成员场景变体 */
 export type MembersVariant = 'members' | 'left';

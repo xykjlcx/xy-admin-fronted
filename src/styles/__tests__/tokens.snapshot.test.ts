@@ -1050,7 +1050,7 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(roleListPanelSource).toContain('border-(--page-pane-divider)');
   expect(rolesPageSource).toContain('border-(--page-section-divider)');
   expect(membersSceneSource).toContain('border-(--page-section-divider)');
-  expect(deptSceneSource).toContain('border-(--page-section-divider)');
+  expect(deptSceneSource).not.toContain('border-(--page-section-divider)');
   expect(menusPageSource).toContain('border-(--page-pane-divider)');
   expect(menusPageSource).toContain('border-(--page-section-divider)');
   expect(navMenuInsetSource).not.toContain("aria-label={t('shell.nav.collapse')}");

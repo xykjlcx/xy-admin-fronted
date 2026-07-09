@@ -114,11 +114,15 @@
       "save": "Save",
       "confirmDelete": "Confirm delete",
       "resign": "Resign",
-      "createDept": "Create department"
+      "createDept": "Create department",
+      "createChildDept": "Add child department",
+      "editDept": "Edit department"
     },
     "form": {
       "name": "Name",
       "dept": "Select department",
+      "deptName": "Department name",
+      "parentDept": "Parent department",
       "role": "Role",
       "phone": "Phone",
       "email": "Email"
@@ -130,11 +134,35 @@
     },
     "filters": {
       "accountStatus": "Account status",
-      "directOnly": "Direct members only"
+      "directOnly": "Direct members only",
+      "advanced": "Advanced filters",
+      "advancedActive": "Advanced filters {{count}}",
+      "addCondition": "Add condition",
+      "clearConditions": "Clear",
+      "field": "Field",
+      "operator": "Condition",
+      "value": "Value",
+      "valuePlaceholder": "Enter value",
+      "removeCondition": "Remove condition",
+      "emptyConditions": "No filter conditions",
+      "operators": {
+        "contains": "Contains",
+        "eq": "Equals"
+      },
+      "fields": {
+        "name": "Name",
+        "phone": "Phone",
+        "email": "Email",
+        "role": "Role",
+        "status": "Account status"
+      }
     },
     "dialog": {
       "createTitle": "Add member",
       "editTitle": "Edit member",
+      "createDeptTitle": "Create department",
+      "createChildDeptTitle": "Add child department",
+      "editDeptTitle": "Edit department",
       "deleteTitle": "Confirm deletion",
       "deleteDesc": "This member will be removed from the current list.",
       "detailFallback": "Member details"
@@ -142,6 +170,7 @@
     "deptList": {
       "title": "Organization",
       "subtitle": "Manage department hierarchy",
+      "root": "Root department",
       "empty": "No departments",
       "loading": "Loading departments"
     },

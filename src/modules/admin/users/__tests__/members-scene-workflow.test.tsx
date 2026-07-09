@@ -150,6 +150,9 @@ test('left variant passes undefined write callbacks and keeps detail read entry 
   renderUsersPage({ ...defaultSearch, status: 'left' });
 
   expect(await screen.findByText('徐若琳')).toBeInTheDocument();
+  expect(screen.queryByRole('tree', { name: '部门' })).not.toBeInTheDocument();
+  expect(screen.getByRole('searchbox', { name: '搜索姓名、角色、手机号' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '高级筛选' })).toBeInTheDocument();
   expect(screen.getAllByRole('button', { name: '详情' })).toHaveLength(2);
   expect(screen.queryByRole('button', { name: '添加成员' })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '编辑' })).not.toBeInTheDocument();

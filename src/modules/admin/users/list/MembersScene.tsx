@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
+import { cn } from '@/lib/utils';
 import { matchPermission } from '@/lib/permission';
 import { UserDetailPage } from '../detail/UserDetailPage';
 import { UserFormDialog } from '../form/UserFormDialog';
@@ -39,7 +40,7 @@ export function MembersScene({
   const clearRowSelection = useCallback(() => setRowSelection({}), []);
   // search（页码/筛选/部门）变化时清空行选择——用「渲染期同步 setState」而非整场景 remount，
   // 防跨页/跨筛选选择错乱，同时避免翻页重挂场景与 DeptTree 滚动丢失（诊断 F9）。
-  const searchKey = `${search.page}:${search.pageSize}:${search.status}:${search.keyword ?? ''}:${search.deptId ?? ''}`;
+  const searchKey = `${search.page}:${search.pageSize}:${search.status}:${search.keyword ?? ''}:${search.deptId ?? ''}:${search.filters ?? ''}`;
   const [prevSearchKey, setPrevSearchKey] = useState(searchKey);
   if (searchKey !== prevSearchKey) {
     setPrevSearchKey(searchKey);
@@ -61,16 +62,24 @@ export function MembersScene({
     await mutations.deleteUser.mutateAsync(deleteTarget.id);
     setDeleteTarget(null);
   };
+  const showDeptTree = variant === 'members';
 
   return (
     <>
       <div className="flex min-h-0 flex-1">
-        <DeptTree
-          selectedId={search.deptId}
-          onSelect={(deptId) => handleSearchChange({ deptId, page: 1 })}
-        />
+        {showDeptTree && (
+          <DeptTree
+            selectedId={search.deptId}
+            onSelect={(deptId) => handleSearchChange({ deptId, page: 1 })}
+          />
+        )}
 
-        <main className="flex min-w-0 flex-1 flex-col border-l border-(--page-section-divider) px-(--page-scene-px) py-(--page-scene-py)">
+        <main
+          className={cn(
+            'flex min-w-0 flex-1 flex-col px-(--page-scene-px) py-(--page-scene-py)',
+            showDeptTree && 'border-l border-(--page-section-divider)',
+          )}
+        >
           <MembersTable
             variant={variant}
             permissions={permissions}

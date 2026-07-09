@@ -1,29 +1,39 @@
-import { useMemo, type JSX } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Folder } from 'lucide-react';
+import { Folder, Pencil, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DataTable } from '@/components/pro/DataTable';
-import { deptsQuery, type DeptDto, type UsersQueryParams } from '../api';
+import { Button } from '@/components/ui/button';
+import { matchPermission } from '@/lib/permission';
+import {
+  deptsQuery,
+  useDeptMutations,
+  type CreateDeptInput,
+  type DeptDto,
+  type UpdateDeptInput,
+} from '../api';
+import { DeptFormDialog } from '../form/DeptFormDialog';
 import { buildDepthMap, deptIndentClass } from '../model';
-import { DeptTree } from './DeptTree';
-import type { UsersSearch } from '../types';
+import type { DeptFormState } from '../types';
 
-export function DeptScene({
-  search,
-  onSearchChange,
-}: {
-  search: UsersSearch;
-  onSearchChange: (patch: Partial<UsersQueryParams>) => void;
-}): JSX.Element {
+interface DeptSceneProps {
+  permissions: string[];
+}
+
+export function DeptScene({ permissions }: DeptSceneProps): JSX.Element {
   const { t } = useTranslation('admin');
   const { data: depts = [], isPending } = useQuery(deptsQuery);
+  const mutations = useDeptMutations();
   const depthMap = useMemo(() => buildDepthMap(depts), [depts]);
+  const [formState, setFormState] = useState<DeptFormState>({ kind: 'closed' });
+  const canCreate = matchPermission(permissions, 'iam:dept:create');
+  const canUpdate = matchPermission(permissions, 'iam:dept:update');
   const columns: ColumnDef<DeptDto>[] = [
     {
       id: 'dept',
       header: t('users.columns.dept'),
-      meta: { width: '80%' },
+      meta: { width: '64%' },
       enableSorting: false,
       cell: ({ row }) => {
         const dept = row.original;
@@ -41,30 +51,75 @@ export function DeptScene({
       header: t('users.columns.memberCount'),
       meta: { width: 'calc(120px * var(--app-scale))' },
       enableSorting: false,
+      cell: ({ row }) => (
+        <span className="text-[calc(13px*var(--app-scale))] text-text-2">
+          {t('users.memberCount', { count: row.original.memberCount })}
+        </span>
+      ),
+    },
+    {
+      id: 'actions',
+      header: t('users.columns.actions'),
+      meta: { width: 'calc(220px * var(--app-scale))', align: 'end' },
+      enableSorting: false,
       cell: ({ row }) => {
         const dept = row.original;
 
         return (
-          <span className="text-[calc(13px*var(--app-scale))] text-text-2">
-            {t('users.memberCount', { count: dept.memberCount })}
-          </span>
+          <div className="flex items-center justify-end gap-2">
+            {canCreate && (
+              <Button
+                type="button"
+                variant="text"
+                size="xs"
+                onClick={() => setFormState({ kind: 'createChild', parent: dept })}
+              >
+                <Plus data-icon="inline-start" />
+                {t('users.actions.createChildDept')}
+              </Button>
+            )}
+            {canUpdate && (
+              <Button
+                type="button"
+                variant="text"
+                size="xs"
+                onClick={() => setFormState({ kind: 'edit', dept })}
+              >
+                <Pencil data-icon="inline-start" />
+                {t('users.actions.editDept')}
+              </Button>
+            )}
+          </div>
         );
       },
     },
   ];
 
+  const handleCreateDept = async (dto: CreateDeptInput) => {
+    await mutations.createDept.mutateAsync(dto);
+  };
+
+  const handleUpdateDept = async (id: string, dto: UpdateDeptInput) => {
+    await mutations.updateDept.mutateAsync({ id, dto });
+  };
+
   return (
-    <div className="flex min-h-0 flex-1">
-      <DeptTree
-        selectedId={search.deptId}
-        onSelect={(deptId) => onSearchChange({ deptId, page: 1 })}
-      />
-      <main className="flex min-w-0 flex-1 flex-col border-l border-(--page-section-divider) px-(--page-scene-px) py-(--page-scene-py)">
-        <div className="mb-4 flex items-center">
-          <span className="text-base font-bold">{t('users.deptList.title')}</span>
-          <span className="ml-3 text-[calc(13px*var(--app-scale))] text-text-3">
-            {t('users.deptList.subtitle')}
-          </span>
+    <>
+      <main className="flex min-w-0 flex-1 flex-col px-(--page-scene-px) py-(--page-scene-py)">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="min-w-0">
+            <div className="text-base font-bold">{t('users.deptList.title')}</div>
+            <div className="mt-1 text-[calc(13px*var(--app-scale))] text-text-3">
+              {t('users.deptList.subtitle')}
+            </div>
+          </div>
+          <div className="flex-1" />
+          {canCreate && (
+            <Button type="button" size="sm" onClick={() => setFormState({ kind: 'create' })}>
+              <Plus data-icon="inline-start" />
+              {t('users.actions.createDept')}
+            </Button>
+          )}
         </div>
         <DataTable
           columns={columns}
@@ -75,6 +130,13 @@ export function DeptScene({
           loadingText={t('users.deptList.loading')}
         />
       </main>
-    </div>
+      <DeptFormDialog
+        state={formState}
+        depts={depts}
+        onOpenChange={(open) => !open && setFormState({ kind: 'closed' })}
+        onCreateDept={handleCreateDept}
+        onUpdateDept={handleUpdateDept}
+      />
+    </>
   );
 }

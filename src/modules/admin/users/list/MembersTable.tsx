@@ -50,7 +50,9 @@ export function MembersTable({
   const usersPage = usersResult.data ?? emptyUsersPage;
   const pageCount = Math.max(1, Math.ceil(usersPage.total / search.pageSize));
   const deptById = useMemo(() => new Map(depts.map((dept) => [dept.id, dept])), [depts]);
-  const selectedDeptLabel = search.deptId ? deptById.get(search.deptId)?.name : t('users.allMembers');
+  let selectedDeptLabel = t('users.allMembers');
+  if (variant === 'left') selectedDeptLabel = t('users.tabs.left');
+  else if (search.deptId) selectedDeptLabel = deptById.get(search.deptId)?.name ?? selectedDeptLabel;
   const canDisable = !!onBatchDisable && matchPermission(permissions, 'iam:user:resign');
   const selectionEnabled = variant === 'members' && canDisable;
 

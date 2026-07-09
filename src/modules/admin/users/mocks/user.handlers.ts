@@ -8,6 +8,7 @@ import {
   type PageResult,
   type UserDto,
 } from '@/modules/admin/users/api';
+import { parseUserFilters, userMatchesAdvancedFilters } from '../model';
 import { collectDeptIds, toUserDetail, users } from './db';
 
 const BatchDisableRequestSchema = z.object({ ids: z.array(z.string()) });
@@ -34,6 +35,7 @@ export const userHandlers = [
     const deptId = search.get('deptId') ?? undefined;
     const directOnly = search.get('directOnly') === 'true';
     const keyword = search.get('keyword')?.trim() ?? '';
+    const filters = parseUserFilters(search.get('filters') ?? undefined);
 
     const deptScope = deptId ? collectDeptIds(deptId) : null;
     const filtered = users
@@ -42,7 +44,8 @@ export const userHandlers = [
         return directOnly ? user.deptId === deptId : deptScope.has(user.deptId);
       })
       .filter((user) => (status === 'all' ? user.status !== 'left' : user.status === status))
-      .filter((user) => includesKeyword(user, keyword));
+      .filter((user) => includesKeyword(user, keyword))
+      .filter((user) => userMatchesAdvancedFilters(user, filters));
     const start = (page - 1) * pageSize;
     const data: PageResult<UserDto> = {
       list: filtered.slice(start, start + pageSize),

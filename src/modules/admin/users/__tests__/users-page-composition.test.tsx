@@ -51,7 +51,7 @@ test('users index is a UI skeleton without query or mutation hooks', () => {
   expect(source).not.toMatch(/use(Query|SuspenseQuery|Mutation|QueryClient)\b/);
 });
 
-test('users page mounts members scene and department scene from vertical list components', async () => {
+test('users page keeps department tree only in active members tab', async () => {
   renderUsersPage();
 
   expect(await screen.findByText('成员与部门')).toBeInTheDocument();
@@ -60,9 +60,12 @@ test('users page mounts members scene and department scene from vertical list co
 
   await userEvent.click(screen.getByRole('tab', { name: '部门' }));
   await waitFor(() => expect(screen.getByText('组织架构')).toBeInTheDocument());
-  expect(screen.getByRole('tree', { name: '部门' })).toBeInTheDocument();
-  expect(screen.getByRole('treeitem', { name: '全部成员 14' })).toBeInTheDocument();
-  expect(screen.getAllByText('产品研发中心').length).toBeGreaterThanOrEqual(2);
+  expect(screen.queryByRole('tree', { name: '部门' })).not.toBeInTheDocument();
+  expect(screen.getAllByText('产品研发中心')).toHaveLength(1);
+
+  await userEvent.click(screen.getByRole('tab', { name: '已离职成员' }));
+  await waitFor(() => expect(screen.getByText('徐若琳')).toBeInTheDocument());
+  expect(screen.queryByRole('tree', { name: '部门' })).not.toBeInTheDocument();
 });
 
 test('members scene owns controlled row selection and clears it with search changes', () => {
@@ -136,11 +139,18 @@ test('department scene uses department-specific empty and loading labels', () =>
   const zh = readFileSync('src/locales/zh-CN/admin.json', 'utf8');
   const en = readFileSync('src/locales/en-US/admin.json', 'utf8');
 
-  expect(source).toContain('border-l border-(--page-section-divider)');
+  expect(source).not.toContain('<DeptTree');
+  expect(source).toContain("t('users.actions.createDept')");
+  expect(source).toContain("t('users.actions.createChildDept')");
+  expect(source).toContain("t('users.actions.editDept')");
   expect(source).toContain("t('users.deptList.empty')");
   expect(source).toContain("t('users.deptList.loading')");
   expect(zh).toContain('"empty": "暂无部门"');
   expect(zh).toContain('"loading": "正在加载部门"');
+  expect(zh).toContain('"createChildDept": "新增子部门"');
+  expect(zh).toContain('"editDept": "编辑部门"');
   expect(en).toContain('"empty": "No departments"');
   expect(en).toContain('"loading": "Loading departments"');
+  expect(en).toContain('"createChildDept": "Add child department"');
+  expect(en).toContain('"editDept": "Edit department"');
 });

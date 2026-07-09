@@ -16,6 +16,13 @@ export const DeptSchema = z.object({
   memberCount: z.number(),
 });
 
+export const CreateDeptSchema = z.object({
+  name: z.string().min(1),
+  parentId: z.string().nullable().optional(),
+});
+
+export const UpdateDeptSchema = CreateDeptSchema.partial();
+
 export const UserSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -49,6 +56,8 @@ export const NullSchema = z.null();
 
 export type UserStatus = z.infer<typeof UserStatusSchema>;
 export type DeptDto = z.infer<typeof DeptSchema>;
+export type CreateDeptInput = z.infer<typeof CreateDeptSchema>;
+export type UpdateDeptInput = z.infer<typeof UpdateDeptSchema>;
 export type UserDto = z.infer<typeof UserSchema>;
 export type UserDetailDto = z.infer<typeof UserDetailSchema>;
 export type UsersPageDto = z.infer<typeof UsersPageSchema>;
@@ -63,4 +72,5 @@ export interface UsersQueryParams {
   deptId?: string;
   directOnly?: boolean;
   keyword?: string;
+  filters?: string;
 }
