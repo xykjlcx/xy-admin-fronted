@@ -150,7 +150,7 @@ export function DataTable<T>({
   return (
     <>
       {bulkBar}
-      <div className="overflow-hidden rounded-10 border border-(--table-border) bg-(--table-bg)">
+      <div className="overflow-hidden rounded-10 border border-(--table-shell-border) bg-(--table-bg)">
         <Table>
           <colgroup>
             {table.getVisibleLeafColumns().map((column) => (
@@ -187,7 +187,7 @@ export function DataTable<T>({
                   <TableRow
                     key={row.id}
                     data-state={state}
-                    className={cn('border-t border-b-0 transition-none', onRowClick && 'cursor-pointer')}
+                    className={cn('border-t border-(--table-row-border) border-b-0 transition-none', onRowClick && 'cursor-pointer')}
                     onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                   >
                     {row.getVisibleCells().map((cell) => {

@@ -48,10 +48,10 @@ function withGridTemplate(gridTemplateColumns: string, style?: CSSProperties): C
 export function TableShell({ header, children, empty, pagination, selectedBar, className }: TableShellProps) {
   return (
     <>
-      <div className={cn('overflow-hidden rounded-10 border border-(--table-border) bg-(--table-bg)', className)}>
+      <div className={cn('overflow-hidden rounded-10 border border-(--table-shell-border) bg-(--table-bg)', className)}>
         {header}
         {children ?? (
-          <div className="flex h-36 items-center justify-center border-t border-(--table-border) text-sm text-(--table-header-fg)">
+          <div className="flex h-36 items-center justify-center border-t border-(--table-row-border) text-sm text-(--table-header-fg)">
             {empty}
           </div>
         )}
@@ -81,7 +81,7 @@ export function TableShellRow({ gridTemplateColumns, children, className, style,
   return (
     <div
       className={cn(
-        'ui-table-row grid h-(--table-row-h) items-center border-t border-(--table-border) px-(--table-cell-px)',
+        'ui-table-row grid h-(--table-row-h) items-center border-t border-(--table-row-border) px-(--table-cell-px)',
         className,
       )}
       style={withGridTemplate(gridTemplateColumns, style)}
@@ -104,7 +104,7 @@ export function TableShellLoadingRows({
         <div
           key={rowIndex}
           data-testid="table-loading-row"
-          className="grid h-(--table-row-h) items-center border-t border-(--table-border) px-(--table-cell-px)"
+          className="grid h-(--table-row-h) items-center border-t border-(--table-row-border) px-(--table-cell-px)"
           style={{ gridTemplateColumns }}
         >
           {Array.from({ length: cells }).map((__, cellIndex) => (

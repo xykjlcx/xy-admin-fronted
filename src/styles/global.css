@@ -219,6 +219,10 @@
     --page-surface-bg: transparent;
     --page-surface-border: transparent;
     --page-surface-shadow: none;
+    --page-pane-divider: transparent;
+    --table-shell-border: transparent;
+    --table-row-border: color-mix(in srgb, var(--table-border) 72%, transparent);
+    --tabs-line-border: color-mix(in srgb, var(--border) 70%, transparent);
     --page-tabs-px: calc(18px * var(--app-scale));
     --page-tabs-pt: calc(12px * var(--app-scale));
     --page-tabs-gap: calc(24px * var(--app-scale));

@@ -22,7 +22,7 @@ export function SideList({
   search?: ReactNode;
 }) {
   return (
-    <aside className="w-[calc(248px*var(--app-scale))] shrink-0 border-r border-(--side-list-border) bg-(--side-list-bg) px-3 py-4">
+    <aside className="w-[calc(248px*var(--app-scale))] shrink-0 border-r border-(--page-pane-divider) bg-(--side-list-bg) px-3 py-4">
       {search && <div className="mb-3">{search}</div>}
       {items.map((item) => (
         <Button

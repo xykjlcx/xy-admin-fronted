@@ -137,6 +137,8 @@
   --empty-fg: var(--text-3);
   --table-bg: var(--surface);
   --table-border: var(--border);
+  --table-shell-border: var(--table-border);
+  --table-row-border: var(--table-border);
   --table-header-bg: var(--surface-2);
   --table-header-fg: var(--text-3);
   --table-row-bg: var(--surface);
@@ -190,6 +192,7 @@
   --pro-filter-bg: var(--surface);
   --side-list-bg: var(--surface);
   --side-list-border: var(--border);
+  --page-pane-divider: var(--side-list-border);
   --side-list-item-bg-hover: var(--fill-hover);
   --side-list-item-bg-active: var(--fill-selected);
   --side-list-item-fg-active: var(--pri);

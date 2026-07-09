@@ -66,11 +66,12 @@ test('TableShell 消费 Table token 而不是页面 primitive 状态类', () => 
   const row = screen.getByText('李长昕').parentElement;
   const expandedRow = screen.getByText('展开行').parentElement;
 
-  expect(shell).toHaveClass('border-(--table-border)');
+  expect(shell).toHaveClass('border-(--table-shell-border)');
   expect(shell).toHaveClass('bg-(--table-bg)');
   expect(header).toHaveClass('bg-(--table-header-bg)');
   expect(header).toHaveClass('text-(--table-header-fg)');
   expect(row).toHaveClass('ui-table-row');
+  expect(row).toHaveClass('border-(--table-row-border)');
   expect(row).not.toHaveClass('hover:bg-(--table-row-bg-hover)');
   expect(row).not.toHaveClass('data-[state=selected]:bg-(--table-row-bg-selected)');
   expect(expandedRow).toHaveClass('ui-table-row');

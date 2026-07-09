@@ -478,7 +478,7 @@ export function MenusView({
         <div className="flex min-h-0 flex-1">
           <aside
             aria-label={t('menus.subsystems.listLabel')}
-            className="flex min-h-0 w-[calc(300px*var(--app-scale))] shrink-0 flex-col border-r border-(--side-list-border) bg-(--side-list-bg) px-3 py-4"
+            className="flex min-h-0 w-[calc(300px*var(--app-scale))] shrink-0 flex-col border-r border-(--page-pane-divider) bg-(--side-list-bg) px-3 py-4"
           >
             <div className="mb-4 flex items-start gap-3 px-1">
               <span className="flex size-9 shrink-0 items-center justify-center rounded-10 bg-(--nav-item-bg-current) text-(--nav-item-fg-current)">

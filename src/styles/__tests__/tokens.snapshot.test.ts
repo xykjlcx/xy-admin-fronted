@@ -900,6 +900,8 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   const step7Tokens = [
     '--table-bg: var(--surface);',
     '--table-border: var(--border);',
+    '--table-shell-border: var(--table-border);',
+    '--table-row-border: var(--table-border);',
     '--table-header-bg: var(--surface-2);',
     '--table-header-fg: var(--text-3);',
     '--table-row-bg: var(--surface);',
@@ -917,6 +919,7 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
     '--pro-filter-bg: var(--surface);',
     '--side-list-bg: var(--surface);',
     '--side-list-border: var(--border);',
+    '--page-pane-divider: var(--side-list-border);',
     '--side-list-item-bg-hover: var(--fill-hover);',
     '--side-list-item-bg-active: var(--fill-selected);',
     '--side-list-item-fg-active: var(--pri);',
@@ -939,12 +942,14 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(tableSource).toContain('[&_tr]:bg-(--table-header-bg)');
   expect(tableSource).toContain('text-(--table-header-fg)');
   expect(tableSource).toContain('ui-table-row');
+  expect(tableSource).toContain('border-(--table-row-border)');
   expect(tableSource).not.toContain('hover:bg-(--table-row-bg-hover)');
   expect(tableSource).not.toContain('aria-expanded:bg-(--table-row-bg-expanded)');
   expect(tableSource).not.toContain('data-[state=selected]:bg-(--table-row-bg-selected)');
   expect(tableSource).not.toContain('has-aria-expanded:bg-(--table-row-bg-expanded)');
 
-  expect(tableShellSource).toContain('border-(--table-border)');
+  expect(tableShellSource).toContain('border-(--table-shell-border)');
+  expect(tableShellSource).toContain('border-(--table-row-border)');
   expect(tableShellSource).toContain('bg-(--table-bg)');
   expect(tableShellSource).toContain('bg-(--table-header-bg)');
   expect(tableShellSource).toContain('text-(--table-header-fg)');
@@ -1020,8 +1025,17 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(globalCss).toContain('--page-surface-bg: transparent;');
   expect(globalCss).toContain('--page-surface-border: transparent;');
   expect(globalCss).toContain('--page-surface-shadow: none;');
+  expect(globalCss).toContain('--page-pane-divider: transparent;');
+  expect(globalCss).toContain('--table-shell-border: transparent;');
+  expect(globalCss).toContain('--table-row-border: color-mix(in srgb, var(--table-border) 72%, transparent);');
+  expect(globalCss).toContain('--tabs-line-border: color-mix(in srgb, var(--border) 70%, transparent);');
+  expect(dataTableSource).toContain('border-(--table-shell-border)');
+  expect(dataTableSource).toContain('border-(--table-row-border)');
+  expect(deptTreeSource).toContain('border-(--page-pane-divider)');
+  expect(roleListPanelSource).toContain('border-(--page-pane-divider)');
+  expect(menusPageSource).toContain('border-(--page-pane-divider)');
   expect(sideListSource).toContain('bg-(--side-list-bg)');
-  expect(sideListSource).toContain('border-(--side-list-border)');
+  expect(sideListSource).toContain('border-(--page-pane-divider)');
   expect(sideListSource).toContain('hover:bg-(--side-list-item-bg-hover)');
   expect(sideListSource).toContain('bg-(--side-list-item-bg-active)');
   expect(sideListSource).toContain('text-(--side-list-item-fg-active)');
