@@ -33,6 +33,7 @@ import {
   buildManagedMenuRows,
   collapsibleMenuIds,
   countMenuStats,
+  hasMenuChildren,
 } from './menu-management-model';
 import type { MenuRecord, Subsystem } from '@/modules/types';
 
@@ -97,6 +98,10 @@ function subsystemLabel(subsystem: Subsystem | undefined, locale: string) {
 
 function menuLabel(menu: MenuRecord | null, locale: string) {
   return menu ? lv(menu.label, locale) : '';
+}
+
+function menuValue(value: string | null | undefined, fallback: string) {
+  return value?.trim() ? value : fallback;
 }
 
 function subsystemDraft(state: ActiveSubsystemFormState, locale: string): SubsystemDraft {
@@ -298,6 +303,132 @@ function SubsystemFormDialog({
   );
 }
 
+function MenuInspectorRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1">
+      <dt className="text-xs text-text-3">{label}</dt>
+      <dd className="truncate text-sm text-text">{value}</dd>
+    </div>
+  );
+}
+
+function MenuNodeInspector({
+  menu,
+  parent,
+  hasChildren,
+  locale,
+  t,
+  canCreate,
+  canUpdate,
+  canDelete,
+  canToggle,
+  onAddChild,
+  onEdit,
+  onDelete,
+  onSetVisibility,
+}: {
+  menu: MenuRecord | null;
+  parent: MenuRecord | null;
+  hasChildren: boolean;
+  locale: string;
+  t: TFunction<'admin'>;
+  canCreate: boolean;
+  canUpdate: boolean;
+  canDelete: boolean;
+  canToggle: boolean;
+  onAddChild: (menu: MenuRecord) => void;
+  onEdit: (menu: MenuRecord) => void;
+  onDelete: (menu: MenuRecord) => void;
+  onSetVisibility: (id: string, visible: boolean) => void;
+}) {
+  const emptyValue = t('menus.inspector.emptyValue');
+
+  if (!menu) {
+    return (
+      <aside
+        aria-label={t('menus.inspector.label')}
+        className="hidden w-[calc(286px*var(--app-scale))] shrink-0 flex-col border-l border-(--page-section-divider) px-5 py-5 2xl:flex"
+      >
+        <div className="text-base font-bold text-text">{t('menus.inspector.title')}</div>
+        <p className="mt-2 text-sm leading-6 text-text-3">{t('menus.inspector.empty')}</p>
+      </aside>
+    );
+  }
+
+  const name = menuLabel(menu, locale);
+  const parentName = parent ? menuLabel(parent, locale) : t('menus.form.rootParent');
+
+  return (
+    <aside
+      aria-label={t('menus.inspector.label')}
+      className="hidden w-[calc(286px*var(--app-scale))] shrink-0 flex-col border-l border-(--page-section-divider) px-5 py-5 2xl:flex"
+    >
+      <div className="min-w-0">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-base font-bold text-text">{t('menus.inspector.title')}</div>
+            <div className="mt-3 flex min-w-0 items-center gap-2">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-10 bg-(--accent-emphasis-soft) text-(--accent-emphasis)">
+                <Icon name={menu.icon} className="size-4" />
+              </span>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-text">{name}</div>
+                <div className="truncate text-xs text-text-3">{menu.id}</div>
+              </div>
+            </div>
+          </div>
+          <span className="inline-flex shrink-0 rounded-5 bg-(--table-header-bg) px-2 py-0.5 text-xs text-text-2">
+            {t(`menus.types.${menu.type}`)}
+          </span>
+        </div>
+
+        <dl className="mt-5 space-y-4">
+          <MenuInspectorRow label={t('menus.columns.path')} value={menuValue(menu.path, emptyValue)} />
+          <MenuInspectorRow label={t('menus.columns.permission')} value={menuValue(menu.permission, emptyValue)} />
+          <MenuInspectorRow label={t('menus.form.parent')} value={parentName} />
+          <MenuInspectorRow label={t('menus.form.sort')} value={String(menu.sort)} />
+          <div className="flex items-center justify-between gap-3 rounded-10 bg-(--table-header-bg) px-3 py-2">
+            <div>
+              <dt className="text-xs text-text-3">{t('menus.columns.visible')}</dt>
+              <dd className="text-sm text-text">
+                {menu.visible ? t('menus.inspector.visible') : t('menus.inspector.hidden')}
+              </dd>
+            </div>
+            {canToggle && (
+              <Switch
+                aria-label={t('menus.actions.toggleVisible', { name })}
+                checked={menu.visible}
+                size="sm"
+                onCheckedChange={(checked) => onSetVisibility(menu.id, checked)}
+              />
+            )}
+          </div>
+        </dl>
+
+        <div className="mt-5 grid gap-2">
+          {canUpdate && (
+            <Button type="button" size="sm" variant="outline" onClick={() => onEdit(menu)}>
+              <Edit3 data-icon="inline-start" />
+              {t('menus.actions.edit')}
+            </Button>
+          )}
+          {canCreate && menu.type !== 'action' && (
+            <Button type="button" size="sm" variant="outline" onClick={() => onAddChild(menu)}>
+              <Plus data-icon="inline-start" />
+              {t('menus.actions.addChild')}
+            </Button>
+          )}
+          {canDelete && !hasChildren && (
+            <Button type="button" size="sm" variant="outline" onClick={() => onDelete(menu)}>
+              {t('menus.actions.delete')}
+            </Button>
+          )}
+        </div>
+      </div>
+    </aside>
+  );
+}
+
 export function MenusPage({ permissions }: MenusPageProps) {
   // 菜单管理是 Shell 导航的维护入口，保存后必须失效 nav/menus 前缀。
   // 这样侧边栏和当前页面表格都能从同一份 Query 缓存更新。
@@ -419,6 +550,7 @@ export function MenusView({
   const [formState, setFormState] = useState<FormState>(null);
   const [subsystemFormState, setSubsystemFormState] = useState<SubsystemFormState>(null);
   const [deleteTarget, setDeleteTarget] = useState<MenuRecord | null>(null);
+  const [selectedMenuId, setSelectedMenuId] = useState<string | null>(null);
   const activeSubsystem = subsystems.find((subsystem) => subsystem.key === activeSubsystemKey) ?? subsystems[0];
   const activeKey = activeSubsystem?.key ?? activeSubsystemKey;
   const stats = useMemo(() => countMenuStats(menus), [menus]);
@@ -434,6 +566,13 @@ export function MenusView({
   const canDelete = matchPermission(permissions, 'iam:menu:del');
   const canToggle = matchPermission(permissions, 'iam:menu:toggle');
   const activeSubsystemName = subsystemLabel(activeSubsystem, locale);
+  const visibleRows = rows.filter((row) => !row.hiddenByCollapse);
+  const selectedMenu =
+    menus.find((menu) => menu.id === selectedMenuId) ?? visibleRows[0]?.menu ?? menus[0] ?? null;
+  const selectedParent = selectedMenu?.parentId
+    ? (menus.find((menu) => menu.id === selectedMenu.parentId) ?? null)
+    : null;
+  const selectedHasChildren = selectedMenu ? hasMenuChildren(menus, selectedMenu.id) : false;
 
   const toggleCollapse = (id: string) => {
     setCollapsedIds((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
@@ -478,7 +617,7 @@ export function MenusView({
         <div className="flex min-h-0 flex-1">
           <aside
             aria-label={t('menus.subsystems.listLabel')}
-            className="flex min-h-0 w-[calc(300px*var(--app-scale))] shrink-0 flex-col border-r border-(--page-pane-divider) bg-(--side-list-bg) px-3 py-4"
+            className="flex min-h-0 w-[calc(280px*var(--app-scale))] shrink-0 flex-col border-r border-(--page-pane-divider) bg-(--side-list-bg) px-3 py-4"
           >
             <div className="mb-4 flex items-start gap-3 px-1">
               <span className="flex size-9 shrink-0 items-center justify-center rounded-10 bg-(--nav-item-bg-current) text-(--nav-item-fg-current)">
@@ -498,17 +637,17 @@ export function MenusView({
                   <div
                     key={subsystem.key}
                     className={cn(
-                      'group relative rounded-10 border transition-colors',
+                      'group relative rounded-10 transition-colors',
                       active
-                        ? 'border-(--nav-item-border-current) bg-(--nav-item-bg-current) shadow-(--nav-item-shadow-current)'
-                        : 'border-transparent bg-transparent hover:bg-(--side-list-item-bg-hover)',
+                        ? 'bg-(--nav-item-bg-current)'
+                        : 'bg-transparent hover:bg-(--side-list-item-bg-hover)',
                     )}
                   >
                     <button
                       type="button"
                       aria-current={active ? 'page' : undefined}
                       aria-label={t('menus.actions.selectSubsystem', { name: label })}
-                      className="flex min-h-[calc(94px*var(--app-scale))] w-full items-start gap-3 rounded-10 px-3 py-3 pr-10 text-left"
+                      className="flex min-h-[calc(82px*var(--app-scale))] w-full items-start gap-3 rounded-10 px-3 py-3 pr-10 text-left"
                       onClick={() => onActiveSubsystemChange(subsystem.key)}
                     >
                       <span
@@ -567,65 +706,91 @@ export function MenusView({
 
           <section
             aria-label={t('menus.treeRegionLabel', { subsystem: activeSubsystemName })}
-            className="flex min-w-0 flex-1 flex-col border-l border-(--page-section-divider) px-7 py-[calc(22px*var(--app-scale))]"
+            className="flex min-w-0 flex-1 border-l border-(--page-section-divider)"
           >
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-base font-bold text-text">
-                  {t('menus.treeTitle', { subsystem: activeSubsystemName })}
-                </span>
-                {refreshing && <span className="text-xs text-text-3">{t('menus.refreshing')}</span>}
+            <div className="flex min-w-0 flex-1 flex-col px-6 py-[calc(20px*var(--app-scale))]">
+              <div className="mb-3 flex items-start gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-base font-bold text-text">
+                      {t('menus.treeTitle', { subsystem: activeSubsystemName })}
+                    </span>
+                    {refreshing && <span className="text-xs text-text-3">{t('menus.refreshing')}</span>}
+                  </div>
+                  <div className="mt-1 text-[calc(13px*var(--app-scale))] text-text-3">
+                    {t('menus.stats', {
+                      dirs: stats.dirCount,
+                      menus: stats.menuCount,
+                      actions: stats.actionCount,
+                      hidden: stats.hiddenCount,
+                    })}
+                  </div>
+                </div>
+                <div className="flex-1" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={allCollapsibleIds.length === 0}
+                  onClick={toggleAllCollapsed}
+                >
+                  {allMenusCollapsed ? (
+                    <ChevronsDown data-icon="inline-start" />
+                  ) : (
+                    <ChevronsUp data-icon="inline-start" />
+                  )}
+                  {t(allMenusCollapsed ? 'menus.actions.expand' : 'menus.actions.collapse')}
+                </Button>
+                {canCreate && (
+                  <Button size="sm" onClick={() => setFormState({ mode: 'create', parentId: null, type: 'dir' })}>
+                    <Plus className="size-4" />
+                    {t('menus.actions.create')}
+                  </Button>
+                )}
               </div>
-              <div className="mt-1 text-[calc(13px*var(--app-scale))] text-text-3">
-                {t('menus.stats', {
-                  dirs: stats.dirCount,
-                  menus: stats.menuCount,
-                  actions: stats.actionCount,
-                  hidden: stats.hiddenCount,
-                })}
+
+              <div className="mb-3">
+                <SearchField
+                  aria-label={t('menus.searchLabel')}
+                  value={keyword}
+                  placeholder={t('menus.searchPlaceholder')}
+                  containerClassName="w-full max-w-[calc(360px*var(--app-scale))]"
+                  onChange={(event) => setKeyword(event.currentTarget.value)}
+                />
+              </div>
+
+              <div className="min-h-0 flex-1 overflow-auto pr-1">
+                <MenuTreeTable
+                  rows={rows}
+                  collapsedIds={collapsedIds}
+                  selectedMenuId={selectedMenu?.id ?? null}
+                  locale={locale}
+                  t={t}
+                  canCreate={canCreate}
+                  canUpdate={canUpdate}
+                  canDelete={canDelete}
+                  canToggle={canToggle}
+                  onSelect={(menu) => setSelectedMenuId(menu.id)}
+                  onToggleCollapse={toggleCollapse}
+                  onAddChild={openAddChild}
+                  onEdit={(menu) => setFormState({ mode: 'edit', menu })}
+                  onDelete={setDeleteTarget}
+                  onSetVisibility={(id, visible) => {
+                    void onSetMenuVisibility(id, visible);
+                  }}
+                />
               </div>
             </div>
-            <div className="flex-1" />
-            <SearchField
-              aria-label={t('menus.searchLabel')}
-              value={keyword}
-              placeholder={t('menus.searchPlaceholder')}
-              containerClassName="w-[calc(280px*var(--app-scale))]"
-              onChange={(event) => setKeyword(event.currentTarget.value)}
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={allCollapsibleIds.length === 0}
-              onClick={toggleAllCollapsed}
-            >
-              {allMenusCollapsed ? (
-                <ChevronsDown data-icon="inline-start" />
-              ) : (
-                <ChevronsUp data-icon="inline-start" />
-              )}
-              {t(allMenusCollapsed ? 'menus.actions.expand' : 'menus.actions.collapse')}
-            </Button>
-            {canCreate && (
-              <Button size="sm" onClick={() => setFormState({ mode: 'create', parentId: null, type: 'dir' })}>
-                <Plus className="size-4" />
-                {t('menus.actions.create')}
-              </Button>
-            )}
-          </div>
 
-          <div className="min-h-0 overflow-auto">
-            <MenuTreeTable
-              rows={rows}
-              collapsedIds={collapsedIds}
+            <MenuNodeInspector
+              menu={selectedMenu}
+              parent={selectedParent}
+              hasChildren={selectedHasChildren}
               locale={locale}
               t={t}
               canCreate={canCreate}
               canUpdate={canUpdate}
               canDelete={canDelete}
               canToggle={canToggle}
-              onToggleCollapse={toggleCollapse}
               onAddChild={openAddChild}
               onEdit={(menu) => setFormState({ mode: 'edit', menu })}
               onDelete={setDeleteTarget}
@@ -633,7 +798,6 @@ export function MenusView({
                 void onSetMenuVisibility(id, visible);
               }}
             />
-          </div>
           </section>
         </div>
       </PageSurface>

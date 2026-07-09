@@ -289,6 +289,7 @@
     "columns": {
       "name": "菜单名称",
       "path": "路由路径",
+      "meta": "路由 / 权限",
       "type": "类型",
       "permission": "权限标识",
       "visible": "显示",
@@ -379,6 +380,14 @@
     "empty": {
       "title": "该子系统暂无菜单",
       "desc": "点击「新增菜单」开始配置"
+    },
+    "inspector": {
+      "label": "节点详情",
+      "title": "节点详情",
+      "empty": "选择一个菜单节点后查看配置详情。",
+      "emptyValue": "未配置",
+      "visible": "已显示",
+      "hidden": "已隐藏"
     },
     "toast": {
       "created": "菜单已创建",

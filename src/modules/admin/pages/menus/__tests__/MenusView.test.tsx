@@ -149,24 +149,44 @@ test('viewer 能看子系统区和菜单树，但看不到写操作', () => {
   expect(screen.queryByRole('button', { name: '删除企业概览' })).not.toBeInTheDocument();
 });
 
-test('菜单管理采用左侧子系统列表、右侧菜单树的单层结构', () => {
+test('菜单管理采用左侧子系统列表、中间菜单树和右侧节点详情', () => {
   renderMenusView({ permissions: ['*:*:*'] });
 
   const subsystemList = screen.getByRole('complementary', { name: '子系统列表' });
   const menuTreePanel = screen.getByRole('region', { name: '后台管理菜单树' });
+  const inspector = screen.getByRole('complementary', { name: '节点详情' });
 
-  expect(subsystemList).toHaveClass('w-[calc(300px*var(--app-scale))]');
+  expect(subsystemList).toHaveClass('w-[calc(280px*var(--app-scale))]');
   expect(subsystemList).toHaveClass('border-r');
   expect(menuTreePanel).toHaveClass('min-w-0');
   expect(menuTreePanel).toHaveClass('flex-1');
   expect(menuTreePanel).toHaveClass('border-l');
   expect(menuTreePanel).toHaveClass('border-(--page-section-divider)');
+  expect(inspector).toHaveClass('border-l');
+  expect(inspector).toHaveClass('border-(--page-section-divider)');
   expect(within(subsystemList).getByRole('button', { name: '选择后台管理子系统' })).toBeInTheDocument();
   expect(within(subsystemList).getByRole('button', { name: '选择仓储系统子系统' })).toBeInTheDocument();
   expect(within(subsystemList).getByRole('button', { name: '新增子系统' })).toBeInTheDocument();
   expect(within(menuTreePanel).getByText('菜单名称')).toBeInTheDocument();
+  expect(within(inspector).getByText('工作台')).toBeInTheDocument();
 
   expect(screen.getByTestId('menu-management-surface')).toHaveClass('min-h-[calc(100dvh-138px)]');
+});
+
+test('点击菜单树节点后右侧详情面板展示该节点配置', async () => {
+  renderMenusView({ permissions: ['*:*:*'] });
+
+  const roleNode = screen
+    .getAllByRole('button', { name: /角色与权限/ })
+    .find((button) => button.getAttribute('aria-pressed') !== null);
+
+  expect(roleNode).toBeDefined();
+  await userEvent.click(roleNode!);
+
+  const inspector = screen.getByRole('complementary', { name: '节点详情' });
+  expect(within(inspector).getByText('角色与权限')).toBeInTheDocument();
+  expect(within(inspector).getByText('/admin/roles')).toBeInTheDocument();
+  expect(within(inspector).getByText('iam:role:view')).toBeInTheDocument();
 });
 
 test('admin 可以从子系统卡片编辑入口保存子系统显示信息', async () => {

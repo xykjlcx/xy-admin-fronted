@@ -289,6 +289,7 @@
     "columns": {
       "name": "Menu name",
       "path": "Route path",
+      "meta": "Route / Permission",
       "type": "Type",
       "permission": "Permission",
       "visible": "Visible",
@@ -379,6 +380,14 @@
     "empty": {
       "title": "No menus in this subsystem",
       "desc": "Click \"New menu\" to configure"
+    },
+    "inspector": {
+      "label": "Node details",
+      "title": "Node details",
+      "empty": "Select a menu node to inspect its configuration.",
+      "emptyValue": "Not configured",
+      "visible": "Visible",
+      "hidden": "Hidden"
     },
     "toast": {
       "created": "Menu created",
