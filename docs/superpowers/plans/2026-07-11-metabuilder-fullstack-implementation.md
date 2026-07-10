@@ -84,6 +84,8 @@ GREEN：按 v4 §3.3/§11 的签名实现最小 immutable records/interfaces，�
 - 两套最小 V1 migration 与 Testcontainers 集成测试
 - generated package 分别为 `com.metabuild.schema.platform`、`com.metabuild.schema.lastmile`
 
+工具链锁定为已核验的源仓基线：jOOQ `3.19.24`、Flyway `11.7.2`、PostgreSQL driver `42.7.7`、Testcontainers `1.21.4`、`postgres:16-alpine`；generated annotation 禁日期/版本漂移，输出入 git。
+
 RED：
 
 - platform-only fresh DB、platform→lastmile fresh DB、重复 validate。
