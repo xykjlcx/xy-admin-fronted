@@ -6,19 +6,19 @@
 
 ## §20.1 对照表
 
-| #   | 完成条件                                           | 当前状态 | 证据指针                                                         |
-| --- | -------------------------------------------------- | -------- | ---------------------------------------------------------------- |
-| 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`       |
-| 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts`；`pnpm guard:desktop`；双构建产物守卫  |
-| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 682 项、`theme:guard` 196 项、`build:web` 与产物扫描    |
-| 4   | 两种窗口模式与三套 Shell 安全区                    | 通过     | 双 packaged E2E；3 布局 × 3 比例截图与几何断言                   |
-| 5   | Electron 凭证安全存储与统一会话服务                | 通过     | Phase 3 单元测试、架构守卫与 packaged `safeStorage` E2E          |
-| 6   | 原生文件下载闭环                                   | 通过     | Phase 5 单元/页面测试；packaged Main stub 保存框 + 实际流式落盘  |
-| 7   | 更新状态机、feed、metadata 与真实更新              | 部分通过 | Phase 6 状态机/generic feed/HTTP 契约通过；真实签名更新 pending  |
-| 8   | CSP、sandbox、隔离、fuses、导航、sender、schema    | 实施中   | Phase 0 已验证 CSP/窗口隔离/导航；IPC 与 release fuse 待后续阶段 |
-| 9   | 全部门禁、visual、Electron E2E、平台 smoke         | 实施中   | Phase 0 自动化与 macOS arm64 未签名 packaged smoke 已登记        |
-| 10  | 四份文档与代码一致                                 | pending  | Phase 8                                                          |
-| 11  | 既有改动未覆盖、提交可独立回滚                     | 通过     | 独立 worktree；Phase 0–6 独立提交，最新 `6d0e75a`                |
+| #   | 完成条件                                           | 当前状态 | 证据指针                                                          |
+| --- | -------------------------------------------------- | -------- | ----------------------------------------------------------------- |
+| 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`        |
+| 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts`；`pnpm guard:desktop`；双构建产物守卫   |
+| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 682 项、`theme:guard` 196 项、`build:web` 与产物扫描     |
+| 4   | 两种窗口模式与三套 Shell 安全区                    | 通过     | 双 packaged E2E；3 布局 × 3 比例截图与几何断言                    |
+| 5   | Electron 凭证安全存储与统一会话服务                | 通过     | Phase 3 单元测试、架构守卫与 packaged `safeStorage` E2E           |
+| 6   | 原生文件下载闭环                                   | 通过     | Phase 5 单元/页面测试；packaged Main stub 保存框 + 实际流式落盘   |
+| 7   | 更新状态机、feed、metadata 与真实更新              | 部分通过 | generic feed/HTTP/metadata/公网回读工具通过；真实签名更新 pending |
+| 8   | CSP、sandbox、隔离、fuses、导航、sender、schema    | 通过     | 安全窗口/IPC 门禁；四套 macOS 产物 fuse wire 实读                 |
+| 9   | 全部门禁、visual、Electron E2E、平台 smoke         | 阶段通过 | Web 682 项、Desktop 169 项、双 E2E、macOS arm64 DMG smoke         |
+| 10  | 四份文档与代码一致                                 | pending  | Phase 8                                                           |
+| 11  | 既有改动未覆盖、提交可独立回滚                     | 通过     | 独立 worktree；Phase 0–7 独立提交，最新 `b85cfa7`                 |
 
 ## 分期证据
 
@@ -144,22 +144,41 @@
 - 阶段门禁：Web Vitest 117 个文件/682 项；Desktop Vitest 23 个文件/142 项；theme guard 196 项；design lint 0 error；Web/Desktop TypeScript、ESLint 0 error、Web build、native/integrated build、双 packaged E2E 全通过。
 - 产物回读：Web `totalBytes=1,426,652`、最大 JS `264,519` bytes；native Desktop `totalBytes=1,423,736`、integrated Desktop `totalBytes=1,423,740`，最大 JS 均为 `264,785` bytes。
 
+### Phase 7 — 打包发布
+
+- 提交：`b85cfa7`。
+- 发布身份与签名入口：
+  - `desktop.config.ts` 对 `appId/productName/executableName/copyright/macTeamId/windowsPublisher` 做 Zod 校验；脚手架占位身份显式不可发布。
+  - `DESKTOP_RELEASE_BUILD=true` 时，macOS 强制 `CSC_NAME + APPLE_ID + APPLE_APP_SPECIFIC_PASSWORD + APPLE_TEAM_ID`，Windows 强制 `CSC_LINK + CSC_KEY_PASSWORD + publisher`；未注入即构建失败。
+  - macOS 验证器回读 `codesign` Team ID 与 `ElectronAsarIntegrity`；Windows 路径通过 PowerShell 回读 Authenticode status/subject，正式包 publisher 不匹配即失败。
+- release fuse profile 显式固定 Electron 43 的全部 9 个 V1 fuse；`afterPack` 先 flip 再实读，产物验证再次从可执行文件实读。`RunAsNode/NodeOptions/inspect/file 额外权限` 关闭，cookie encryption/ASAR integrity/only-ASAR/WASM trap handler 开启；因产物不含 browser V8 snapshot，该 fuse 显式关闭。
+- 产物与 feed：
+  - `pnpm make:desktop -- --window-chrome=native|integrated` 均成功；每种模式生成 macOS arm64/x64 的 DMG + ZIP + blockmap + `latest-mac.yml`。
+  - 四套 ASAR 均为 103 个条目、约 2.24 MB，且无 `node_modules/.env/证书/测试/快照/.superpowers`；必含 Main、Preload、Renderer 与本地恢复页。
+  - feed 按 `window chrome/stable/platform/arch` 隔离，先复制二进制与 blockmap，最后复制 metadata；回读校验 version/path/arch/size/SHA-512。
+  - `verify:update-feed` 可对公网 HTTPS feed 执行 metadata GET/HEAD、artifact HEAD/Range/GET、cache/MIME/Content-Length 契约与全量 SHA-512 回读。本仓库未指定真实公网源，因此未伪造公网通过证据。
+- 生命周期与可诊断性：首次安装无密文时不再提前访问 Keychain；退出前取消并等待下载临时文件清理；Renderer 加载失败进入本地恢复页；`userData/logs` 按大小轮转并脱敏；IPC 错误只记 channel/schema issue。
+- 未签名 macOS arm64 DMG smoke：挂载、复制安装副本、`codesign --verify --deep --strict`、Main/Renderer/GPU/Network 进程、日志 `application ready/renderer healthy`、标准 Quit、删除安装副本与弹出 DMG 均通过。证据级别仅为“未签名安装包 smoke”。
+- 对抗修正：实包启动首轮暴露 `safeStorage.isAsyncEncryptionAvailable()` 在无凭据时仍卡住 Keychain；调整为先读密文后再访问安全存储后启动通过。首轮 fuse 开启 browser-specific V8 snapshot 后实包因缺少 snapshot 启动失败；按实际产物能力显式关闭后四套产物均可启动/验证。
+- 阶段门禁：Desktop Vitest 31 个文件/169 项；Web Vitest 117 个文件/682 项；theme guard 196 项；Web/Desktop TypeScript、ESLint 0 error、design lint、Web build、双 packaged E2E、双 `make` 全部通过。
+
 ## 平台证据矩阵
 
-| 平台        | build                                  | install | backend                      | update  | uninstall | 签名            |
-| ----------- | -------------------------------------- | ------- | ---------------------------- | ------- | --------- | --------------- |
-| macOS arm64 | native/integrated packaged `.app` 通过 | pending | packaged HTTPS/CORS/下载通过 | pending | pending   | 未签名；pending |
-| macOS x64   | pending                                | pending | pending                      | pending | pending   | pending         |
-| Windows x64 | pending                                | pending | pending                      | pending | pending   | pending         |
+| 平台        | build                              | install               | backend                      | update  | uninstall        | 签名                     |
+| ----------- | ---------------------------------- | --------------------- | ---------------------------- | ------- | ---------------- | ------------------------ |
+| macOS arm64 | native/integrated DMG+ZIP 通过     | 未签名 DMG smoke 通过 | packaged HTTPS/CORS/下载通过 | pending | 隔离副本删除通过 | ad-hoc；正式签名 pending |
+| macOS x64   | pending（产物生成/自动校验已执行） | pending               | pending                      | pending | pending          | pending                  |
+| Windows x64 | pending                            | pending               | pending                      | pending | pending          | pending                  |
 
 ## 偏差记录
 
 1. 原要求意图：sandbox Preload 必须是无外部依赖的单文件。实际做法：未使用 `electron-vite 5` 实验性的 `isolatedEntries`，改用单入口、`externalizeDeps: false`、`inlineDynamicImports: true`、CJS 输出。理由：`isolatedEntries` 在非 TTY 构建中无条件调用 `process.stdout.moveCursor` 并崩溃；替代做法保持相同安全产物约束，且可在无人值守环境稳定构建。
 2. 工具链：因 `electron-vite 5.0.0` 的 peer 范围不支持 Vite 8，按用户确认将 Vite 固定为 `7.3.6`、React 插件固定为 `5.2.0`。共享 manual chunks 后 Web 最大业务入口从对比基线约 596 KiB 收敛为约 128 KiB。
+3. 原文件名：设计文档以 `electron-builder.yml` 为配置载体。实际改为 `electron-builder.ts`，并由守卫禁止 YAML/TS 双配置并存。理由：发布身份、平台签名前置条件和 Spike fuse 例外需要可类型检查、可单测的动态配置；安全、范围与产物目标不变。
 
 ## Pending 与后续人工动作
 
-- 当前报告已完成 Phase 0–6 证据；Phase 7–8 继续实施。
+- 当前报告已完成 Phase 0–7 证据；Phase 8 继续实施。
 - 原生保存框自动化是 Main stub；真实 macOS/Windows 保存框点击 smoke 保持 pending。
 - macOS x64、Windows x64 的真实安装、远程后端、更新、卸载和签名保持 pending，不能由当前 arm64 结果替代。
 - 当前机器没有 Developer ID identity，macOS 真实旧版到新版签名更新闭环保持 pending，不声明通过。
