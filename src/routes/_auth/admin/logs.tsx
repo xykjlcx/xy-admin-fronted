@@ -1,0 +1,20 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { LogsPage } from '@/modules/admin/logs';
+
+export const Route = createFileRoute('/_auth/admin/logs')({
+  staticData: {
+    labelKey: 'logs.title',
+    permission: 'audit:oplog:view',
+    groupKey: 'logs.breadcrumbGroup',
+    actions: [
+      { code: 'audit:oplog:export', labelKey: 'logs.actions.export' },
+      { code: 'audit:login:export', labelKey: 'logs.actions.export' },
+    ],
+  },
+  component: LogsRoute,
+});
+
+function LogsRoute() {
+  const { me } = Route.useRouteContext();
+  return <LogsPage permissions={me.permissions} />;
+}
