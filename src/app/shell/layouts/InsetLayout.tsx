@@ -47,9 +47,12 @@ export function InsetLayout({
             面包屑靠 min-w-0 截断、搜索靠自身 max-w 收缩，三区永不重叠 */}
         <div
           data-slot="inset-shell-header"
-          className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-(--page-breadcrumb-divider) px-(--page-frame-px)"
+          className="desktop-drag-region grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-(--page-breadcrumb-divider) px-(--page-frame-px)"
         >
-          <div data-slot="inset-shell-header-start" className="flex min-w-0 items-center gap-3">
+          <div
+            data-slot="inset-shell-header-start"
+            className="desktop-no-drag flex min-w-0 items-center gap-3"
+          >
             <Button
               variant="ghost"
               size="icon"
@@ -67,11 +70,14 @@ export function InsetLayout({
           </div>
           <div
             data-slot="inset-shell-header-center"
-            className="flex min-w-0 items-center justify-center"
+            className="desktop-no-drag flex min-w-0 items-center justify-center"
           >
             <GlobalSearch />
           </div>
-          <div data-slot="inset-shell-header-suffix" className="flex items-center justify-end gap-1.5">
+          <div
+            data-slot="inset-shell-header-suffix"
+            className="inset-window-controls-right desktop-no-drag flex items-center justify-end gap-1.5"
+          >
             <NotificationBell />
             <AppearanceDrawer />
             <DarkModeToggle />

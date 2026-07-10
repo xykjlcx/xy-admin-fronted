@@ -17,6 +17,10 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
   return (
     <>
       <nav className="h-screen flex w-[calc(76px*var(--app-scale))] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-border bg-chrome py-2.5">
+        <div
+          data-slot="rail-window-drag-region"
+          className="rail-window-drag-region desktop-drag-region shrink-0"
+        />
         {groups.map((g) => {
           const active = g === activeGroup;
           const first = g.pages[0];

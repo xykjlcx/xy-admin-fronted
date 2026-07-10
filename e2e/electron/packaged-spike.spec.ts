@@ -28,6 +28,7 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
   const executablePath = requiredEnvironment('SPIKE_APP_EXECUTABLE');
   const evidencePath = requiredEnvironment('SPIKE_EVIDENCE_PATH');
   const userDataPath = requiredEnvironment('SPIKE_USER_DATA_PATH');
+  const expectedPlatform = process.platform === 'darwin' ? 'darwin' : 'win32';
   const desktop = await electron.launch({
     executablePath,
     args: [`--user-data-dir=${userDataPath}`],
@@ -42,17 +43,23 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
     await expect(page).toHaveURL(/app:\/\/renderer\/index\.html#\/login/);
     await expect(page.getByRole('heading', { name: '欢迎回来' })).toBeVisible();
 
-    expect(
-      await page.evaluate(() => {
-        const api = (window as Window & { desktop?: { window?: { getSnapshot(): unknown } } }).desktop;
-        return {
-          snapshot: api?.window?.getSnapshot(),
-          processType: typeof (globalThis as { process?: unknown }).process,
-          requireType: typeof (globalThis as { require?: unknown }).require,
-        };
-      }),
-    ).toEqual({
-      snapshot: { runtime: 'desktop', platform: 'darwin', chrome: 'native' },
+    const rendererContext = await page.evaluate(() => {
+      const api = (window as Window & { desktop?: { window?: { getSnapshot(): unknown } } }).desktop;
+      return {
+        snapshot: api?.window?.getSnapshot(),
+        processType: typeof (globalThis as { process?: unknown }).process,
+        requireType: typeof (globalThis as { require?: unknown }).require,
+      };
+    });
+    expect(rendererContext).toMatchObject({
+      snapshot: {
+        runtime: 'desktop',
+        platform: expectedPlatform,
+        chrome: 'native',
+        controlsInsetLeft: 0,
+        controlsInsetRight: 0,
+        titlebarHeight: 0,
+      },
       processType: 'undefined',
       requireType: 'undefined',
     });

@@ -13,6 +13,10 @@
 }
 
 :root {
+  /* 宿主窗口安全区：Web/native 固定为 0，Electron integrated 由 App 启动层覆盖。 */
+  --window-controls-inset-left: 0px;
+  --window-controls-inset-right: 0px;
+  --desktop-titlebar-height: 0px;
   --pri-hover: color-mix(in srgb, var(--pri) 85%, white);
   --pri-active: color-mix(in srgb, var(--pri) 76%, black);
   --soft: var(--pri-soft);

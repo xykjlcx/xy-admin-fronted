@@ -15,10 +15,11 @@ export function RailLayout({ menuTree, subsystems, children }: ShellLayoutProps)
   const { breadcrumbs, chrome } = useShellBreadcrumbs();
 
   return (
-    <div className="h-screen flex w-full overflow-hidden bg-surface text-text">
+    <div data-shell-layout="rail" className="h-screen flex w-full overflow-hidden bg-surface text-text">
       <NavMenuRail tree={menuTree} />
       <div className="relative flex min-w-0 flex-1 flex-col bg-bg">
         <ShellHeader
+          consumeLeftInset={false}
           left={
             <div className="flex min-w-0 items-center gap-3">
               <SubsystemSwitcher subsystems={subsystems} variant="header" />

@@ -37,8 +37,11 @@ export function NavMenuInset({
       )}
     >
       {!collapsed && (
-        <div className="mb-3 flex items-center">
-          <div className="min-w-0 flex-1">
+        <div
+          data-slot="inset-window-brand"
+          className="inset-window-brand desktop-drag-region mb-3 flex items-center"
+        >
+          <div className="desktop-no-drag min-w-0 flex-1">
             <SubsystemSwitcher subsystems={subsystems} variant="brand" />
           </div>
         </div>
@@ -65,7 +68,10 @@ export function NavMenuInset({
                       : 'text-text-2 hover:bg-(--nav-item-bg-hover)',
                   )}
                 >
-                  <Icon name={p.icon ?? g.node.icon} className="size-[calc(18px*var(--app-scale))] shrink-0" />
+                  <Icon
+                    name={p.icon ?? g.node.icon}
+                    className="size-[calc(18px*var(--app-scale))] shrink-0"
+                  />
                   {!collapsed && <span className="truncate">{lv(p.label, i18n.language)}</span>}
                 </Link>
               ) : null,

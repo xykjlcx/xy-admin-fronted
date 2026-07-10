@@ -16,8 +16,13 @@ export function createWindowOptions(input: CreateWindowOptionsInput): BrowserWin
     minWidth: 1024,
     minHeight: 640,
     show: false,
-    titleBarStyle: integrated && input.platform === 'darwin' ? 'hiddenInset' : undefined,
-    titleBarOverlay: integrated && input.platform === 'win32' ? { height: 48 } : undefined,
+    titleBarStyle:
+      integrated && input.platform === 'darwin'
+        ? 'hiddenInset'
+        : integrated && input.platform === 'win32'
+          ? 'hidden'
+          : undefined,
+    titleBarOverlay: integrated && input.platform === 'win32' ? { height: 56 } : undefined,
     webPreferences: {
       preload: input.preloadPath,
       nodeIntegration: false,

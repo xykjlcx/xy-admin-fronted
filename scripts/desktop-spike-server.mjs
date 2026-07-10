@@ -36,13 +36,20 @@ export function createSpikeResponse(request) {
     } catch {
       return response(400, JSON.stringify({ error: 'invalid json' }), request.origin);
     }
-    if (input?.username !== 'spike-user' || input?.password !== 'spike-password') {
+    const token =
+      input?.username === 'spike-user' && input?.password === 'spike-password'
+        ? 'spike-session-token'
+        : input?.username === 'chrome-user' && input?.password === 'spike-password'
+          ? 'chrome-session-token'
+          : null;
+    if (!token) {
       return response(401, JSON.stringify({ error: 'invalid credentials' }), request.origin);
     }
-    return response(200, envelope({ token: 'spike-session-token' }), request.origin);
+    return response(200, envelope({ token }), request.origin);
   }
 
-  const authorized = request.headers.authorization === 'Bearer spike-session-token';
+  const bearerToken = request.headers.authorization?.replace(/^Bearer\s+/, '') ?? '';
+  const authorized = bearerToken === 'spike-session-token' || bearerToken === 'chrome-session-token';
   if (!authorized) return response(401, JSON.stringify({ error: 'unauthorized' }), request.origin);
 
   if (request.method === 'GET' && request.path === '/api/auth/me') {
@@ -96,6 +103,38 @@ export function createSpikeResponse(request) {
     );
   }
   if (request.method === 'GET' && request.path === '/api/dashboard/overview') {
+    if (bearerToken === 'chrome-session-token') {
+      return response(
+        200,
+        envelope({
+          company: {
+            mark: 'C',
+            name: 'Packaged Chrome',
+            status: 'Verified',
+            meta: 'Electron packaged window chrome evidence',
+          },
+          metrics: {
+            newMembers: { value: '24', delta: '6', negative: false },
+            activeUsers: { value: '96', delta: '12', negative: false },
+            newRoles: { value: '3', delta: '1', negative: false },
+            auditLogs: { value: '1,284', delta: '38', negative: true },
+          },
+          todo: {
+            stats: {
+              pending: { value: '10', label: 'Pending' },
+              done: { value: '52', label: 'Done' },
+              overdue: { value: '3', label: 'Overdue' },
+            },
+            items: {
+              phone: { title: 'Call', time: '09:00-12:00', status: 'In progress' },
+              onboard: { title: 'Visit', time: '12:00-15:00', status: 'Urgent' },
+              interview: { title: 'Meeting', time: '14:00-15:00', status: 'Pending' },
+            },
+          },
+        }),
+        request.origin,
+      );
+    }
     return response(401, JSON.stringify({ code: 401, data: null, message: 'expired' }), request.origin);
   }
   return response(404, JSON.stringify({ error: 'not found' }), request.origin);

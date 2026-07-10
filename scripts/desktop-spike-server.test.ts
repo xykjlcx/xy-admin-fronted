@@ -64,4 +64,28 @@ describe('packaged Spike HTTPS API', () => {
     expect(JSON.parse(me.body)).toMatchObject({ code: 0, data: { user: { username: 'spike-user' } } });
     expect(dashboard.status).toBe(401);
   });
+
+  test('keeps a dedicated chrome-validation session on the dashboard', () => {
+    const login = createSpikeResponse({
+      method: 'POST',
+      path: '/api/auth/login',
+      origin: rendererOrigin,
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'chrome-user', password: 'spike-password' }),
+    });
+    const dashboard = createSpikeResponse({
+      method: 'GET',
+      path: '/api/dashboard/overview',
+      origin: rendererOrigin,
+      headers: { authorization: 'Bearer chrome-session-token' },
+      body: '',
+    });
+
+    expect(JSON.parse(login.body)).toMatchObject({ data: { token: 'chrome-session-token' } });
+    expect(dashboard.status).toBe(200);
+    expect(JSON.parse(dashboard.body)).toMatchObject({
+      code: 0,
+      data: { company: { name: 'Packaged Chrome' } },
+    });
+  });
 });

@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { getDesktopEnvironment } from '../config';
-import { WindowSnapshotSchema, type DesktopApi } from '../shared/desktop-api';
-import { ipcChannels } from '../shared/ipc-channels';
+import type { DesktopApi } from '../shared/desktop-api';
+import { ipcChannels, ipcEvents } from '../shared/ipc-channels';
 import {
   ClipboardWriteInputSchema,
   CredentialClearInputSchema,
@@ -11,18 +11,30 @@ import {
   IpcSuccessSchema,
   type CredentialClearInput,
 } from '../shared/schemas';
+import { createWindowSnapshot, WindowSnapshotSchema, type WindowSnapshot } from '../shared/window-state';
 
 const environment = getDesktopEnvironment();
 const platform = process.platform === 'darwin' ? 'darwin' : 'win32';
-const snapshot = WindowSnapshotSchema.parse({
-  runtime: 'desktop',
+let snapshot = createWindowSnapshot({
   platform,
   chrome: environment.windowChrome,
+  maximized: false,
+  fullScreen: false,
+  scaleFactor: 1,
+});
+const windowStateListeners = new Set<(next: WindowSnapshot) => void>();
+ipcRenderer.on(ipcEvents.windowStateChanged, (_event, payload: unknown) => {
+  snapshot = WindowSnapshotSchema.parse(payload);
+  for (const listener of windowStateListeners) listener(snapshot);
 });
 
 const desktopApi: DesktopApi = Object.freeze({
   window: Object.freeze({
     getSnapshot: () => snapshot,
+    subscribe: (listener: (next: WindowSnapshot) => void) => {
+      windowStateListeners.add(listener);
+      return () => windowStateListeners.delete(listener);
+    },
   }),
   clipboard: Object.freeze({
     writeText: async (text: string) => {

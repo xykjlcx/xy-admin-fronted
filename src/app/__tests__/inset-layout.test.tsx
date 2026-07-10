@@ -56,7 +56,7 @@ function renderShellWithLayout({
   layout = 'inset',
   collapsed = false,
 }: {
-  layout?: 'sidebar' | 'inset';
+  layout?: 'sidebar' | 'rail' | 'inset';
   collapsed?: boolean;
 } = {}) {
   act(() => {
@@ -67,7 +67,10 @@ function renderShellWithLayout({
     defaultOptions: { queries: { retry: false } },
   });
   const adminManifest = manifests.find((manifest) => manifest.subsystem.key === 'admin')!;
-  queryClient.setQueryData(subsystemsQuery.queryKey, manifests.map((manifest) => manifest.subsystem));
+  queryClient.setQueryData(
+    subsystemsQuery.queryKey,
+    manifests.map((manifest) => manifest.subsystem),
+  );
   queryClient.setQueryData(menusQuery('admin').queryKey, adminManifest.menuSeed);
   queryClient.setQueryData(meQuery.queryKey, {
     user: { id: 'u-test', name: '测试用户', username: 'test' },
@@ -119,10 +122,14 @@ test('Inset 布局把子系统切换和用户入口放回侧栏', async () => {
   const headerStart = header.querySelector('[data-slot="inset-shell-header-start"]') as HTMLElement;
   const headerCenter = header.querySelector('[data-slot="inset-shell-header-center"]') as HTMLElement;
   const headerSuffix = header.querySelector('[data-slot="inset-shell-header-suffix"]') as HTMLElement;
+  const brand = aside.querySelector('[data-slot="inset-window-brand"]') as HTMLElement;
   const collapseButton = await within(header).findByRole('button', { name: '收起导航' });
   const sidebarFooter = await screen.findByTestId('inset-sidebar-footer');
 
   expect(aside).not.toContainElement(collapseButton);
+  expect(brand).toHaveClass('desktop-drag-region');
+  expect(header).toHaveClass('desktop-drag-region');
+  expect(headerSuffix).toHaveClass('inset-window-controls-right');
   expect(aside).toHaveClass('w-[calc(248px*var(--app-scale))]');
   expect(surface).toHaveClass('m-2');
   expect(surface).toHaveClass('ml-1');
@@ -131,7 +138,9 @@ test('Inset 布局把子系统切换和用户入口放回侧栏', async () => {
   expect(within(headerStart).queryByRole('button', { name: /后台管理/ })).not.toBeInTheDocument();
   expect(within(headerStart).getByText('组织与权限')).toBeInTheDocument();
   expect(within(headerStart).getByText('成员与部门')).toBeInTheDocument();
-  expect(within(headerCenter).getByRole('searchbox', { name: '搜索功能导航、组织数据、角色详情等' })).toBeInTheDocument();
+  expect(
+    within(headerCenter).getByRole('searchbox', { name: '搜索功能导航、组织数据、角色详情等' }),
+  ).toBeInTheDocument();
   const sidebarSwitcher = within(aside).getByRole('button', { name: /后台管理/ });
   expect(sidebarSwitcher).toHaveClass('px-2');
   expect(sidebarSwitcher).toHaveClass('py-2');
@@ -190,8 +199,23 @@ test('Sidebar 布局用子系统切换和页面面包屑替代左上角品牌位
   const main = document.querySelector('#shell-main') as HTMLElement;
 
   expect(within(header).queryByText('Ship Any')).not.toBeInTheDocument();
+  expect(header).toHaveAttribute('data-window-inset-left', 'true');
+  expect(header).toHaveClass('desktop-drag-region');
   expect(within(header).getByRole('button', { name: /后台管理/ })).toBeInTheDocument();
   expect(within(header).getByText('组织与权限')).toBeInTheDocument();
   expect(within(header).getByText('成员与部门')).toBeInTheDocument();
   expect(main.querySelector('[data-slot="page-breadcrumb"]')).not.toBeInTheDocument();
+});
+
+test('Rail 布局由左侧窗口区消费 macOS inset，右侧 Header 不重复消费', async () => {
+  renderShellWithLayout({ layout: 'rail' });
+
+  expect(await screen.findByText('Users content')).toBeInTheDocument();
+  const railWindowRegion = document.querySelector('[data-slot="rail-window-drag-region"]');
+  const header = document.querySelector('header');
+
+  expect(railWindowRegion).toBeInTheDocument();
+  expect(railWindowRegion).toHaveClass('desktop-drag-region');
+  expect(header).toHaveAttribute('data-window-inset-left', 'false');
+  expect(header).toHaveClass('desktop-drag-region');
 });

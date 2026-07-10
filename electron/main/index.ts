@@ -1,7 +1,18 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { app, BrowserWindow, clipboard, dialog, net, protocol, safeStorage, session, shell } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  clipboard,
+  dialog,
+  net,
+  protocol,
+  safeStorage,
+  screen,
+  session,
+  shell,
+} from 'electron';
 import { getDesktopEnvironment, readRendererDevelopmentUrl, readSpikeUserDataPathValue } from '../config';
 import { createWindowOptions } from './create-window';
 import { createAtomicCredentialFileStore, createCredentialVault } from './credential-vault';
@@ -9,6 +20,7 @@ import { registerDesktopIpcHandlers } from './ipc';
 import { decideNavigation } from './navigation-policy';
 import { buildRendererCsp, resolveRendererAssetPath } from './protocol';
 import { parseSpikeUserDataPath } from './spike-user-data';
+import { bindWindowState } from './window-state';
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -71,8 +83,16 @@ function createMainWindow(): BrowserWindow {
       preloadPath: path.join(import.meta.dirname, '../preload/index.cjs'),
     }),
   );
+  const disposeWindowState = bindWindowState({
+    window,
+    displaySource: screen,
+    platform: process.platform,
+    chrome: environment.windowChrome,
+  });
   attachNavigationPolicy(window);
   window.once('ready-to-show', () => window.show());
+  // webContents 销毁前解绑；在 closed 后访问已销毁 webContents 会阻塞 Playwright/app.quit 清理。
+  window.once('close', disposeWindowState);
   window.on('closed', () => {
     if (mainWindow === window) mainWindow = null;
   });

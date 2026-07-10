@@ -1,5 +1,8 @@
 import { startMockWorkerIfEnabled } from '@/config';
+import { disposeHostWindow } from '@/app/host-window';
 import { sessionCredentialService } from '@/lib/session-credential-service';
+
+import.meta.hot?.dispose(disposeHostWindow);
 
 // 应用入口只做启动编排：先决定 mock 是否接管网络，再懒加载真正的 React 应用装配。
 // 这样生产构建能把 MSW/faker 静态剥离，首屏也不会在 mock 未就绪时先发真实请求。

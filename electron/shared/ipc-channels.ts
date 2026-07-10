@@ -6,4 +6,9 @@ export const ipcChannels = {
   credentialClear: 'desktop:credential:clear',
 } as const;
 
+export const ipcEvents = {
+  windowStateChanged: 'desktop:window:state-changed',
+} as const;
+
 export type DesktopIpcChannel = (typeof ipcChannels)[keyof typeof ipcChannels];
+export type DesktopIpcEvent = (typeof ipcEvents)[keyof typeof ipcEvents];

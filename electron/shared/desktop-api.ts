@@ -1,17 +1,13 @@
-import { z } from 'zod';
 import type { CredentialClearInput } from './schemas';
+import type { WindowSnapshot } from './window-state';
 
-export const WindowSnapshotSchema = z.object({
-  runtime: z.literal('desktop'),
-  platform: z.enum(['darwin', 'win32']),
-  chrome: z.enum(['native', 'integrated']),
-});
-
-export type WindowSnapshot = z.infer<typeof WindowSnapshotSchema>;
+export { WindowSnapshotSchema } from './window-state';
+export type { WindowSnapshot } from './window-state';
 
 export interface DesktopApi {
   window: {
     getSnapshot(): WindowSnapshot;
+    subscribe(listener: (snapshot: WindowSnapshot) => void): () => void;
   };
   clipboard: {
     writeText(text: string): Promise<void>;

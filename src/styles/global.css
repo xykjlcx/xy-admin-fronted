@@ -121,6 +121,59 @@
   }
 }
 
+/* Electron integrated chrome 只在明确标记的顶层区域启用拖动；所有交互子区恢复 no-drag。
+   安全区由三套 Shell 各自消费，禁止用一条全局 Header padding 覆盖结构差异。 */
+[data-runtime='desktop'][data-window-chrome='integrated'] .desktop-drag-region {
+  app-region: drag;
+}
+
+[data-runtime='desktop'][data-window-chrome='integrated'] .desktop-no-drag,
+[data-runtime='desktop'][data-window-chrome='integrated'] button,
+[data-runtime='desktop'][data-window-chrome='integrated'] a,
+[data-runtime='desktop'][data-window-chrome='integrated'] input,
+[data-runtime='desktop'][data-window-chrome='integrated'] textarea,
+[data-runtime='desktop'][data-window-chrome='integrated'] select,
+[data-runtime='desktop'][data-window-chrome='integrated'] [role='button'],
+[data-runtime='desktop'][data-window-chrome='integrated'] [role='menuitem'],
+[data-runtime='desktop'][data-window-chrome='integrated'] [role='searchbox'] {
+  app-region: no-drag;
+}
+
+.shell-window-header {
+  padding-left: calc(1.25rem + var(--window-controls-inset-left));
+  padding-right: calc(1.25rem + var(--window-controls-inset-right));
+}
+
+.shell-window-header[data-window-inset-left='false'] {
+  padding-left: 1.25rem;
+}
+
+.rail-window-drag-region {
+  width: max(100%, var(--window-controls-inset-left));
+  height: min(var(--desktop-titlebar-height), var(--window-controls-inset-left));
+  min-height: min(var(--desktop-titlebar-height), var(--window-controls-inset-left));
+}
+
+.inset-window-brand {
+  min-height: min(var(--desktop-titlebar-height), var(--window-controls-inset-left));
+  padding-left: var(--window-controls-inset-left);
+}
+
+.inset-window-controls-right {
+  padding-right: var(--window-controls-inset-right);
+}
+
+@media (max-width: 1023px) {
+  .shell-window-header {
+    padding-left: calc(0.5rem + var(--window-controls-inset-left));
+    padding-right: calc(0.5rem + var(--window-controls-inset-right));
+  }
+
+  .shell-window-header[data-window-inset-left='false'] {
+    padding-left: 0.5rem;
+  }
+}
+
 @layer utilities {
   /* 设计体系 Field 状态机。组件只挂 ui-field 和结构尺寸，base/hover/focus/open/invalid/disabled
      全部从 --field-* token 读取，保证 flavor 可以独立换系。顺序即优先级：disabled > invalid > focus/open > hover > base。 */

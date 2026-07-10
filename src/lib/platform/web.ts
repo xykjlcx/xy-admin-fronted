@@ -28,7 +28,20 @@ export function createWebPlatform(dependencies: WebPlatformDependencies = browse
   const credentialStorage = dependencies.credentialStorage ?? localStorage;
   return {
     runtime: 'web',
-    window: { getSnapshot: () => ({ runtime: 'web', platform: 'browser', chrome: 'native' }) },
+    window: {
+      getSnapshot: () => ({
+        runtime: 'web',
+        platform: 'browser',
+        chrome: 'native',
+        controlsInsetLeft: 0,
+        controlsInsetRight: 0,
+        titlebarHeight: 0,
+        maximized: false,
+        fullScreen: false,
+        scaleFactor: 1,
+      }),
+      subscribe: () => () => undefined,
+    },
     clipboard: { writeText: (text) => dependencies.writeClipboardText(text) },
     external: {
       open: async (url) => dependencies.openExternal(assertSafeHttpsExternalUrl(url)),

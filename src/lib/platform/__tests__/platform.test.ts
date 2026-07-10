@@ -42,7 +42,21 @@ test('Web credentials preserve the existing auth localStorage envelope', async (
 test('Desktop platform delegates only to the typed Preload API', async () => {
   const api = {
     window: {
-      getSnapshot: vi.fn(() => ({ runtime: 'desktop', platform: 'darwin', chrome: 'integrated' }) as const),
+      getSnapshot: vi.fn(
+        () =>
+          ({
+            runtime: 'desktop',
+            platform: 'darwin',
+            chrome: 'integrated',
+            controlsInsetLeft: 80,
+            controlsInsetRight: 0,
+            titlebarHeight: 56,
+            maximized: false,
+            fullScreen: false,
+            scaleFactor: 2,
+          }) as const,
+      ),
+      subscribe: vi.fn(() => () => undefined),
     },
     clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
     external: { open: vi.fn().mockResolvedValue(undefined) },
@@ -59,6 +73,12 @@ test('Desktop platform delegates only to the typed Preload API', async () => {
     runtime: 'desktop',
     platform: 'darwin',
     chrome: 'integrated',
+    controlsInsetLeft: 80,
+    controlsInsetRight: 0,
+    titlebarHeight: 56,
+    maximized: false,
+    fullScreen: false,
+    scaleFactor: 2,
   });
   await platform.clipboard.writeText('tracking-id');
   await platform.external.open('https://docs.example.com');

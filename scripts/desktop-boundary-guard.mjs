@@ -55,6 +55,9 @@ export function findDesktopBoundaryViolations(files) {
       ) {
         violations.push(`${normalizedFile}: credential adapter 只能由 SessionCredentialService 调用`);
       }
+      if (/\bplatform\s*\.\s*window\b/.test(source) && !normalizedFile.startsWith('src/app/')) {
+        violations.push(`${normalizedFile}: window platform 只能由 App/Shell 消费`);
+      }
     }
 
     if (normalizedFile.startsWith('electron/') && !testFile) {
@@ -69,9 +72,9 @@ export function findDesktopBoundaryViolations(files) {
       }
       if (
         normalizedFile.startsWith('electron/preload/') &&
-        /ipcRenderer\s*\.(?:send|sendSync|postMessage|on|once|addListener|invoke\s*\(\s*(?!ipcChannels\.))/.test(
-          source,
-        )
+        (/(?:ipcRenderer\s*\.\s*(?:send|sendSync|postMessage)\s*\()/.test(source) ||
+          /ipcRenderer\s*\.\s*invoke\s*\(\s*(?!ipcChannels\.)/.test(source) ||
+          /ipcRenderer\s*\.\s*(?:on|once|addListener|removeListener)\s*\(\s*(?!ipcEvents\.)/.test(source))
       ) {
         violations.push(`${normalizedFile}: Preload 只能通过 ipcChannels 调用 invoke，禁止暴露任意 IPC`);
       }

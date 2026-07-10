@@ -6,7 +6,7 @@ describe('BrowserWindow security and chrome options', () => {
     ['darwin', 'native', undefined, undefined],
     ['darwin', 'integrated', 'hiddenInset', undefined],
     ['win32', 'native', undefined, undefined],
-    ['win32', 'integrated', undefined, expect.any(Object)],
+    ['win32', 'integrated', 'hidden', { height: 56 }],
   ] as const)(
     'maps %s %s without weakening Renderer isolation',
     (platform, chrome, titleBarStyle, titleBarOverlay) => {

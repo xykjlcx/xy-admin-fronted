@@ -2,13 +2,34 @@ export type HostRuntime = 'web' | 'desktop';
 export type SessionClearReason = 'logout' | 'expired' | 'switch-account';
 
 export type PlatformWindowSnapshot =
-  | { runtime: 'web'; platform: 'browser'; chrome: 'native' }
-  | { runtime: 'desktop'; platform: 'darwin' | 'win32'; chrome: 'native' | 'integrated' };
+  | {
+      runtime: 'web';
+      platform: 'browser';
+      chrome: 'native';
+      controlsInsetLeft: 0;
+      controlsInsetRight: 0;
+      titlebarHeight: 0;
+      maximized: false;
+      fullScreen: false;
+      scaleFactor: 1;
+    }
+  | {
+      runtime: 'desktop';
+      platform: 'darwin' | 'win32';
+      chrome: 'native' | 'integrated';
+      controlsInsetLeft: number;
+      controlsInsetRight: number;
+      titlebarHeight: number;
+      maximized: boolean;
+      fullScreen: boolean;
+      scaleFactor: number;
+    };
 
 export interface AppPlatform {
   readonly runtime: HostRuntime;
   readonly window: {
     getSnapshot(): PlatformWindowSnapshot;
+    subscribe(listener: (snapshot: PlatformWindowSnapshot) => void): () => void;
   };
   readonly clipboard: {
     writeText(text: string): Promise<void>;

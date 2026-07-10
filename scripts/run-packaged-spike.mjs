@@ -9,7 +9,8 @@ const tlsRoot = path.join(artifactRoot, 'tls');
 const keyPath = path.join(tlsRoot, 'localhost-key.pem');
 const certPath = path.join(tlsRoot, 'localhost-cert.pem');
 const evidencePath = path.join(artifactRoot, 'https-evidence.json');
-const userDataPath = path.join(artifactRoot, 'user-data');
+const nativeUserDataPath = path.join(artifactRoot, 'user-data-native');
+const integratedUserDataPath = path.join(artifactRoot, 'user-data-integrated');
 const port = 43119;
 
 function localBinary(name) {
@@ -97,6 +98,29 @@ function packagedExecutable() {
   throw new Error(`当前平台不支持 Packaged Spike: ${process.platform}/${process.arch}`);
 }
 
+function buildPackaged(windowChrome, environment) {
+  rmSync(path.join(root, 'release'), { recursive: true, force: true });
+  run(
+    process.execPath,
+    ['scripts/desktop-command.mjs', 'build', `--window-chrome=${windowChrome}`],
+    environment,
+  );
+  const builderArgs =
+    process.platform === 'darwin' ? ['--mac', `--${process.arch}`, '--dir'] : ['--win', '--x64', '--dir'];
+  run(localBinary('electron-builder'), builderArgs, environment);
+  const executable = packagedExecutable();
+  if (!existsSync(executable)) throw new Error(`Packaged Spike 可执行文件不存在: ${executable}`);
+  return executable;
+}
+
+function runPackagedSpec(executable, spec, userDataPath, environment) {
+  run(localBinary('playwright'), ['test', '-c', 'playwright.electron.config.ts', spec], {
+    ...environment,
+    SPIKE_APP_EXECUTABLE: executable,
+    SPIKE_USER_DATA_PATH: userDataPath,
+  });
+}
+
 async function main() {
   rmSync(artifactRoot, { recursive: true, force: true });
   rmSync(path.join(root, 'release'), { recursive: true, force: true });
@@ -119,20 +143,14 @@ async function main() {
   const server = await startServer(environment);
 
   try {
-    run(process.execPath, ['scripts/desktop-command.mjs', 'build', '--window-chrome=native'], environment);
-    const builderArgs =
-      process.platform === 'darwin' ? ['--mac', `--${process.arch}`, '--dir'] : ['--win', '--x64', '--dir'];
-    run(localBinary('electron-builder'), builderArgs, environment);
-    const executable = packagedExecutable();
-    if (!existsSync(executable)) throw new Error(`Packaged Spike 可执行文件不存在: ${executable}`);
-    run(
-      localBinary('playwright'),
-      ['test', '-c', 'playwright.electron.config.ts', 'e2e/electron/packaged-spike.spec.ts'],
-      {
-        ...environment,
-        SPIKE_APP_EXECUTABLE: executable,
-        SPIKE_USER_DATA_PATH: userDataPath,
-      },
+    const nativeExecutable = buildPackaged('native', environment);
+    runPackagedSpec(nativeExecutable, 'e2e/electron/packaged-spike.spec.ts', nativeUserDataPath, environment);
+    const integratedExecutable = buildPackaged('integrated', environment);
+    runPackagedSpec(
+      integratedExecutable,
+      'e2e/electron/packaged-chrome.spec.ts',
+      integratedUserDataPath,
+      environment,
     );
   } finally {
     server.kill('SIGTERM');

@@ -80,6 +80,20 @@ describe('desktop architecture guard', () => {
     ]);
   });
 
+  test('allows window host state only in the App and Shell layers', () => {
+    const violations = findDesktopBoundaryViolations(
+      new Map([
+        ['src/modules/admin/users/list/MembersScene.tsx', 'platform.window.getSnapshot();'],
+        ['src/app/host-window.ts', 'platform.window.getSnapshot();'],
+        ['src/app/shell/Shell.tsx', 'platform.window.getSnapshot();'],
+      ]),
+    );
+
+    expect(violations).toEqual([
+      'src/modules/admin/users/list/MembersScene.tsx: window platform 只能由 App/Shell 消费',
+    ]);
+  });
+
   test('allows the designated config, preload, and Renderer platform adapter boundaries', () => {
     expect(
       findDesktopBoundaryViolations(
