@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { setupServer } from 'msw/node';
 import { beforeAll, vi } from 'vitest';
@@ -76,7 +76,8 @@ test('members scene confirms delete through user mutations and refreshes list', 
   renderUsersPage();
 
   expect(await screen.findByText('李长昕')).toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: '删除李长昕' }));
+  const memberRow = screen.getByRole('row', { name: /李长昕/ });
+  await userEvent.click(within(memberRow).getByRole('button', { name: '删除' }));
   expect(screen.getByRole('dialog', { name: '确认删除成员' })).toBeInTheDocument();
 
   await userEvent.click(screen.getByRole('button', { name: '确认删除' }));
@@ -149,14 +150,14 @@ test('external search prop changes clear member table selection without reviving
 test('left variant passes undefined write callbacks and keeps detail read entry only', async () => {
   renderUsersPage({ ...defaultSearch, status: 'left' });
 
-  expect(await screen.findByText('徐若琳')).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: '徐若琳' })).toBeInTheDocument();
   expect(screen.queryByRole('tree', { name: '部门' })).not.toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: '搜索姓名、角色、手机号' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: '高级筛选' })).toBeInTheDocument();
-  expect(screen.getAllByRole('button', { name: '详情' })).toHaveLength(2);
+  expect(screen.queryByRole('button', { name: '详情' })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '添加成员' })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '编辑' })).not.toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: '删除徐若琳' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '删除' })).not.toBeInTheDocument();
 });
 
 test('out-of-range page index auto-corrects to the last available page', async () => {

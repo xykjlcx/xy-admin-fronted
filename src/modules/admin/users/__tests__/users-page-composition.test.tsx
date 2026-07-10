@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ColumnDef } from '@tanstack/react-table';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -70,9 +70,12 @@ test('users page keeps department tree only in active members tab', async () => 
 
 test('members scene owns controlled row selection and clears it with search changes', () => {
   const sceneSource = readFileSync('src/modules/admin/users/list/MembersScene.tsx', 'utf8');
+  const deptTreeSource = readFileSync('src/modules/admin/users/list/DeptTree.tsx', 'utf8');
   const tableSource = readFileSync('src/modules/admin/users/list/MembersTable.tsx', 'utf8');
 
   expect(sceneSource).toContain('border-l border-(--page-section-divider)');
+  expect(deptTreeSource).not.toContain('border-r');
+  expect(deptTreeSource).not.toContain('border-(--page-pane-divider)');
   expect(sceneSource).toContain('useState<RowSelectionState>({})');
   expect(sceneSource).toContain('handleRowSelectionChange');
   expect(sceneSource).toContain(
@@ -97,7 +100,9 @@ test('members scene owns controlled row selection and clears it with search chan
 test('member columns expose TanStack ColumnDef without legacy DataTable column API', () => {
   const source = readFileSync('src/modules/admin/users/list/columns.tsx', 'utf8');
 
+  expect(existsSync('src/components/pro/DataTableRowActions.tsx')).toBe(true);
   expect(source).toContain("import type { ColumnDef } from '@tanstack/react-table'");
+  expect(source).toContain('DataTableRowActions, type DataTableRowAction');
   expect(source).toContain('export function userColumns');
   expect(source).toContain('): ColumnDef<UserDto>[]');
   expect(source).not.toContain('DataTableColumn');
@@ -105,25 +110,37 @@ test('member columns expose TanStack ColumnDef without legacy DataTable column A
   expect(source).toContain('row.original');
   expect(source).toContain('row.index');
   expect(source.match(/enableSorting: false/g)).toHaveLength(5);
-  expect(source).toContain("meta: { width: '24%' }");
-  expect(source).toContain("meta: { width: '17%' }");
-  expect(source).toContain("meta: { width: 'calc(120px * var(--app-scale))', align: 'end' }");
+  expect(source).toContain('size: 220');
+  expect(source).toContain('minSize: 180');
+  expect(source).toContain('size: 112');
+  expect(source).toContain("meta: { headerAlign: 'start', cellAlign: 'start', pin: 'right', stopRowClick: true }");
+  expect(source).toContain('<DataTableRowActions');
+  expect(source).not.toContain("t('users.actions.detail')");
   expect(source).not.toContain('getSortedRowModel');
   expect(source).not.toContain('getFilteredRowModel');
-  expect(source).not.toContain('size:');
+  expect(source).not.toContain("width: '");
 });
 
 test('TanStack ColumnMeta exposes table layout metadata without type assertions', () => {
   const column: ColumnDef<ColumnMetaProbeRow> = {
     id: 'probe',
-    meta: { width: '24%', align: 'end' },
+    size: 240,
+    minSize: 160,
+    maxSize: 320,
+    meta: { headerAlign: 'start', cellAlign: 'end', pin: 'right', stopRowClick: true },
   };
 
-  const width: string | undefined = column.meta?.width;
-  const align: 'start' | 'center' | 'end' | undefined = column.meta?.align;
+  const size: number | undefined = column.size;
+  const headerAlign: 'start' | 'center' | 'end' | undefined = column.meta?.headerAlign;
+  const cellAlign: 'start' | 'center' | 'end' | undefined = column.meta?.cellAlign;
+  const pin: 'left' | 'right' | undefined = column.meta?.pin;
+  const stopRowClick: boolean | undefined = column.meta?.stopRowClick;
 
-  expect(width).toBe('24%');
-  expect(align).toBe('end');
+  expect(size).toBe(240);
+  expect(headerAlign).toBe('start');
+  expect(cellAlign).toBe('end');
+  expect(pin).toBe('right');
+  expect(stopRowClick).toBe(true);
 });
 
 test('department tree count keeps baseline numeric meta without member suffix', async () => {

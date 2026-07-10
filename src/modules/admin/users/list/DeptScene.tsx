@@ -33,7 +33,8 @@ export function DeptScene({ permissions }: DeptSceneProps): JSX.Element {
     {
       id: 'dept',
       header: t('users.columns.dept'),
-      meta: { width: '64%' },
+      size: 360,
+      minSize: 260,
       enableSorting: false,
       cell: ({ row }) => {
         const dept = row.original;
@@ -49,7 +50,8 @@ export function DeptScene({ permissions }: DeptSceneProps): JSX.Element {
     {
       id: 'memberCount',
       header: t('users.columns.memberCount'),
-      meta: { width: 'calc(120px * var(--app-scale))' },
+      size: 140,
+      minSize: 120,
       enableSorting: false,
       cell: ({ row }) => (
         <span className="text-[calc(13px*var(--app-scale))] text-text-2">
@@ -60,7 +62,11 @@ export function DeptScene({ permissions }: DeptSceneProps): JSX.Element {
     {
       id: 'actions',
       header: t('users.columns.actions'),
-      meta: { width: 'calc(220px * var(--app-scale))', align: 'end' },
+      size: 220,
+      minSize: 220,
+      maxSize: 220,
+      enablePinning: true,
+      meta: { headerAlign: 'start', cellAlign: 'end', pin: 'right', stopRowClick: true },
       enableSorting: false,
       cell: ({ row }) => {
         const dept = row.original;

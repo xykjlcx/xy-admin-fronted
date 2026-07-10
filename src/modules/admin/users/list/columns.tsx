@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import type { TFunction } from 'i18next';
-import { MoreHorizontal } from 'lucide-react';
+import { DataTableRowActions, type DataTableRowAction } from '@/components/pro/DataTableRowActions';
 import { StatusBadge } from '@/components/pro/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { matchPermission } from '@/lib/permission';
@@ -32,7 +32,9 @@ export function userColumns({
     {
       id: 'name',
       header: t('users.columns.name'),
-      meta: { width: '24%' },
+      size: 220,
+      minSize: 180,
+      maxSize: 280,
       enableSorting: false,
       cell: ({ row }) => {
         const user = row.original;
@@ -48,7 +50,22 @@ export function userColumns({
             >
               {initials(user.name)}
             </div>
-            <span className="truncate text-sm text-text">{user.name}</span>
+            {onView ? (
+              <Button
+                type="button"
+                variant="link"
+                size="xs"
+                className="min-w-0 shrink"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onView(user);
+                }}
+              >
+                <span className="truncate">{user.name}</span>
+              </Button>
+            ) : (
+              <span className="truncate text-sm text-text">{user.name}</span>
+            )}
           </div>
         );
       },
@@ -56,7 +73,9 @@ export function userColumns({
     {
       id: 'status',
       header: t('users.columns.status'),
-      meta: { width: '17%' },
+      size: 120,
+      minSize: 100,
+      maxSize: 140,
       enableSorting: false,
       cell: ({ row }) => {
         const user = row.original;
@@ -67,7 +86,9 @@ export function userColumns({
     {
       id: 'phone',
       header: t('users.columns.phone'),
-      meta: { width: '24%' },
+      size: 180,
+      minSize: 160,
+      maxSize: 220,
       enableSorting: false,
       cell: ({ row }) => {
         const user = row.original;
@@ -80,7 +101,9 @@ export function userColumns({
     {
       id: 'dept',
       header: t('users.columns.dept'),
-      meta: { width: '17%' },
+      size: 180,
+      minSize: 150,
+      maxSize: 240,
       enableSorting: false,
       cell: ({ row }) => {
         const user = row.original;
@@ -95,31 +118,29 @@ export function userColumns({
     {
       id: 'actions',
       header: t('users.columns.actions'),
-      meta: { width: 'calc(120px * var(--app-scale))', align: 'end' },
+      size: 112,
+      minSize: 112,
+      maxSize: 112,
+      enablePinning: true,
+      meta: { headerAlign: 'start', cellAlign: 'start', pin: 'right', stopRowClick: true },
       enableSorting: false,
       cell: ({ row }) => {
         const user = row.original;
+        const actions: DataTableRowAction[] = [];
 
-        return (
-          <div className="flex items-center gap-3.5 text-[calc(13px*var(--app-scale))]">
-            {onView && (
-              <Button type="button" variant="link" size="xs" onClick={() => onView(user)}>
-                {t('users.actions.detail')}
-              </Button>
-            )}
-            {canUpdate && (
-              <Button type="button" variant="link" size="xs" onClick={() => onEdit(user)}>
-                {t('users.actions.edit')}
-              </Button>
-            )}
-            {canDelete && (
-              <Button type="button" variant="ghost" size="icon-xs" onClick={() => onDelete(user)}>
-                <MoreHorizontal />
-                <span className="sr-only">{t('users.actions.deleteName', { name: user.name })}</span>
-              </Button>
-            )}
-          </div>
-        );
+        if (canUpdate) {
+          actions.push({ id: 'edit', label: t('users.actions.edit'), onSelect: () => onEdit(user) });
+        }
+        if (canDelete) {
+          actions.push({
+            id: 'delete',
+            label: t('users.actions.delete'),
+            onSelect: () => onDelete(user),
+            tone: 'danger',
+          });
+        }
+
+        return <DataTableRowActions actions={actions} overflowLabel={t('users.actions.more')} />;
       },
     },
   ];

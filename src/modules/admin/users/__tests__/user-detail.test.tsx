@@ -45,10 +45,9 @@ test('detail page owns full detail query by id without enabled branching', () =>
 test('clicking member detail opens independently queried profile and permission tabs', async () => {
   renderUsersPage();
 
-  expect(await screen.findByText('李长昕')).toBeInTheDocument();
-  const detailButton = screen.getAllByRole('button', { name: '详情' })[0];
-  if (!detailButton) throw new Error('detail button missing');
-  await userEvent.click(detailButton);
+  const memberLink = await screen.findByRole('button', { name: '李长昕' });
+  expect(screen.queryByRole('button', { name: '详情' })).not.toBeInTheDocument();
+  await userEvent.click(memberLink);
 
   const dialog = await screen.findByRole('dialog', { name: '李长昕' });
   expect(dialog).toBeInTheDocument();
@@ -68,10 +67,8 @@ test('detail request failure shows an error message and retry recovers the profi
   );
   renderUsersPage();
 
-  expect(await screen.findByText('李长昕')).toBeInTheDocument();
-  const detailButton = screen.getAllByRole('button', { name: '详情' })[0];
-  if (!detailButton) throw new Error('detail button missing');
-  await userEvent.click(detailButton);
+  const memberLink = await screen.findByRole('button', { name: '李长昕' });
+  await userEvent.click(memberLink);
 
   const alert = await screen.findByRole('alert');
   expect(within(alert).getByText('加载成员详情失败')).toBeInTheDocument();
