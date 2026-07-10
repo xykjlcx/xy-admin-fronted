@@ -1,7 +1,7 @@
 # M1 角色与权限设计文档
 
 - 日期：2026-07-03
-- 状态：执行中
+- 状态：历史实现记录；信息架构已被 `2026-07-10-role-management-data-permissions-design.md` 替代
 - 视觉基准：`后台管理脚手架.dc.html` 的 `ROLES & PERMISSIONS` 屏
 - 上游约束：M0 已完成后台管理骨架、成员与部门页、轻量 `TableShell` / `StatusBadge` / `ConfirmDialog`，当前阶段不预置 HR、CRM、Project 等未来子系统
 
