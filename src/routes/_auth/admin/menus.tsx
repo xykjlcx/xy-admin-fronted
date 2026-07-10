@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { MenusPage } from '@/modules/admin/pages/menus';
+import { MenusPage } from '@/modules/admin/menus';
 
 // 菜单管理目前不需要 URL search，路由层只声明权限元数据并把 me.permissions 传给页面。
 // 新增筛选/选中态时优先放 search，保持刷新后状态可恢复。

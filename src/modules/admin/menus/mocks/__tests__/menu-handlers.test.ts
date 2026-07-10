@@ -1,7 +1,7 @@
 import { setupServer } from 'msw/node';
 import { resetDb } from '@/mocks/db';
-import type { CreateMenuInput, CreateSubsystemInput, UpdateMenuInput } from '@/modules/admin/api/menu.api';
-import { menuHandlers } from '@/modules/admin/mocks/menu.handlers';
+import type { CreateMenuInput, CreateSubsystemInput, UpdateMenuInput } from '@/modules/admin/menus/api';
+import { menuHandlers } from '@/modules/admin/menus/mocks';
 import type { MenuRecord } from '@/modules/types';
 
 const server = setupServer(...menuHandlers);
@@ -44,7 +44,9 @@ test('PUT /api/subsystems/:key 编辑子系统显示信息后可读回', async (
   expect(updated.data.label).toEqual({ 'zh-CN': '基础后台' });
   expect(updated.data.desc).toEqual({ 'zh-CN': '组织权限与审计' });
 
-  const list = await readEnv<{ key: string; label: Record<string, string> }[]>(await fetch('/api/subsystems'));
+  const list = await readEnv<{ key: string; label: Record<string, string> }[]>(
+    await fetch('/api/subsystems'),
+  );
   expect(list.data.find((subsystem) => subsystem.key === 'admin')?.label).toEqual({ 'zh-CN': '基础后台' });
 });
 
@@ -75,7 +77,9 @@ test('POST /api/subsystems 新增子系统后可读回', async () => {
     sort: 9,
   });
 
-  const list = await readEnv<{ key: string; label: Record<string, string> }[]>(await fetch('/api/subsystems'));
+  const list = await readEnv<{ key: string; label: Record<string, string> }[]>(
+    await fetch('/api/subsystems'),
+  );
   expect(list.data.find((subsystem) => subsystem.key === 'wms')?.label).toEqual({ 'zh-CN': '仓储执行' });
 });
 
@@ -220,4 +224,25 @@ test('POST /api/menus 校验动作节点必须有权限且不能有路由', asyn
   );
   expect(invalid.code).not.toBe(0);
   expect(invalid.message).toContain('权限');
+});
+
+test('POST /api/menus 在执行业务规则前拒绝不合法的路由契约', async () => {
+  const invalid = await readEnv<null>(
+    await fetch('/api/menus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subsystemKey: 'admin',
+        parentId: 'm-org',
+        type: 'menu',
+        label: { 'zh-CN': '错误路由' },
+        path: 'admin/users',
+        visible: true,
+        sort: 1,
+      }),
+    }),
+  );
+
+  expect(invalid.code).not.toBe(0);
+  expect(invalid.message).toContain('参数');
 });

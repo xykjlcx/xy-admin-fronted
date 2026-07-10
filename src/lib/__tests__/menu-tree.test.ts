@@ -9,7 +9,13 @@ test('组树 + 权限过滤 + action 不渲染', () => {
 });
 
 test('通配符全量可见', () => {
-  expect(buildMenuTree(adminManifest.menuSeed, ['*:*:*'])).toHaveLength(2);
+  expect(buildMenuTree(adminManifest.menuSeed, ['*:*:*']).map((node) => node.id)).toEqual([
+    'm-home',
+    'm-org',
+    'm-audit',
+    'm-file-center',
+    'm-system',
+  ]);
 });
 
 test('角色与权限菜单受 iam:role:view 控制', () => {

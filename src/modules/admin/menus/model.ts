@@ -1,8 +1,25 @@
 import { lv } from '@/lib/localized';
+import { manifests } from '@/modules/registry';
 import type { MenuRecord } from '@/modules/types';
 
+const registeredRouteOptions = new Map<
+  NonNullable<MenuRecord['path']>,
+  { value: NonNullable<MenuRecord['path']>; label: MenuRecord['label'] }
+>();
+
+for (const manifest of manifests) {
+  for (const menu of manifest.menuSeed) {
+    if (menu.type !== 'menu' || !menu.path || registeredRouteOptions.has(menu.path)) continue;
+    registeredRouteOptions.set(menu.path, { value: menu.path, label: menu.label });
+  }
+}
+
+export const menuRouteOptions = [...registeredRouteOptions.values()];
+
+export type NavigationMenuRecord = MenuRecord & { type: 'dir' | 'menu' };
+
 export interface ManagedMenuRow {
-  menu: MenuRecord;
+  menu: NavigationMenuRecord;
   depth: number;
   hasChildren: boolean;
   hiddenByCollapse: boolean;
@@ -64,8 +81,11 @@ export function buildManagedMenuRows(
 ): ManagedMenuRow[] {
   const collapsed = new Set(collapsedIds);
   const normalizedKeyword = keyword.trim();
-  const byParent = new Map<string | null, MenuRecord[]>();
-  for (const menu of [...menus].sort(sortMenus(locale))) {
+  const navigationMenus = menus.filter(
+    (menu): menu is NavigationMenuRecord => menu.type !== 'action',
+  );
+  const byParent = new Map<string | null, NavigationMenuRecord[]>();
+  for (const menu of navigationMenus.toSorted(sortMenus(locale))) {
     const siblings = byParent.get(menu.parentId) ?? [];
     siblings.push(menu);
     byParent.set(menu.parentId, siblings);
@@ -88,7 +108,11 @@ export function buildManagedMenuRows(
       if (!shouldInclude) continue;
 
       rows.push({ menu, depth, hasChildren, hiddenByCollapse });
-      walk(menu.id, depth + 1, hiddenByCollapse || collapsed.has(menu.id));
+      walk(
+        menu.id,
+        depth + 1,
+        normalizedKeyword ? false : hiddenByCollapse || collapsed.has(menu.id),
+      );
     }
   };
 
