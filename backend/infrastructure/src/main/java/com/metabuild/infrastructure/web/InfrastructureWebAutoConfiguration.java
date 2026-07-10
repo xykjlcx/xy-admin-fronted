@@ -4,8 +4,10 @@ import com.metabuild.infrastructure.exception.GlobalExceptionHandler;
 import com.metabuild.infrastructure.observability.TraceIdFilter;
 import com.metabuild.infrastructure.security.SecurityHeadersFilter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.Ordered;
 
 /**
  * MetaBuilder Web 基线自动装配。
@@ -15,12 +17,20 @@ import org.springframework.context.annotation.Import;
 public class InfrastructureWebAutoConfiguration {
 
     @Bean
-    TraceIdFilter traceIdFilter() {
-        return new TraceIdFilter();
+    FilterRegistrationBean<TraceIdFilter> traceIdFilterRegistration() {
+        FilterRegistrationBean<TraceIdFilter> registration =
+                new FilterRegistrationBean<>(new TraceIdFilter());
+        registration.setName("traceIdFilter");
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return registration;
     }
 
     @Bean
-    SecurityHeadersFilter securityHeadersFilter() {
-        return new SecurityHeadersFilter();
+    FilterRegistrationBean<SecurityHeadersFilter> securityHeadersFilterRegistration() {
+        FilterRegistrationBean<SecurityHeadersFilter> registration =
+                new FilterRegistrationBean<>(new SecurityHeadersFilter());
+        registration.setName("securityHeadersFilter");
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+        return registration;
     }
 }

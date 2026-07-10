@@ -81,6 +81,17 @@ class DomainProblemDetailIntegrationTest {
                         jsonPath("$.traceId").value(org.hamcrest.Matchers.not("user-controlled")));
     }
 
+    @Test
+    void mapsUnsupportedDomainSubtypeAsUnknownServerError() throws Exception {
+        mockMvc.perform(get("/test/domain/unsupported"))
+                .andExpectAll(
+                        status().isInternalServerError(),
+                        content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+                        jsonPath("$.code").value("internal.server-error"),
+                        content().string(org.hamcrest.Matchers.not(
+                                org.hamcrest.Matchers.containsString("unsupported domain detail"))));
+    }
+
     @SpringBootConfiguration
     @EnableAutoConfiguration
     @Import(DomainExceptionFixtureController.class)
@@ -104,8 +115,16 @@ class DomainProblemDetailIntegrationTest {
                 case "not-found" -> new NotFound(errorCode, detail);
                 case "conflict" -> new Conflict(errorCode, detail);
                 case "rate-limited" -> new RateLimited(errorCode, detail);
+                case "unsupported" -> new UnsupportedDomainException(errorCode);
                 default -> throw new IllegalArgumentException("Unknown fixture: " + kind);
             };
+        }
+    }
+
+    static final class UnsupportedDomainException extends DomainException {
+
+        UnsupportedDomainException(ErrorCode errorCode) {
+            super(errorCode, "unsupported domain detail");
         }
     }
 }

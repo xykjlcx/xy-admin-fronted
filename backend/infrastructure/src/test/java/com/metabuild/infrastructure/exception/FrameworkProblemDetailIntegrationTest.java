@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -103,6 +104,14 @@ class FrameworkProblemDetailIntegrationTest {
     }
 
     @Test
+    void preservesMissingRequestHeaderAsBadRequest() throws Exception {
+        expectProblem(
+                mockMvc.perform(get("/test/required-header")),
+                400,
+                "request.parameter.missing");
+    }
+
+    @Test
     void mapsMissingMultipartPart() throws Exception {
         expectProblem(
                 mockMvc.perform(multipart("/test/required-part")),
@@ -137,6 +146,14 @@ class FrameworkProblemDetailIntegrationTest {
     }
 
     @Test
+    void preservesNotAcceptableStatus() throws Exception {
+        expectProblem(
+                mockMvc.perform(get("/test/json-only").accept(MediaType.APPLICATION_XML)),
+                406,
+                "request.media-type.unsupported");
+    }
+
+    @Test
     void mapsUnknownExceptionWithoutLeakingItsMessage() throws Exception {
         mockMvc.perform(get("/test/unknown"))
                 .andExpectAll(
@@ -162,11 +179,15 @@ class FrameworkProblemDetailIntegrationTest {
     }
 
     @Test
-    void doesNotTurnMissingResourceIntoGenericServerError() throws Exception {
-        expectProblem(
-                mockMvc.perform(get("/test/does-not-exist")),
-                404,
-                "request.resource.not-found");
+    void preservesMissingResourceAsStandardNotFound() throws Exception {
+        mockMvc.perform(get("/test/does-not-exist"))
+                .andExpectAll(
+                        status().isNotFound(),
+                        content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+                        jsonPath("$.status").value(404),
+                        jsonPath("$.code").doesNotExist(),
+                        jsonPath("$.traceId").value(Matchers.matchesPattern("[0-9a-f]{32}")),
+                        header().string("X-Trace-Id", Matchers.matchesPattern("[0-9a-f]{32}")));
     }
 
     private void expectProblem(ResultActions result, int expectedStatus, String expectedCode) throws Exception {
@@ -200,6 +221,16 @@ class FrameworkProblemDetailIntegrationTest {
         @GetMapping("/test/required-param")
         String requiredParam(@RequestParam String value) {
             return value;
+        }
+
+        @GetMapping("/test/required-header")
+        String requiredHeader(@RequestHeader("X-Required") String value) {
+            return value;
+        }
+
+        @GetMapping(path = "/test/json-only", produces = MediaType.APPLICATION_JSON_VALUE)
+        Map<String, String> jsonOnly() {
+            return Map.of("value", "ok");
         }
 
         @PostMapping(path = "/test/required-part", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

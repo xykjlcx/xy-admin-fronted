@@ -20,16 +20,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 将领域错误映射为稳定的 RFC 9457 ProblemDetail。
@@ -44,12 +46,46 @@ public final class GlobalExceptionHandler {
         this.messageSource = messageSource;
     }
 
-    @ExceptionHandler(DomainException.class)
-    public ResponseEntity<ProblemDetail> handleDomainException(
-            DomainException exception,
+    @ExceptionHandler(BadRequest.class)
+    public ResponseEntity<ProblemDetail> handleBadRequest(
+            BadRequest exception,
             HttpServletRequest request) {
-        HttpStatus status = statusOf(exception);
-        return problem(status, exception.errorCode().code(), exception.getMessage(), request);
+        return handleDomain(exception, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(Unauthorized.class)
+    public ResponseEntity<ProblemDetail> handleUnauthorized(
+            Unauthorized exception,
+            HttpServletRequest request) {
+        return handleDomain(exception, HttpStatus.UNAUTHORIZED, request);
+    }
+
+    @ExceptionHandler(Forbidden.class)
+    public ResponseEntity<ProblemDetail> handleForbidden(
+            Forbidden exception,
+            HttpServletRequest request) {
+        return handleDomain(exception, HttpStatus.FORBIDDEN, request);
+    }
+
+    @ExceptionHandler(NotFound.class)
+    public ResponseEntity<ProblemDetail> handleNotFound(
+            NotFound exception,
+            HttpServletRequest request) {
+        return handleDomain(exception, HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler(Conflict.class)
+    public ResponseEntity<ProblemDetail> handleConflict(
+            Conflict exception,
+            HttpServletRequest request) {
+        return handleDomain(exception, HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(RateLimited.class)
+    public ResponseEntity<ProblemDetail> handleRateLimited(
+            RateLimited exception,
+            HttpServletRequest request) {
+        return handleDomain(exception, HttpStatus.TOO_MANY_REQUESTS, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -136,27 +172,50 @@ public final class GlobalExceptionHandler {
                 request);
     }
 
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ProblemDetail> handleMissingResource(
-            NoResourceFoundException exception,
-            HttpServletRequest request) {
-        return problem(
-                HttpStatus.NOT_FOUND,
-                "request.resource.not-found",
-                "request.resource.not-found",
-                request);
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleUnknownException(
             Exception exception,
             HttpServletRequest request) {
+        if (exception instanceof ErrorResponse errorResponse) {
+            return standardProblem(errorResponse, exception, request);
+        }
         LOGGER.error("Unhandled server exception", exception);
         return problem(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "internal.server-error",
                 "internal.server-error",
                 request);
+    }
+
+    private ResponseEntity<ProblemDetail> standardProblem(
+            ErrorResponse errorResponse,
+            Exception exception,
+            HttpServletRequest request) {
+        ProblemDetail problem = errorResponse.getBody();
+        problem.setInstance(URI.create(request.getRequestURI()));
+        problem.setProperty(
+                "traceId",
+                Objects.toString(request.getAttribute(TraceIdFilter.REQUEST_ATTRIBUTE), ""));
+
+        String code = null;
+        if (exception instanceof MissingRequestHeaderException) {
+            code = "request.parameter.missing";
+        } else if (exception instanceof HttpMediaTypeNotAcceptableException) {
+            code = "request.media-type.unsupported";
+        }
+        if (code != null) {
+            problem.setDetail(messageSource.getMessage(
+                    code,
+                    null,
+                    problem.getDetail(),
+                    LocaleContextHolder.getLocale()));
+            problem.setProperty("code", code);
+        }
+
+        return ResponseEntity.status(errorResponse.getStatusCode())
+                .headers(errorResponse.getHeaders())
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(problem);
     }
 
     private ResponseEntity<ProblemDetail> problem(
@@ -182,16 +241,10 @@ public final class GlobalExceptionHandler {
                 .body(problem);
     }
 
-    private HttpStatus statusOf(DomainException exception) {
-        return switch (exception) {
-            case BadRequest ignored -> HttpStatus.BAD_REQUEST;
-            case Unauthorized ignored -> HttpStatus.UNAUTHORIZED;
-            case Forbidden ignored -> HttpStatus.FORBIDDEN;
-            case NotFound ignored -> HttpStatus.NOT_FOUND;
-            case Conflict ignored -> HttpStatus.CONFLICT;
-            case RateLimited ignored -> HttpStatus.TOO_MANY_REQUESTS;
-            default -> throw new IllegalStateException(
-                    "Unsupported domain exception: " + exception.getClass().getName());
-        };
+    private ResponseEntity<ProblemDetail> handleDomain(
+            DomainException exception,
+            HttpStatus status,
+            HttpServletRequest request) {
+        return problem(status, exception.errorCode().code(), exception.getMessage(), request);
     }
 }
