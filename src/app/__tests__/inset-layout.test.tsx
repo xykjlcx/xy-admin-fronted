@@ -9,13 +9,13 @@ import {
 } from '@tanstack/react-router';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeAll, afterEach } from 'vitest';
+import { beforeAll, afterEach, vi } from 'vitest';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { PageFrame, PageSurface } from '@/components/pro/PageScaffold';
 import { Shell } from '@/app/shell/Shell';
 import { useAppearance } from '@/stores/appearance';
-import { meQuery } from '@/modules/admin/api/auth.api';
-import { menusQuery, subsystemsQuery } from '@/modules/admin/api/menu.api';
+import { meQuery } from '@/modules/admin/auth/api';
+import { menusQuery, subsystemsQuery } from '@/modules/admin/menus/api';
 import { manifests } from '@/modules/registry';
 import { i18nInit } from '@/lib/i18n';
 
@@ -24,9 +24,32 @@ beforeAll(async () => {
 });
 
 afterEach(() => {
+  vi.unstubAllGlobals();
   act(() => {
     useAppearance.setState({ layout: 'sidebar', collapsed: {} });
   });
+});
+
+test('窄屏强制使用折叠 Sidebar，避免已保存的宽布局挤压业务内容', async () => {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn().mockImplementation((query: string) => ({
+      matches: query === '(max-width: 1023px)',
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  );
+
+  renderShellWithLayout({ layout: 'inset', collapsed: false });
+
+  expect(await screen.findByText('Users content')).toBeInTheDocument();
+  expect(document.querySelector('[data-shell-layout="inset"]')).not.toBeInTheDocument();
+  expect(document.querySelector('aside')).toHaveClass('w-16');
 });
 
 function renderShellWithLayout({

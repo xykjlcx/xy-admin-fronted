@@ -3,16 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import {
-  ChevronDown,
-  User,
-  Settings,
-  KeyRound,
-  Languages,
-  UserCog,
-  HelpCircle,
-  LogOut,
-} from 'lucide-react';
+import { ChevronDown, User, Settings, KeyRound, Languages, UserCog, HelpCircle, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { meQuery, authApi } from '@/modules/admin/api/auth.api';
+import { meQuery, authApi } from '@/modules/admin/auth/api';
 import { resetSession } from '@/lib/reset-auth';
 import { appConfig } from '@/config';
 
@@ -40,6 +31,10 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
   const suppressSidebarFocusRestore = variant === 'sidebar';
 
   const stub = () => toast(t('shell.toast.stub'));
+  const openProfile = (tab: 'info' | 'security' | 'preferences', action?: 'password') => {
+    setOpen(false);
+    void nav({ to: '/admin/profile', search: { tab, action } });
+  };
 
   const logout = async () => {
     // 后端登出失败不阻断前端清理：无论如何回登录并清缓存
@@ -58,7 +53,7 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
       <DropdownMenuTrigger asChild>
         <button
           ref={triggerRef}
-          aria-label={compact ? `${me.user.name} ${roleLabel}` : undefined}
+          aria-label={variant !== 'sidebar' ? `${me.user.name} ${roleLabel}` : undefined}
           onPointerDown={
             suppressSidebarFocusRestore
               ? () => {
@@ -77,7 +72,7 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
             'flex items-center gap-2.5 rounded-8 outline-none transition-colors hover:bg-(--nav-item-bg-hover)',
             variant !== 'sidebar' &&
               'focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--button-ring)',
-            variant === 'header' && 'px-2 py-1',
+            variant === 'header' && 'px-2 py-1 max-lg:size-9 max-lg:justify-center max-lg:p-0',
             variant === 'sidebar' &&
               'w-full rounded-9 px-2 py-2 text-left hover:bg-(--nav-item-bg-hover) focus-visible:bg-(--nav-item-bg-hover) focus-visible:shadow-none',
             variant === 'icon' && 'size-9 justify-center p-0',
@@ -90,12 +85,18 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
           </Avatar>
           {!compact && (
             <>
-              <div className="min-w-0 flex-1 text-left leading-tight">
-                <div className="truncate text-[calc(13px*var(--app-scale))] font-semibold text-text">{me.user.name}</div>
+              <div className={cn('min-w-0 flex-1 text-left leading-tight', variant === 'header' && 'max-lg:hidden')}>
+                <div className="truncate text-[calc(13px*var(--app-scale))] font-semibold text-text">
+                  {me.user.name}
+                </div>
                 <div className="truncate text-[calc(11px*var(--app-scale))] text-text-3">{roleLabel}</div>
               </div>
               <ChevronDown
-                className={cn('size-3.5 shrink-0 text-text-3 transition-transform', open && 'rotate-180')}
+                className={cn(
+                  'size-3.5 shrink-0 text-text-3 transition-transform',
+                  variant === 'header' && 'max-lg:hidden',
+                  open && 'rotate-180',
+                )}
               />
             </>
           )}
@@ -126,19 +127,31 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
         </div>
         <DropdownMenuSeparator className="my-0" />
         <DropdownMenuGroup className="p-1.5">
-          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
+          <DropdownMenuItem
+            onClick={() => openProfile('info')}
+            className="h-[calc(42px*var(--app-scale))] gap-3 px-3"
+          >
             <User />
             {t('shell.user.profile')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
+          <DropdownMenuItem
+            onClick={() => openProfile('security')}
+            className="h-[calc(42px*var(--app-scale))] gap-3 px-3"
+          >
             <Settings />
             {t('shell.user.account')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
+          <DropdownMenuItem
+            onClick={() => openProfile('security', 'password')}
+            className="h-[calc(42px*var(--app-scale))] gap-3 px-3"
+          >
             <KeyRound />
             {t('shell.user.changePassword')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
+          <DropdownMenuItem
+            onClick={() => openProfile('preferences')}
+            className="h-[calc(42px*var(--app-scale))] gap-3 px-3"
+          >
             <Languages />
             {t('shell.user.language')}
           </DropdownMenuItem>

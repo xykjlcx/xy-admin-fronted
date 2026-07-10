@@ -1,16 +1,16 @@
 import { Bell } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { featuresConfig } from '@/config';
+import { messagesQuery } from '@/modules/admin/messages/api';
 
-export const SHELL_NOTIFICATION_UNREAD = 3; // M0 写死；消息中心在 M1 接真实未读数
-
-// 未接真前只在开发/demo 显示，生产交付隐藏避免露假功能（诊断 F8）。
 export function NotificationBell() {
   const { t } = useTranslation();
-  if (!featuresConfig.showStubChrome) return null;
+  const navigate = useNavigate();
+  const { data } = useQuery(messagesQuery('all'));
+  const unreadCount = data?.unreadCount ?? 0;
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -18,13 +18,13 @@ export function NotificationBell() {
           variant="ghost"
           size="icon"
           className="relative"
-          onClick={() => toast(t('shell.toast.notification'))}
+          onClick={() => void navigate({ to: '/admin/messages' })}
           aria-label={t('shell.notification')}
         >
           <Bell className="size-5" />
-          {SHELL_NOTIFICATION_UNREAD > 0 && (
+          {unreadCount > 0 && (
             <span className="absolute right-1 top-1 flex h-[calc(15px*var(--app-scale))] min-w-[calc(15px*var(--app-scale))] items-center justify-center rounded-full border-[1.5px] border-surface bg-danger px-1 text-[calc(10px*var(--app-scale))] font-semibold text-white">
-              {SHELL_NOTIFICATION_UNREAD}
+              {unreadCount}
             </span>
           )}
         </Button>

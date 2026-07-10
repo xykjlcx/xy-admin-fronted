@@ -13,7 +13,7 @@ export function GlobalSearch() {
       readOnly
       aria-label={t('shell.search')}
       placeholder={t('shell.search')}
-      containerClassName="h-9 w-[calc(440px*var(--app-scale))] max-w-[34vw]"
+      containerClassName="h-9 w-[calc(440px*var(--app-scale))] max-w-[34vw] max-lg:hidden"
       onFocus={(event) => {
         event.currentTarget.blur();
         toast(t('shell.toast.search'));

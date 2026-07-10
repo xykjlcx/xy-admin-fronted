@@ -108,8 +108,9 @@ export function NavMenuSidebar({
         })}
       </nav>
       <button
+        aria-label={t(collapsed ? 'shell.nav.expand' : 'shell.nav.collapse')}
         onClick={onToggle}
-        className="flex h-11 shrink-0 items-center gap-2.5 border-t border-border px-5 text-[calc(13px*var(--app-scale))] text-text-3 hover:text-(--nav-item-fg-current)"
+        className="flex h-11 shrink-0 items-center gap-2.5 border-t border-border px-5 text-[calc(13px*var(--app-scale))] text-text-3 hover:text-(--nav-item-fg-current) max-lg:hidden"
       >
         <Menu className="size-[calc(18px*var(--app-scale))] shrink-0" />
         {!collapsed && <span>{t('shell.nav.collapse')}</span>}

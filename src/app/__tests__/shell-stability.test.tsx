@@ -12,8 +12,8 @@ import userEvent from '@testing-library/user-event';
 import { beforeAll } from 'vitest';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Shell } from '@/app/shell/Shell';
-import { meQuery } from '@/modules/admin/api/auth.api';
-import { menusQuery, subsystemsQuery } from '@/modules/admin/api/menu.api';
+import { meQuery } from '@/modules/admin/auth/api';
+import { menusQuery, subsystemsQuery } from '@/modules/admin/menus/api';
 import { manifests } from '@/modules/registry';
 import { i18nInit } from '@/lib/i18n';
 

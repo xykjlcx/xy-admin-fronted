@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
-import { meQuery } from '@/modules/admin/api/auth.api';
-import { subsystemsQuery, menusQuery } from '@/modules/admin/api/menu.api';
+import { meQuery } from '@/modules/admin/auth/api';
+import { subsystemsQuery, menusQuery } from '@/modules/admin/menus/api';
 import { useAuth } from '@/stores/auth';
 import { matchPermission } from '@/lib/permission';
 import { subsystemKeyFromPath } from '@/app/shell/subsystem-key';

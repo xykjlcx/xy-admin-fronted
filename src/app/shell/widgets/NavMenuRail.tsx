@@ -39,7 +39,7 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
           );
         })}
       </nav>
-      <aside className="h-screen flex w-[calc(192px*var(--app-scale))] shrink-0 flex-col overflow-y-auto border-r border-border bg-chrome py-4">
+      <aside className="h-screen flex w-[calc(192px*var(--app-scale))] shrink-0 flex-col overflow-y-auto border-r border-border bg-chrome py-4 max-lg:hidden">
         <div className="px-5 pb-3 text-[calc(15px*var(--app-scale))] font-bold text-text">
           {activeGroup ? lv(activeGroup.node.label, i18n.language) : ''}
         </div>
