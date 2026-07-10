@@ -23,19 +23,19 @@
 
 ## 2. 已定需求
 
-| 决策项          | 结论                                                 |
-| --------------- | ---------------------------------------------------- |
-| 代码形态        | 单仓库、同一套业务代码、Web/Electron 双宿主          |
-| 数据形态        | 在线连接远程后端，不做本地数据库和离线同步           |
-| 交付层级        | 脚手架级；不绑定真实证书、企业身份或更新服务器       |
-| 桌面平台        | macOS arm64/x64；Windows x64                         |
-| 更新源          | 可配置的通用 HTTPS 静态更新源                        |
-| 更新通道        | 首期只做 `stable`                                    |
-| 更新交互        | 后台检查；用户点击下载；展示进度；用户点击重启安装   |
-| token           | Web 延续浏览器策略；Electron 使用系统安全存储        |
-| 窗口模式        | 打包时可选 `native` 或 `integrated`                  |
+| 决策项          | 结论                                                            |
+| --------------- | --------------------------------------------------------------- |
+| 代码形态        | 单仓库、同一套业务代码、Web/Electron 双宿主                     |
+| 数据形态        | 在线连接远程后端，不做本地数据库和离线同步                      |
+| 交付层级        | 脚手架级；不绑定真实证书、企业身份或更新服务器                  |
+| 桌面平台        | macOS arm64/x64；Windows x64                                    |
+| 更新源          | 可配置的通用 HTTPS 静态更新源                                   |
+| 更新通道        | 首期只做 `stable`                                               |
+| 更新交互        | 后台检查；用户点击下载；展示进度；用户点击重启安装              |
+| token           | Web 延续浏览器策略；Electron 使用系统安全存储                   |
+| 窗口模式        | 打包时可选 `native` 或 `integrated`                             |
 | integrated 布局 | A 方案：保留原生窗口按钮，按三套 Shell 的实际顶层结构预留安全区 |
-| 打包更新工具    | `electron-builder + electron-updater`                |
+| 打包更新工具    | `electron-builder + electron-updater`                           |
 
 ## 3. 范围
 
@@ -265,11 +265,11 @@ type WindowChromeMode = 'native' | 'integrated';
 
 三套布局的消费位置固定如下，禁止用一条全局 Header padding 规则覆盖：
 
-| Shell       | macOS 左侧安全区消费者                               | Windows 右侧安全区消费者       |
-| ----------- | --------------------------------------------------- | ------------------------------ |
-| `sidebar`   | `ShellHeader` start，子系统切换器在同一顶带内右移   | `ShellHeader` actions          |
-| `rail`      | `NavMenuRail` 顶部窗口区；右侧 Header 不消费左 inset | `ShellHeader` actions          |
-| `inset`     | `NavMenuInset` brand 区；内容卡 Header 不消费左 inset | `inset-shell-header-suffix`    |
+| Shell     | macOS 左侧安全区消费者                                | Windows 右侧安全区消费者    |
+| --------- | ----------------------------------------------------- | --------------------------- |
+| `sidebar` | `ShellHeader` start，子系统切换器在同一顶带内右移     | `ShellHeader` actions       |
+| `rail`    | `NavMenuRail` 顶部窗口区；右侧 Header 不消费左 inset  | `ShellHeader` actions       |
+| `inset`   | `NavMenuInset` brand 区；内容卡 Header 不消费左 inset | `inset-shell-header-suffix` |
 
 这仍然保持 A 方案的视觉原则：系统按钮与应用顶层导航位于同一视觉顶带，但不强迫三套布局具有相同 DOM 结构。
 
@@ -496,14 +496,14 @@ downloading
 
 状态快照还包含 `operationId`、`lastCommand`、`retryable` 和脱敏错误码。命令合法性固定如下：
 
-| 命令              | 允许状态                                      | 约束                                               |
-| ----------------- | --------------------------------------------- | -------------------------------------------------- |
-| `check`           | `idle/upToDate/available/error/cancelled`     | single-flight；已有 checking 时复用同一 Promise    |
-| `download`        | `available`                                   | 同一版本只允许一个下载任务                         |
-| `cancelDownload`  | `downloading`                                 | 幂等；清理临时产物后进入 `cancelled`               |
-| `install`         | `downloaded`                                  | 用户明确确认后执行；重复调用只接受第一次           |
-| `retry`           | `error/cancelled` 且 `retryable=true`         | 根据 `lastCommand` 回到 check 或 download           |
-| `getSnapshot`     | 任意状态                                      | 只读，不触发副作用                                 |
+| 命令             | 允许状态                                  | 约束                                            |
+| ---------------- | ----------------------------------------- | ----------------------------------------------- |
+| `check`          | `idle/upToDate/available/error/cancelled` | single-flight；已有 checking 时复用同一 Promise |
+| `download`       | `available`                               | 同一版本只允许一个下载任务                      |
+| `cancelDownload` | `downloading`                             | 幂等；清理临时产物后进入 `cancelled`            |
+| `install`        | `downloaded`                              | 用户明确确认后执行；重复调用只接受第一次        |
+| `retry`          | `error/cancelled` 且 `retryable=true`     | 根据 `lastCommand` 回到 check 或 download       |
+| `getSnapshot`    | 任意状态                                  | 只读，不触发副作用                              |
 
 非法状态调用返回 typed domain error，不调用 `electron-updater`。Main 只注册一次 updater listener，应用退出时释放；窗口重建只重新订阅快照，不能重复绑定底层事件。
 
@@ -567,12 +567,12 @@ macOS 产物在 macOS 环境构建；Windows 产物在 Windows 环境构建。�
 
 ### 15.4 验收证据分级
 
-| 证据级别           | 可以证明                                                     | 不能证明                               |
-| ------------------ | ------------------------------------------------------------ | -------------------------------------- |
+| 证据级别           | 可以证明                                                    | 不能证明                               |
+| ------------------ | ----------------------------------------------------------- | -------------------------------------- |
 | 开发/自动化证据    | Main/Preload/Renderer 契约、状态机、feed、metadata、UI 联动 | OS 信任、正式签名、公证、SmartScreen   |
-| 未签名安装包 smoke | 当前平台安装、启动、卸载和基础窗口行为                       | macOS 自动更新和生产发布可信度         |
-| 测试签名更新证据   | 指定平台旧版到新版更新链路                                   | 正式 publisher 的公开分发信誉          |
-| 正式发布验收       | 正式签名、公证/publisher、生产 feed、真实平台升级            | 不自动外推到未执行的其他 platform/arch |
+| 未签名安装包 smoke | 当前平台安装、启动、卸载和基础窗口行为                      | macOS 自动更新和生产发布可信度         |
+| 测试签名更新证据   | 指定平台旧版到新版更新链路                                  | 正式 publisher 的公开分发信誉          |
+| 正式发布验收       | 正式签名、公证/publisher、生产 feed、真实平台升级           | 不自动外推到未执行的其他 platform/arch |
 
 平台证据按 `macOS arm64 / macOS x64 / Windows x64` 分行记录 build、install、backend、update、uninstall 和签名状态。未经单独授权修改 CI/CD 时，当前机器无法执行的平台保持“待平台验证”，不能用交叉构建或 Mock 标记为通过。
 
@@ -725,22 +725,22 @@ pnpm make:desktop -- --window-chrome=integrated
 
 ## 21. 主要风险与处理
 
-| 风险                            | 处理                                                            |
-| ------------------------------- | --------------------------------------------------------------- |
-| Electron 代码侵入业务层         | platform adapter + import guard + typed preload                 |
-| Web/Desktop Vite 配置漂移       | 单一 Renderer 配置工厂 + outDir 参数化 + 双构建门禁             |
-| custom protocol 下路由/CORS 异常 | Phase 0 packaged Spike + 标准安全 scheme + hash history         |
-| 三套 Shell 与窗口按钮重叠       | 每布局明确安全区消费者 + 三比例/窄屏矩阵                         |
-| CSP 与现有动态样式冲突          | script/style 指令分离；只保留受限 `style-src-attr`               |
-| Renderer/Main token 双真值      | `SessionCredentialService` + 直接 setToken 守卫                  |
-| 下载重定向泄露 Authorization    | 每跳校验 origin + 跨域去 header + 限制跳数                       |
-| 更新元数据先于二进制发布        | 二进制先上传，metadata 最后可见并从公网回读                      |
-| CDN 缓存旧 metadata             | metadata no-cache + versioned artifact immutable + CDN 刷新      |
-| unsigned build 被误写成生产可用 | 脚手架完成与派生产品发布验收分级                                 |
-| generic feed 被任意 URL 劫持    | HTTPS、构建期固定 base、平台签名、禁止 Renderer 修改 feed       |
-| 更新命令并发或重复 listener     | Main 单 owner + single-flight + 合法命令表 + listener 生命周期   |
-| Playwright Electron 实验性      | 纯逻辑测试 + IPC 集成 + packaged smoke 三层兜底                 |
-| 当前脏工作区混入桌面改造        | 先 checkpoint；并行时独立 worktree/branch                       |
+| 风险                             | 处理                                                           |
+| -------------------------------- | -------------------------------------------------------------- |
+| Electron 代码侵入业务层          | platform adapter + import guard + typed preload                |
+| Web/Desktop Vite 配置漂移        | 单一 Renderer 配置工厂 + outDir 参数化 + 双构建门禁            |
+| custom protocol 下路由/CORS 异常 | Phase 0 packaged Spike + 标准安全 scheme + hash history        |
+| 三套 Shell 与窗口按钮重叠        | 每布局明确安全区消费者 + 三比例/窄屏矩阵                       |
+| CSP 与现有动态样式冲突           | script/style 指令分离；只保留受限 `style-src-attr`             |
+| Renderer/Main token 双真值       | `SessionCredentialService` + 直接 setToken 守卫                |
+| 下载重定向泄露 Authorization     | 每跳校验 origin + 跨域去 header + 限制跳数                     |
+| 更新元数据先于二进制发布         | 二进制先上传，metadata 最后可见并从公网回读                    |
+| CDN 缓存旧 metadata              | metadata no-cache + versioned artifact immutable + CDN 刷新    |
+| unsigned build 被误写成生产可用  | 脚手架完成与派生产品发布验收分级                               |
+| generic feed 被任意 URL 劫持     | HTTPS、构建期固定 base、平台签名、禁止 Renderer 修改 feed      |
+| 更新命令并发或重复 listener      | Main 单 owner + single-flight + 合法命令表 + listener 生命周期 |
+| Playwright Electron 实验性       | 纯逻辑测试 + IPC 集成 + packaged smoke 三层兜底                |
+| 当前脏工作区混入桌面改造         | 先 checkpoint；并行时独立 worktree/branch                      |
 
 ## 22. 官方资料
 
