@@ -61,8 +61,8 @@ git diff --check
 
 新增：
 
-- `shared-kernel`：`PageResult`、Problem code/exception、UUID 值对象约束、Clock/CurrentUser/AuthFacade 接口
-- `admin-api`：`BatchResult`、User/Department summary、Attachment/File capability ticket、Inbox command/result
+- `shared-kernel`：`PageResult<T>(List<T> list,long total)`、`ErrorCode`、领域异常基类；集合 defensive copy，total 不得为负。`CurrentUser/AuthFacade` 等到 Task 8/12 与 `AuthorizationState` 一起定义，本任务不建占位接口。
+- `admin-api`：`BatchResult<K,V>`、`UserSummary(UUID id,String displayName,UUID deptId,boolean active)`、`DepartmentSummary(UUID id,UUID parentId,String name,boolean active)`、`FileMetadata(UUID id,String name,String contentType,long size,String sha256)`、`UploadPolicy(Set<String> extensions,Set<String> mimeTypes,long maxBytes,Duration ttl)`、只暴露 `token/expiresAt` 的 upload/download ticket、`InboxMessageCommand(idempotencyKey,recipientUserId,category,titleKey,body,link)` 与 `PublishResult(acceptedKeys,rejectedKeys)`；接口签名按 v4 §3.3。
 - 对应单测与 ArchUnit 无框架依赖测试
 
 RED：
