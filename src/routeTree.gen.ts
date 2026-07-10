@@ -9,18 +9,60 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as R403RouteImport } from './routes/403'
+import { Route as AuthLastmileSuppliersRouteImport } from './routes/_auth/lastmile/suppliers'
+import { Route as AuthLastmileShipmentsRouteImport } from './routes/_auth/lastmile/shipments'
+import { Route as AuthLastmileOverviewRouteImport } from './routes/_auth/lastmile/overview'
+import { Route as AuthLastmileCustomersRouteImport } from './routes/_auth/lastmile/customers'
+import { Route as AuthLastmileChannelsRouteImport } from './routes/_auth/lastmile/channels'
+import { Route as AuthLastmileCarriersRouteImport } from './routes/_auth/lastmile/carriers'
+import { Route as AuthLastmileBillingRouteImport } from './routes/_auth/lastmile/billing'
 import { Route as AuthDevThemeStatesRouteImport } from './routes/_auth/dev/theme-states'
 import { Route as AuthAdminUsersRouteImport } from './routes/_auth/admin/users'
 import { Route as AuthAdminRolesRouteImport } from './routes/_auth/admin/roles'
+import { Route as AuthAdminProfileRouteImport } from './routes/_auth/admin/profile'
+import { Route as AuthAdminMessagesRouteImport } from './routes/_auth/admin/messages'
 import { Route as AuthAdminMenusRouteImport } from './routes/_auth/admin/menus'
+import { Route as AuthAdminLogsRouteImport } from './routes/_auth/admin/logs'
+import { Route as AuthAdminFilesRouteImport } from './routes/_auth/admin/files'
+import { Route as AuthAdminDictionariesRouteImport } from './routes/_auth/admin/dictionaries'
 import { Route as AuthAdminDashboardRouteImport } from './routes/_auth/admin/dashboard'
+import { Route as AuthAdminCompanyRouteImport } from './routes/_auth/admin/company'
+import { Route as AuthLastmileSuppliersIndexRouteImport } from './routes/_auth/lastmile/suppliers.index'
+import { Route as AuthLastmileShipmentsIndexRouteImport } from './routes/_auth/lastmile/shipments.index'
+import { Route as AuthLastmileCustomersIndexRouteImport } from './routes/_auth/lastmile/customers.index'
+import { Route as AuthLastmileChannelsIndexRouteImport } from './routes/_auth/lastmile/channels.index'
+import { Route as AuthLastmileCarriersIndexRouteImport } from './routes/_auth/lastmile/carriers.index'
+import { Route as AuthLastmileSuppliersSupplierIdRouteImport } from './routes/_auth/lastmile/suppliers.$supplierId'
+import { Route as AuthLastmileShipmentsNewRouteImport } from './routes/_auth/lastmile/shipments.new'
+import { Route as AuthLastmileShipmentsShipmentIdRouteImport } from './routes/_auth/lastmile/shipments.$shipmentId'
+import { Route as AuthLastmileCustomersCustomerIdRouteImport } from './routes/_auth/lastmile/customers.$customerId'
+import { Route as AuthLastmileChannelsNewRouteImport } from './routes/_auth/lastmile/channels.new'
+import { Route as AuthLastmileChannelsChannelIdRouteImport } from './routes/_auth/lastmile/channels.$channelId'
+import { Route as AuthLastmileCarriersCarrierIdRouteImport } from './routes/_auth/lastmile/carriers.$carrierId'
+import { Route as AuthLastmileShipmentsShipmentIdIndexRouteImport } from './routes/_auth/lastmile/shipments.$shipmentId.index'
+import { Route as AuthLastmileChannelsChannelIdIndexRouteImport } from './routes/_auth/lastmile/channels.$channelId.index'
+import { Route as AuthLastmileShipmentsShipmentIdTrackRouteImport } from './routes/_auth/lastmile/shipments.$shipmentId.track'
+import { Route as AuthLastmileShipmentsShipmentIdPrintRouteImport } from './routes/_auth/lastmile/shipments.$shipmentId.print'
+import { Route as AuthLastmileChannelsChannelIdEditRouteImport } from './routes/_auth/lastmile/channels.$channelId.edit'
 
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -31,6 +73,41 @@ const R403Route = R403RouteImport.update({
   id: '/403',
   path: '/403',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLastmileSuppliersRoute = AuthLastmileSuppliersRouteImport.update({
+  id: '/lastmile/suppliers',
+  path: '/lastmile/suppliers',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLastmileShipmentsRoute = AuthLastmileShipmentsRouteImport.update({
+  id: '/lastmile/shipments',
+  path: '/lastmile/shipments',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLastmileOverviewRoute = AuthLastmileOverviewRouteImport.update({
+  id: '/lastmile/overview',
+  path: '/lastmile/overview',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLastmileCustomersRoute = AuthLastmileCustomersRouteImport.update({
+  id: '/lastmile/customers',
+  path: '/lastmile/customers',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLastmileChannelsRoute = AuthLastmileChannelsRouteImport.update({
+  id: '/lastmile/channels',
+  path: '/lastmile/channels',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLastmileCarriersRoute = AuthLastmileCarriersRouteImport.update({
+  id: '/lastmile/carriers',
+  path: '/lastmile/carriers',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLastmileBillingRoute = AuthLastmileBillingRouteImport.update({
+  id: '/lastmile/billing',
+  path: '/lastmile/billing',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthDevThemeStatesRoute = AuthDevThemeStatesRouteImport.update({
   id: '/dev/theme-states',
@@ -47,9 +124,34 @@ const AuthAdminRolesRoute = AuthAdminRolesRouteImport.update({
   path: '/admin/roles',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthAdminProfileRoute = AuthAdminProfileRouteImport.update({
+  id: '/admin/profile',
+  path: '/admin/profile',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthAdminMessagesRoute = AuthAdminMessagesRouteImport.update({
+  id: '/admin/messages',
+  path: '/admin/messages',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthAdminMenusRoute = AuthAdminMenusRouteImport.update({
   id: '/admin/menus',
   path: '/admin/menus',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthAdminLogsRoute = AuthAdminLogsRouteImport.update({
+  id: '/admin/logs',
+  path: '/admin/logs',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthAdminFilesRoute = AuthAdminFilesRouteImport.update({
+  id: '/admin/files',
+  path: '/admin/files',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthAdminDictionariesRoute = AuthAdminDictionariesRouteImport.update({
+  id: '/admin/dictionaries',
+  path: '/admin/dictionaries',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthAdminDashboardRoute = AuthAdminDashboardRouteImport.update({
@@ -57,84 +159,384 @@ const AuthAdminDashboardRoute = AuthAdminDashboardRouteImport.update({
   path: '/admin/dashboard',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthAdminCompanyRoute = AuthAdminCompanyRouteImport.update({
+  id: '/admin/company',
+  path: '/admin/company',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLastmileSuppliersIndexRoute =
+  AuthLastmileSuppliersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthLastmileSuppliersRoute,
+  } as any)
+const AuthLastmileShipmentsIndexRoute =
+  AuthLastmileShipmentsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthLastmileShipmentsRoute,
+  } as any)
+const AuthLastmileCustomersIndexRoute =
+  AuthLastmileCustomersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthLastmileCustomersRoute,
+  } as any)
+const AuthLastmileChannelsIndexRoute =
+  AuthLastmileChannelsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthLastmileChannelsRoute,
+  } as any)
+const AuthLastmileCarriersIndexRoute =
+  AuthLastmileCarriersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthLastmileCarriersRoute,
+  } as any)
+const AuthLastmileSuppliersSupplierIdRoute =
+  AuthLastmileSuppliersSupplierIdRouteImport.update({
+    id: '/$supplierId',
+    path: '/$supplierId',
+    getParentRoute: () => AuthLastmileSuppliersRoute,
+  } as any)
+const AuthLastmileShipmentsNewRoute =
+  AuthLastmileShipmentsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthLastmileShipmentsRoute,
+  } as any)
+const AuthLastmileShipmentsShipmentIdRoute =
+  AuthLastmileShipmentsShipmentIdRouteImport.update({
+    id: '/$shipmentId',
+    path: '/$shipmentId',
+    getParentRoute: () => AuthLastmileShipmentsRoute,
+  } as any)
+const AuthLastmileCustomersCustomerIdRoute =
+  AuthLastmileCustomersCustomerIdRouteImport.update({
+    id: '/$customerId',
+    path: '/$customerId',
+    getParentRoute: () => AuthLastmileCustomersRoute,
+  } as any)
+const AuthLastmileChannelsNewRoute = AuthLastmileChannelsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthLastmileChannelsRoute,
+} as any)
+const AuthLastmileChannelsChannelIdRoute =
+  AuthLastmileChannelsChannelIdRouteImport.update({
+    id: '/$channelId',
+    path: '/$channelId',
+    getParentRoute: () => AuthLastmileChannelsRoute,
+  } as any)
+const AuthLastmileCarriersCarrierIdRoute =
+  AuthLastmileCarriersCarrierIdRouteImport.update({
+    id: '/$carrierId',
+    path: '/$carrierId',
+    getParentRoute: () => AuthLastmileCarriersRoute,
+  } as any)
+const AuthLastmileShipmentsShipmentIdIndexRoute =
+  AuthLastmileShipmentsShipmentIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthLastmileShipmentsShipmentIdRoute,
+  } as any)
+const AuthLastmileChannelsChannelIdIndexRoute =
+  AuthLastmileChannelsChannelIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthLastmileChannelsChannelIdRoute,
+  } as any)
+const AuthLastmileShipmentsShipmentIdTrackRoute =
+  AuthLastmileShipmentsShipmentIdTrackRouteImport.update({
+    id: '/track',
+    path: '/track',
+    getParentRoute: () => AuthLastmileShipmentsShipmentIdRoute,
+  } as any)
+const AuthLastmileShipmentsShipmentIdPrintRoute =
+  AuthLastmileShipmentsShipmentIdPrintRouteImport.update({
+    id: '/print',
+    path: '/print',
+    getParentRoute: () => AuthLastmileShipmentsShipmentIdRoute,
+  } as any)
+const AuthLastmileChannelsChannelIdEditRoute =
+  AuthLastmileChannelsChannelIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthLastmileChannelsChannelIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/403': typeof R403Route
   '/': typeof AuthRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/admin/company': typeof AuthAdminCompanyRoute
   '/admin/dashboard': typeof AuthAdminDashboardRoute
+  '/admin/dictionaries': typeof AuthAdminDictionariesRoute
+  '/admin/files': typeof AuthAdminFilesRoute
+  '/admin/logs': typeof AuthAdminLogsRoute
   '/admin/menus': typeof AuthAdminMenusRoute
+  '/admin/messages': typeof AuthAdminMessagesRoute
+  '/admin/profile': typeof AuthAdminProfileRoute
   '/admin/roles': typeof AuthAdminRolesRoute
   '/admin/users': typeof AuthAdminUsersRoute
   '/dev/theme-states': typeof AuthDevThemeStatesRoute
+  '/lastmile/billing': typeof AuthLastmileBillingRoute
+  '/lastmile/carriers': typeof AuthLastmileCarriersRouteWithChildren
+  '/lastmile/channels': typeof AuthLastmileChannelsRouteWithChildren
+  '/lastmile/customers': typeof AuthLastmileCustomersRouteWithChildren
+  '/lastmile/overview': typeof AuthLastmileOverviewRoute
+  '/lastmile/shipments': typeof AuthLastmileShipmentsRouteWithChildren
+  '/lastmile/suppliers': typeof AuthLastmileSuppliersRouteWithChildren
+  '/lastmile/carriers/$carrierId': typeof AuthLastmileCarriersCarrierIdRoute
+  '/lastmile/channels/$channelId': typeof AuthLastmileChannelsChannelIdRouteWithChildren
+  '/lastmile/channels/new': typeof AuthLastmileChannelsNewRoute
+  '/lastmile/customers/$customerId': typeof AuthLastmileCustomersCustomerIdRoute
+  '/lastmile/shipments/$shipmentId': typeof AuthLastmileShipmentsShipmentIdRouteWithChildren
+  '/lastmile/shipments/new': typeof AuthLastmileShipmentsNewRoute
+  '/lastmile/suppliers/$supplierId': typeof AuthLastmileSuppliersSupplierIdRoute
+  '/lastmile/carriers/': typeof AuthLastmileCarriersIndexRoute
+  '/lastmile/channels/': typeof AuthLastmileChannelsIndexRoute
+  '/lastmile/customers/': typeof AuthLastmileCustomersIndexRoute
+  '/lastmile/shipments/': typeof AuthLastmileShipmentsIndexRoute
+  '/lastmile/suppliers/': typeof AuthLastmileSuppliersIndexRoute
+  '/lastmile/channels/$channelId/edit': typeof AuthLastmileChannelsChannelIdEditRoute
+  '/lastmile/shipments/$shipmentId/print': typeof AuthLastmileShipmentsShipmentIdPrintRoute
+  '/lastmile/shipments/$shipmentId/track': typeof AuthLastmileShipmentsShipmentIdTrackRoute
+  '/lastmile/channels/$channelId/': typeof AuthLastmileChannelsChannelIdIndexRoute
+  '/lastmile/shipments/$shipmentId/': typeof AuthLastmileShipmentsShipmentIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/403': typeof R403Route
   '/': typeof AuthRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/admin/company': typeof AuthAdminCompanyRoute
   '/admin/dashboard': typeof AuthAdminDashboardRoute
+  '/admin/dictionaries': typeof AuthAdminDictionariesRoute
+  '/admin/files': typeof AuthAdminFilesRoute
+  '/admin/logs': typeof AuthAdminLogsRoute
   '/admin/menus': typeof AuthAdminMenusRoute
+  '/admin/messages': typeof AuthAdminMessagesRoute
+  '/admin/profile': typeof AuthAdminProfileRoute
   '/admin/roles': typeof AuthAdminRolesRoute
   '/admin/users': typeof AuthAdminUsersRoute
   '/dev/theme-states': typeof AuthDevThemeStatesRoute
+  '/lastmile/billing': typeof AuthLastmileBillingRoute
+  '/lastmile/overview': typeof AuthLastmileOverviewRoute
+  '/lastmile/carriers/$carrierId': typeof AuthLastmileCarriersCarrierIdRoute
+  '/lastmile/channels/new': typeof AuthLastmileChannelsNewRoute
+  '/lastmile/customers/$customerId': typeof AuthLastmileCustomersCustomerIdRoute
+  '/lastmile/shipments/new': typeof AuthLastmileShipmentsNewRoute
+  '/lastmile/suppliers/$supplierId': typeof AuthLastmileSuppliersSupplierIdRoute
+  '/lastmile/carriers': typeof AuthLastmileCarriersIndexRoute
+  '/lastmile/channels': typeof AuthLastmileChannelsIndexRoute
+  '/lastmile/customers': typeof AuthLastmileCustomersIndexRoute
+  '/lastmile/shipments': typeof AuthLastmileShipmentsIndexRoute
+  '/lastmile/suppliers': typeof AuthLastmileSuppliersIndexRoute
+  '/lastmile/channels/$channelId/edit': typeof AuthLastmileChannelsChannelIdEditRoute
+  '/lastmile/shipments/$shipmentId/print': typeof AuthLastmileShipmentsShipmentIdPrintRoute
+  '/lastmile/shipments/$shipmentId/track': typeof AuthLastmileShipmentsShipmentIdTrackRoute
+  '/lastmile/channels/$channelId': typeof AuthLastmileChannelsChannelIdIndexRoute
+  '/lastmile/shipments/$shipmentId': typeof AuthLastmileShipmentsShipmentIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/403': typeof R403Route
   '/_auth': typeof AuthRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/_auth/admin/company': typeof AuthAdminCompanyRoute
   '/_auth/admin/dashboard': typeof AuthAdminDashboardRoute
+  '/_auth/admin/dictionaries': typeof AuthAdminDictionariesRoute
+  '/_auth/admin/files': typeof AuthAdminFilesRoute
+  '/_auth/admin/logs': typeof AuthAdminLogsRoute
   '/_auth/admin/menus': typeof AuthAdminMenusRoute
+  '/_auth/admin/messages': typeof AuthAdminMessagesRoute
+  '/_auth/admin/profile': typeof AuthAdminProfileRoute
   '/_auth/admin/roles': typeof AuthAdminRolesRoute
   '/_auth/admin/users': typeof AuthAdminUsersRoute
   '/_auth/dev/theme-states': typeof AuthDevThemeStatesRoute
+  '/_auth/lastmile/billing': typeof AuthLastmileBillingRoute
+  '/_auth/lastmile/carriers': typeof AuthLastmileCarriersRouteWithChildren
+  '/_auth/lastmile/channels': typeof AuthLastmileChannelsRouteWithChildren
+  '/_auth/lastmile/customers': typeof AuthLastmileCustomersRouteWithChildren
+  '/_auth/lastmile/overview': typeof AuthLastmileOverviewRoute
+  '/_auth/lastmile/shipments': typeof AuthLastmileShipmentsRouteWithChildren
+  '/_auth/lastmile/suppliers': typeof AuthLastmileSuppliersRouteWithChildren
+  '/_auth/lastmile/carriers/$carrierId': typeof AuthLastmileCarriersCarrierIdRoute
+  '/_auth/lastmile/channels/$channelId': typeof AuthLastmileChannelsChannelIdRouteWithChildren
+  '/_auth/lastmile/channels/new': typeof AuthLastmileChannelsNewRoute
+  '/_auth/lastmile/customers/$customerId': typeof AuthLastmileCustomersCustomerIdRoute
+  '/_auth/lastmile/shipments/$shipmentId': typeof AuthLastmileShipmentsShipmentIdRouteWithChildren
+  '/_auth/lastmile/shipments/new': typeof AuthLastmileShipmentsNewRoute
+  '/_auth/lastmile/suppliers/$supplierId': typeof AuthLastmileSuppliersSupplierIdRoute
+  '/_auth/lastmile/carriers/': typeof AuthLastmileCarriersIndexRoute
+  '/_auth/lastmile/channels/': typeof AuthLastmileChannelsIndexRoute
+  '/_auth/lastmile/customers/': typeof AuthLastmileCustomersIndexRoute
+  '/_auth/lastmile/shipments/': typeof AuthLastmileShipmentsIndexRoute
+  '/_auth/lastmile/suppliers/': typeof AuthLastmileSuppliersIndexRoute
+  '/_auth/lastmile/channels/$channelId/edit': typeof AuthLastmileChannelsChannelIdEditRoute
+  '/_auth/lastmile/shipments/$shipmentId/print': typeof AuthLastmileShipmentsShipmentIdPrintRoute
+  '/_auth/lastmile/shipments/$shipmentId/track': typeof AuthLastmileShipmentsShipmentIdTrackRoute
+  '/_auth/lastmile/channels/$channelId/': typeof AuthLastmileChannelsChannelIdIndexRoute
+  '/_auth/lastmile/shipments/$shipmentId/': typeof AuthLastmileShipmentsShipmentIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/403'
     | '/'
+    | '/forgot-password'
     | '/login'
+    | '/register'
+    | '/admin/company'
     | '/admin/dashboard'
+    | '/admin/dictionaries'
+    | '/admin/files'
+    | '/admin/logs'
     | '/admin/menus'
+    | '/admin/messages'
+    | '/admin/profile'
     | '/admin/roles'
     | '/admin/users'
     | '/dev/theme-states'
+    | '/lastmile/billing'
+    | '/lastmile/carriers'
+    | '/lastmile/channels'
+    | '/lastmile/customers'
+    | '/lastmile/overview'
+    | '/lastmile/shipments'
+    | '/lastmile/suppliers'
+    | '/lastmile/carriers/$carrierId'
+    | '/lastmile/channels/$channelId'
+    | '/lastmile/channels/new'
+    | '/lastmile/customers/$customerId'
+    | '/lastmile/shipments/$shipmentId'
+    | '/lastmile/shipments/new'
+    | '/lastmile/suppliers/$supplierId'
+    | '/lastmile/carriers/'
+    | '/lastmile/channels/'
+    | '/lastmile/customers/'
+    | '/lastmile/shipments/'
+    | '/lastmile/suppliers/'
+    | '/lastmile/channels/$channelId/edit'
+    | '/lastmile/shipments/$shipmentId/print'
+    | '/lastmile/shipments/$shipmentId/track'
+    | '/lastmile/channels/$channelId/'
+    | '/lastmile/shipments/$shipmentId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/403'
     | '/'
+    | '/forgot-password'
     | '/login'
+    | '/register'
+    | '/admin/company'
     | '/admin/dashboard'
+    | '/admin/dictionaries'
+    | '/admin/files'
+    | '/admin/logs'
     | '/admin/menus'
+    | '/admin/messages'
+    | '/admin/profile'
     | '/admin/roles'
     | '/admin/users'
     | '/dev/theme-states'
+    | '/lastmile/billing'
+    | '/lastmile/overview'
+    | '/lastmile/carriers/$carrierId'
+    | '/lastmile/channels/new'
+    | '/lastmile/customers/$customerId'
+    | '/lastmile/shipments/new'
+    | '/lastmile/suppliers/$supplierId'
+    | '/lastmile/carriers'
+    | '/lastmile/channels'
+    | '/lastmile/customers'
+    | '/lastmile/shipments'
+    | '/lastmile/suppliers'
+    | '/lastmile/channels/$channelId/edit'
+    | '/lastmile/shipments/$shipmentId/print'
+    | '/lastmile/shipments/$shipmentId/track'
+    | '/lastmile/channels/$channelId'
+    | '/lastmile/shipments/$shipmentId'
   id:
     | '__root__'
     | '/403'
     | '/_auth'
+    | '/forgot-password'
     | '/login'
+    | '/register'
+    | '/_auth/admin/company'
     | '/_auth/admin/dashboard'
+    | '/_auth/admin/dictionaries'
+    | '/_auth/admin/files'
+    | '/_auth/admin/logs'
     | '/_auth/admin/menus'
+    | '/_auth/admin/messages'
+    | '/_auth/admin/profile'
     | '/_auth/admin/roles'
     | '/_auth/admin/users'
     | '/_auth/dev/theme-states'
+    | '/_auth/lastmile/billing'
+    | '/_auth/lastmile/carriers'
+    | '/_auth/lastmile/channels'
+    | '/_auth/lastmile/customers'
+    | '/_auth/lastmile/overview'
+    | '/_auth/lastmile/shipments'
+    | '/_auth/lastmile/suppliers'
+    | '/_auth/lastmile/carriers/$carrierId'
+    | '/_auth/lastmile/channels/$channelId'
+    | '/_auth/lastmile/channels/new'
+    | '/_auth/lastmile/customers/$customerId'
+    | '/_auth/lastmile/shipments/$shipmentId'
+    | '/_auth/lastmile/shipments/new'
+    | '/_auth/lastmile/suppliers/$supplierId'
+    | '/_auth/lastmile/carriers/'
+    | '/_auth/lastmile/channels/'
+    | '/_auth/lastmile/customers/'
+    | '/_auth/lastmile/shipments/'
+    | '/_auth/lastmile/suppliers/'
+    | '/_auth/lastmile/channels/$channelId/edit'
+    | '/_auth/lastmile/shipments/$shipmentId/print'
+    | '/_auth/lastmile/shipments/$shipmentId/track'
+    | '/_auth/lastmile/channels/$channelId/'
+    | '/_auth/lastmile/shipments/$shipmentId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   R403Route: typeof R403Route
   AuthRoute: typeof AuthRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth': {
@@ -150,6 +552,55 @@ declare module '@tanstack/react-router' {
       fullPath: '/403'
       preLoaderRoute: typeof R403RouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_auth/lastmile/suppliers': {
+      id: '/_auth/lastmile/suppliers'
+      path: '/lastmile/suppliers'
+      fullPath: '/lastmile/suppliers'
+      preLoaderRoute: typeof AuthLastmileSuppliersRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/lastmile/shipments': {
+      id: '/_auth/lastmile/shipments'
+      path: '/lastmile/shipments'
+      fullPath: '/lastmile/shipments'
+      preLoaderRoute: typeof AuthLastmileShipmentsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/lastmile/overview': {
+      id: '/_auth/lastmile/overview'
+      path: '/lastmile/overview'
+      fullPath: '/lastmile/overview'
+      preLoaderRoute: typeof AuthLastmileOverviewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/lastmile/customers': {
+      id: '/_auth/lastmile/customers'
+      path: '/lastmile/customers'
+      fullPath: '/lastmile/customers'
+      preLoaderRoute: typeof AuthLastmileCustomersRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/lastmile/channels': {
+      id: '/_auth/lastmile/channels'
+      path: '/lastmile/channels'
+      fullPath: '/lastmile/channels'
+      preLoaderRoute: typeof AuthLastmileChannelsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/lastmile/carriers': {
+      id: '/_auth/lastmile/carriers'
+      path: '/lastmile/carriers'
+      fullPath: '/lastmile/carriers'
+      preLoaderRoute: typeof AuthLastmileCarriersRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/lastmile/billing': {
+      id: '/_auth/lastmile/billing'
+      path: '/lastmile/billing'
+      fullPath: '/lastmile/billing'
+      preLoaderRoute: typeof AuthLastmileBillingRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_auth/dev/theme-states': {
       id: '/_auth/dev/theme-states'
@@ -172,11 +623,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAdminRolesRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/admin/profile': {
+      id: '/_auth/admin/profile'
+      path: '/admin/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AuthAdminProfileRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/admin/messages': {
+      id: '/_auth/admin/messages'
+      path: '/admin/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AuthAdminMessagesRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/admin/menus': {
       id: '/_auth/admin/menus'
       path: '/admin/menus'
       fullPath: '/admin/menus'
       preLoaderRoute: typeof AuthAdminMenusRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/admin/logs': {
+      id: '/_auth/admin/logs'
+      path: '/admin/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AuthAdminLogsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/admin/files': {
+      id: '/_auth/admin/files'
+      path: '/admin/files'
+      fullPath: '/admin/files'
+      preLoaderRoute: typeof AuthAdminFilesRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/admin/dictionaries': {
+      id: '/_auth/admin/dictionaries'
+      path: '/admin/dictionaries'
+      fullPath: '/admin/dictionaries'
+      preLoaderRoute: typeof AuthAdminDictionariesRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/admin/dashboard': {
@@ -186,23 +672,291 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAdminDashboardRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/admin/company': {
+      id: '/_auth/admin/company'
+      path: '/admin/company'
+      fullPath: '/admin/company'
+      preLoaderRoute: typeof AuthAdminCompanyRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/lastmile/suppliers/': {
+      id: '/_auth/lastmile/suppliers/'
+      path: '/'
+      fullPath: '/lastmile/suppliers/'
+      preLoaderRoute: typeof AuthLastmileSuppliersIndexRouteImport
+      parentRoute: typeof AuthLastmileSuppliersRoute
+    }
+    '/_auth/lastmile/shipments/': {
+      id: '/_auth/lastmile/shipments/'
+      path: '/'
+      fullPath: '/lastmile/shipments/'
+      preLoaderRoute: typeof AuthLastmileShipmentsIndexRouteImport
+      parentRoute: typeof AuthLastmileShipmentsRoute
+    }
+    '/_auth/lastmile/customers/': {
+      id: '/_auth/lastmile/customers/'
+      path: '/'
+      fullPath: '/lastmile/customers/'
+      preLoaderRoute: typeof AuthLastmileCustomersIndexRouteImport
+      parentRoute: typeof AuthLastmileCustomersRoute
+    }
+    '/_auth/lastmile/channels/': {
+      id: '/_auth/lastmile/channels/'
+      path: '/'
+      fullPath: '/lastmile/channels/'
+      preLoaderRoute: typeof AuthLastmileChannelsIndexRouteImport
+      parentRoute: typeof AuthLastmileChannelsRoute
+    }
+    '/_auth/lastmile/carriers/': {
+      id: '/_auth/lastmile/carriers/'
+      path: '/'
+      fullPath: '/lastmile/carriers/'
+      preLoaderRoute: typeof AuthLastmileCarriersIndexRouteImport
+      parentRoute: typeof AuthLastmileCarriersRoute
+    }
+    '/_auth/lastmile/suppliers/$supplierId': {
+      id: '/_auth/lastmile/suppliers/$supplierId'
+      path: '/$supplierId'
+      fullPath: '/lastmile/suppliers/$supplierId'
+      preLoaderRoute: typeof AuthLastmileSuppliersSupplierIdRouteImport
+      parentRoute: typeof AuthLastmileSuppliersRoute
+    }
+    '/_auth/lastmile/shipments/new': {
+      id: '/_auth/lastmile/shipments/new'
+      path: '/new'
+      fullPath: '/lastmile/shipments/new'
+      preLoaderRoute: typeof AuthLastmileShipmentsNewRouteImport
+      parentRoute: typeof AuthLastmileShipmentsRoute
+    }
+    '/_auth/lastmile/shipments/$shipmentId': {
+      id: '/_auth/lastmile/shipments/$shipmentId'
+      path: '/$shipmentId'
+      fullPath: '/lastmile/shipments/$shipmentId'
+      preLoaderRoute: typeof AuthLastmileShipmentsShipmentIdRouteImport
+      parentRoute: typeof AuthLastmileShipmentsRoute
+    }
+    '/_auth/lastmile/customers/$customerId': {
+      id: '/_auth/lastmile/customers/$customerId'
+      path: '/$customerId'
+      fullPath: '/lastmile/customers/$customerId'
+      preLoaderRoute: typeof AuthLastmileCustomersCustomerIdRouteImport
+      parentRoute: typeof AuthLastmileCustomersRoute
+    }
+    '/_auth/lastmile/channels/new': {
+      id: '/_auth/lastmile/channels/new'
+      path: '/new'
+      fullPath: '/lastmile/channels/new'
+      preLoaderRoute: typeof AuthLastmileChannelsNewRouteImport
+      parentRoute: typeof AuthLastmileChannelsRoute
+    }
+    '/_auth/lastmile/channels/$channelId': {
+      id: '/_auth/lastmile/channels/$channelId'
+      path: '/$channelId'
+      fullPath: '/lastmile/channels/$channelId'
+      preLoaderRoute: typeof AuthLastmileChannelsChannelIdRouteImport
+      parentRoute: typeof AuthLastmileChannelsRoute
+    }
+    '/_auth/lastmile/carriers/$carrierId': {
+      id: '/_auth/lastmile/carriers/$carrierId'
+      path: '/$carrierId'
+      fullPath: '/lastmile/carriers/$carrierId'
+      preLoaderRoute: typeof AuthLastmileCarriersCarrierIdRouteImport
+      parentRoute: typeof AuthLastmileCarriersRoute
+    }
+    '/_auth/lastmile/shipments/$shipmentId/': {
+      id: '/_auth/lastmile/shipments/$shipmentId/'
+      path: '/'
+      fullPath: '/lastmile/shipments/$shipmentId/'
+      preLoaderRoute: typeof AuthLastmileShipmentsShipmentIdIndexRouteImport
+      parentRoute: typeof AuthLastmileShipmentsShipmentIdRoute
+    }
+    '/_auth/lastmile/channels/$channelId/': {
+      id: '/_auth/lastmile/channels/$channelId/'
+      path: '/'
+      fullPath: '/lastmile/channels/$channelId/'
+      preLoaderRoute: typeof AuthLastmileChannelsChannelIdIndexRouteImport
+      parentRoute: typeof AuthLastmileChannelsChannelIdRoute
+    }
+    '/_auth/lastmile/shipments/$shipmentId/track': {
+      id: '/_auth/lastmile/shipments/$shipmentId/track'
+      path: '/track'
+      fullPath: '/lastmile/shipments/$shipmentId/track'
+      preLoaderRoute: typeof AuthLastmileShipmentsShipmentIdTrackRouteImport
+      parentRoute: typeof AuthLastmileShipmentsShipmentIdRoute
+    }
+    '/_auth/lastmile/shipments/$shipmentId/print': {
+      id: '/_auth/lastmile/shipments/$shipmentId/print'
+      path: '/print'
+      fullPath: '/lastmile/shipments/$shipmentId/print'
+      preLoaderRoute: typeof AuthLastmileShipmentsShipmentIdPrintRouteImport
+      parentRoute: typeof AuthLastmileShipmentsShipmentIdRoute
+    }
+    '/_auth/lastmile/channels/$channelId/edit': {
+      id: '/_auth/lastmile/channels/$channelId/edit'
+      path: '/edit'
+      fullPath: '/lastmile/channels/$channelId/edit'
+      preLoaderRoute: typeof AuthLastmileChannelsChannelIdEditRouteImport
+      parentRoute: typeof AuthLastmileChannelsChannelIdRoute
+    }
   }
 }
 
+interface AuthLastmileCarriersRouteChildren {
+  AuthLastmileCarriersCarrierIdRoute: typeof AuthLastmileCarriersCarrierIdRoute
+  AuthLastmileCarriersIndexRoute: typeof AuthLastmileCarriersIndexRoute
+}
+
+const AuthLastmileCarriersRouteChildren: AuthLastmileCarriersRouteChildren = {
+  AuthLastmileCarriersCarrierIdRoute: AuthLastmileCarriersCarrierIdRoute,
+  AuthLastmileCarriersIndexRoute: AuthLastmileCarriersIndexRoute,
+}
+
+const AuthLastmileCarriersRouteWithChildren =
+  AuthLastmileCarriersRoute._addFileChildren(AuthLastmileCarriersRouteChildren)
+
+interface AuthLastmileChannelsChannelIdRouteChildren {
+  AuthLastmileChannelsChannelIdEditRoute: typeof AuthLastmileChannelsChannelIdEditRoute
+  AuthLastmileChannelsChannelIdIndexRoute: typeof AuthLastmileChannelsChannelIdIndexRoute
+}
+
+const AuthLastmileChannelsChannelIdRouteChildren: AuthLastmileChannelsChannelIdRouteChildren =
+  {
+    AuthLastmileChannelsChannelIdEditRoute:
+      AuthLastmileChannelsChannelIdEditRoute,
+    AuthLastmileChannelsChannelIdIndexRoute:
+      AuthLastmileChannelsChannelIdIndexRoute,
+  }
+
+const AuthLastmileChannelsChannelIdRouteWithChildren =
+  AuthLastmileChannelsChannelIdRoute._addFileChildren(
+    AuthLastmileChannelsChannelIdRouteChildren,
+  )
+
+interface AuthLastmileChannelsRouteChildren {
+  AuthLastmileChannelsChannelIdRoute: typeof AuthLastmileChannelsChannelIdRouteWithChildren
+  AuthLastmileChannelsNewRoute: typeof AuthLastmileChannelsNewRoute
+  AuthLastmileChannelsIndexRoute: typeof AuthLastmileChannelsIndexRoute
+}
+
+const AuthLastmileChannelsRouteChildren: AuthLastmileChannelsRouteChildren = {
+  AuthLastmileChannelsChannelIdRoute:
+    AuthLastmileChannelsChannelIdRouteWithChildren,
+  AuthLastmileChannelsNewRoute: AuthLastmileChannelsNewRoute,
+  AuthLastmileChannelsIndexRoute: AuthLastmileChannelsIndexRoute,
+}
+
+const AuthLastmileChannelsRouteWithChildren =
+  AuthLastmileChannelsRoute._addFileChildren(AuthLastmileChannelsRouteChildren)
+
+interface AuthLastmileCustomersRouteChildren {
+  AuthLastmileCustomersCustomerIdRoute: typeof AuthLastmileCustomersCustomerIdRoute
+  AuthLastmileCustomersIndexRoute: typeof AuthLastmileCustomersIndexRoute
+}
+
+const AuthLastmileCustomersRouteChildren: AuthLastmileCustomersRouteChildren = {
+  AuthLastmileCustomersCustomerIdRoute: AuthLastmileCustomersCustomerIdRoute,
+  AuthLastmileCustomersIndexRoute: AuthLastmileCustomersIndexRoute,
+}
+
+const AuthLastmileCustomersRouteWithChildren =
+  AuthLastmileCustomersRoute._addFileChildren(
+    AuthLastmileCustomersRouteChildren,
+  )
+
+interface AuthLastmileShipmentsShipmentIdRouteChildren {
+  AuthLastmileShipmentsShipmentIdPrintRoute: typeof AuthLastmileShipmentsShipmentIdPrintRoute
+  AuthLastmileShipmentsShipmentIdTrackRoute: typeof AuthLastmileShipmentsShipmentIdTrackRoute
+  AuthLastmileShipmentsShipmentIdIndexRoute: typeof AuthLastmileShipmentsShipmentIdIndexRoute
+}
+
+const AuthLastmileShipmentsShipmentIdRouteChildren: AuthLastmileShipmentsShipmentIdRouteChildren =
+  {
+    AuthLastmileShipmentsShipmentIdPrintRoute:
+      AuthLastmileShipmentsShipmentIdPrintRoute,
+    AuthLastmileShipmentsShipmentIdTrackRoute:
+      AuthLastmileShipmentsShipmentIdTrackRoute,
+    AuthLastmileShipmentsShipmentIdIndexRoute:
+      AuthLastmileShipmentsShipmentIdIndexRoute,
+  }
+
+const AuthLastmileShipmentsShipmentIdRouteWithChildren =
+  AuthLastmileShipmentsShipmentIdRoute._addFileChildren(
+    AuthLastmileShipmentsShipmentIdRouteChildren,
+  )
+
+interface AuthLastmileShipmentsRouteChildren {
+  AuthLastmileShipmentsShipmentIdRoute: typeof AuthLastmileShipmentsShipmentIdRouteWithChildren
+  AuthLastmileShipmentsNewRoute: typeof AuthLastmileShipmentsNewRoute
+  AuthLastmileShipmentsIndexRoute: typeof AuthLastmileShipmentsIndexRoute
+}
+
+const AuthLastmileShipmentsRouteChildren: AuthLastmileShipmentsRouteChildren = {
+  AuthLastmileShipmentsShipmentIdRoute:
+    AuthLastmileShipmentsShipmentIdRouteWithChildren,
+  AuthLastmileShipmentsNewRoute: AuthLastmileShipmentsNewRoute,
+  AuthLastmileShipmentsIndexRoute: AuthLastmileShipmentsIndexRoute,
+}
+
+const AuthLastmileShipmentsRouteWithChildren =
+  AuthLastmileShipmentsRoute._addFileChildren(
+    AuthLastmileShipmentsRouteChildren,
+  )
+
+interface AuthLastmileSuppliersRouteChildren {
+  AuthLastmileSuppliersSupplierIdRoute: typeof AuthLastmileSuppliersSupplierIdRoute
+  AuthLastmileSuppliersIndexRoute: typeof AuthLastmileSuppliersIndexRoute
+}
+
+const AuthLastmileSuppliersRouteChildren: AuthLastmileSuppliersRouteChildren = {
+  AuthLastmileSuppliersSupplierIdRoute: AuthLastmileSuppliersSupplierIdRoute,
+  AuthLastmileSuppliersIndexRoute: AuthLastmileSuppliersIndexRoute,
+}
+
+const AuthLastmileSuppliersRouteWithChildren =
+  AuthLastmileSuppliersRoute._addFileChildren(
+    AuthLastmileSuppliersRouteChildren,
+  )
+
 interface AuthRouteChildren {
+  AuthAdminCompanyRoute: typeof AuthAdminCompanyRoute
   AuthAdminDashboardRoute: typeof AuthAdminDashboardRoute
+  AuthAdminDictionariesRoute: typeof AuthAdminDictionariesRoute
+  AuthAdminFilesRoute: typeof AuthAdminFilesRoute
+  AuthAdminLogsRoute: typeof AuthAdminLogsRoute
   AuthAdminMenusRoute: typeof AuthAdminMenusRoute
+  AuthAdminMessagesRoute: typeof AuthAdminMessagesRoute
+  AuthAdminProfileRoute: typeof AuthAdminProfileRoute
   AuthAdminRolesRoute: typeof AuthAdminRolesRoute
   AuthAdminUsersRoute: typeof AuthAdminUsersRoute
   AuthDevThemeStatesRoute: typeof AuthDevThemeStatesRoute
+  AuthLastmileBillingRoute: typeof AuthLastmileBillingRoute
+  AuthLastmileCarriersRoute: typeof AuthLastmileCarriersRouteWithChildren
+  AuthLastmileChannelsRoute: typeof AuthLastmileChannelsRouteWithChildren
+  AuthLastmileCustomersRoute: typeof AuthLastmileCustomersRouteWithChildren
+  AuthLastmileOverviewRoute: typeof AuthLastmileOverviewRoute
+  AuthLastmileShipmentsRoute: typeof AuthLastmileShipmentsRouteWithChildren
+  AuthLastmileSuppliersRoute: typeof AuthLastmileSuppliersRouteWithChildren
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthAdminCompanyRoute: AuthAdminCompanyRoute,
   AuthAdminDashboardRoute: AuthAdminDashboardRoute,
+  AuthAdminDictionariesRoute: AuthAdminDictionariesRoute,
+  AuthAdminFilesRoute: AuthAdminFilesRoute,
+  AuthAdminLogsRoute: AuthAdminLogsRoute,
   AuthAdminMenusRoute: AuthAdminMenusRoute,
+  AuthAdminMessagesRoute: AuthAdminMessagesRoute,
+  AuthAdminProfileRoute: AuthAdminProfileRoute,
   AuthAdminRolesRoute: AuthAdminRolesRoute,
   AuthAdminUsersRoute: AuthAdminUsersRoute,
   AuthDevThemeStatesRoute: AuthDevThemeStatesRoute,
+  AuthLastmileBillingRoute: AuthLastmileBillingRoute,
+  AuthLastmileCarriersRoute: AuthLastmileCarriersRouteWithChildren,
+  AuthLastmileChannelsRoute: AuthLastmileChannelsRouteWithChildren,
+  AuthLastmileCustomersRoute: AuthLastmileCustomersRouteWithChildren,
+  AuthLastmileOverviewRoute: AuthLastmileOverviewRoute,
+  AuthLastmileShipmentsRoute: AuthLastmileShipmentsRouteWithChildren,
+  AuthLastmileSuppliersRoute: AuthLastmileSuppliersRouteWithChildren,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
@@ -210,7 +964,9 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   R403Route: R403Route,
   AuthRoute: AuthRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

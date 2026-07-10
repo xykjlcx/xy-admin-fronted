@@ -5,7 +5,7 @@ import { parseConfigFileTextToJson } from 'typescript';
 const projectRoot = resolve(__dirname, '../../..');
 const adminRoutesDir = resolve(projectRoot, 'src/routes/_auth/admin');
 const adminApiDir = resolve(projectRoot, 'src/modules/admin/api');
-const adminUsersApiDir = resolve(projectRoot, 'src/modules/admin/users/api');
+const adminModulesDir = resolve(projectRoot, 'src/modules/admin');
 const sourceRoot = resolve(projectRoot, 'src');
 const themeStatesRoute = 'src/routes/_auth/dev/theme-states.tsx';
 
@@ -35,14 +35,16 @@ function getAdminRouteEntries() {
 }
 
 function getAdminPageImport(page: string) {
-  return page === 'users' ? '@/modules/admin/users' : `@/modules/admin/pages/${page}`;
+  return page === 'dashboard' ? '@/modules/admin/pages/dashboard' : `@/modules/admin/${page}`;
 }
 
 function getAdminPageEntry(page: string) {
-  return page === 'users' ? 'src/modules/admin/users/index.tsx' : `src/modules/admin/pages/${page}/index.tsx`;
+  return page === 'dashboard'
+    ? 'src/modules/admin/pages/dashboard/index.tsx'
+    : `src/modules/admin/${page}/index.tsx`;
 }
 
-test('admin routes import page entries from module pages or vertical packages', () => {
+test('admin routes import page entries from vertical packages except the dashboard legacy page', () => {
   const routeEntries = getAdminRouteEntries();
 
   for (const entry of routeEntries) {
@@ -50,9 +52,7 @@ test('admin routes import page entries from module pages or vertical packages', 
 
     expect(source).toContain(getAdminPageImport(entry.page));
     expect(source).not.toContain('@/modules/admin/components');
-    if (entry.page === 'users') {
-      expect(source).not.toContain('@/modules/admin/pages/users');
-    }
+    if (entry.page !== 'dashboard') expect(source).not.toContain(`@/modules/admin/pages/${entry.page}`);
   }
 });
 
@@ -68,13 +68,13 @@ test('admin module does not keep legacy components page directories', () => {
   expect(existsSync(resolve(projectRoot, 'src/modules/admin/components'))).toBe(false);
 });
 
-test('no new business is added under the legacy horizontal pages/ dir', () => {
-  // 止血守卫：pages/ 是待迁移的横切遗留，只允许现存三页；新业务必须走纵切 modules/<key>/<business>/。
+test('only dashboard remains under the legacy horizontal pages directory', () => {
+  // 止血守卫：pages/ 是待迁移的横切遗留，只允许 Dashboard；新业务必须走纵切 modules/<key>/<business>/。
   // 迁移完成后 pages/ 目录消失，本守卫自然放行。
   const legacyPagesDir = resolve(projectRoot, 'src/modules/admin/pages');
   if (!existsSync(legacyPagesDir)) return;
 
-  const allowed = new Set(['roles', 'menus', 'dashboard']);
+  const allowed = new Set(['dashboard']);
   const dirs = readdirSync(legacyPagesDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name);
@@ -84,6 +84,183 @@ test('no new business is added under the legacy horizontal pages/ dir', () => {
       allowed.has(dir),
       `modules/admin/pages/${dir} 是横切遗留结构，新业务请用纵切 modules/<key>/<business>/`,
     ).toBe(true);
+  }
+});
+
+test('roles and menus keep the required vertical package shape', () => {
+  for (const business of ['roles', 'menus']) {
+    const root = resolve(projectRoot, `src/modules/admin/${business}`);
+    for (const path of [
+      'index.tsx',
+      'api/schema.ts',
+      'api/keys.ts',
+      'mocks/index.ts',
+      'list',
+      'detail',
+      'form',
+      '__tests__',
+    ]) {
+      expect(existsSync(resolve(root, path)), `${business}/${path} should exist`).toBe(true);
+    }
+  }
+});
+
+test('dictionaries is registered as a complete vertical business package', () => {
+  const root = resolve(projectRoot, 'src/modules/admin/dictionaries');
+  for (const path of [
+    'index.tsx',
+    'api/schema.ts',
+    'api/keys.ts',
+    'mocks/db.ts',
+    'mocks/index.ts',
+    'list',
+    'detail',
+    'form',
+    '__tests__',
+  ]) {
+    expect(existsSync(resolve(root, path)), `dictionaries/${path} should exist`).toBe(true);
+  }
+
+  expect(existsSync(resolve(projectRoot, 'src/routes/_auth/admin/dictionaries.tsx'))).toBe(true);
+  expect(readProjectFile('src/mocks/handlers.ts')).toContain('@/modules/admin/dictionaries/mocks');
+});
+
+test('dictionaries is declared in the admin manifest and permission catalog', () => {
+  const manifest = readProjectFile('src/modules/admin/manifest.ts');
+  const roleMock = readProjectFile('src/modules/admin/roles/mocks/role.handlers.ts');
+
+  expect(manifest).toContain("path: '/admin/dictionaries'");
+  expect(manifest).toContain("permission: 'sys:dict:view'");
+  expect(roleMock).toContain("code: 'sys:dict'");
+  expect(roleMock).toContain("id: 'audit:oplog'");
+  expect(roleMock).toContain("'audit:oplog': ['view'");
+  expect(roleMock).toContain("code: 'notice:msg'");
+  expect(roleMock).not.toContain("code: 'notice:notice'");
+});
+
+test('implemented admin vertical packages are connected to mocks and navigation declarations', () => {
+  const manifest = readProjectFile('src/modules/admin/manifest.ts');
+  const handlers = readProjectFile('src/mocks/handlers.ts');
+  const menuModel = readProjectFile('src/modules/admin/menus/model.ts');
+
+  expect(handlers).toContain('@/modules/admin/messages/mocks');
+  expect(handlers).toContain('@/modules/admin/logs/mocks');
+  expect(handlers).toContain('@/modules/admin/files/mocks');
+  expect(handlers).toContain('@/modules/admin/company/mocks');
+  expect(handlers).toContain('@/modules/admin/profile/mocks');
+  expect(manifest).toContain("path: '/admin/logs'");
+  expect(manifest).toContain("permission: 'audit:oplog:view'");
+  expect(manifest).toContain("path: '/admin/files'");
+  expect(manifest).toContain("permission: 'file:doc:view'");
+  expect(manifest).toContain("path: '/admin/company'");
+  expect(manifest).toContain("permission: 'sys:org:view'");
+  expect(menuModel).toContain("import { manifests } from '@/modules/registry'");
+  expect(menuModel).toContain('for (const manifest of manifests)');
+  expect(menuModel).toContain("menu.type !== 'menu'");
+  expect(menuModel).not.toContain("value: '/admin/logs'");
+});
+
+test('visual workflow covers every completed Admin page and public auth screen', () => {
+  const visual = readProjectFile('scripts/visual-agent-browser.mjs');
+  for (const route of [
+    '/admin/messages',
+    '/admin/logs',
+    '/admin/files',
+    '/admin/company',
+    '/admin/dictionaries',
+    '/admin/profile',
+    '/register',
+    '/forgot-password',
+  ]) {
+    expect(visual).toContain(`url: '${route}'`);
+  }
+});
+
+test('remaining admin features are owned by vertical business packages', () => {
+  for (const business of ['messages', 'logs', 'files', 'company', 'profile', 'auth']) {
+    const root = resolve(projectRoot, `src/modules/admin/${business}`);
+    for (const path of [
+      'index.tsx',
+      'api/schema.ts',
+      'api/keys.ts',
+      'mocks/index.ts',
+      'list',
+      'detail',
+      'form',
+      '__tests__',
+    ]) {
+      expect(existsSync(resolve(root, path)), `${business}/${path} should exist`).toBe(true);
+    }
+  }
+
+  for (const route of ['messages', 'logs', 'files', 'company', 'profile']) {
+    expect(
+      existsSync(resolve(projectRoot, `src/routes/_auth/admin/${route}.tsx`)),
+      `${route} route should exist`,
+    ).toBe(true);
+  }
+  expect(existsSync(resolve(projectRoot, 'src/routes/register.tsx'))).toBe(true);
+  expect(existsSync(resolve(projectRoot, 'src/routes/forgot-password.tsx'))).toBe(true);
+});
+
+test('lastmile features use the complete vertical package shape', () => {
+  for (const business of [
+    'overview',
+    'shipments',
+    'customers',
+    'channels',
+    'carriers',
+    'suppliers',
+    'billing',
+  ]) {
+    const root = resolve(projectRoot, `src/modules/lastmile/${business}`);
+    for (const path of [
+      'index.tsx',
+      'api/schema.ts',
+      'api/keys.ts',
+      'mocks/index.ts',
+      'list',
+      'detail',
+      'form',
+      '__tests__',
+    ]) {
+      expect(existsSync(resolve(root, path)), `${business}/${path} should exist`).toBe(true);
+    }
+  }
+
+  expect(existsSync(resolve(projectRoot, 'src/modules/lastmile/pages'))).toBe(false);
+  expect(existsSync(resolve(projectRoot, 'src/modules/lastmile/api'))).toBe(false);
+});
+
+test('lastmile is registered with routes, mocks, manifest and visual coverage', () => {
+  const registry = readProjectFile('src/modules/registry.ts');
+  const handlers = readProjectFile('src/mocks/handlers.ts');
+  const manifest = readProjectFile('src/modules/lastmile/manifest.ts');
+  const visual = readProjectFile('scripts/visual-agent-browser.mjs');
+
+  expect(registry).toContain('lastmileManifest');
+  for (const business of [
+    'overview',
+    'shipments',
+    'customers',
+    'channels',
+    'carriers',
+    'suppliers',
+    'billing',
+  ]) {
+    expect(handlers).toContain(`@/modules/lastmile/${business}/mocks`);
+  }
+  for (const route of [
+    '/lastmile/overview',
+    '/lastmile/shipments',
+    '/lastmile/customers',
+    '/lastmile/channels',
+    '/lastmile/carriers',
+    '/lastmile/suppliers',
+    '/lastmile/billing',
+  ]) {
+    expect(manifest).toContain(`path: '${route}'`);
+    expect(visual).toContain(`url: '${route}'`);
   }
 });
 
@@ -116,9 +293,9 @@ test('theme states route exposes stable visual matrix controls', () => {
   expect(source).toContain('data-matrix="scale"');
   expect(source).toContain('value={zoom}');
   expect(source).toContain('set({ zoom:');
-  expect(source).toContain("dev.themeStates.scale");
+  expect(source).toContain('dev.themeStates.scale');
   expect(source).toContain('scaleLabelKeys');
-  expect(source).toContain("shell.appearanceDrawer.zoomSm");
+  expect(source).toContain('shell.appearanceDrawer.zoomSm');
   expect(source).toContain('t(scaleLabelKeys[item])');
 });
 
@@ -181,11 +358,17 @@ test('theme states route exposes the Step 7 table and shell state matrix', () =>
   expect(source).toContain('dataTableRows');
   expect(source).toContain('dataTableLoading');
   expect(source).toContain('dataTableEmpty');
+  expect(source).toContain('dataTableError');
+  expect(source).toContain('QueryState');
+  expect(source).toContain('queryStateMatrix');
   expect(source).toContain('TableShell');
   expect(source).toContain('TableShellHeader');
   expect(source).toContain('TableShellRow');
   expect(source).toContain('data-state="selected"');
   expect(source).toContain('SideList');
+  expect(source).toContain('SideCardList');
+  expect(source).toContain('PageThreePane');
+  expect(source).toContain('data-testid="pageThreePaneMatrix"');
   expect(source).toContain('Pagination');
   expect(source).toContain('tableTokenRows');
   expect(source).toContain('shellTokenItems');
@@ -199,6 +382,11 @@ test('theme states route exposes the Tree state matrix', () => {
   expect(source).toContain('treeThemeNodes');
   expect(source).toContain('selectedId="rd"');
   expect(source).toContain('treeAriaLabel');
+  expect(source).toContain('expanded: treeExpanded');
+  expect(source).toContain('hidden: !treeExpanded');
+  expect(source).toContain('leading:');
+  expect(source).toContain('trailing:');
+  expect(source).toContain('onToggle={() => setTreeExpanded');
 });
 
 test('theme states route exposes the Step 8 overlay and option state matrix', () => {
@@ -240,7 +428,9 @@ test('root TypeScript configs expose the app alias for shadcn and external CLIs'
       config.compilerOptions?.ignoreDeprecations,
       `${file} should keep baseUrl compatible with TypeScript 6`,
     ).toBe('6.0');
-    expect(config.compilerOptions?.paths?.['@/*'], `${file} should resolve @/* into src/*`).toEqual(['./src/*']);
+    expect(config.compilerOptions?.paths?.['@/*'], `${file} should resolve @/* into src/*`).toEqual([
+      './src/*',
+    ]);
   }
 });
 
@@ -285,9 +475,48 @@ test('page and business layers do not bypass form primitives with raw text input
 
   for (const file of sourceFiles) {
     if (allowedRawInputFiles.has(file)) continue;
-    expect(readProjectFile(file), `${file} should use Input/InputGroup/SearchField instead of raw input`).not.toMatch(
-      /<input\b/,
-    );
+    expect(
+      readProjectFile(file),
+      `${file} should use Input/InputGroup/SearchField instead of raw input`,
+    ).not.toMatch(/<input\b/);
+  }
+});
+
+test('admin auth pages do not bypass the shared Button primitive', () => {
+  const authRoot = resolve(projectRoot, 'src/modules/admin/auth');
+  const sourceFiles = collectFiles(authRoot)
+    .filter((file) => file.endsWith('.tsx'))
+    .filter((file) => !file.includes('/__tests__/'));
+
+  for (const file of sourceFiles) {
+    expect(
+      readFileSync(file, 'utf8'),
+      `${file.replace(`${projectRoot}/`, '')} should use the shared Button primitive`,
+    ).not.toMatch(/<button\b/);
+  }
+});
+
+test('completed vertical packages only consume query keys from their keys factories', () => {
+  const packageRoots = [
+    ...['auth', 'company', 'dictionaries', 'files', 'logs', 'menus', 'messages', 'profile', 'roles'].map(
+      (business) => resolve(projectRoot, `src/modules/admin/${business}`),
+    ),
+    ...['overview', 'shipments', 'customers', 'channels', 'carriers', 'suppliers', 'billing'].map(
+      (business) => resolve(projectRoot, `src/modules/lastmile/${business}`),
+    ),
+  ];
+
+  for (const root of packageRoots) {
+    const sourceFiles = collectFiles(root)
+      .filter((file) => file.endsWith('.ts') || file.endsWith('.tsx'))
+      .filter((file) => !file.includes('/__tests__/'))
+      .filter((file) => !file.endsWith('/api/keys.ts'));
+    for (const file of sourceFiles) {
+      expect(
+        readFileSync(file, 'utf8'),
+        `${file.replace(`${projectRoot}/`, '')} should use its api/keys.ts factory`,
+      ).not.toMatch(/queryKey:\s*\[/);
+    }
   }
 });
 
@@ -312,18 +541,36 @@ test('admin routes stay thin and keep async state in module pages', () => {
 });
 
 test('menu form options are driven by i18n keys instead of hardcoded Chinese labels', () => {
-  const source = readProjectFile('src/modules/admin/pages/menus/MenuFormDialog.tsx');
+  const path = 'src/modules/admin/menus/form/MenuFormDialog.tsx';
+  if (!existsSync(resolve(projectRoot, path))) return;
+  const source = readProjectFile(path);
 
   expect(source).not.toMatch(/label:\s*['"][\p{Script=Han}]/u);
   expect(source).not.toContain('根级菜单');
 });
 
 test('login page does not ship demo credentials as default field values', () => {
-  const source = readProjectFile('src/routes/login.tsx');
+  const source = readProjectFile('src/modules/admin/auth/list/LoginScene.tsx');
 
   expect(source).not.toContain('password123');
   expect(source).not.toContain('leah@acme.com');
   expect(source).not.toContain('158 0611');
+});
+
+test('login route is a thin shell over the admin auth vertical package', () => {
+  const source = readProjectFile('src/routes/login.tsx');
+
+  expect(source).toContain('@/modules/admin/auth');
+  for (const forbidden of ['useForm', 'useTranslation', 'authApi', 'resetSession', 'useState']) {
+    expect(source).not.toContain(forbidden);
+  }
+});
+
+test('authentication API and mocks are owned by the auth vertical package', () => {
+  expect(existsSync(resolve(projectRoot, 'src/modules/admin/api/auth.api.ts'))).toBe(false);
+  expect(existsSync(resolve(projectRoot, 'src/modules/admin/mocks/auth.handlers.ts'))).toBe(false);
+  expect(readProjectFile('src/modules/admin/auth/api/index.ts')).toContain("export * from './session'");
+  expect(readProjectFile('src/mocks/handlers.ts')).toContain('@/modules/admin/auth/mocks');
 });
 
 test('mock-only packages stay out of production dependencies', () => {
@@ -346,6 +593,15 @@ test('global mock aggregation imports users handlers from the vertical module', 
   expect(source).not.toContain('@/modules/admin/mocks/user.handlers');
 });
 
+test('global mock aggregation imports roles and menus handlers from their vertical modules', () => {
+  const source = readProjectFile('src/mocks/handlers.ts');
+
+  expect(source).toContain('@/modules/admin/roles/mocks');
+  expect(source).toContain('@/modules/admin/menus/mocks');
+  expect(source).not.toContain('@/modules/admin/mocks/role.handlers');
+  expect(source).not.toContain('@/modules/admin/mocks/menu.handlers');
+});
+
 test('runtime env reads stay behind the config layer', () => {
   const allowed = new Set(['src/config/env.ts']);
   const sourceFiles = collectFiles(sourceRoot)
@@ -355,9 +611,10 @@ test('runtime env reads stay behind the config layer', () => {
 
   for (const file of sourceFiles) {
     if (allowed.has(file)) continue;
-    expect(readProjectFile(file), `${file} should import config instead of reading import.meta.env`).not.toContain(
-      'import.meta.env',
-    );
+    expect(
+      readProjectFile(file),
+      `${file} should import config instead of reading import.meta.env`,
+    ).not.toContain('import.meta.env');
   }
 });
 
@@ -365,11 +622,12 @@ test('admin api modules use runtime response contracts instead of ts-only http g
   const legacyApiFiles = readdirSync(adminApiDir)
     .filter((file) => file.endsWith('.api.ts'))
     .map((file) => `src/modules/admin/api/${file}`);
-  const usersApiFiles = collectFiles(adminUsersApiDir)
+  const verticalApiFiles = collectFiles(adminModulesDir)
     .filter((file) => file.endsWith('.ts'))
+    .filter((file) => file.includes('/api/'))
     .filter((file) => !file.includes('/__tests__/'))
     .map((file) => file.replace(`${projectRoot}/`, ''));
-  const apiFiles = [...legacyApiFiles, ...usersApiFiles];
+  const apiFiles = [...legacyApiFiles, ...verticalApiFiles];
 
   for (const file of apiFiles) {
     const source = readProjectFile(file);

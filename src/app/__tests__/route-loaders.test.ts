@@ -4,20 +4,20 @@ import { setupServer } from 'msw/node';
 import { queryClient as appQueryClient } from '@/app/query';
 import { routeTree } from '@/routeTree.gen';
 import { dashboardOverviewQuery } from '@/modules/admin/api/dashboard.api';
-import { meQuery } from '@/modules/admin/api/auth.api';
-import { menusQuery, subsystemsQuery } from '@/modules/admin/api/menu.api';
+import { meQuery } from '@/modules/admin/auth/api';
+import { menusQuery, subsystemsQuery } from '@/modules/admin/menus/api';
 import {
-  adminRolesQuery,
   permissionTreeQuery,
-  roleLogsQuery,
+  roleAuditLogsQuery,
+  roleDataPermissionsQuery,
   roleMembersQuery,
   rolePermissionsQuery,
   rolesQuery,
-} from '@/modules/admin/api/role.api';
+} from '@/modules/admin/roles/api';
 import { deptsQuery, usersQuery } from '@/modules/admin/api/user.api';
 import { dashboardHandlers } from '@/modules/admin/mocks/dashboard.handlers';
-import { menuHandlers } from '@/modules/admin/mocks/menu.handlers';
-import { roleHandlers } from '@/modules/admin/mocks/role.handlers';
+import { menuHandlers } from '@/modules/admin/menus/mocks';
+import { roleHandlers } from '@/modules/admin/roles/mocks';
 import { userHandlers } from '@/modules/admin/mocks/user.handlers';
 import { useAuth } from '@/stores/auth';
 
@@ -87,9 +87,9 @@ test('roles 已配置首屏预取，冷缓存进入时角色列表和默认详�
 
   expect(queryClient.getQueryData(rolesQuery.queryKey)).toBeTruthy();
   expect(queryClient.getQueryData(permissionTreeQuery.queryKey)).toBeTruthy();
-  expect(queryClient.getQueryData(adminRolesQuery.queryKey)).toBeTruthy();
-  expect(queryClient.getQueryData(rolePermissionsQuery('hr').queryKey)).toBeTruthy();
-  expect(queryClient.getQueryData(roleMembersQuery('hr').queryKey)).toBeTruthy();
-  expect(queryClient.getQueryData(roleLogsQuery('hr').queryKey)).toBeTruthy();
-  expect(queryClient.getQueryData(usersQuery({ page: 1, pageSize: 50, status: 'all', keyword: '' }).queryKey)).toBeTruthy();
+  expect(queryClient.getQueryData(rolePermissionsQuery('superadmin').queryKey)).toBeTruthy();
+  expect(queryClient.getQueryData(roleDataPermissionsQuery('superadmin').queryKey)).toBeTruthy();
+  expect(queryClient.getQueryData(roleMembersQuery('superadmin').queryKey)).toBeTruthy();
+  expect(queryClient.getQueryData(roleAuditLogsQuery.queryKey)).toBeTruthy();
+  expect(queryClient.getQueryData(deptsQuery.queryKey)).toBeTruthy();
 });
