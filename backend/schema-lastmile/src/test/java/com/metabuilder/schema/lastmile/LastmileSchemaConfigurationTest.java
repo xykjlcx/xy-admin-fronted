@@ -24,9 +24,12 @@ class LastmileSchemaConfigurationTest {
     assertTrue(modulePom.contains("<generatedAnnotationDate>false</generatedAnnotationDate>"));
     assertTrue(modulePom.contains("<generatedAnnotationJooqVersion>false</generatedAnnotationJooqVersion>"));
     assertFalse(modulePom.contains("(mb_|biz_).*"));
+    assertFalse(modulePom.contains("<activeByDefault>"));
+    assertFalse(modulePom.contains("<id>schema-integration-tests</id>"));
     int platformDependency =
         modulePom.indexOf("<artifactId>metabuilder-schema-platform</artifactId>");
     assertTrue(platformDependency >= 0);
+    assertTrue(platformDependency < modulePom.indexOf("</dependencies>"));
     assertEquals(
         -1,
         modulePom.indexOf(

@@ -15,6 +15,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.metabuilder</groupId>
+      <artifactId>metabuilder-schema-platform</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.jooq</groupId>
       <artifactId>jooq</artifactId>
     </dependency>
@@ -76,19 +81,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>schema-integration-tests</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>com.metabuilder</groupId>
-          <artifactId>metabuilder-schema-platform</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
     <profile>
       <id>codegen</id>
       <properties>

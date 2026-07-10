@@ -1,5 +1,6 @@
 package com.metabuilder.schema.platform;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,6 +12,7 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
+import org.flywaydb.core.api.exception.FlywayValidateException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -61,6 +63,20 @@ class PlatformSchemaIntegrationTest {
   }
 
   @Test
+  void rejectsCorruptedPlatformMigrationChecksum() throws SQLException {
+    PlatformFlywayRunner.migrate(dataSource);
+    int originalChecksum = migrationChecksum("flyway_platform_history");
+
+    try {
+      overwriteMigrationChecksum("flyway_platform_history", originalChecksum ^ 1);
+      assertThrows(
+          FlywayValidateException.class, () -> PlatformFlywayRunner.validate(dataSource));
+    } finally {
+      overwriteMigrationChecksum("flyway_platform_history", originalChecksum);
+    }
+  }
+
+  @Test
   void rejectsDuplicateVersionsInsideAnIsolatedPlatformFixture() {
     Flyway duplicateFixture =
         Flyway.configure()
@@ -80,6 +96,28 @@ class PlatformSchemaIntegrationTest {
             statement.executeQuery("select to_regclass('public." + tableName + "') is not null")) {
       assertTrue(result.next());
       return result.getBoolean(1);
+    }
+  }
+
+  private static int migrationChecksum(String historyTable) throws SQLException {
+    try (Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement();
+        ResultSet result =
+            statement.executeQuery(
+                "select checksum from " + historyTable + " where version = '1'")) {
+      assertTrue(result.next());
+      return result.getInt(1);
+    }
+  }
+
+  private static void overwriteMigrationChecksum(String historyTable, int checksum)
+      throws SQLException {
+    try (Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement()) {
+      assertEquals(
+          1,
+          statement.executeUpdate(
+              "update " + historyTable + " set checksum = " + checksum + " where version = '1'"));
     }
   }
 }

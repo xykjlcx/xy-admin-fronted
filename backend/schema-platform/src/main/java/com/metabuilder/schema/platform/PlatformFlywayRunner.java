@@ -4,7 +4,6 @@ import java.util.Objects;
 import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.output.MigrateResult;
-import org.flywaydb.core.api.output.ValidateResult;
 
 public final class PlatformFlywayRunner {
 
@@ -17,8 +16,8 @@ public final class PlatformFlywayRunner {
     return configured(dataSource).migrate();
   }
 
-  public static ValidateResult validate(DataSource dataSource) {
-    return configured(dataSource).validateWithResult();
+  public static void validate(DataSource dataSource) {
+    configured(dataSource).validate();
   }
 
   private static Flyway configured(DataSource dataSource) {
