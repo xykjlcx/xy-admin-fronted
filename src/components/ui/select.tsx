@@ -6,21 +6,15 @@ import { cn } from '@/lib/utils';
 
 const EMPTY_ITEM_VALUE = '__ui_select_empty__';
 
-function Select({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Root>) {
+function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot="select" {...props} />;
 }
 
-function SelectGroup({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Group>) {
+function SelectGroup({ ...props }: React.ComponentProps<typeof SelectPrimitive.Group>) {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />;
 }
 
-function SelectValue({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Value>) {
+function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.Value>) {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />;
 }
 
@@ -50,7 +44,10 @@ function SelectTrigger({
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon data-icon="inline-end" className="transition-transform duration-150 group-data-[state=open]:rotate-180" />
+        <ChevronDownIcon
+          data-icon="inline-end"
+          className="transition-transform duration-150 group-data-[state=open]:rotate-180"
+        />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -93,10 +90,7 @@ function SelectContent({
   );
 }
 
-function SelectLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Label>) {
+function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
@@ -106,11 +100,7 @@ function SelectLabel({
   );
 }
 
-function SelectItem({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Item>) {
+function SelectItem({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Item>) {
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
@@ -134,10 +124,7 @@ function SelectItem({
   );
 }
 
-function SelectSeparator({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Separator>) {
+function SelectSeparator({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Separator>) {
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
@@ -189,9 +176,8 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
-function toRadixValue(value: string, hasEmptyOption: boolean) {
-  if (value === '') return hasEmptyOption ? EMPTY_ITEM_VALUE : undefined;
-  return value;
+function toRadixValue(value: string) {
+  return value === '' ? EMPTY_ITEM_VALUE : value;
 }
 
 function fromRadixValue(value: string) {
@@ -231,7 +217,7 @@ function SelectControl({
 
   return (
     <Select
-      value={toRadixValue(value, hasEmptyOption)}
+      value={toRadixValue(value)}
       disabled={disabled}
       onValueChange={(nextValue) => onValueChange(fromRadixValue(nextValue))}
     >
@@ -246,6 +232,11 @@ function SelectControl({
       </SelectTrigger>
       <SelectContent className={contentClassName}>
         <SelectGroup>
+          {!hasEmptyOption && (
+            <SelectItem value={EMPTY_ITEM_VALUE} disabled className="hidden">
+              {placeholder ?? ariaLabel ?? EMPTY_ITEM_VALUE}
+            </SelectItem>
+          )}
           {options.map((option) => (
             <SelectItem
               key={option.value || EMPTY_ITEM_VALUE}

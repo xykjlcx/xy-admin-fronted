@@ -146,6 +146,7 @@
   --table-row-bg-selected: var(--fill-selected);
   --table-row-bg-expanded: var(--fill-hover);
   --table-row-fg: var(--text);
+  --table-row-focus-ring: var(--soft);
   --table-action-fg: var(--pri);
   /* 表格几何（密度轴）。cell 水平内距链 --field-px 单一真相源（feishu/shadcn 12、claude 16）；
      行高 feishu/shadcn 44，claude 在下方覆盖为宽松 48；表头 feishu/claude 48，shadcn 覆盖为 44。

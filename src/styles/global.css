@@ -254,6 +254,18 @@
     color: var(--table-row-fg);
   }
 
+  /* 固定列必须是最终不透明表面：状态色只叠加一次，底层横向滚动内容不可透出。 */
+  .ui-table-pinned-cell {
+    background:
+      linear-gradient(var(--_table-row-bg), var(--_table-row-bg)),
+      var(--table-bg);
+  }
+
+  .ui-table-row.ui-table-row:focus-visible {
+    outline: var(--focus-ring) solid var(--table-row-focus-ring);
+    outline-offset: calc(-1 * var(--focus-ring));
+  }
+
   .ui-table-row.ui-table-row:hover {
     --_table-row-bg: var(--table-row-bg-hover);
   }

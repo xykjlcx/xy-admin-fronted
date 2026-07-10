@@ -118,6 +118,144 @@ export function PageSurface({
   );
 }
 
+export function PageSplit({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      data-testid="page-split"
+      className={cn(
+        'grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function PageThreePane({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      data-testid="page-three-pane"
+      className={cn(
+        'grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)_minmax(0,5fr)]',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function PagePane({
+  variant,
+  className,
+  ...props
+}: ComponentProps<'section'> & { variant: 'navigation' | 'master' | 'detail' }) {
+  return (
+    <section
+      data-slot="page-pane"
+      data-variant={variant}
+      className={cn(
+        'flex min-h-0 min-w-0 flex-col',
+        (variant === 'navigation' || variant === 'master') &&
+          'border-r border-(--page-pane-divider) bg-(--side-list-bg)',
+        variant === 'detail' && 'bg-(--page-surface-bg)',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function PagePaneHeader({
+  title,
+  meta,
+  actions,
+  ariaLabel,
+}: {
+  title: ReactNode;
+  meta?: ReactNode;
+  actions?: ReactNode;
+  ariaLabel?: string;
+}) {
+  return (
+    <div
+      data-slot="page-pane-header"
+      role={ariaLabel ? 'toolbar' : undefined}
+      aria-label={ariaLabel}
+      className="flex min-h-[calc(52px*var(--app-scale))] items-center justify-between gap-3 border-b border-(--page-section-divider) px-4 py-2"
+    >
+      <div data-slot="page-pane-heading" className="flex min-w-0 flex-col items-start">
+        <h2 className="max-w-full truncate text-sm font-semibold text-text">{title}</h2>
+        {meta ? (
+          <span data-slot="page-pane-meta" className="max-w-full truncate text-xs text-text-3">
+            {meta}
+          </span>
+        ) : null}
+      </div>
+      {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+    </div>
+  );
+}
+
+export function PagePaneToolbar({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="page-pane-toolbar"
+      className={cn('border-b border-(--page-section-divider) px-4 py-2.5', className)}
+      {...props}
+    />
+  );
+}
+
+export function PagePaneBody({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="page-pane-body"
+      className={cn('min-h-0 flex-1 overflow-y-auto p-3', className)}
+      {...props}
+    />
+  );
+}
+
+export function PagePaneFooter({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="page-pane-footer"
+      className={cn('border-t border-(--page-section-divider) p-3', className)}
+      {...props}
+    />
+  );
+}
+
+export function PageSection({
+  title,
+  description,
+  actions,
+  children,
+  className,
+  ...props
+}: Omit<ComponentProps<'section'>, 'title'> & {
+  title: ReactNode;
+  description?: ReactNode;
+  actions?: ReactNode;
+}) {
+  return (
+    <section
+      data-slot="page-section"
+      className={cn('rounded-10 bg-(--pro-page-bg) p-3', className)}
+      {...props}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="text-sm font-semibold text-text">{title}</h3>
+          {description ? <p className="mt-1 text-xs text-text-3">{description}</p> : null}
+        </div>
+        {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
 export interface PageTabItem<TValue extends string> {
   value: TValue;
   label: ReactNode;
@@ -127,10 +265,23 @@ export function PageTabs<TValue extends string>({
   value,
   items,
   onValueChange,
+  ariaLabel,
+  trailing,
 }: {
   value: TValue;
   items: PageTabItem<TValue>[];
   onValueChange: (value: TValue) => void;
+  ariaLabel?: string;
+  trailing?: ReactNode;
 }) {
-  return <AnimatedTabs value={value} items={items} onValueChange={onValueChange} variant="page" />;
+  return (
+    <AnimatedTabs
+      value={value}
+      items={items}
+      onValueChange={onValueChange}
+      variant="page"
+      ariaLabel={ariaLabel}
+      trailing={trailing}
+    />
+  );
 }

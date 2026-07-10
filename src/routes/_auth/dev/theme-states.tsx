@@ -34,11 +34,25 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
 import { DataTable } from '@/components/pro/DataTable';
+import { QueryState } from '@/components/pro/QueryState';
+import { DataTableRowActions, type DataTableRowAction } from '@/components/pro/DataTableRowActions';
 import { Tree, type TreeNode } from '@/components/pro/Tree';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
-import { SideList, type SideListItem } from '@/components/pro/SideList';
+import {
+  SideCardList,
+  SideList,
+  type SideListItem,
+} from '@/components/pro/SideList';
+import {
+  PagePane,
+  PagePaneBody,
+  PagePaneFooter,
+  PagePaneHeader,
+  PageThreePane,
+} from '@/components/pro/PageScaffold';
 import { Pagination } from '@/components/pro/Pagination';
 import { SearchField } from '@/components/pro/SearchField';
+import { FileDropzone } from '@/components/pro/FileDropzone';
 
 export const Route = createFileRoute('/_auth/dev/theme-states')({
   // dev 组件状态矩阵：仅开发态 / 视觉验收（VITE_ENABLE_VISUAL_DEBUG）可见，生产环境视同不存在。
@@ -188,6 +202,7 @@ function ThemeStatesRoute() {
   const { flavor, mode, accent, customAccent, zoom, set, setFlavor } = useAppearance();
   const [animatedTabsValue, setAnimatedTabsValue] = useState<'members' | 'logs'>('members');
   const [sideListActive, setSideListActive] = useState<(typeof shellTokenItems)[number]>('members');
+  const [treeExpanded, setTreeExpanded] = useState(true);
   const fieldSelectOptions = [
     { value: '', label: t('dev.themeStates.fieldSelectPlaceholder') },
     { value: 'rd', label: t('dev.themeStates.fieldResearch') },
@@ -207,31 +222,62 @@ function ThemeStatesRoute() {
     label: t(node.labelKey),
     depth: node.depth,
     meta: node.meta,
+    expandable: node.id === 'all',
+    expanded: treeExpanded,
+    toggleLabel: t('dev.themeStates.treeAriaLabel'),
+    hidden: !treeExpanded && node.id !== 'all',
+    leading: <CheckIcon data-icon="inline" />,
+    trailing: <Badge variant={node.id === 'rd' ? 'primary' : 'neutral'}>{node.id}</Badge>,
   }));
+  const dataTableRowActions: DataTableRowAction[] = [
+    {
+      id: 'view',
+      label: t('dev.themeStates.tableActionView'),
+      onSelect: () => undefined,
+    },
+    {
+      id: 'edit',
+      label: t('dev.themeStates.tableActionEdit'),
+      onSelect: () => undefined,
+    },
+    {
+      id: 'delete',
+      label: t('dev.themeStates.tableActionDelete'),
+      onSelect: () => undefined,
+      tone: 'danger',
+    },
+  ];
   const dataTableColumns: ColumnDef<DataTableThemeRow>[] = [
     {
       id: 'name',
       header: t('dev.themeStates.tableName'),
-      meta: { width: '45%' },
+      size: 220,
+      minSize: 180,
       enableSorting: false,
       cell: ({ row }) => t(row.original.nameKey),
     },
     {
       id: 'status',
       header: t('dev.themeStates.tableStatus'),
-      meta: { width: '35%' },
+      size: 160,
+      minSize: 140,
       enableSorting: false,
       cell: ({ row }) => t(row.original.statusKey),
     },
     {
       id: 'action',
       header: t('dev.themeStates.tableAction'),
-      meta: { width: '20%', align: 'end' },
+      size: 112,
+      minSize: 112,
+      maxSize: 112,
+      enablePinning: true,
+      meta: { headerAlign: 'start', cellAlign: 'start', pin: 'right', stopRowClick: true },
       enableSorting: false,
       cell: () => (
-        <Button variant="link" size="xs">
-          {t('dev.themeStates.tableActionView')}
-        </Button>
+        <DataTableRowActions
+          actions={dataTableRowActions}
+          overflowLabel={t('dev.themeStates.tableActionMore')}
+        />
       ),
     },
   ];
@@ -795,6 +841,48 @@ function ThemeStatesRoute() {
                 emptyText={t('dev.themeStates.dataTableEmpty')}
                 loadingText={t('dev.themeStates.dataTableLoading')}
               />
+              <DataTable
+                columns={dataTableColumns}
+                data={[]}
+                rowKey={(row) => row.id}
+                error
+                errorText={t('dev.themeStates.dataTableError')}
+                retryText={t('errors.retry')}
+                onRetry={() => undefined}
+                emptyText={t('dev.themeStates.dataTableEmpty')}
+                loadingText={t('dev.themeStates.dataTableLoading')}
+              />
+              <div data-testid="queryStateMatrix" className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <p className="mb-2 text-sm font-medium text-text">
+                    {t('dev.themeStates.queryStateMatrix')}
+                  </p>
+                  <QueryState
+                    data={undefined}
+                    pending
+                    error={false}
+                    loadingLabel={t('dev.themeStates.dataTableLoading')}
+                    errorLabel={t('dev.themeStates.dataTableError')}
+                    retryLabel={t('errors.retry')}
+                    onRetry={() => undefined}
+                    className="min-h-32"
+                  >
+                    {() => null}
+                  </QueryState>
+                </div>
+                <QueryState
+                  data={undefined}
+                  pending={false}
+                  error
+                  loadingLabel={t('dev.themeStates.dataTableLoading')}
+                  errorLabel={t('dev.themeStates.dataTableError')}
+                  retryLabel={t('errors.retry')}
+                  onRetry={() => undefined}
+                  className="min-h-32"
+                >
+                  {() => null}
+                </QueryState>
+              </div>
             </div>
           </div>
 
@@ -838,6 +926,7 @@ function ThemeStatesRoute() {
               nodes={treeNodes}
               selectedId="rd"
               onSelect={() => undefined}
+              onToggle={() => setTreeExpanded((current) => !current)}
               ariaLabel={t('dev.themeStates.treeAriaLabel')}
             />
           </div>
@@ -861,6 +950,79 @@ function ThemeStatesRoute() {
               currentLabel={t('dev.themeStates.paginationCurrent')}
               onPageChange={() => undefined}
             />
+            <div className="mt-4 grid gap-3" data-testid="fileDropzoneMatrix">
+              <p className="text-sm font-medium text-text">{t('dev.themeStates.fileDropzoneMatrix')}</p>
+              <FileDropzone
+                label={t('dev.themeStates.fileDropzoneLabel')}
+                hint={t('dev.themeStates.fileDropzoneHint')}
+                inputLabel={t('dev.themeStates.fileDropzoneInput')}
+                files={[]}
+                onFiles={() => undefined}
+              />
+              <FileDropzone
+                label={t('dev.themeStates.fileDropzoneLabel')}
+                hint={t('dev.themeStates.fileDropzoneHint')}
+                inputLabel={t('dev.themeStates.fileDropzoneDisabled')}
+                files={[]}
+                disabled
+                onFiles={() => undefined}
+              />
+            </div>
+          </div>
+
+          <div
+            data-testid="pageThreePaneMatrix"
+            className="min-h-[calc(280px*var(--app-scale))] overflow-hidden rounded-10 border border-(--page-surface-border) xl:col-span-2"
+          >
+            <PageThreePane>
+              <PagePane variant="navigation">
+                <PagePaneHeader title={t('dev.themeStates.shellStateMatrix')} />
+                <PagePaneBody>
+                  <SideCardList
+                    activeId="members"
+                    onSelect={() => undefined}
+                    items={[
+                      {
+                        id: 'members',
+                        label: t('dev.themeStates.sideList.members'),
+                        ariaLabel: t('dev.themeStates.sideList.members'),
+                        description: t('dev.themeStates.tableStatusEnabled'),
+                        icon: <CheckIcon data-icon="inline" />,
+                        action: (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-xs"
+                            aria-label={t('dev.themeStates.tableActionEdit')}
+                          >
+                            <CheckIcon data-icon="inline" />
+                          </Button>
+                        ),
+                      },
+                      {
+                        id: 'roles',
+                        label: t('dev.themeStates.sideList.roles'),
+                        ariaLabel: t('dev.themeStates.sideList.roles'),
+                        description: t('dev.themeStates.dataTableNormal'),
+                      },
+                    ]}
+                  />
+                </PagePaneBody>
+                <PagePaneFooter>
+                  <Button type="button" variant="dashed" block>
+                    {t('dev.themeStates.tableActionEdit')}
+                  </Button>
+                </PagePaneFooter>
+              </PagePane>
+              <PagePane variant="master">
+                <PagePaneHeader title={t('dev.themeStates.treeStateMatrix')} />
+                <PagePaneBody>{t('dev.themeStates.treeNodes.all')}</PagePaneBody>
+              </PagePane>
+              <PagePane variant="detail">
+                <PagePaneHeader title={t('dev.themeStates.tableSelected')} />
+                <PagePaneBody>{t('dev.themeStates.tableStatusEnabled')}</PagePaneBody>
+              </PagePane>
+            </PageThreePane>
           </div>
         </div>
       </section>

@@ -28,6 +28,7 @@ const tabsSource = readFileSync('src/components/ui/tabs.tsx', 'utf8');
 const tableSource = readFileSync('src/components/ui/table.tsx', 'utf8');
 const animatedTabsSource = readFileSync('src/components/pro/AnimatedTabs.tsx', 'utf8');
 const dataTableSource = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
+const dataTableRowActionsSource = readFileSync('src/components/pro/DataTableRowActions.tsx', 'utf8');
 const searchFieldSource = readFileSync('src/components/pro/SearchField.tsx', 'utf8');
 const tableShellSource = readFileSync('src/components/pro/TableShell.tsx', 'utf8');
 const pageScaffoldSource = readFileSync('src/components/pro/PageScaffold.tsx', 'utf8');
@@ -48,17 +49,20 @@ const membersSceneSource = readFileSync('src/modules/admin/users/list/MembersSce
 const deptSceneSource = readFileSync('src/modules/admin/users/list/DeptScene.tsx', 'utf8');
 const deptTreeSource = readFileSync('src/modules/admin/users/list/DeptTree.tsx', 'utf8');
 const usersModelSource = readFileSync('src/modules/admin/users/model.ts', 'utf8');
-const rolesPageSource = readFileSync('src/modules/admin/pages/roles/index.tsx', 'utf8');
-const roleListPanelSource = readFileSync('src/modules/admin/pages/roles/RoleListPanel.tsx', 'utf8');
-const rolesModelSource = readFileSync('src/modules/admin/pages/roles/model.ts', 'utf8');
-const roleDetailsPanelSource = readFileSync('src/modules/admin/pages/roles/RoleDetailsPanel.tsx', 'utf8');
+const rolesPageSource = readFileSync('src/modules/admin/roles/list/RolesScene.tsx', 'utf8');
+const roleListPanelSource = readFileSync('src/modules/admin/roles/list/RoleListPanel.tsx', 'utf8');
+const rolesModelSource = readFileSync('src/modules/admin/roles/model.ts', 'utf8');
+const roleAuditLogsSource = readFileSync('src/modules/admin/roles/list/RoleAuditLogsPanel.tsx', 'utf8');
+const roleDetailsPanelSource = readFileSync('src/modules/admin/roles/detail/RoleDetailsPanel.tsx', 'utf8');
 const rolePermissionEditorSource = readFileSync(
-  'src/modules/admin/pages/roles/RolePermissionEditor.tsx',
+  'src/modules/admin/roles/detail/RolePermissionEditor.tsx',
   'utf8',
 );
-const menuTreeTableSource = readFileSync('src/modules/admin/pages/menus/MenuTreeTable.tsx', 'utf8');
-const menuFormDialogSource = readFileSync('src/modules/admin/pages/menus/MenuFormDialog.tsx', 'utf8');
-const menusPageSource = readFileSync('src/modules/admin/pages/menus/index.tsx', 'utf8');
+const treeSource = readFileSync('src/components/pro/Tree.tsx', 'utf8');
+const menuTreeSource = readFileSync('src/modules/admin/menus/list/MenuTree.tsx', 'utf8');
+const menuInspectorSource = readFileSync('src/modules/admin/menus/detail/MenuInspector.tsx', 'utf8');
+const menuFormDialogSource = readFileSync('src/modules/admin/menus/form/MenuFormDialog.tsx', 'utf8');
+const menusPageSource = readFileSync('src/modules/admin/menus/list/MenusView.tsx', 'utf8');
 const checkboxSource = readFileSync('src/components/ui/checkbox.tsx', 'utf8');
 const radioGroupSource = readFileSync('src/components/ui/radio-group.tsx', 'utf8');
 const switchSource = readFileSync('src/components/ui/switch.tsx', 'utf8');
@@ -66,7 +70,7 @@ const avatarSource = readFileSync('src/components/ui/avatar.tsx', 'utf8');
 const skeletonSource = readFileSync('src/components/ui/skeleton.tsx', 'utf8');
 const emptySource = readFileSync('src/components/ui/empty.tsx', 'utf8');
 const progressSource = readFileSync('src/components/ui/progress.tsx', 'utf8');
-const loginSource = readFileSync('src/routes/login.tsx', 'utf8');
+const loginSource = readFileSync('src/modules/admin/auth/list/LoginScene.tsx', 'utf8');
 const languageMenuSource = readFileSync('src/app/shell/widgets/LanguageMenu.tsx', 'utf8');
 const themeStatesSource = readFileSync('src/routes/_auth/dev/theme-states.tsx', 'utf8');
 const visualScriptSource = readFileSync('scripts/visual-agent-browser.mjs', 'utf8');
@@ -977,6 +981,14 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-hover);');
   expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-expanded);');
   expect(globalCss).toContain('--_table-row-bg: var(--table-row-bg-selected);');
+  expect(globalCss).toContain('.ui-table-pinned-cell');
+  expect(globalCss).toContain('linear-gradient(var(--_table-row-bg), var(--_table-row-bg))');
+  expect(globalCss).toContain('var(--table-bg);');
+  expect(css).toContain('--table-row-focus-ring: var(--soft);');
+  expect(globalCss).toContain('.ui-table-row.ui-table-row:focus-visible');
+  expect(globalCss).toContain('outline: var(--focus-ring) solid var(--table-row-focus-ring);');
+  expect(dataTableSource).toContain("surface === 'header' ? 'bg-(--table-header-bg)' : 'ui-table-pinned-cell'");
+  expect(dataTableSource).not.toContain("surface === 'header' ? 'bg-(--table-header-bg)' : 'bg-(--_table-row-bg)'");
   expect(globalCss).not.toContain(':has([aria-expanded');
 
   expect(pageScaffoldSource).toContain('bg-(--page-frame-bg)');
@@ -1052,16 +1064,16 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(globalCss).toContain('--table-shell-border: transparent;');
   expect(globalCss).toContain('--table-row-border: color-mix(in srgb, var(--table-border) 54%, transparent);');
   expect(globalCss).toContain('--tabs-line-border: transparent;');
-  expect(dataTableSource).toContain('border-(--table-shell-border)');
+  expect(dataTableSource).not.toContain('border-(--table-shell-border)');
   expect(dataTableSource).toContain('border-(--table-row-border)');
-  expect(deptTreeSource).toContain('border-(--page-pane-divider)');
-  expect(roleListPanelSource).toContain('border-(--page-pane-divider)');
+  expect(deptTreeSource).not.toContain('border-(--page-pane-divider)');
+  expect(roleListPanelSource).not.toContain('border-(--page-pane-divider)');
   expect(rolesPageSource).toContain('border-(--page-section-divider)');
   expect(membersSceneSource).toContain('border-(--page-section-divider)');
   expect(deptSceneSource).not.toContain('border-(--page-section-divider)');
-  expect(menusPageSource).toContain('border-(--page-pane-divider)');
-  expect(menusPageSource).toContain('border-(--page-section-divider)');
-  expect(menusPageSource).toContain('border-(--page-inset-section-divider)');
+  expect(pageScaffoldSource).toContain('border-(--page-pane-divider)');
+  expect(pageScaffoldSource).toContain('border-(--page-section-divider)');
+  expect(menusPageSource).not.toContain('border-(');
   expect(navMenuInsetSource).not.toContain("aria-label={t('shell.nav.collapse')}");
   expect(navMenuInsetSource).not.toContain('SearchField');
   expect(navMenuInsetSource).not.toContain('variant="sidebar"');
@@ -1133,13 +1145,13 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(usersModelSource).toContain('--accent-emphasis');
   expect(usersModelSource).not.toContain('--nav-item');
   expect(rolesModelSource).toContain('--accent-emphasis');
-  expect(rolesModelSource).toContain("add: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)'");
-  expect(rolesModelSource).toContain("create: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)'");
+  expect(roleAuditLogsSource).toContain('auditKindBadge');
+  expect(roleAuditLogsSource).toContain('<Badge variant={auditKindBadge[row.original.kind]}>');
   expect(rolesModelSource).not.toContain('--nav-item');
-  expect(rolesModelSource).not.toContain('bg-info-soft text-info');
-  expect(menuTreeTableSource).toContain('bg-(--accent-emphasis-soft) text-(--accent-emphasis)');
-  expect(menuTreeTableSource).toContain('bg-(--accent-emphasis-soft) text-(--accent-emphasis)');
-  expect(menuTreeTableSource).not.toContain('bg-(--nav-item-bg-current) text-(--nav-item-fg-current)');
+  expect(roleAuditLogsSource).not.toContain('bg-info-soft text-info');
+  expect(treeSource).toContain('bg-(--side-list-item-bg-active)');
+  expect(treeSource).toContain('hover:bg-(--side-list-item-bg-hover)');
+  expect(menuTreeSource).not.toContain('--side-list-item');
   expect(subsystemSwitcherSource).toContain("var(--accent-emphasis)' :");
   expect(roleDetailsPanelSource).toContain('text-(--accent-emphasis)');
   expect(rolePermissionEditorSource).toContain('text-(--accent-emphasis)');
@@ -1149,16 +1161,17 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(rolePermissionEditorSource).toContain('grid-rows-[1fr] opacity-100');
   expect(rolePermissionEditorSource).not.toContain('--nav-item');
   expect(rolePermissionEditorSource).not.toContain('--table-action-fg');
-  expect(menuTreeTableSource).toContain('data-menu-tree-row');
-  expect(menuTreeTableSource).toContain('transition-[grid-template-rows,opacity]');
-  expect(menuTreeTableSource).toContain('grid-rows-[0fr] opacity-0');
-  expect(menuTreeTableSource).toContain('grid-rows-[1fr] opacity-100');
-  expect(menuTreeTableSource).not.toContain('transition-colors');
-  expect(menuTreeTableSource).not.toContain('data-[state=checked]:bg-success');
+  expect(treeSource).toContain('data-tree-row');
+  expect(treeSource).toContain('transition-[grid-template-rows,opacity]');
+  expect(treeSource).toContain('grid-rows-[0fr] opacity-0');
+  expect(treeSource).toContain('grid-rows-[1fr] opacity-100');
+  expect(treeSource).not.toContain('transition-colors');
+  expect(treeSource).not.toContain('transition-[background-color]');
+  expect(treeSource).not.toContain('data-[state=checked]:bg-success');
   expect(menuFormDialogSource).not.toContain('data-[state=checked]:bg-success');
-  expect(menuTreeTableSource).not.toContain('text-(--table-action-fg)');
-  expect(menuTreeTableSource).not.toContain('menus.columns.actions');
-  expect(menusPageSource).toContain('variant="danger-ghost"');
+  expect(treeSource).not.toContain('text-(--table-action-fg)');
+  expect(menuTreeSource).not.toContain('menus.columns.actions');
+  expect(menuInspectorSource).toContain('variant="danger-ghost"');
   expect(menusPageSource).toContain('PageFrame');
   expect(menusPageSource).toContain('PageSurface');
 
@@ -1193,6 +1206,12 @@ test('DataTable TanStack 迁移守卫：无旧状态机、无 checkbox 补丁、
   expect(dataTableSource).toContain('getIsSomePageRowsSelected');
   expect(dataTableSource).toContain('toggleAllPageRowsSelected');
   expect(dataTableSource).toContain('getSelectedRowModel');
+  expect(dataTableSource).toContain('ColumnPinningState');
+  expect(dataTableSource).toContain('columnPinning: pinnedColumns');
+  expect(dataTableSource).toContain("column.getStart('left')");
+  expect(dataTableSource).toContain("column.getAfter('right')");
+  expect(dataTableSource).toContain('columnVisibility');
+  expect(dataTableSource).toContain('column.getSize()');
   expect(dataTableSource).toContain('stopPropagation');
   expect(dataTableSource).not.toMatch(/selectedIds|toggleRow|toggleVisibleRows|resetSelectionKey/);
   expect(dataTableSource).not.toMatch(
@@ -1204,6 +1223,7 @@ test('DataTable TanStack 迁移守卫：无旧状态机、无 checkbox 补丁、
   expect(dataTableSource).not.toMatch(/selectionSlotClassName|selectionCheckboxClassName/);
   expect(dataTableSource).not.toContain("id: 'select'");
   expect(dataTableSource).not.toContain("cellIndex === 0 && 'mx-auto w-4'");
+  expect(dataTableSource).not.toMatch(/meta\?\.(width|align)/);
   expect(dataTableSource).not.toMatch(/getSortedRowModel|manualSorting|getFilteredRowModel|manualFiltering/);
   expect(dataTableSource).not.toMatch(/getGroupedRowModel|getFacetedRowModel|useVirtualizer/);
   expect(dataTableSource).not.toContain('@/modules/');
@@ -1225,6 +1245,24 @@ test('主题状态页暴露 DataTable 选择列三态对齐矩阵', () => {
   expect(themeStatesSource).toContain("t('dev.themeStates.dataTableSelected')");
   expect(themeStatesSource).toContain('dataTableLoading');
   expect(themeStatesSource).toContain('dataTableEmpty');
+});
+
+test('DataTable 行操作守卫：两项平铺，三项以上进入菜单，并在主题状态页暴露', () => {
+  expect(dataTableRowActionsSource).toContain("actions.length <= 2");
+  expect(dataTableRowActionsSource).toContain('actions.slice(0, 1)');
+  expect(dataTableRowActionsSource).toContain('actions.slice(1)');
+  expect(dataTableRowActionsSource).toContain('<DropdownMenuGroup>');
+  expect(dataTableRowActionsSource).toContain("variant={action.tone === 'danger' ? 'destructive' : 'default'}");
+  expect(dataTableRowActionsSource).not.toContain('@/modules/');
+  expect(dataTableRowActionsSource).not.toContain('useTranslation');
+
+  expect(themeStatesSource).toContain("import { DataTableRowActions");
+  expect(themeStatesSource).toContain('const dataTableRowActions: DataTableRowAction[]');
+  expect(themeStatesSource).toContain('actions={dataTableRowActions}');
+  expect(themeStatesSource).toContain("overflowLabel={t('dev.themeStates.tableActionMore')}");
+  expect(themeStatesSource).toContain(
+    "meta: { headerAlign: 'start', cellAlign: 'start', pin: 'right', stopRowClick: true }",
+  );
 });
 
 test('claude display font 只进入页面标题层，不污染 Field label / 表头', () => {

@@ -33,3 +33,26 @@ test('FormDialogContent omits aria-describedby when no description is provided',
 
   expect(screen.getByRole('dialog')).not.toHaveAttribute('aria-describedby');
 });
+
+test('FormDialogContent owns dialog width, error and submit loading presentation', () => {
+  render(
+    <Dialog open>
+      <FormDialogContent
+        title="标题"
+        error="保存失败"
+        size="lg"
+        submitLoading
+        cancelText="取消"
+        submitText="保存"
+        onCancel={() => undefined}
+        onSubmit={() => undefined}
+      >
+        <div>content</div>
+      </FormDialogContent>
+    </Dialog>,
+  );
+
+  expect(screen.getByRole('dialog')).toHaveAttribute('data-size', 'lg');
+  expect(screen.getByRole('alert')).toHaveTextContent('保存失败');
+  expect(screen.getByRole('button', { name: '保存' })).toHaveAttribute('data-loading', 'true');
+});

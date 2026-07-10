@@ -390,6 +390,24 @@ test('SelectControl 使用自定义下拉层而不是原生 select', async () =>
   expect(onValueChange).toHaveBeenCalledWith('rd');
 });
 
+test('SelectControl 从空值切换到已选值时保持受控', () => {
+  const consoleWarning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+  const options = [
+    { value: 'rd', label: '研发部' },
+    { value: 'mk', label: '市场部' },
+  ];
+  const { rerender } = render(
+    <SelectControl aria-label="部门" value="" options={options} onValueChange={vi.fn()} />,
+  );
+
+  rerender(<SelectControl aria-label="部门" value="rd" options={options} onValueChange={vi.fn()} />);
+
+  expect(consoleWarning).not.toHaveBeenCalledWith(
+    expect.stringContaining('Select is changing from uncontrolled to controlled'),
+  );
+  consoleWarning.mockRestore();
+});
+
 test('SelectItem 与 DropdownMenuItem 分别消费 Option/Menu token', async () => {
   const { unmount } = render(
     <SelectControl

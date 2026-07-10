@@ -43,3 +43,38 @@ test('Tree stays business agnostic and delegates all copy through props', () => 
   expect(source).not.toContain('TableTreeCell');
   expect(source).not.toContain('transition-colors');
 });
+
+test('Tree owns expand, hidden-row, leading and trailing presentation', async () => {
+  const onToggle = vi.fn();
+
+  render(
+    <Tree
+      nodes={[
+        {
+          id: 'root',
+          label: '系统管理',
+          depth: 0,
+          expandable: true,
+          expanded: false,
+          toggleLabel: '展开或折叠系统管理',
+          leading: <span>图标</span>,
+          trailing: <span>目录</span>,
+        },
+        { id: 'child', label: '菜单管理', depth: 1, hidden: true },
+      ]}
+      selectedId="root"
+      onSelect={() => undefined}
+      onToggle={onToggle}
+      ariaLabel="菜单树"
+    />,
+  );
+
+  await userEvent.click(screen.getByRole('button', { name: '展开或折叠系统管理' }));
+  expect(onToggle).toHaveBeenCalledWith('root');
+  expect(screen.getByText('图标')).toBeInTheDocument();
+  expect(screen.getByText('目录')).toBeInTheDocument();
+  expect(screen.getByText('菜单管理').closest('[data-tree-row]')).toHaveAttribute(
+    'data-collapsed-hidden',
+    'true',
+  );
+});

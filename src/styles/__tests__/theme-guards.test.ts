@@ -19,6 +19,15 @@ const tokenReferenceRoots = [
   'src/app',
   'src/modules/admin/pages',
   'src/modules/admin/users',
+  'src/modules/admin/roles',
+  'src/modules/admin/menus',
+  'src/modules/admin/dictionaries',
+  'src/modules/admin/messages',
+  'src/modules/admin/logs',
+  'src/modules/admin/files',
+  'src/modules/admin/company',
+  'src/modules/admin/profile',
+  'src/modules/admin/auth',
   'src/routes',
   'index.html',
 ];
@@ -28,6 +37,15 @@ const violationRoots = [
   'src/app',
   'src/modules/admin/pages',
   'src/modules/admin/users',
+  'src/modules/admin/roles',
+  'src/modules/admin/menus',
+  'src/modules/admin/dictionaries',
+  'src/modules/admin/messages',
+  'src/modules/admin/logs',
+  'src/modules/admin/files',
+  'src/modules/admin/company',
+  'src/modules/admin/profile',
+  'src/modules/admin/auth',
   'src/routes',
 ];
 const tokenizedStateFiles = [
@@ -38,16 +56,19 @@ const tokenizedStateFiles = [
   'src/components/pro/DataTable.tsx',
   'src/components/pro/TableShell.tsx',
   'src/components/pro/Tree.tsx',
+  'src/components/pro/FormDialog.tsx',
+  'src/components/pro/DescriptionList.tsx',
+  'src/components/pro/FileDropzone.tsx',
   'src/app/shell/widgets/AppearanceDrawer.tsx',
   'src/app/shell/widgets/NavMenuInset.tsx',
   'src/app/shell/widgets/NavMenuRail.tsx',
   'src/app/shell/widgets/NavMenuSidebar.tsx',
   'src/app/shell/widgets/SubsystemSwitcher.tsx',
   'src/modules/admin/users/list/MembersTable.tsx',
-  'src/modules/admin/pages/roles/RoleListPanel.tsx',
-  'src/modules/admin/pages/roles/RolePermissionEditor.tsx',
-  'src/modules/admin/pages/menus/MenuTreeTable.tsx',
-  'src/modules/admin/pages/menus/index.tsx',
+  'src/modules/admin/roles/list/RoleListPanel.tsx',
+  'src/modules/admin/roles/detail/RolePermissionEditor.tsx',
+  'src/modules/admin/menus/list/MenuTree.tsx',
+  'src/modules/admin/menus/list/MenusView.tsx',
 ];
 const fieldFamilyFiles = [
   'src/components/ui/input.tsx',
@@ -55,6 +76,7 @@ const fieldFamilyFiles = [
   'src/components/ui/native-select.tsx',
   'src/components/pro/SearchField.tsx',
   'src/components/pro/FilterSelect.tsx',
+  'src/components/pro/FileDropzone.tsx',
 ];
 
 const forbiddenClasses = [

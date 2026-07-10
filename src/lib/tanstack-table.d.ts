@@ -6,8 +6,10 @@ declare const columnMetaValueType: unique symbol;
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
-    width?: string;
-    align?: 'start' | 'center' | 'end';
+    headerAlign?: 'start' | 'center' | 'end';
+    cellAlign?: 'start' | 'center' | 'end';
+    pin?: 'left' | 'right';
+    stopRowClick?: boolean;
     readonly [columnMetaDataType]?: TData;
     readonly [columnMetaValueType]?: TValue;
   }

@@ -1,5 +1,17 @@
 import { render, screen } from '@testing-library/react';
-import { PageFrame, PageFrameChromeProvider, PageSurface } from '@/components/pro/PageScaffold';
+import {
+  PageFrame,
+  PageFrameChromeProvider,
+  PagePane,
+  PagePaneBody,
+  PagePaneFooter,
+  PagePaneHeader,
+  PagePaneToolbar,
+  PageSection,
+  PageSplit,
+  PageSurface,
+  PageThreePane,
+} from '@/components/pro/PageScaffold';
 
 test('PageFrame 和 PageSurface 暴露稳定 class 供 shell 布局降噪', () => {
   const { container } = render(
@@ -88,4 +100,61 @@ test('header 模式重渲染只发布新值，不先清空再发布（防 Shell 
   rerender(view('成员与部门'));
   expect(onHeaderBreadcrumbsChange).toHaveBeenLastCalledWith([{ label: '成员与部门' }]);
   expect(onHeaderBreadcrumbsChange).not.toHaveBeenCalledWith([]);
+});
+
+test('PageScaffold owns master-detail pane and section presentation', () => {
+  render(
+    <PageSurface>
+      <PageSplit>
+        <PagePane variant="master">
+          <PagePaneHeader title="菜单管理" meta="5 个节点" actions={<button type="button">新增</button>} />
+          <PagePaneToolbar>搜索</PagePaneToolbar>
+          <PagePaneBody>菜单树</PagePaneBody>
+        </PagePane>
+        <PagePane variant="detail">
+          <PageSection title="基本信息">详情</PageSection>
+        </PagePane>
+      </PageSplit>
+    </PageSurface>,
+  );
+
+  expect(screen.getByTestId('page-split')).toHaveClass('xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]');
+  expect(screen.getByText('菜单管理').closest('[data-slot="page-pane-header"]')).toBeInTheDocument();
+  expect(screen.getByText('搜索').closest('[data-slot="page-pane-toolbar"]')).toBeInTheDocument();
+  expect(screen.getByText('菜单树').closest('[data-slot="page-pane-body"]')).toBeInTheDocument();
+  expect(screen.getByText('详情').closest('[data-slot="page-section"]')).toBeInTheDocument();
+});
+
+test('PagePaneHeader stacks metadata below its title so pane actions cannot squeeze the heading', () => {
+  const { container } = render(
+    <PagePaneHeader title="菜单管理" meta="5 个节点" actions={<button type="button">新增菜单</button>} />,
+  );
+
+  expect(container.querySelector('[data-slot="page-pane-heading"]')).toHaveClass('flex-col');
+  expect(screen.getByText('5 个节点')).toHaveAttribute('data-slot', 'page-pane-meta');
+});
+
+test('PageScaffold owns responsive 2:3:5 three-pane workspace presentation', () => {
+  render(
+    <PageThreePane>
+      <PagePane variant="navigation">
+        <PagePaneHeader title="子系统管理" />
+        <PagePaneBody>子系统卡片</PagePaneBody>
+        <PagePaneFooter>新增子系统</PagePaneFooter>
+      </PagePane>
+      <PagePane variant="master">
+        <PagePaneHeader title="菜单管理" />
+      </PagePane>
+      <PagePane variant="detail">
+        <PagePaneHeader title="菜单详情" />
+      </PagePane>
+    </PageThreePane>,
+  );
+
+  expect(screen.getByTestId('page-three-pane')).toHaveClass(
+    'lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]',
+    'xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)_minmax(0,5fr)]',
+  );
+  expect(screen.getByText('子系统卡片').closest('[data-variant="navigation"]')).toBeInTheDocument();
+  expect(screen.getByText('新增子系统').closest('[data-slot="page-pane-footer"]')).toBeInTheDocument();
 });
