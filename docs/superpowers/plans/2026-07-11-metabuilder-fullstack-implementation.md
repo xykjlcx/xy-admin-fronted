@@ -118,16 +118,18 @@ GREEN：只实现错误方言与 filter 装配；非目标异常不得 catch 成
 
 新增：
 
-- `backend/app` Spring Boot 入口与配置
-- `compose.dev.yml`（PostgreSQL 16 + Redis）
-- `backend/.env.example`、`scripts/dev.sh`、健康检查
-- contract ADR：transport/path/permission grammar/ID/origin
+- `backend/app` Spring Boot 入口 `com.metabuild.app.MetaBuilderApplication` 与类型化配置
+- 根目录 `compose.dev.yml`（`postgres:16-alpine` + `redis:7-alpine`，只用于本地开发）
+- `backend/.env.example`、根目录 `scripts/dev.sh`、Actuator 健康检查
+- `docs/adr/0001-metabuilder-backend-contract.md`：transport/path/permission grammar/ID/origin
 
-RED：配置绑定测试、缺 secret/错误 DB 时 readiness 失败、CORS 默认空、`/actuator/health/readiness` 依赖 DB/Redis；脚本 contract 先因资源缺失失败。
+配置键固定：`METABUILDER_AUTH_TOKEN_SECRET` 必填且不得使用 example 占位值；`DB_URL/DB_USERNAME/DB_PASSWORD`、`REDIS_HOST/REDIS_PORT` 供本地装配；`METABUILDER_CORS_ALLOWED_ORIGINS` 默认空。禁用 Spring Boot 默认 Flyway auto migration，由 app 中两个显式 bean 按 platform → lastmile 顺序调用既有 runner。`/actuator/health/liveness` 只含进程状态，`/actuator/health/readiness` 必须包含 DB 与 Redis。
 
-GREEN：本地进程可重复启动/停止，不提交密码；前端暂留根目录，P0a 不移动文件。
+RED：配置绑定测试证明缺 secret 或 example 占位值会使 context 启动失败；错误启动期 DB 配置因显式 Flyway 失败而拒绝启动；CORS 默认不产生跨域响应头；在已启动应用中断开 DB 或 Redis 后 readiness 为 `DOWN`，liveness 仍为 `UP`；脚本 contract 先因资源缺失失败。
 
-验证：Testcontainers app context + compose config 校验 + 启动后 curl health。
+GREEN：`scripts/dev.sh start|stop|status` 用 PID 文件管理当前仓 backend/frontend 进程，用 compose 管理 PostgreSQL/Redis；首次 start 从 example 生成 gitignored `backend/.env` 并生成本地随机 password/secret，不把真实凭据写进已跟踪文件；重复 start 不产生第二套进程，stop 不误杀非当前仓进程。前端暂留根目录，P0a 不移动文件，也暂不修改 Vite proxy（P0b Task 7 统一完成）。
+
+验证：Testcontainers app context/依赖中断测试 + `docker compose -f compose.dev.yml config` + shell contract + 两轮 `start → curl liveness/readiness → stop`；每轮核验监听进程 cwd/命令行与 PID 文件一致，且 stop 后端口释放。
 
 ## Task 6：P0a 架构守卫与里程碑复审
 
