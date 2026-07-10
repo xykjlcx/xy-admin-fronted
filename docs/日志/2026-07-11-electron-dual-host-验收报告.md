@@ -10,9 +10,9 @@
 | --- | -------------------------------------------------- | -------- | ---------------------------------------------------------------- |
 | 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`       |
 | 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts`；`pnpm guard:desktop`；双构建产物守卫  |
-| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 666 项、`theme:guard` 196 项、`build:web` 与产物扫描    |
+| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 671 项、`theme:guard` 196 项、`build:web` 与产物扫描    |
 | 4   | 两种窗口模式与三套 Shell 安全区                    | pending  | Phase 4                                                          |
-| 5   | Electron 凭证安全存储与统一会话服务                | pending  | Phase 3                                                          |
+| 5   | Electron 凭证安全存储与统一会话服务                | 通过     | Phase 3 单元测试、架构守卫与 packaged `safeStorage` E2E          |
 | 6   | 原生文件下载闭环                                   | pending  | Phase 5                                                          |
 | 7   | 更新状态机、feed、metadata 与真实更新              | pending  | Phase 6–7；真实签名更新需满足签名前提                            |
 | 8   | CSP、sandbox、隔离、fuses、导航、sender、schema    | 实施中   | Phase 0 已验证 CSP/窗口隔离/导航；IPC 与 release fuse 待后续阶段 |
@@ -77,6 +77,23 @@
   - 外链自动化使用 Main `shell.openExternal` stub，证实 allowlist URL 被传入、非 allowlist URL 被拒；该证据不表述为真实系统浏览器已打开。
 - Web 回归：Vitest 113 个文件、666 项通过；theme guard 196 项；design lint 0 error；Web 产物 `totalBytes=1,412,198`、最大 JS chunk `264,517` bytes。
 
+### Phase 3 — 鉴权与安全存储
+
+- 提交：`84d39b6`。
+- 统一会话：Zustand auth store 只保留进程内 token；`SessionCredentialService` 是 restore/replace/clear 的唯一入口，登录、短信登录、二维码登录、登出和 401 均通过该服务。Web adapter 继续读写既有 Zustand localStorage envelope，Web 刷新语义不变。
+- Main credential vault：
+  - 使用 `safeStorage.encryptStringAsync/decryptStringAsync`，加密能力不可用时拒绝持久化且不回退明文。
+  - 密文通过 `0600` 临时文件与 rename 原子写入 `userData/credentials/session.bin`；轮换标记触发重加密；restore single-flight 且只解密一次。
+  - persist 失败不发布内存 token；clear 先清 active token，再删除密文；物理清理失败仍立即清 Renderer token 与 Query cache，并给用户反馈。
+- 架构守卫：新增 `setToken` 唯一入口和 `platform.credentials` 唯一消费方断言；Main/Preload 的凭证 channel 全部经过 sender 校验与 Zod 输入/输出校验。
+- RED → GREEN：凭证 vault、统一会话、Web 兼容 envelope、IPC schema、直接 `setToken`、直接 credential adapter、Spike userData 隔离均先见失败再实现。
+- packaged 证据：
+  - 真实持久化 `packaged-vault-token` 后，密文文件存在且 bytes 不包含明文 token；Desktop `localStorage.auth` 始终为空。
+  - Preload restore 回读成功；clear 后密文消失；真实登录后 401 再次确认 localStorage 为空且密文已删除。
+  - 首轮 packaged 运行揭示共用 config 引入 `node:path` 会导致 sandboxed Preload 加载失败；路径逻辑移至 Main 专属模块后同一用例转绿，防止用 dev server 掩盖 packaged 限制。
+- 阶段门禁：Desktop Vitest 14 个文件、70 项；packaged E2E 1 项（3.0 秒）；Web Vitest 114 个文件、671 项；theme guard 196 项；design lint 0 error；Web/Desktop TypeScript、ESLint 与双构建全部通过。
+- 产物回读：Web `totalBytes=1,413,812`、最大 JS `264,519` bytes；Desktop `totalBytes=1,412,469`、最大 JS `264,785` bytes。
+
 ## 平台证据矩阵
 
 | 平台        | build                | install | backend                  | update  | uninstall | 签名            |
@@ -92,6 +109,6 @@
 
 ## Pending 与后续人工动作
 
-- 当前报告已完成 Phase 0–2 证据；Phase 3–8 继续实施。
+- 当前报告已完成 Phase 0–3 证据；Phase 4–8 继续实施。
 - macOS x64、Windows x64 的真实安装、远程后端、更新、卸载和签名保持 pending，不能由当前 arm64 结果替代。
 - 当前机器没有 Developer ID identity，macOS 真实旧版到新版签名更新闭环保持 pending，不声明通过。
