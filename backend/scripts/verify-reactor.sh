@@ -21,6 +21,13 @@ require_file() {
   [[ -f "${file}" ]] || fail "missing file: ${file#"${REPO_DIR}/"}"
 }
 
+if [[ "$#" -gt 0 ]]; then
+  [[ "$#" -eq 2 && "$1" == "--repo-root" ]] || fail "usage: $0 [--repo-root PATH]"
+  [[ -d "$2" ]] || fail "repository root does not exist: $2"
+  REPO_DIR="$(cd "$2" && pwd)"
+  BACKEND_DIR="${REPO_DIR}/backend"
+fi
+
 require_file "${JAVA_HOME}/bin/java"
 java_version="$("${JAVA_HOME}/bin/java" -version 2>&1 | head -n 1)"
 [[ "${java_version}" == *'version "21.'* ]] || fail "Java 21 required, found: ${java_version}"
@@ -87,16 +94,55 @@ if grep -R -n --include='pom.xml' 'sa-token-jwt' "${BACKEND_DIR}" >/dev/null; th
 fi
 pass "sa-token-jwt absent"
 
-lastmile_pom="${BACKEND_DIR}/modules/lastmile/pom.xml"
-for required_dependency in metabuilder-admin-api metabuilder-shared-kernel metabuilder-schema-lastmile; do
-  grep -Fq "<artifactId>${required_dependency}</artifactId>" "${lastmile_pom}" || fail "lastmile missing dependency: ${required_dependency}"
-done
+list_direct_dependency_artifact_ids() {
+  local pom="$1"
 
-for forbidden_dependency in metabuilder-admin metabuilder-schema-platform; do
-  if grep -Fq "<artifactId>${forbidden_dependency}</artifactId>" "${lastmile_pom}"; then
-    fail "lastmile must not depend on: ${forbidden_dependency}"
-  fi
-done
+  awk '
+    /^[[:space:]]*<dependencies>[[:space:]]*$/ {
+      in_dependencies = 1
+      next
+    }
+    in_dependencies && /^[[:space:]]*<\/dependencies>[[:space:]]*$/ {
+      exit
+    }
+    in_dependencies && /^[[:space:]]*<dependency>[[:space:]]*$/ {
+      in_dependency = 1
+      next
+    }
+    in_dependencies && /^[[:space:]]*<\/dependency>[[:space:]]*$/ {
+      in_dependency = 0
+      next
+    }
+    in_dependency && /^[[:space:]]*<exclusions>[[:space:]]*$/ {
+      in_exclusions = 1
+      next
+    }
+    in_dependency && /^[[:space:]]*<\/exclusions>[[:space:]]*$/ {
+      in_exclusions = 0
+      next
+    }
+    in_dependency && !in_exclusions && /<artifactId>[^<]+<\/artifactId>/ {
+      artifact_id = $0
+      sub(/^.*<artifactId>[[:space:]]*/, "", artifact_id)
+      sub(/[[:space:]]*<\/artifactId>.*$/, "", artifact_id)
+      print artifact_id
+    }
+  ' "${pom}" | LC_ALL=C sort -u
+}
+
+lastmile_pom="${BACKEND_DIR}/modules/lastmile/pom.xml"
+expected_lastmile_dependencies="$(
+  printf '%s\n' \
+    metabuilder-admin-api \
+    metabuilder-shared-kernel \
+    metabuilder-schema-lastmile \
+    | LC_ALL=C sort -u
+)"
+actual_lastmile_dependencies="$(list_direct_dependency_artifact_ids "${lastmile_pom}")"
+
+if [[ "${actual_lastmile_dependencies}" != "${expected_lastmile_dependencies}" ]]; then
+  fail "lastmile direct dependencies must exactly match the allowlist"
+fi
 
 admin_pom="${BACKEND_DIR}/modules/admin/pom.xml"
 if grep -Fq '<artifactId>metabuilder-lastmile</artifactId>' "${admin_pom}"; then
