@@ -31,6 +31,7 @@
 |---|---|
 | 产品形态 | 配套后端范本；前端 zod、页面语义和交互规则是功能契约甲方，wire contract 由双方契约测试共同约束 |
 | 仓库 | 当前仓原地重组为 `frontend/ + backend/`，保留前端 git 历史 |
+| 命名空间 | 系统名 MetaBuilder；Maven groupId 与 Java package 继续使用 `com.metabuild`，artifactId 使用 `metabuilder-*`；禁止另起 `com.metabuilder` 第二命名空间 |
 | 传输 | HTTP 语义 + RFC 9457 ProblemDetail + 成功对象直出；分页固定 `{list,total}`；不保留内部 adapter 方言 |
 | API 路径 | `/api/*`，不加版本前缀；破坏性变更由 OpenAPI snapshot + oasdiff 拦截 |
 | 认证 | Sa-Token 只承担不透明 access token/account-session；refresh token 自建轮换，不使用 sa-token-jwt |
@@ -344,6 +345,7 @@ lastmile 前后端必须成对实现 shipments/customers/channels/carriers/suppl
 ### 9.1 结构守卫
 
 - Maven dependency/ArchUnit：模块方向、admin 包纵切、lastmile 禁平台 schema、security 依赖隔离、infra slice allow-list。
+- Namespace guard：生产/测试源码、POM groupId 与 generated package 统一 `com.metabuild`，`com.metabuilder` 零命中。
 - jOOQ/Flyway：两个 owner 独立生成；生成物入 git；migration/codegen drift CI。
 - 前端保持现有 route/modules/pro/ui、zod contract、query key、theme/design guard；迁目录后所有脚本从 `frontend/` 可运行。
 - `.env.example` 只含非敏感占位；dev 一键脚本启动 PostgreSQL、Redis、backend、frontend；不提交 token/password。

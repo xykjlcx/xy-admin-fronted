@@ -13,6 +13,7 @@
 - 每个行为变更严格走 RED → GREEN → REFACTOR；实现者报告必须写明失败测试命令、预期失败原因、通过命令和输出摘要。
 - 配置/骨架也先写可执行 contract test 或负向 fixture；不以“只是 POM/YAML”为由跳过验证。
 - 不从旧仓复制 Long ID、sa-token-jwt、共享全域 schema、SaSession 授权字段或旧 envelope。
+- Maven groupId 与全部 Java package 固定 `com.metabuild`，artifactId 固定 `metabuilder-*`；守卫要求 `com.metabuilder` 零命中。
 - 每个任务独立提交，提交只包含该任务文件；每任务必须经过 spec compliance + code quality 双重 review。
 - Java 使用 21；Maven Wrapper 是唯一 CI 入口。本机 JDK 21 未注册进 `/usr/libexec/java_home`，禁止依赖该命令；本仓命令显式设置 `JAVA_HOME=${JAVA_HOME_21:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}` 并先断言 `$JAVA_HOME/bin/java -version` 为 21，CI 使用 Temurin 21。
 - API DTO 不复用 jOOQ record；跨域 DTO 不复用页面 CRUD DTO；前端 DTO 只从 zod schema 推导。
