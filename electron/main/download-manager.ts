@@ -172,6 +172,7 @@ async function writeChunk(file: Awaited<ReturnType<typeof open>>, chunk: Uint8Ar
 
 export function createDownloadManager(dependencies: DownloadManagerDependencies) {
   const active = new Map<string, AbortController>();
+  const tasks = new Map<string, Promise<void>>();
   const apiUrl = new URL(dependencies.apiBaseUrl);
   const approvedOrigins = new Set(dependencies.approvedOrigins);
   approvedOrigins.add(apiUrl.origin);
@@ -292,6 +293,7 @@ export function createDownloadManager(dependencies: DownloadManagerDependencies)
     } finally {
       if (temporaryPath) await rm(temporaryPath, { force: true }).catch(() => undefined);
       active.delete(taskId);
+      tasks.delete(taskId);
     }
   }
 
@@ -300,7 +302,10 @@ export function createDownloadManager(dependencies: DownloadManagerDependencies)
       const taskId = (dependencies.createTaskId ?? randomUUID)();
       const controller = new AbortController();
       active.set(taskId, controller);
-      setImmediate(() => void execute(taskId, input, controller));
+      const task = new Promise<void>((resolve) => {
+        setImmediate(() => void execute(taskId, input, controller).finally(resolve));
+      });
+      tasks.set(taskId, task);
       return { taskId };
     },
     cancel(taskId: string): boolean {
@@ -308,6 +313,10 @@ export function createDownloadManager(dependencies: DownloadManagerDependencies)
       if (!controller) return false;
       controller.abort();
       return true;
+    },
+    async dispose(): Promise<void> {
+      for (const controller of active.values()) controller.abort();
+      await Promise.allSettled([...tasks.values()]);
     },
   };
 }

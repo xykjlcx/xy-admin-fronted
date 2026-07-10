@@ -59,7 +59,7 @@ describe('desktop toolchain contract', () => {
     const requiredFiles = [
       'desktop.config.ts',
       'electron.vite.config.ts',
-      'electron-builder.yml',
+      'electron-builder.ts',
       'vitest.desktop.config.ts',
       'tsconfig.desktop.json',
       'scripts/desktop-command.mjs',
@@ -72,6 +72,7 @@ describe('desktop toolchain contract', () => {
     ];
 
     for (const file of requiredFiles) expect(existsSync(path.join(root, file)), file).toBe(true);
+    expect(existsSync(path.join(root, 'electron-builder.yml'))).toBe(false);
   });
 
   test('keeps the renderer HTML compatible with strict packaged CSP and relative assets', () => {

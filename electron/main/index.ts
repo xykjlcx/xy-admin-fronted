@@ -39,6 +39,14 @@ import { createPendingUpdateMarker } from './pending-update-marker';
 import { createSpikeUpdaterHarness } from './spike-updater';
 import { createUpdateController } from './update-controller';
 import { createUpdateFeedUrl } from './update-source';
+import { createQuitCoordinator } from './quit-coordinator';
+import { createDesktopLogger } from './desktop-logger';
+import {
+  isHealthyRendererUrl,
+  rendererRecoveryLogUrl,
+  rendererRecoveryUrl,
+  shouldShowRendererRecovery,
+} from './renderer-health';
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -64,6 +72,7 @@ const spikeDownloadPath = parseSpikeDownloadPath(
 const rendererRoot = path.join(app.getAppPath(), 'out/renderer');
 const allowedExternalHosts = new Set([new URL(environment.webPublicBaseUrl).hostname]);
 let mainWindow: BrowserWindow | null = null;
+let startupLogger: ReturnType<typeof createDesktopLogger> | null = null;
 
 function registerRendererProtocol(): void {
   protocol.handle('app', async (request) => {
@@ -82,9 +91,16 @@ function registerRendererProtocol(): void {
   });
 }
 
-function attachNavigationPolicy(window: BrowserWindow): void {
+function attachNavigationPolicy(window: BrowserWindow, logger: ReturnType<typeof createDesktopLogger>): void {
   window.webContents.on('will-attach-webview', (event) => event.preventDefault());
   window.webContents.on('will-navigate', (event, targetUrl) => {
+    if (targetUrl === rendererRecoveryLogUrl) {
+      event.preventDefault();
+      void shell.openPath(logger.directory).then((errorMessage) => {
+        if (errorMessage) logger.error('open log directory failed', errorMessage);
+      });
+      return;
+    }
     const decision = decideNavigation(targetUrl, allowedExternalHosts);
     if (decision === 'allow-internal') return;
     event.preventDefault();
@@ -96,7 +112,10 @@ function attachNavigationPolicy(window: BrowserWindow): void {
   });
 }
 
-function createMainWindow(onRendererHealthy: () => void): BrowserWindow {
+function createMainWindow(
+  onRendererHealthy: () => void,
+  logger: ReturnType<typeof createDesktopLogger>,
+): BrowserWindow {
   if (process.platform !== 'darwin' && process.platform !== 'win32') {
     throw new Error(`不支持的桌面平台: ${process.platform}`);
   }
@@ -113,18 +132,33 @@ function createMainWindow(onRendererHealthy: () => void): BrowserWindow {
     platform: process.platform,
     chrome: environment.windowChrome,
   });
-  attachNavigationPolicy(window);
+  attachNavigationPolicy(window, logger);
   window.once('ready-to-show', () => window.show());
-  window.webContents.once('did-finish-load', onRendererHealthy);
+  const developmentUrl = readRendererDevelopmentUrl();
+  let rendererHealthConfirmed = false;
+  window.webContents.on('did-finish-load', () => {
+    if (rendererHealthConfirmed || !isHealthyRendererUrl(window.webContents.getURL(), developmentUrl)) return;
+    rendererHealthConfirmed = true;
+    logger.info('renderer healthy');
+    onRendererHealthy();
+  });
+  window.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedUrl, isMainFrame) => {
+    if (!shouldShowRendererRecovery({ errorCode, isMainFrame, failedUrl: validatedUrl })) return;
+    logger.error('renderer load failed', new Error(`${String(errorCode)} ${errorDescription}`));
+    void window.loadURL(rendererRecoveryUrl).catch((error: unknown) => {
+      logger.error('renderer recovery page failed', error);
+    });
+  });
   // webContents 销毁前解绑；在 closed 后访问已销毁 webContents 会阻塞 Playwright/app.quit 清理。
   window.once('close', disposeWindowState);
   window.on('closed', () => {
     if (mainWindow === window) mainWindow = null;
   });
 
-  const developmentUrl = readRendererDevelopmentUrl();
   const targetUrl = developmentUrl ?? 'app://renderer/index.html#/admin/dashboard';
-  void window.loadURL(targetUrl);
+  void window.loadURL(targetUrl).catch((error: unknown) => {
+    logger.error('renderer load promise rejected', error);
+  });
   return window;
 }
 
@@ -169,6 +203,9 @@ async function startApplication(): Promise<void> {
   });
 
   await app.whenReady();
+  const logger = createDesktopLogger({ directory: path.join(app.getPath('userData'), 'logs') });
+  startupLogger = logger;
+  logger.info('application ready', `${process.platform}/${process.arch} ${app.getVersion()}`);
   registerRendererProtocol();
   registerSecurityPolicies();
   const credentialVault = createCredentialVault({
@@ -183,9 +220,10 @@ async function startApplication(): Promise<void> {
   });
   try {
     await credentialVault.restore();
-  } catch {
+  } catch (error) {
     // 安全存储不可用或密文损坏时按无会话启动，禁止回退明文。
     console.error('Credential vault restore failed; starting without a session');
+    logger.error('credential vault restore failed', error);
   }
   const pendingUpdateMarker = createPendingUpdateMarker(
     path.join(app.getPath('userData'), 'updates', 'pending.json'),
@@ -193,9 +231,11 @@ async function startApplication(): Promise<void> {
   try {
     if (await pendingUpdateMarker.read()) {
       console.error('Pending update marker detected; waiting for a healthy Renderer load');
+      logger.error('pending update marker detected');
     }
-  } catch {
+  } catch (error) {
     console.error('Pending update marker could not be read');
+    logger.error('pending update marker read failed', error);
   }
   const spikeUpdater = environment.spikeMode ? createSpikeUpdaterHarness(app.getVersion()) : null;
   const updaterPort =
@@ -208,12 +248,18 @@ async function startApplication(): Promise<void> {
     const state = globalThis as typeof globalThis & { __spikeInstallRequested?: () => boolean };
     state.__spikeInstallRequested = spikeUpdater.installRequested;
   }
+  let updateInstallRequested = false;
+  let downloadManager: ReturnType<typeof createDownloadManager>;
   const updateController = createUpdateController({
     currentVersion: app.getVersion(),
     updater: updaterPort,
     createOperationId: randomUUID,
     createCancellationToken: spikeUpdater?.createCancellationToken ?? createElectronCancellationPort,
     writePendingMarker: (input) => pendingUpdateMarker.write(input),
+    prepareForInstall: async () => {
+      await downloadManager.dispose();
+      updateInstallRequested = true;
+    },
     publish: (next) => {
       const payload = UpdateSnapshotSchema.parse(next);
       for (const window of BrowserWindow.getAllWindows()) {
@@ -223,7 +269,7 @@ async function startApplication(): Promise<void> {
       }
     },
   });
-  const downloadManager = createDownloadManager({
+  downloadManager = createDownloadManager({
     apiBaseUrl: environment.apiBaseUrl,
     approvedOrigins: new Set([environment.apiOrigin, ...environment.downloadAllowedOrigins]),
     allowInsecureApi: environment.mode === 'development',
@@ -247,27 +293,40 @@ async function startApplication(): Promise<void> {
       }
     },
   });
-  const disposeIpc = registerDesktopIpcHandlers({
-    writeClipboardText: (text) => clipboard.writeText(text),
-    openExternal: (url) => shell.openExternal(url),
-    allowedExternalHosts,
-    credentials: credentialVault,
-    files: downloadManager,
-    updater: updateController,
-  });
-  app.once('before-quit', () => {
+  const disposeIpc = registerDesktopIpcHandlers(
+    {
+      writeClipboardText: (text) => clipboard.writeText(text),
+      openExternal: (url) => shell.openExternal(url),
+      allowedExternalHosts,
+      credentials: credentialVault,
+      files: downloadManager,
+      updater: updateController,
+    },
+    (channel, summary) => logger.error('ipc handler rejected', `${channel} ${summary}`),
+  );
+  app.on(
+    'before-quit',
+    createQuitCoordinator({
+      cleanup: () => downloadManager.dispose(),
+      quit: () => app.quit(),
+      isUpdateInstallRequested: () => updateInstallRequested,
+      reportError: (message, error) => logger.error(message, error),
+    }),
+  );
+  app.once('will-quit', () => {
     updateController.dispose();
     disposeIpc();
   });
   const markRendererHealthy = () => {
     void pendingUpdateMarker.clear().catch(() => {
       console.error('Pending update marker cleanup failed');
+      logger.error('pending update marker cleanup failed');
     });
   };
-  mainWindow = createMainWindow(markRendererHealthy);
+  mainWindow = createMainWindow(markRendererHealthy, logger);
 
   app.on('activate', () => {
-    if (!mainWindow) mainWindow = createMainWindow(markRendererHealthy);
+    if (!mainWindow) mainWindow = createMainWindow(markRendererHealthy, logger);
   });
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
@@ -277,6 +336,7 @@ async function startApplication(): Promise<void> {
 void startApplication().catch((error: unknown) => {
   const message = error instanceof Error ? error.message : '未知启动错误';
   console.error('Application startup failed:', message);
+  startupLogger?.error('application startup failed', error);
   dialog.showErrorBox('应用启动失败', message);
   app.exit(1);
 });

@@ -65,7 +65,10 @@ describe('credential vault', () => {
   });
 
   test('never falls back to plaintext when async encryption is unavailable', async () => {
-    const storage = { read: vi.fn(), replace: vi.fn() };
+    const storage = {
+      read: vi.fn().mockResolvedValue(Buffer.from('encrypted')),
+      replace: vi.fn(),
+    };
     const crypto = {
       isAvailable: vi.fn().mockResolvedValue(false),
       encrypt: vi.fn(),
@@ -76,6 +79,20 @@ describe('credential vault', () => {
     await expect(vault.restore()).resolves.toBeNull();
     await expect(vault.persist('secret-token')).rejects.toThrow('安全存储不可用');
     expect(storage.replace).not.toHaveBeenCalled();
+  });
+
+  test('does not touch the platform keystore when no encrypted credential exists', async () => {
+    const storage = { read: vi.fn().mockResolvedValue(null), replace: vi.fn() };
+    const crypto = {
+      isAvailable: vi.fn(),
+      encrypt: vi.fn(),
+      decrypt: vi.fn(),
+    };
+    const vault = createCredentialVault({ storage, crypto });
+
+    await expect(vault.restore()).resolves.toBeNull();
+    expect(crypto.isAvailable).not.toHaveBeenCalled();
+    expect(crypto.decrypt).not.toHaveBeenCalled();
   });
 
   test('atomic file store replaces and removes the credential without leftover temp files', async () => {

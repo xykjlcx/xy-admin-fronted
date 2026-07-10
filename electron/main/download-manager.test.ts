@@ -282,4 +282,38 @@ describe('main download manager', () => {
     await expect(waitForTerminal(events)).resolves.toMatchObject({ status: 'cancelled' });
     expect(await readdir(directory)).toEqual([]);
   });
+
+  test('cancels all active streams and waits for temp-file cleanup before disposal completes', async () => {
+    const directory = await temporaryDirectory();
+    const targetPath = path.join(directory, 'report.pdf');
+    const events: FileDownloadEvent[] = [];
+    let release: (() => void) | undefined;
+    async function* slowBody(): AsyncIterable<Uint8Array> {
+      yield Buffer.from('half');
+      await new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      yield Buffer.from('done');
+    }
+    const manager = createDownloadManager({
+      apiBaseUrl: 'https://api.example.com',
+      approvedOrigins: new Set(['https://api.example.com']),
+      allowInsecureApi: false,
+      restoreCredential: vi.fn().mockResolvedValue(null),
+      showSaveDialog: vi.fn().mockResolvedValue(targetPath),
+      request: vi.fn().mockResolvedValue(response(200, { 'content-length': '8' }, slowBody())),
+      availableBytes: vi.fn().mockResolvedValue(1024),
+      emit: (event) => events.push(event),
+      createTaskId: () => '9ba560a3-94c6-438a-9d76-1e17627fd483',
+    });
+
+    manager.start({ resourceId: 'report-1', suggestedName: 'report.pdf' });
+    await vi.waitFor(() => expect(events).toContainEqual(expect.objectContaining({ receivedBytes: 4 })));
+    const disposal = manager.dispose();
+    release?.();
+    await disposal;
+
+    expect(events).toContainEqual(expect.objectContaining({ status: 'cancelled' }));
+    expect(await readdir(directory)).toEqual([]);
+  });
 });

@@ -43,6 +43,7 @@ function createHarness() {
   const events: UpdateSnapshot[] = [];
   const cancellationTokens: Array<CancellationPort & { cancelled: boolean }> = [];
   const writePendingMarker = vi.fn().mockResolvedValue(undefined);
+  const prepareForInstall = vi.fn().mockResolvedValue(undefined);
   let operation = 0;
   const controller = createUpdateController({
     currentVersion,
@@ -59,9 +60,10 @@ function createHarness() {
       return token;
     },
     writePendingMarker,
+    prepareForInstall,
     publish: (snapshot) => events.push(snapshot),
   });
-  return { updater, events, cancellationTokens, writePendingMarker, controller };
+  return { updater, events, cancellationTokens, writePendingMarker, prepareForInstall, controller };
 }
 
 describe('update controller', () => {
@@ -257,7 +259,7 @@ describe('update controller', () => {
   });
 
   test('writes the pending marker before accepting install and reuses the first install Promise', async () => {
-    const { updater, controller, writePendingMarker } = createHarness();
+    const { updater, controller, writePendingMarker, prepareForInstall } = createHarness();
     updater.checkForUpdates.mockResolvedValue({ isUpdateAvailable: true, updateInfo: nextInfo });
     updater.downloadUpdate.mockImplementation(async () => {
       updater.emit('update-downloaded', nextInfo);
@@ -272,6 +274,9 @@ describe('update controller', () => {
     await expect(first).resolves.toMatchObject({ status: 'installing', lastCommand: 'install' });
     expect(writePendingMarker).toHaveBeenCalledWith({ fromVersion: '0.1.0', toVersion: '0.2.0' });
     expect(writePendingMarker.mock.invocationCallOrder[0]).toBeLessThan(
+      prepareForInstall.mock.invocationCallOrder[0] ?? Number.MAX_SAFE_INTEGER,
+    );
+    expect(prepareForInstall.mock.invocationCallOrder[0]).toBeLessThan(
       updater.quitAndInstall.mock.invocationCallOrder[0] ?? Number.MAX_SAFE_INTEGER,
     );
     expect(updater.quitAndInstall).toHaveBeenCalledTimes(1);

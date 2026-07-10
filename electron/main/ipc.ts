@@ -54,6 +54,27 @@ type DesktopIpcHandler = (
   IpcSuccess | CredentialRestoreResult | FileDownloadStartResult | UpdateSnapshot | UpdateCommandResult
 >;
 
+export function summarizeIpcContractError(error: unknown): string {
+  if (error && typeof error === 'object' && 'issues' in error && Array.isArray(error.issues)) {
+    const issues = error.issues
+      .map((issue: unknown) => {
+        if (!issue || typeof issue !== 'object') return 'unknown:root';
+        const code = 'code' in issue && typeof issue.code === 'string' ? issue.code : 'unknown';
+        const issuePath = 'path' in issue && Array.isArray(issue.path) ? issue.path : [];
+        const safePath = issuePath
+          .filter(
+            (segment): segment is string | number =>
+              typeof segment === 'string' || typeof segment === 'number',
+          )
+          .join('.');
+        return `${code}:${safePath || 'root'}`;
+      })
+      .join(',');
+    return `SchemaError ${issues}`;
+  }
+  return error instanceof Error ? error.name : 'UnknownError';
+}
+
 function validateSender(event: IpcSenderEvent): void {
   assertTrustedSender(event.senderFrame?.url ?? '');
 }
@@ -125,11 +146,21 @@ export function createDesktopIpcHandlers(
   };
 }
 
-export function registerDesktopIpcHandlers(dependencies: DesktopIpcDependencies): () => void {
+export function registerDesktopIpcHandlers(
+  dependencies: DesktopIpcDependencies,
+  reportError?: (channel: DesktopIpcChannel, summary: string) => void,
+): () => void {
   const handlers = createDesktopIpcHandlers(dependencies);
   const channels = Object.values(ipcChannels);
   for (const channel of channels) {
-    ipcMain.handle(channel, (event, input) => handlers[channel](event, input));
+    ipcMain.handle(channel, async (event, input) => {
+      try {
+        return await handlers[channel](event, input);
+      } catch (error) {
+        reportError?.(channel, summarizeIpcContractError(error));
+        throw error;
+      }
+    });
   }
   return () => {
     for (const channel of channels) ipcMain.removeHandler(channel);

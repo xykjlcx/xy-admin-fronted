@@ -42,6 +42,7 @@ interface UpdateControllerDependencies {
   createOperationId(): string;
   createCancellationToken(): CancellationPort;
   writePendingMarker(input: { fromVersion: string; toVersion: string }): Promise<void>;
+  prepareForInstall(): Promise<void>;
   publish(snapshot: UpdateSnapshot): void;
 }
 
@@ -441,6 +442,7 @@ export function createUpdateController(dependencies: UpdateControllerDependencie
           fromVersion: dependencies.currentVersion,
           toVersion: targetVersion,
         });
+        await dependencies.prepareForInstall();
         publish({
           ...snapshot,
           status: 'installing',

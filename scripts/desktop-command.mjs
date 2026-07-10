@@ -61,11 +61,59 @@ export function createDesktopCommandPlan(parsed, platform = process.platform) {
     { executable: 'node', args: ['scripts/verify-renderer-artifacts.mjs', 'desktop'] },
   ];
   if (parsed.command === 'build') return buildSteps;
+  const releaseRoot = `release/${parsed.windowChrome}`;
+  const feedRoot = `${releaseRoot}/feed`;
   if (platform === 'darwin') {
-    return [...buildSteps, { executable: 'electron-builder', args: ['--mac', '--arm64', '--x64'] }];
+    return [
+      ...buildSteps,
+      {
+        executable: 'electron-builder',
+        args: ['--mac', '--arm64', `--config.directories.output=${releaseRoot}/darwin-arm64`],
+      },
+      {
+        executable: 'node',
+        args: [
+          'scripts/verify-release-artifacts.mjs',
+          '--platform=darwin',
+          '--arch=arm64',
+          `--release-dir=${releaseRoot}/darwin-arm64`,
+          `--feed-root=${feedRoot}`,
+        ],
+      },
+      {
+        executable: 'electron-builder',
+        args: ['--mac', '--x64', `--config.directories.output=${releaseRoot}/darwin-x64`],
+      },
+      {
+        executable: 'node',
+        args: [
+          'scripts/verify-release-artifacts.mjs',
+          '--platform=darwin',
+          '--arch=x64',
+          `--release-dir=${releaseRoot}/darwin-x64`,
+          `--feed-root=${feedRoot}`,
+        ],
+      },
+    ];
   }
   if (platform === 'win32') {
-    return [...buildSteps, { executable: 'electron-builder', args: ['--win', '--x64'] }];
+    return [
+      ...buildSteps,
+      {
+        executable: 'electron-builder',
+        args: ['--win', '--x64', `--config.directories.output=${releaseRoot}/win32-x64`],
+      },
+      {
+        executable: 'node',
+        args: [
+          'scripts/verify-release-artifacts.mjs',
+          '--platform=win32',
+          '--arch=x64',
+          `--release-dir=${releaseRoot}/win32-x64`,
+          `--feed-root=${feedRoot}`,
+        ],
+      },
+    ];
   }
   throw new Error(`不支持在 ${platform} 构建桌面安装包`);
 }

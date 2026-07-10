@@ -1,0 +1,54 @@
+:root {
+  color-scheme: light dark;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: Canvas;
+  color: CanvasText;
+}
+
+body {
+  display: grid;
+  min-height: 100vh;
+  margin: 0;
+  place-items: center;
+}
+
+main {
+  width: min(560px, calc(100vw - 64px));
+}
+
+.eyebrow {
+  color: GrayText;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 12px 0;
+  font-size: 28px;
+}
+
+p {
+  line-height: 1.7;
+}
+
+nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+a {
+  border: 1px solid ButtonBorder;
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: ButtonText;
+  text-decoration: none;
+}
+
+a.primary {
+  border-color: Highlight;
+  background: Highlight;
+  color: HighlightText;
+}

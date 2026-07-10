@@ -48,7 +48,34 @@ describe('desktop command parser', () => {
       { executable: 'node', args: ['scripts/desktop-boundary-guard.mjs'] },
       { executable: 'electron-vite', args: ['build'] },
       { executable: 'node', args: ['scripts/verify-renderer-artifacts.mjs', 'desktop'] },
-      { executable: 'electron-builder', args: ['--mac', '--arm64', '--x64'] },
+      {
+        executable: 'electron-builder',
+        args: ['--mac', '--arm64', '--config.directories.output=release/integrated/darwin-arm64'],
+      },
+      {
+        executable: 'node',
+        args: [
+          'scripts/verify-release-artifacts.mjs',
+          '--platform=darwin',
+          '--arch=arm64',
+          '--release-dir=release/integrated/darwin-arm64',
+          '--feed-root=release/integrated/feed',
+        ],
+      },
+      {
+        executable: 'electron-builder',
+        args: ['--mac', '--x64', '--config.directories.output=release/integrated/darwin-x64'],
+      },
+      {
+        executable: 'node',
+        args: [
+          'scripts/verify-release-artifacts.mjs',
+          '--platform=darwin',
+          '--arch=x64',
+          '--release-dir=release/integrated/darwin-x64',
+          '--feed-root=release/integrated/feed',
+        ],
+      },
     ]);
     expect(createDesktopCommandPlan(parsed, 'win32')).toEqual([
       { executable: 'tsc', args: ['-b', '--noEmit'] },
@@ -56,7 +83,20 @@ describe('desktop command parser', () => {
       { executable: 'node', args: ['scripts/desktop-boundary-guard.mjs'] },
       { executable: 'electron-vite', args: ['build'] },
       { executable: 'node', args: ['scripts/verify-renderer-artifacts.mjs', 'desktop'] },
-      { executable: 'electron-builder', args: ['--win', '--x64'] },
+      {
+        executable: 'electron-builder',
+        args: ['--win', '--x64', '--config.directories.output=release/integrated/win32-x64'],
+      },
+      {
+        executable: 'node',
+        args: [
+          'scripts/verify-release-artifacts.mjs',
+          '--platform=win32',
+          '--arch=x64',
+          '--release-dir=release/integrated/win32-x64',
+          '--feed-root=release/integrated/feed',
+        ],
+      },
     ]);
   });
 });

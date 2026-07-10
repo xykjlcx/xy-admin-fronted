@@ -85,12 +85,12 @@ export function createCredentialVault(dependencies: CredentialVaultDependencies)
       const restoreGeneration = generation;
       restorePromise = runExclusive(async () => {
         try {
-          if (!(await dependencies.crypto.isAvailable())) {
+          const ciphertext = await dependencies.storage.read();
+          if (!ciphertext) {
             restored = true;
             return null;
           }
-          const ciphertext = await dependencies.storage.read();
-          if (!ciphertext) {
+          if (!(await dependencies.crypto.isAvailable())) {
             restored = true;
             return null;
           }

@@ -26,6 +26,7 @@ describe('electron-vite build graph', () => {
     });
 
     expect(config.main?.build?.outDir).toBe('out/main');
+    expect(config.main?.build?.externalizeDeps).toEqual({ exclude: ['electron-updater'] });
     expect(config.main?.build?.rollupOptions?.input).toBe(
       path.resolve(import.meta.dirname, '../main/index.ts'),
     );
@@ -43,9 +44,10 @@ describe('electron-vite build graph', () => {
     );
     expect(config.renderer).toMatchObject({ base: './', build: { outDir: 'out/renderer' } });
     expect(config.renderer?.root).toBe(path.resolve(import.meta.dirname, '../..'));
-    expect(config.renderer?.build?.rollupOptions?.input).toBe(
-      path.resolve(import.meta.dirname, '../../index.html'),
-    );
+    expect(config.renderer?.build?.rollupOptions?.input).toEqual({
+      index: path.resolve(import.meta.dirname, '../../index.html'),
+      recovery: path.resolve(import.meta.dirname, '../renderer/recovery.html'),
+    });
     expect(config.renderer?.plugins).toBeDefined();
     expect(config.renderer?.define?.__APP_VERSION__).toBe(JSON.stringify('0.1.0'));
   });

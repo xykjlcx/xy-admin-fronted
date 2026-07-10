@@ -34,6 +34,7 @@ export function createElectronViteConfig(input: ElectronViteConfigInput): UserCo
       define: { __DESKTOP_BUILD_ENV__: embeddedEnvironment },
       build: {
         outDir: 'out/main',
+        externalizeDeps: { exclude: ['electron-updater'] },
         rollupOptions: { input: path.resolve(projectRoot, 'electron/main/index.ts') },
       },
     },
@@ -56,7 +57,10 @@ export function createElectronViteConfig(input: ElectronViteConfigInput): UserCo
         ...renderer.build,
         rollupOptions: {
           ...renderer.build?.rollupOptions,
-          input: path.resolve(projectRoot, 'index.html'),
+          input: {
+            index: path.resolve(projectRoot, 'index.html'),
+            recovery: path.resolve(projectRoot, 'electron/renderer/recovery.html'),
+          },
         },
       },
     },

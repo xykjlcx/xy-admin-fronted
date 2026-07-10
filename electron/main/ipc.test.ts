@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 import { ipcChannels } from '../shared/ipc-channels';
-import { createDesktopIpcHandlers } from './ipc';
+import { createDesktopIpcHandlers, summarizeIpcContractError } from './ipc';
 
 const trustedEvent = { senderFrame: { url: 'app://renderer/index.html#/admin/dashboard' } };
 const untrustedEvent = { senderFrame: { url: 'https://evil.example.com' } };
@@ -27,6 +27,26 @@ const updaterDependencies = () => ({
 });
 
 describe('desktop IPC handlers', () => {
+  test('summarizes schema issues without retaining a rejected sensitive payload', async () => {
+    const handlers = createDesktopIpcHandlers({
+      writeClipboardText: vi.fn(),
+      openExternal: vi.fn(),
+      allowedExternalHosts: new Set(),
+      credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
+      files: { start: vi.fn(), cancel: vi.fn() },
+      updater: updaterDependencies(),
+    });
+    const error = await handlers[ipcChannels.credentialPersist](trustedEvent, {
+      token: 42,
+      rejectedSecret: 'must-not-be-logged',
+    }).catch((reason: unknown) => reason);
+
+    const summary = summarizeIpcContractError(error);
+    expect(summary).toContain('invalid_type:token');
+    expect(summary).not.toContain('must-not-be-logged');
+    expect(summary).not.toContain('42');
+  });
+
   test('validates sender and payload before writing clipboard text', async () => {
     const writeClipboardText = vi.fn();
     const handlers = createDesktopIpcHandlers({
