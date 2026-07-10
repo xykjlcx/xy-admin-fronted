@@ -3,6 +3,9 @@ import type {
   FileDownloadEvent,
   FileDownloadStartInput,
   FileDownloadStartResult,
+  UpdateCommand,
+  UpdateCommandResult,
+  UpdateSnapshot,
 } from './schemas';
 import type { WindowSnapshot } from './window-state';
 
@@ -29,5 +32,10 @@ export interface DesktopApi {
     save(input: FileDownloadStartInput): Promise<FileDownloadStartResult>;
     cancel(taskId: string): Promise<void>;
     subscribe(listener: (event: FileDownloadEvent) => void): () => void;
+  };
+  updater: {
+    getSnapshot(): Promise<UpdateSnapshot>;
+    command(command: UpdateCommand): Promise<UpdateCommandResult>;
+    subscribe(listener: (snapshot: UpdateSnapshot) => void): () => void;
   };
 }

@@ -10,6 +10,36 @@
     "cancel": "取消",
     "export": "导出"
   },
+  "update": {
+    "title": "软件更新",
+    "entry": {
+      "available": "发现新版本 {{version}}",
+      "downloading": "正在下载 {{percent}}%",
+      "downloaded": "更新已下载",
+      "error": "更新检查失败"
+    },
+    "releaseDate": "发布时间",
+    "releaseNotes": "更新说明",
+    "packageSize": "安装包大小",
+    "downloadProgress": "更新下载进度",
+    "commandRejected": "当前状态不能执行该更新操作",
+    "commandFailed": "更新操作失败，请重试",
+    "upToDate": "当前已是最新版本",
+    "actions": {
+      "check": "检查更新",
+      "download": "下载更新",
+      "cancel": "取消下载",
+      "install": "重启并安装",
+      "retry": "重试"
+    },
+    "errors": {
+      "UPDATE_CHECK_FAILED": "无法检查更新，请稍后重试",
+      "UPDATE_DOWNLOAD_FAILED": "更新下载失败，当前版本仍可继续使用",
+      "UPDATE_INSTALL_FAILED": "更新安装未能启动，请重新打开应用",
+      "INVALID_UPDATE_METADATA": "更新信息无效，已停止本次更新",
+      "UPDATE_UNKNOWN": "更新发生未知错误，请稍后重试"
+    }
+  },
   "auth": {
     "login": "登录",
     "logout": "退出登录",

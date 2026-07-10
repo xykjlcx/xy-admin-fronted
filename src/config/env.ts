@@ -85,7 +85,7 @@ export function parseEnv(input: RawEnv): ParsedEnv {
     runtime,
     windowChrome: parseWindowChrome(runtime, input.VITE_WINDOW_CHROME),
     appEnv: parseAppEnv(mode, input.VITE_APP_ENV),
-    appVersion: String(input.VITE_APP_VERSION || '0.1.0'),
+    appVersion: __APP_VERSION__,
     apiBaseUrl: String(input.VITE_API_BASE_URL || ''),
     webPublicBaseUrl: String(input.VITE_WEB_PUBLIC_BASE_URL || ''),
     defaultLocale: parseLocale(input.VITE_DEFAULT_LOCALE),

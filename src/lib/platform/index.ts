@@ -9,6 +9,9 @@ export type {
   FileDownloadStartResult,
   HostRuntime,
   PlatformWindowSnapshot,
+  UpdateCommand,
+  UpdateCommandResult,
+  UpdateSnapshot,
 } from './types';
 
 export const platform =

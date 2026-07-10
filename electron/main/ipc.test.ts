@@ -4,6 +4,27 @@ import { createDesktopIpcHandlers } from './ipc';
 
 const trustedEvent = { senderFrame: { url: 'app://renderer/index.html#/admin/dashboard' } };
 const untrustedEvent = { senderFrame: { url: 'https://evil.example.com' } };
+const idleUpdateSnapshot = {
+  status: 'idle',
+  currentVersion: '0.1.0',
+  operationId: null,
+  lastCommand: null,
+  retryable: false,
+  targetVersion: null,
+  releaseDate: null,
+  releaseNotes: null,
+  packageSize: null,
+  transferred: 0,
+  total: 0,
+  percent: 0,
+  bytesPerSecond: 0,
+  errorCode: null,
+} as const;
+
+const updaterDependencies = () => ({
+  getSnapshot: vi.fn(() => idleUpdateSnapshot),
+  execute: vi.fn().mockResolvedValue(idleUpdateSnapshot),
+});
 
 describe('desktop IPC handlers', () => {
   test('validates sender and payload before writing clipboard text', async () => {
@@ -14,6 +35,7 @@ describe('desktop IPC handlers', () => {
       allowedExternalHosts: new Set(['docs.example.com']),
       credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
       files: { start: vi.fn(), cancel: vi.fn() },
+      updater: updaterDependencies(),
     });
 
     await expect(handlers[ipcChannels.clipboardWrite](trustedEvent, { text: 'copied' })).resolves.toEqual({
@@ -35,6 +57,7 @@ describe('desktop IPC handlers', () => {
       allowedExternalHosts: new Set(['docs.example.com']),
       credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
       files: { start: vi.fn(), cancel: vi.fn() },
+      updater: updaterDependencies(),
     });
 
     await expect(
@@ -61,6 +84,7 @@ describe('desktop IPC handlers', () => {
       allowedExternalHosts: new Set(),
       credentials,
       files: { start: vi.fn(), cancel: vi.fn() },
+      updater: updaterDependencies(),
     });
 
     await expect(handlers[ipcChannels.credentialRestore](trustedEvent, undefined)).resolves.toEqual({
@@ -93,6 +117,7 @@ describe('desktop IPC handlers', () => {
       allowedExternalHosts: new Set(),
       credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
       files,
+      updater: updaterDependencies(),
     });
 
     await expect(
@@ -118,5 +143,42 @@ describe('desktop IPC handlers', () => {
     ).rejects.toThrow('拒绝非 Renderer IPC sender');
     expect(files.start).toHaveBeenCalledTimes(1);
     expect(files.cancel).toHaveBeenCalledWith(taskId);
+  });
+
+  test('returns updater snapshots and typed domain errors across the same trusted boundary', async () => {
+    const updater = updaterDependencies();
+    const handlers = createDesktopIpcHandlers({
+      writeClipboardText: vi.fn(),
+      openExternal: vi.fn(),
+      allowedExternalHosts: new Set(),
+      credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
+      files: { start: vi.fn(), cancel: vi.fn() },
+      updater,
+    });
+
+    await expect(handlers[ipcChannels.updaterGetSnapshot](trustedEvent, undefined)).resolves.toEqual(
+      idleUpdateSnapshot,
+    );
+    await expect(handlers[ipcChannels.updaterCommand](trustedEvent, { command: 'check' })).resolves.toEqual({
+      ok: true,
+      snapshot: idleUpdateSnapshot,
+    });
+    expect(updater.execute).toHaveBeenCalledWith('check');
+
+    updater.execute.mockRejectedValueOnce({
+      code: 'INVALID_STATE',
+      command: 'download',
+      status: 'idle',
+    });
+    await expect(
+      handlers[ipcChannels.updaterCommand](trustedEvent, { command: 'download' }),
+    ).resolves.toEqual({
+      ok: false,
+      error: { code: 'INVALID_STATE', command: 'download', status: 'idle' },
+    });
+    await expect(handlers[ipcChannels.updaterCommand](untrustedEvent, { command: 'check' })).rejects.toThrow(
+      '拒绝非 Renderer IPC sender',
+    );
+    await expect(handlers[ipcChannels.updaterCommand](trustedEvent, { command: 'force' })).rejects.toThrow();
   });
 });

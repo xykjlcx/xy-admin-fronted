@@ -11,9 +11,16 @@ import {
   FileDownloadStartInputSchema,
   FileDownloadStartResultSchema,
   IpcSuccessSchema,
+  UpdateCommandInputSchema,
+  UpdateCommandResultSchema,
+  UpdateGetSnapshotInputSchema,
+  UpdateSnapshotSchema,
   type CredentialRestoreResult,
   type FileDownloadStartResult,
   type IpcSuccess,
+  type UpdateCommand,
+  type UpdateCommandResult,
+  type UpdateSnapshot,
 } from '../shared/schemas';
 import { assertTrustedSender } from './navigation-policy';
 
@@ -34,12 +41,18 @@ interface DesktopIpcDependencies {
     start(input: { resourceId: string; suggestedName: string }): FileDownloadStartResult;
     cancel(taskId: string): boolean;
   };
+  updater: {
+    getSnapshot(): UpdateSnapshot;
+    execute(command: UpdateCommand): Promise<UpdateSnapshot>;
+  };
 }
 
 type DesktopIpcHandler = (
   event: IpcSenderEvent,
   input: unknown,
-) => Promise<IpcSuccess | CredentialRestoreResult | FileDownloadStartResult>;
+) => Promise<
+  IpcSuccess | CredentialRestoreResult | FileDownloadStartResult | UpdateSnapshot | UpdateCommandResult
+>;
 
 function validateSender(event: IpcSenderEvent): void {
   assertTrustedSender(event.senderFrame?.url ?? '');
@@ -89,6 +102,25 @@ export function createDesktopIpcHandlers(
       const { taskId } = FileDownloadCancelInputSchema.parse(input);
       dependencies.files.cancel(taskId);
       return IpcSuccessSchema.parse({ ok: true });
+    },
+    [ipcChannels.updaterGetSnapshot]: async (event, input) => {
+      validateSender(event);
+      UpdateGetSnapshotInputSchema.parse(input);
+      return UpdateSnapshotSchema.parse(dependencies.updater.getSnapshot());
+    },
+    [ipcChannels.updaterCommand]: async (event, input) => {
+      validateSender(event);
+      const { command } = UpdateCommandInputSchema.parse(input);
+      try {
+        return UpdateCommandResultSchema.parse({
+          ok: true,
+          snapshot: await dependencies.updater.execute(command),
+        });
+      } catch (error) {
+        const domainResult = UpdateCommandResultSchema.safeParse({ ok: false, error });
+        if (domainResult.success) return domainResult.data;
+        throw error;
+      }
     },
   };
 }

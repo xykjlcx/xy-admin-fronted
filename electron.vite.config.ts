@@ -12,6 +12,7 @@ interface ElectronViteConfigInput {
   command: 'serve' | 'build';
   mode: string;
   enableMock: string | undefined;
+  legacyAppVersion: string | undefined;
 }
 
 const projectRoot = import.meta.dirname;
@@ -25,6 +26,7 @@ export function createElectronViteConfig(input: ElectronViteConfigInput): UserCo
     outDir: 'out/renderer',
     base: './',
     enableMock: input.enableMock,
+    legacyAppVersion: input.legacyAppVersion,
   });
 
   return {
@@ -64,5 +66,11 @@ export function createElectronViteConfig(input: ElectronViteConfigInput): UserCo
 export default defineConfig(({ command, mode }) => {
   const environment = readDesktopEnvironment();
   const rendererEnvironment = readDesktopRendererEnvironment();
-  return createElectronViteConfig({ environment, command, mode, enableMock: rendererEnvironment.enableMock });
+  return createElectronViteConfig({
+    environment,
+    command,
+    mode,
+    enableMock: rendererEnvironment.enableMock,
+    legacyAppVersion: rendererEnvironment.legacyAppVersion,
+  });
 });

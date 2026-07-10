@@ -3,7 +3,7 @@ import { appConfig } from '@/config';
 import { env } from '@/config/env';
 import { downloadFile } from '@/lib/download';
 import { createApiFileDownloadUrl, createPublicFileUrl } from './types';
-import type { FileDownloadEvent } from '../../../electron/shared/schemas';
+import type { FileDownloadEvent, UpdateCommand, UpdateSnapshot } from '../../../electron/shared/schemas';
 
 interface CredentialStorage {
   getItem(key: string): string | null;
@@ -19,6 +19,7 @@ interface WebPlatformDependencies {
   apiBaseUrl?: string;
   webPublicBaseUrl?: string;
   createTaskId?: () => string;
+  appVersion?: string;
 }
 
 const browserDependencies: WebPlatformDependencies = {
@@ -34,6 +35,7 @@ const browserDependencies: WebPlatformDependencies = {
   apiBaseUrl: env.apiBaseUrl,
   webPublicBaseUrl: env.webPublicBaseUrl || window.location.origin,
   createTaskId: () => crypto.randomUUID(),
+  appVersion: env.appVersion,
 };
 
 export function createWebPlatform(dependencies: WebPlatformDependencies = browserDependencies): AppPlatform {
@@ -41,6 +43,26 @@ export function createWebPlatform(dependencies: WebPlatformDependencies = browse
   const listeners = new Set<(event: FileDownloadEvent) => void>();
   const active = new Map<string, AbortController>();
   const createTaskId = dependencies.createTaskId ?? (() => crypto.randomUUID());
+  const unsupportedUpdateSnapshot: UpdateSnapshot = {
+    status: 'unsupported',
+    currentVersion: dependencies.appVersion ?? env.appVersion,
+    operationId: null,
+    lastCommand: null,
+    retryable: false,
+    targetVersion: null,
+    releaseDate: null,
+    releaseNotes: null,
+    packageSize: null,
+    transferred: 0,
+    total: 0,
+    percent: 0,
+    bytesPerSecond: 0,
+    errorCode: null,
+  };
+  const unsupportedCommand = async (command: UpdateCommand) => ({
+    ok: false as const,
+    error: { code: 'UNSUPPORTED' as const, command, status: 'unsupported' as const },
+  });
   const emit = (event: FileDownloadEvent) => {
     for (const listener of listeners) listener(event);
   };
@@ -122,6 +144,18 @@ export function createWebPlatform(dependencies: WebPlatformDependencies = browse
       },
       createShareUrl: (resourceId) =>
         createPublicFileUrl(dependencies.webPublicBaseUrl ?? env.webPublicBaseUrl, resourceId),
+    },
+    updater: {
+      getSnapshot: async () => unsupportedUpdateSnapshot,
+      check: () => unsupportedCommand('check'),
+      download: () => unsupportedCommand('download'),
+      cancelDownload: () => unsupportedCommand('cancelDownload'),
+      install: () => unsupportedCommand('install'),
+      retry: () => unsupportedCommand('retry'),
+      subscribe: (listener) => {
+        listener(unsupportedUpdateSnapshot);
+        return () => undefined;
+      },
     },
   };
 }

@@ -16,6 +16,11 @@ import {
   type CredentialClearInput,
   type FileDownloadEvent,
   type FileDownloadStartInput,
+  type UpdateCommand,
+  type UpdateSnapshot,
+  UpdateCommandInputSchema,
+  UpdateCommandResultSchema,
+  UpdateSnapshotSchema,
 } from '../shared/schemas';
 import { createWindowSnapshot, WindowSnapshotSchema, type WindowSnapshot } from '../shared/window-state';
 
@@ -30,6 +35,8 @@ let snapshot = createWindowSnapshot({
 });
 const windowStateListeners = new Set<(next: WindowSnapshot) => void>();
 const fileDownloadListeners = new Set<(event: FileDownloadEvent) => void>();
+const updateListeners = new Set<(next: UpdateSnapshot) => void>();
+let updateSnapshot: UpdateSnapshot | null = null;
 ipcRenderer.on(ipcEvents.windowStateChanged, (_event, payload: unknown) => {
   snapshot = WindowSnapshotSchema.parse(payload);
   for (const listener of windowStateListeners) listener(snapshot);
@@ -37,6 +44,10 @@ ipcRenderer.on(ipcEvents.windowStateChanged, (_event, payload: unknown) => {
 ipcRenderer.on(ipcEvents.fileDownloadChanged, (_event, payload: unknown) => {
   const downloadEvent = FileDownloadEventSchema.parse(payload);
   for (const listener of fileDownloadListeners) listener(downloadEvent);
+});
+ipcRenderer.on(ipcEvents.updaterStateChanged, (_event, payload: unknown) => {
+  updateSnapshot = UpdateSnapshotSchema.parse(payload);
+  for (const listener of updateListeners) listener(updateSnapshot);
 });
 
 const desktopApi: DesktopApi = Object.freeze({
@@ -89,6 +100,38 @@ const desktopApi: DesktopApi = Object.freeze({
     subscribe: (listener: (event: FileDownloadEvent) => void) => {
       fileDownloadListeners.add(listener);
       return () => fileDownloadListeners.delete(listener);
+    },
+  }),
+  updater: Object.freeze({
+    getSnapshot: async () => {
+      const next = UpdateSnapshotSchema.parse(
+        await ipcRenderer.invoke(ipcChannels.updaterGetSnapshot, undefined),
+      );
+      updateSnapshot = next;
+      return next;
+    },
+    command: async (command: UpdateCommand) => {
+      const input = UpdateCommandInputSchema.parse({ command });
+      const result = UpdateCommandResultSchema.parse(
+        await ipcRenderer.invoke(ipcChannels.updaterCommand, input),
+      );
+      if (result.ok) updateSnapshot = result.snapshot;
+      return result;
+    },
+    subscribe: (listener: (next: UpdateSnapshot) => void) => {
+      updateListeners.add(listener);
+      if (updateSnapshot) listener(updateSnapshot);
+      else {
+        void ipcRenderer
+          .invoke(ipcChannels.updaterGetSnapshot, undefined)
+          .then((payload: unknown) => {
+            const initial = UpdateSnapshotSchema.parse(payload);
+            if (!updateSnapshot) updateSnapshot = initial;
+            if (updateListeners.has(listener)) listener(updateSnapshot);
+          })
+          .catch(() => undefined);
+      }
+      return () => updateListeners.delete(listener);
     },
   }),
 });

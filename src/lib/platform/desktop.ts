@@ -21,6 +21,15 @@ export function createDesktopPlatform(api: DesktopApi, webPublicBaseUrl: string)
       subscribe: (listener) => api.files.subscribe(listener),
       createShareUrl: (resourceId) => createPublicFileUrl(webPublicBaseUrl, resourceId),
     },
+    updater: {
+      getSnapshot: () => api.updater.getSnapshot(),
+      check: () => api.updater.command('check'),
+      download: () => api.updater.command('download'),
+      cancelDownload: () => api.updater.command('cancelDownload'),
+      install: () => api.updater.command('install'),
+      retry: () => api.updater.command('retry'),
+      subscribe: (listener) => api.updater.subscribe(listener),
+    },
   };
 }
 

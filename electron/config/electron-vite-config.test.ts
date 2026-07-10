@@ -22,6 +22,7 @@ describe('electron-vite build graph', () => {
       command: 'build',
       mode: 'production',
       enableMock: undefined,
+      legacyAppVersion: undefined,
     });
 
     expect(config.main?.build?.outDir).toBe('out/main');
@@ -46,5 +47,6 @@ describe('electron-vite build graph', () => {
       path.resolve(import.meta.dirname, '../../index.html'),
     );
     expect(config.renderer?.plugins).toBeDefined();
+    expect(config.renderer?.define?.__APP_VERSION__).toBe(JSON.stringify('0.1.0'));
   });
 });

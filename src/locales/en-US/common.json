@@ -10,6 +10,36 @@
     "cancel": "Cancel",
     "export": "Export"
   },
+  "update": {
+    "title": "Software update",
+    "entry": {
+      "available": "Version {{version}} available",
+      "downloading": "Downloading {{percent}}%",
+      "downloaded": "Update downloaded",
+      "error": "Update check failed"
+    },
+    "releaseDate": "Release date",
+    "releaseNotes": "Release notes",
+    "packageSize": "Package size",
+    "downloadProgress": "Update download progress",
+    "commandRejected": "This update action is not available now",
+    "commandFailed": "Update action failed. Please retry.",
+    "upToDate": "You are up to date",
+    "actions": {
+      "check": "Check for updates",
+      "download": "Download update",
+      "cancel": "Cancel download",
+      "install": "Restart and install",
+      "retry": "Retry"
+    },
+    "errors": {
+      "UPDATE_CHECK_FAILED": "Unable to check for updates. Please try again later.",
+      "UPDATE_DOWNLOAD_FAILED": "The update download failed. You can keep using this version.",
+      "UPDATE_INSTALL_FAILED": "The update installer did not start. Please reopen the app.",
+      "INVALID_UPDATE_METADATA": "The update information is invalid. This update was stopped.",
+      "UPDATE_UNKNOWN": "An unknown update error occurred. Please try again later."
+    }
+  },
   "auth": {
     "login": "Log in",
     "logout": "Log out",

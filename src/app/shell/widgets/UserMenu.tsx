@@ -3,7 +3,17 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { ChevronDown, User, Settings, KeyRound, Languages, UserCog, HelpCircle, LogOut } from 'lucide-react';
+import {
+  ChevronDown,
+  User,
+  Settings,
+  KeyRound,
+  Languages,
+  UserCog,
+  HelpCircle,
+  LogOut,
+  RefreshCw,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { meQuery, authApi } from '@/modules/admin/auth/api';
 import { sessionCredentialService } from '@/lib/session-credential-service';
 import { appConfig } from '@/config';
+import { platform } from '@/lib/platform';
 
 export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar' | 'icon' } = {}) {
   const { t } = useTranslation();
@@ -31,6 +42,22 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
   const suppressSidebarFocusRestore = variant === 'sidebar';
 
   const stub = () => toast(t('shell.toast.stub'));
+  const checkUpdate = async () => {
+    setOpen(false);
+    try {
+      const result = await platform.updater.check();
+      if (!result.ok) {
+        toast.error(t('update.commandRejected'));
+        return;
+      }
+      if (result.snapshot.status === 'upToDate') toast.success(t('update.upToDate'));
+      if (result.snapshot.status === 'available') {
+        toast(t('update.entry.available', { version: result.snapshot.targetVersion }));
+      }
+    } catch {
+      toast.error(t('update.commandFailed'));
+    }
+  };
   const openProfile = (tab: 'info' | 'security' | 'preferences', action?: 'password') => {
     setOpen(false);
     void nav({ to: '/admin/profile', search: { tab, action } });
@@ -164,6 +191,15 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
             <Languages />
             {t('shell.user.language')}
           </DropdownMenuItem>
+          {platform.runtime === 'desktop' && (
+            <DropdownMenuItem
+              onClick={() => void checkUpdate()}
+              className="h-[calc(42px*var(--app-scale))] gap-3 px-3"
+            >
+              <RefreshCw />
+              {t('update.actions.check')}
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={stub} className="h-[calc(42px*var(--app-scale))] gap-3 px-3">
             <UserCog />
             {t('shell.user.switchAccount')}

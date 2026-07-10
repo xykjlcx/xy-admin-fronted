@@ -22,6 +22,7 @@ describe('shared renderer config', () => {
       outDir,
       base,
       enableMock: undefined,
+      legacyAppVersion: undefined,
     });
     const pluginNames = (config.plugins ?? [])
       .flat()
@@ -40,6 +41,7 @@ describe('shared renderer config', () => {
       ]),
     );
     expect(config.resolve?.alias).toEqual({ '@': expect.stringMatching(/\/src$/) });
+    expect(config.define?.__APP_VERSION__).toBe(JSON.stringify('0.1.0'));
   });
 
   test('rejects a non-demo production renderer build with mock enabled', () => {
@@ -51,6 +53,7 @@ describe('shared renderer config', () => {
         outDir: 'out/renderer',
         base: './',
         enableMock: 'true',
+        legacyAppVersion: undefined,
       }),
     ).toThrow('VITE_ENABLE_MOCK=true');
   });
@@ -70,6 +73,7 @@ describe('shared renderer config', () => {
       outDir,
       base: './',
       enableMock: undefined,
+      legacyAppVersion: undefined,
     });
     const stripPlugin = (config.plugins ?? [])
       .flat()
@@ -87,5 +91,30 @@ describe('shared renderer config', () => {
     expect(source).not.toContain('process.env');
     expect(source).not.toContain('import.meta.env');
     expect(source).not.toContain('loadEnv(');
+  });
+
+  test('fails a transition build when legacy VITE_APP_VERSION drifts from package.json', () => {
+    expect(() =>
+      createRendererConfig({
+        target: 'web',
+        command: 'build',
+        mode: 'production',
+        outDir: 'dist',
+        base: '/',
+        enableMock: undefined,
+        legacyAppVersion: '9.9.9',
+      }),
+    ).toThrow('VITE_APP_VERSION');
+    expect(() =>
+      createRendererConfig({
+        target: 'web',
+        command: 'build',
+        mode: 'production',
+        outDir: 'dist',
+        base: '/',
+        enableMock: undefined,
+        legacyAppVersion: '0.1.0',
+      }),
+    ).not.toThrow();
   });
 });

@@ -14,6 +14,7 @@ export default defineConfig(({ command, mode }) => {
       outDir: 'dist',
       base: '/',
       enableMock: rawEnv.VITE_ENABLE_MOCK,
+      legacyAppVersion: rawEnv.VITE_APP_VERSION,
     }),
     test: {
       environment: 'jsdom',

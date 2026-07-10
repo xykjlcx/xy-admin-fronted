@@ -13,6 +13,7 @@ test('Web platform preserves browser clipboard and safe external-link semantics'
     apiBaseUrl: 'https://api.example.com/v1',
     webPublicBaseUrl: 'https://app.example.com/console/',
     createTaskId: () => '9ba560a3-94c6-438a-9d76-1e17627fd483',
+    appVersion: '0.1.0',
   });
 
   expect(platform.runtime).toBe('web');
@@ -48,6 +49,19 @@ test('Web platform preserves browser clipboard and safe external-link semantics'
     'https://app.example.com/console/admin/files?fileId=file-1',
   );
   unsubscribe();
+
+  const updateEvents: unknown[] = [];
+  const unsubscribeUpdater = platform.updater.subscribe((snapshot) => updateEvents.push(snapshot));
+  await expect(platform.updater.getSnapshot()).resolves.toMatchObject({
+    status: 'unsupported',
+    currentVersion: '0.1.0',
+  });
+  await expect(platform.updater.check()).resolves.toEqual({
+    ok: false,
+    error: { code: 'UNSUPPORTED', command: 'check', status: 'unsupported' },
+  });
+  expect(updateEvents).toEqual([expect.objectContaining({ status: 'unsupported' })]);
+  unsubscribeUpdater();
 });
 
 test('public share URLs reject remote cleartext HTTP', () => {
@@ -109,6 +123,29 @@ test('Desktop platform delegates only to the typed Preload API', async () => {
       cancel: vi.fn().mockResolvedValue(undefined),
       subscribe: vi.fn(() => () => undefined),
     },
+    updater: {
+      getSnapshot: vi.fn().mockResolvedValue({
+        status: 'idle',
+        currentVersion: '0.1.0',
+        operationId: null,
+        lastCommand: null,
+        retryable: false,
+        targetVersion: null,
+        releaseDate: null,
+        releaseNotes: null,
+        packageSize: null,
+        transferred: 0,
+        total: 0,
+        percent: 0,
+        bytesPerSecond: 0,
+        errorCode: null,
+      }),
+      command: vi.fn().mockResolvedValue({
+        ok: false,
+        error: { code: 'INVALID_STATE', command: 'download', status: 'idle' },
+      }),
+      subscribe: vi.fn(() => () => undefined),
+    },
   } as const;
   const platform = createDesktopPlatform(api, 'https://app.example.com/console/');
 
@@ -136,4 +173,7 @@ test('Desktop platform delegates only to the typed Preload API', async () => {
   );
   expect(api.files.save).toHaveBeenCalledWith({ resourceId: 'file-1', suggestedName: 'report.pdf' });
   expect(api.files.cancel).toHaveBeenCalledWith('9ba560a3-94c6-438a-9d76-1e17627fd483');
+  await expect(platform.updater.getSnapshot()).resolves.toMatchObject({ status: 'idle' });
+  await platform.updater.download();
+  expect(api.updater.command).toHaveBeenCalledWith('download');
 });

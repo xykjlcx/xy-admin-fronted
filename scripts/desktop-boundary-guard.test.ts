@@ -111,6 +111,20 @@ describe('desktop architecture guard', () => {
     ]);
   });
 
+  test('allows updater capability only in the App Shell host UI', () => {
+    const violations = findDesktopBoundaryViolations(
+      new Map([
+        ['src/modules/admin/dashboard/list/DashboardScene.tsx', 'platform.updater.check();'],
+        ['src/app/shell/widgets/UpdateStatus.tsx', 'platform.updater.check();'],
+        ['src/lib/platform/desktop.ts', "updater: { check: () => api.updater.command('check') }"],
+      ]),
+    );
+
+    expect(violations).toEqual([
+      'src/modules/admin/dashboard/list/DashboardScene.tsx: updater platform 只能由 App/Shell 消费',
+    ]);
+  });
+
   test('allows the designated config, preload, and Renderer platform adapter boundaries', () => {
     expect(
       findDesktopBoundaryViolations(

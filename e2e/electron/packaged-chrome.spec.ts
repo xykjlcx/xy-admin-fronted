@@ -1,4 +1,4 @@
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { _electron as electron, expect, test, type Page } from '@playwright/test';
 
@@ -42,7 +42,7 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
   const expectedPlatform = process.platform === 'darwin' ? 'darwin' : 'win32';
   const expectedInsets = expectedPlatform === 'darwin' ? { left: 80, right: 0 } : { left: 0, right: 138 };
   mkdirSync(screenshotRoot, { recursive: true });
-  const desktop = await electron.launch({
+  let desktop = await electron.launch({
     executablePath,
     args: [`--user-data-dir=${userDataPath}`],
     cwd: process.cwd(),
@@ -57,6 +57,27 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
     await page.locator('#login-password').fill('spike-password');
     await page.getByRole('button', { name: /^登录/ }).click();
     await expect(page.getByText('Packaged Chrome')).toBeVisible();
+
+    const appVersion = await desktop.evaluate(({ app }) => app.getVersion());
+    const nextVersion = `${appVersion.slice(0, appVersion.lastIndexOf('.') + 1)}${String(
+      Number(appVersion.slice(appVersion.lastIndexOf('.') + 1)) + 1,
+    )}`;
+    await userFacingUpdateFlow(page, appVersion, nextVersion);
+    const pendingMarkerPath = path.join(userDataPath, 'updates', 'pending.json');
+    await expect.poll(() => existsSync(pendingMarkerPath)).toBe(true);
+    expect(JSON.parse(readFileSync(pendingMarkerPath, 'utf8'))).toMatchObject({
+      fromVersion: appVersion,
+      toVersion: nextVersion,
+    });
+    await expect
+      .poll(() =>
+        desktop.evaluate(() =>
+          (
+            globalThis as typeof globalThis & { __spikeInstallRequested?: () => boolean }
+          ).__spikeInstallRequested?.(),
+        ),
+      )
+      .toBe(true);
 
     await expect
       .poll(() =>
@@ -139,6 +160,7 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
         });
       }
     }
+    expect(existsSync(pendingMarkerPath)).toBe(true);
 
     const window = desktop.windows()[0];
     expect(window).toBeDefined();
@@ -171,7 +193,33 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
         }),
       )
       .toEqual([`${String(expectedInsets.left)}px`, `${String(expectedInsets.right)}px`]);
+
+    await desktop.close();
+    desktop = await electron.launch({
+      executablePath,
+      args: [`--user-data-dir=${userDataPath}`],
+      cwd: process.cwd(),
+      env: { ...process.env, ELECTRON_ENABLE_LOGGING: '1' },
+    });
+    const restartedPage = await desktop.firstWindow();
+    await restartedPage.waitForLoadState('domcontentloaded');
+    await expect.poll(() => existsSync(pendingMarkerPath)).toBe(false);
   } finally {
     await desktop.close();
   }
 });
+
+async function userFacingUpdateFlow(page: Page, currentVersion: string, nextVersion: string): Promise<void> {
+  await userEventButton(page, `发现新版本 ${nextVersion}`);
+  await expect(page.getByRole('dialog', { name: '软件更新' })).toBeVisible();
+  await expect(page.getByText(`${currentVersion} → ${nextVersion}`)).toBeVisible();
+  await page.getByRole('button', { name: '下载更新' }).click();
+  await expect(page.getByRole('button', { name: '重启并安装' })).toBeVisible();
+  await page.getByRole('button', { name: '重启并安装' }).click();
+}
+
+async function userEventButton(page: Page, name: string): Promise<void> {
+  const button = page.getByRole('button', { name });
+  await expect(button).toBeVisible();
+  await button.click();
+}

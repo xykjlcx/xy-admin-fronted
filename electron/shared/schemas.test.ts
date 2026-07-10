@@ -10,6 +10,9 @@ import {
   FileDownloadStartInputSchema,
   FileDownloadStartResultSchema,
   IpcSuccessSchema,
+  UpdateCommandInputSchema,
+  UpdateCommandResultSchema,
+  UpdateSnapshotSchema,
 } from './schemas';
 
 describe('desktop IPC schemas', () => {
@@ -116,6 +119,55 @@ describe('desktop IPC schemas', () => {
         receivedBytes: 2048,
         totalBytes: 1024,
         percent: 200,
+      }),
+    ).toThrow();
+  });
+
+  test('validates serializable updater snapshots and typed command results', () => {
+    const snapshot = {
+      status: 'available',
+      currentVersion: '0.1.0',
+      operationId: '9ba560a3-94c6-438a-9d76-1e17627fd483',
+      lastCommand: 'check',
+      retryable: false,
+      targetVersion: '0.2.0',
+      releaseDate: '2026-07-11T00:00:00.000Z',
+      releaseNotes: 'Security and stability improvements',
+      packageSize: 4096,
+      transferred: 0,
+      total: 4096,
+      percent: 0,
+      bytesPerSecond: 0,
+      errorCode: null,
+    } as const;
+    expect(UpdateSnapshotSchema.parse(snapshot)).toEqual(snapshot);
+    expect(UpdateCommandInputSchema.parse({ command: 'download' })).toEqual({ command: 'download' });
+    expect(UpdateCommandResultSchema.parse({ ok: true, snapshot })).toMatchObject({
+      ok: true,
+      snapshot: { status: 'available' },
+    });
+    expect(
+      UpdateCommandResultSchema.parse({
+        ok: false,
+        error: { code: 'INVALID_STATE', command: 'download', status: 'idle' },
+      }),
+    ).toEqual({
+      ok: false,
+      error: { code: 'INVALID_STATE', command: 'download', status: 'idle' },
+    });
+
+    expect(() => UpdateSnapshotSchema.parse({ ...snapshot, targetVersion: null })).toThrow();
+    expect(() => UpdateSnapshotSchema.parse({ ...snapshot, status: 'error', errorCode: null })).toThrow();
+    expect(() => UpdateCommandInputSchema.parse({ command: 'force-update' })).toThrow();
+    expect(() =>
+      UpdateCommandResultSchema.parse({
+        ok: false,
+        error: {
+          code: 'INVALID_STATE',
+          command: 'download',
+          status: 'idle',
+          message: 'raw updater error must not cross IPC',
+        },
       }),
     ).toThrow();
   });

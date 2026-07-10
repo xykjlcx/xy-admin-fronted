@@ -95,6 +95,78 @@ export const FileDownloadEventSchema = z.discriminatedUnion('status', [
   FileDownloadErrorEventSchema,
 ]);
 
+const StableSemVerSchema = z
+  .string()
+  .regex(/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\+[0-9A-Za-z.-]+)?$/);
+export const UpdateStatusSchema = z.enum([
+  'unsupported',
+  'idle',
+  'checking',
+  'upToDate',
+  'available',
+  'downloading',
+  'downloaded',
+  'installing',
+  'error',
+  'cancelled',
+]);
+export const UpdateCommandSchema = z.enum(['check', 'download', 'cancelDownload', 'install', 'retry']);
+export const UpdateErrorCodeSchema = z.enum([
+  'UPDATE_CHECK_FAILED',
+  'UPDATE_DOWNLOAD_FAILED',
+  'UPDATE_INSTALL_FAILED',
+  'INVALID_UPDATE_METADATA',
+  'UPDATE_UNKNOWN',
+]);
+export const UpdateSnapshotSchema = z
+  .object({
+    status: UpdateStatusSchema,
+    currentVersion: StableSemVerSchema,
+    operationId: z.uuid().nullable(),
+    lastCommand: UpdateCommandSchema.nullable(),
+    retryable: z.boolean(),
+    targetVersion: StableSemVerSchema.nullable(),
+    releaseDate: z.string().datetime().nullable(),
+    releaseNotes: z.string().max(20_000).nullable(),
+    packageSize: z.number().int().nonnegative().nullable(),
+    transferred: z.number().int().nonnegative(),
+    total: z.number().int().nonnegative(),
+    percent: z.number().min(0).max(100),
+    bytesPerSecond: z.number().nonnegative(),
+    errorCode: UpdateErrorCodeSchema.nullable(),
+  })
+  .strict()
+  .superRefine((snapshot, context) => {
+    const requiresTarget = ['available', 'downloading', 'downloaded', 'installing', 'cancelled'].includes(
+      snapshot.status,
+    );
+    if (requiresTarget && !snapshot.targetVersion) {
+      context.addIssue({ code: 'custom', message: '更新状态缺少目标版本', path: ['targetVersion'] });
+    }
+    if (snapshot.status === 'error' && !snapshot.errorCode) {
+      context.addIssue({ code: 'custom', message: '错误状态缺少脱敏错误码', path: ['errorCode'] });
+    }
+    if (snapshot.status !== 'error' && snapshot.errorCode) {
+      context.addIssue({ code: 'custom', message: '非错误状态不能携带错误码', path: ['errorCode'] });
+    }
+    if (snapshot.transferred > snapshot.total && snapshot.total > 0) {
+      context.addIssue({ code: 'custom', message: '更新进度超过总大小', path: ['transferred'] });
+    }
+  });
+export const UpdateCommandInputSchema = z.object({ command: UpdateCommandSchema }).strict();
+export const UpdateGetSnapshotInputSchema = z.undefined();
+const UpdateCommandDomainErrorSchema = z
+  .object({
+    code: z.enum(['INVALID_STATE', 'UNSUPPORTED']),
+    command: UpdateCommandSchema,
+    status: UpdateStatusSchema,
+  })
+  .strict();
+export const UpdateCommandResultSchema = z.discriminatedUnion('ok', [
+  z.object({ ok: z.literal(true), snapshot: UpdateSnapshotSchema }).strict(),
+  z.object({ ok: z.literal(false), error: UpdateCommandDomainErrorSchema }).strict(),
+]);
+
 export type ClipboardWriteInput = z.infer<typeof ClipboardWriteInputSchema>;
 export type ExternalOpenInput = z.infer<typeof ExternalOpenInputSchema>;
 export type IpcSuccess = z.infer<typeof IpcSuccessSchema>;
@@ -105,3 +177,9 @@ export type FileDownloadStartResult = z.infer<typeof FileDownloadStartResultSche
 export type FileDownloadCancelInput = z.infer<typeof FileDownloadCancelInputSchema>;
 export type FileDownloadEvent = z.infer<typeof FileDownloadEventSchema>;
 export type FileDownloadErrorCode = z.infer<typeof FileDownloadErrorCodeSchema>;
+export type UpdateStatus = z.infer<typeof UpdateStatusSchema>;
+export type UpdateCommand = z.infer<typeof UpdateCommandSchema>;
+export type UpdateErrorCode = z.infer<typeof UpdateErrorCodeSchema>;
+export type UpdateSnapshot = z.infer<typeof UpdateSnapshotSchema>;
+export type UpdateCommandInput = z.infer<typeof UpdateCommandInputSchema>;
+export type UpdateCommandResult = z.infer<typeof UpdateCommandResultSchema>;

@@ -6,11 +6,14 @@ export const ipcChannels = {
   credentialClear: 'desktop:credential:clear',
   fileDownloadStart: 'desktop:file:download-start',
   fileDownloadCancel: 'desktop:file:download-cancel',
+  updaterGetSnapshot: 'desktop:updater:get-snapshot',
+  updaterCommand: 'desktop:updater:command',
 } as const;
 
 export const ipcEvents = {
   windowStateChanged: 'desktop:window:state-changed',
   fileDownloadChanged: 'desktop:file:download-changed',
+  updaterStateChanged: 'desktop:updater:state-changed',
 } as const;
 
 export type DesktopIpcChannel = (typeof ipcChannels)[keyof typeof ipcChannels];

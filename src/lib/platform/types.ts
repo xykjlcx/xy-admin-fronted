@@ -1,3 +1,20 @@
+import type {
+  FileDownloadEvent,
+  FileDownloadStartInput,
+  FileDownloadStartResult,
+  UpdateCommandResult,
+  UpdateSnapshot,
+} from '../../../electron/shared/schemas';
+
+export type {
+  FileDownloadEvent,
+  FileDownloadStartInput,
+  FileDownloadStartResult,
+  UpdateCommand,
+  UpdateCommandResult,
+  UpdateSnapshot,
+} from '../../../electron/shared/schemas';
+
 export type HostRuntime = 'web' | 'desktop';
 export type SessionClearReason = 'logout' | 'expired' | 'switch-account';
 
@@ -48,6 +65,15 @@ export interface AppPlatform {
     subscribe(listener: (event: FileDownloadEvent) => void): () => void;
     createShareUrl(resourceId: string): string;
   };
+  readonly updater: {
+    getSnapshot(): Promise<UpdateSnapshot>;
+    check(): Promise<UpdateCommandResult>;
+    download(): Promise<UpdateCommandResult>;
+    cancelDownload(): Promise<UpdateCommandResult>;
+    install(): Promise<UpdateCommandResult>;
+    retry(): Promise<UpdateCommandResult>;
+    subscribe(listener: (snapshot: UpdateSnapshot) => void): () => void;
+  };
 }
 
 export function createPublicFileUrl(webPublicBaseUrl: string, resourceId: string): string {
@@ -77,14 +103,3 @@ export function assertSafeHttpsExternalUrl(value: string): string {
   }
   return url.toString();
 }
-import type {
-  FileDownloadEvent,
-  FileDownloadStartInput,
-  FileDownloadStartResult,
-} from '../../../electron/shared/schemas';
-
-export type {
-  FileDownloadEvent,
-  FileDownloadStartInput,
-  FileDownloadStartResult,
-} from '../../../electron/shared/schemas';

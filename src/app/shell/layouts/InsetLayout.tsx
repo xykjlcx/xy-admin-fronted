@@ -10,6 +10,7 @@ import { LanguageMenu } from '../widgets/LanguageMenu';
 import { NotificationBell } from '../widgets/NotificationBell';
 import { NavMenuInset } from '../widgets/NavMenuInset';
 import { UserMenu } from '../widgets/UserMenu';
+import { UpdateStatus } from '../widgets/UpdateStatus';
 import { Button } from '@/components/ui/button';
 import { PageFrameChromeProvider } from '@/components/pro/PageScaffold';
 import { PageTransition } from '@/components/pro/PageTransition';
@@ -78,6 +79,7 @@ export function InsetLayout({
             data-slot="inset-shell-header-suffix"
             className="inset-window-controls-right desktop-no-drag flex items-center justify-end gap-1.5"
           >
+            <UpdateStatus />
             <NotificationBell />
             <AppearanceDrawer />
             <DarkModeToggle />

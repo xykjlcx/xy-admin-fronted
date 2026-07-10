@@ -42,6 +42,17 @@ test('parseEnv exposes a validated desktop host selection', () => {
   ).toThrow('VITE_WINDOW_CHROME');
 });
 
+test('package.json version is the Renderer version truth regardless of runtime env input', () => {
+  expect(
+    parseEnv({
+      MODE: 'production',
+      DEV: false,
+      PROD: true,
+      VITE_APP_VERSION: '9.9.9',
+    }).appVersion,
+  ).toBe('0.1.0');
+});
+
 test('feature config preserves mock gating rules', () => {
   expect(createFeatureConfig(parseEnv({ MODE: 'development', DEV: true, PROD: false })).enableMock).toBe(
     true,

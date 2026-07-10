@@ -123,8 +123,14 @@ export function readDesktopEnvironment(): DesktopEnvironment {
   return parseDesktopEnvironment(process.env);
 }
 
-export function readDesktopRendererEnvironment(): { enableMock: string | undefined } {
-  return { enableMock: process.env.VITE_ENABLE_MOCK };
+export function readDesktopRendererEnvironment(): {
+  enableMock: string | undefined;
+  legacyAppVersion: string | undefined;
+} {
+  return {
+    enableMock: process.env.VITE_ENABLE_MOCK,
+    legacyAppVersion: process.env.VITE_APP_VERSION,
+  };
 }
 
 export function readSpikeUserDataPathValue(): string | undefined {

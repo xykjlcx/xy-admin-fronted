@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 import { statfs } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
@@ -14,6 +15,7 @@ import {
   session,
   shell,
 } from 'electron';
+import electronUpdater from 'electron-updater';
 import {
   getDesktopEnvironment,
   readRendererDevelopmentUrl,
@@ -24,6 +26,7 @@ import { createWindowOptions } from './create-window';
 import { createAtomicCredentialFileStore, createCredentialVault } from './credential-vault';
 import { createDownloadManager } from './download-manager';
 import { requestDownloadWithElectronNet } from './download-net';
+import { configureElectronUpdater, createElectronCancellationPort } from './electron-updater-port';
 import { registerDesktopIpcHandlers } from './ipc';
 import { decideNavigation } from './navigation-policy';
 import { buildRendererCsp, resolveRendererAssetPath } from './protocol';
@@ -31,6 +34,11 @@ import { parseSpikeDownloadPath, parseSpikeUserDataPath } from './spike-user-dat
 import { bindWindowState } from './window-state';
 import { ipcEvents } from '../shared/ipc-channels';
 import { FileDownloadEventSchema } from '../shared/schemas';
+import { UpdateSnapshotSchema } from '../shared/schemas';
+import { createPendingUpdateMarker } from './pending-update-marker';
+import { createSpikeUpdaterHarness } from './spike-updater';
+import { createUpdateController } from './update-controller';
+import { createUpdateFeedUrl } from './update-source';
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -45,6 +53,7 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 const environment = getDesktopEnvironment();
+const { autoUpdater } = electronUpdater;
 const spikeUserDataPath = parseSpikeUserDataPath(readSpikeUserDataPathValue(), environment.spikeMode);
 if (spikeUserDataPath) app.setPath('userData', spikeUserDataPath);
 const spikeDownloadPath = parseSpikeDownloadPath(
@@ -87,7 +96,7 @@ function attachNavigationPolicy(window: BrowserWindow): void {
   });
 }
 
-function createMainWindow(): BrowserWindow {
+function createMainWindow(onRendererHealthy: () => void): BrowserWindow {
   if (process.platform !== 'darwin' && process.platform !== 'win32') {
     throw new Error(`不支持的桌面平台: ${process.platform}`);
   }
@@ -106,6 +115,7 @@ function createMainWindow(): BrowserWindow {
   });
   attachNavigationPolicy(window);
   window.once('ready-to-show', () => window.show());
+  window.webContents.once('did-finish-load', onRendererHealthy);
   // webContents 销毁前解绑；在 closed 后访问已销毁 webContents 会阻塞 Playwright/app.quit 清理。
   window.once('close', disposeWindowState);
   window.on('closed', () => {
@@ -177,6 +187,42 @@ async function startApplication(): Promise<void> {
     // 安全存储不可用或密文损坏时按无会话启动，禁止回退明文。
     console.error('Credential vault restore failed; starting without a session');
   }
+  const pendingUpdateMarker = createPendingUpdateMarker(
+    path.join(app.getPath('userData'), 'updates', 'pending.json'),
+  );
+  try {
+    if (await pendingUpdateMarker.read()) {
+      console.error('Pending update marker detected; waiting for a healthy Renderer load');
+    }
+  } catch {
+    console.error('Pending update marker could not be read');
+  }
+  const spikeUpdater = environment.spikeMode ? createSpikeUpdaterHarness(app.getVersion()) : null;
+  const updaterPort =
+    spikeUpdater?.port ??
+    configureElectronUpdater(
+      autoUpdater,
+      createUpdateFeedUrl(environment.updateBaseUrl, process.platform, process.arch),
+    );
+  if (spikeUpdater) {
+    const state = globalThis as typeof globalThis & { __spikeInstallRequested?: () => boolean };
+    state.__spikeInstallRequested = spikeUpdater.installRequested;
+  }
+  const updateController = createUpdateController({
+    currentVersion: app.getVersion(),
+    updater: updaterPort,
+    createOperationId: randomUUID,
+    createCancellationToken: spikeUpdater?.createCancellationToken ?? createElectronCancellationPort,
+    writePendingMarker: (input) => pendingUpdateMarker.write(input),
+    publish: (next) => {
+      const payload = UpdateSnapshotSchema.parse(next);
+      for (const window of BrowserWindow.getAllWindows()) {
+        if (!window.isDestroyed() && !window.webContents.isDestroyed()) {
+          window.webContents.send(ipcEvents.updaterStateChanged, payload);
+        }
+      }
+    },
+  });
   const downloadManager = createDownloadManager({
     apiBaseUrl: environment.apiBaseUrl,
     approvedOrigins: new Set([environment.apiOrigin, ...environment.downloadAllowedOrigins]),
@@ -207,12 +253,21 @@ async function startApplication(): Promise<void> {
     allowedExternalHosts,
     credentials: credentialVault,
     files: downloadManager,
+    updater: updateController,
   });
-  app.once('before-quit', disposeIpc);
-  mainWindow = createMainWindow();
+  app.once('before-quit', () => {
+    updateController.dispose();
+    disposeIpc();
+  });
+  const markRendererHealthy = () => {
+    void pendingUpdateMarker.clear().catch(() => {
+      console.error('Pending update marker cleanup failed');
+    });
+  };
+  mainWindow = createMainWindow(markRendererHealthy);
 
   app.on('activate', () => {
-    if (!mainWindow) mainWindow = createMainWindow();
+    if (!mainWindow) mainWindow = createMainWindow(markRendererHealthy);
   });
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
@@ -221,6 +276,7 @@ async function startApplication(): Promise<void> {
 
 void startApplication().catch((error: unknown) => {
   const message = error instanceof Error ? error.message : '未知启动错误';
+  console.error('Application startup failed:', message);
   dialog.showErrorBox('应用启动失败', message);
   app.exit(1);
 });

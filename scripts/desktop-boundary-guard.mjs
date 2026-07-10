@@ -59,6 +59,13 @@ export function findDesktopBoundaryViolations(files) {
         violations.push(`${normalizedFile}: window platform 只能由 App/Shell 消费`);
       }
       if (
+        /\bplatform\s*\.\s*updater\b/.test(source) &&
+        !normalizedFile.startsWith('src/app/') &&
+        !normalizedFile.startsWith('src/lib/platform/')
+      ) {
+        violations.push(`${normalizedFile}: updater platform 只能由 App/Shell 消费`);
+      }
+      if (
         normalizedFile.startsWith('src/modules/admin/files/') &&
         (/(?:from\s+|import\s*\()['"]@\/lib\/download['"]/.test(source) || /\bdownloadFile\s*\(/.test(source))
       ) {
