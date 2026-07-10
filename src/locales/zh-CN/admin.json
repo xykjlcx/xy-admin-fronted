@@ -107,6 +107,7 @@
       "batchDisable": "批量禁用",
       "detail": "详情",
       "delete": "删除",
+      "more": "更多操作",
       "deleteName": "删除{{name}}",
       "prev": "上一页",
       "next": "下一页",
@@ -192,12 +193,11 @@
     "title": "角色与权限",
     "breadcrumbGroup": "组织与权限",
     "tabs": {
-      "roles": "业务角色",
-      "admins": "管理员权限"
+      "roles": "角色管理",
+      "auditLogs": "操作日志"
     },
     "searchPlaceholder": "搜索角色",
     "permissionSearchPlaceholder": "搜索权限…",
-    "adminIntro": "管理员角色决定了后台各模块的可管理范围",
     "refreshing": "正在更新",
     "empty": "暂无角色",
     "noPermissionResult": "暂无匹配权限",
@@ -206,9 +206,9 @@
       "custom": "自定义"
     },
     "detailTabs": {
-      "permissions": "权限配置",
-      "members": "角色成员 · {{count}}",
-      "logs": "操作日志"
+      "permissions": "功能权限",
+      "dataPermissions": "数据权限",
+      "members": "角色成员 · {{count}}"
     },
     "permission": {
       "granted": "已授权 {{granted}} / {{total}}",
@@ -219,11 +219,62 @@
       "expandGroup": "展开{{group}}权限分组",
       "collapseGroup": "折叠{{group}}权限分组"
     },
-    "columns": {
-      "adminRole": "角色名称",
-      "admin": "管理员",
-      "scope": "权限范围",
-      "actions": "操作"
+    "dataPermission": {
+      "defaultScope": "角色默认数据范围",
+      "defaultScopeDesc": "未单独设置的数据资源继承此范围",
+      "customDepartments": "默认可见部门",
+      "selectDepartments": "选择部门",
+      "visibleDepartments": "可见部门",
+      "departmentsSelected": "已选择 {{count}} 个部门",
+      "selectDefaultDepartments": "选择角色默认可见部门",
+      "selectResourceDepartments": "选择{{resource}}可见部门",
+      "resourceScopeLabel": "{{resource}}数据范围",
+      "notApplicable": "—",
+      "empty": "暂无可配置的数据资源",
+      "columns": {
+        "resource": "数据资源",
+        "scope": "生效范围",
+        "departments": "自定义范围"
+      },
+      "scopes": {
+        "inherit": "继承角色默认值",
+        "all": "全部数据",
+        "deptAndChildren": "本部门及下级部门",
+        "dept": "仅本部门",
+        "self": "仅本人数据",
+        "custom": "自定义部门"
+      },
+      "resources": {
+        "members": "成员与部门",
+        "files": "文件管理",
+        "notices": "通知公告",
+        "auditLogs": "操作日志"
+      }
+    },
+    "auditLogs": {
+      "searchLabel": "搜索操作日志",
+      "searchPlaceholder": "搜索操作人、角色或变更内容",
+      "allRoles": "全部角色",
+      "empty": "暂无匹配的操作日志",
+      "filters": {
+        "role": "角色",
+        "kind": "变更类型"
+      },
+      "columns": {
+        "occurredAt": "操作时间",
+        "operator": "操作人",
+        "role": "角色",
+        "kind": "变更类型",
+        "change": "变更内容"
+      },
+      "kinds": {
+        "all": "全部类型",
+        "create": "创建角色",
+        "edit": "编辑角色",
+        "grant": "新增权限",
+        "remove": "移除权限",
+        "dataScope": "数据权限"
+      }
     },
     "actions": {
       "addRole": "新增角色",
@@ -232,38 +283,33 @@
       "collapse": "折叠",
       "clear": "清空",
       "grantAll": "全部授权",
+      "cancelAll": "全部取消",
       "reset": "重置",
-      "savePermissions": "保存权限",
+      "save": "保存",
+      "savePermissions": "保存功能权限",
+      "saveDataPermissions": "保存数据权限",
       "cancel": "取消",
       "confirmCreate": "确定创建",
       "confirmDelete": "确认删除",
-      "createAdmin": "创建管理员角色",
-      "detail": "详情",
-      "add": "添加",
       "removeMember": "移除"
     },
     "dialog": {
       "addRoleTitle": "新增角色",
       "deleteRoleTitle": "删除角色",
-      "deleteRoleDesc": "删除后该角色及其权限配置会从当前列表移除。",
-      "addAdminTitle": "创建管理员角色"
+      "deleteRoleDesc": "删除后该角色及其权限配置会从当前列表移除。"
     },
     "form": {
       "roleName": "角色名称",
       "roleNamePlaceholder": "如：运营、客服",
       "roleDesc": "角色描述",
-      "roleDescPlaceholder": "选填，描述该角色的职责",
-      "adminRoleName": "角色名称",
-      "adminRoleNamePlaceholder": "如：文件管理员",
-      "adminMember": "指派管理员",
-      "adminMemberPlaceholder": "请选择成员"
+      "roleDescPlaceholder": "选填，描述该角色的职责"
     },
     "toast": {
       "stub": "该流程将在后续任务接入",
       "created": "角色已创建，请配置权限",
       "deleted": "角色已删除",
-      "permissionsSaved": "权限已保存",
-      "adminCreated": "管理员角色已创建"
+      "permissionsSaved": "功能权限已保存",
+      "dataPermissionsSaved": "数据权限已保存"
     }
   },
   "menus": {
@@ -272,13 +318,19 @@
     "refreshing": "正在更新",
     "searchLabel": "搜索菜单",
     "searchPlaceholder": "搜索菜单名称、路由、权限标识",
+    "workspaceLabel": "菜单配置工作区",
     "treeTitle": "{{subsystem}} · 菜单树",
     "treeRegionLabel": "{{subsystem}}菜单树",
+    "treeLabel": "菜单导航树",
+    "treeToolbarLabel": "菜单树工具栏",
+    "treeHeading": "菜单管理",
+    "treeSummary": "共 {{count}} 个导航节点",
     "stats": "目录 {{dirs}} · 菜单 {{menus}} · 动作 {{actions}} · 隐藏 {{hidden}}",
     "subsystems": {
       "title": "子系统管理",
       "desc": "选择子系统后维护对应菜单树",
       "listLabel": "子系统列表",
+      "switcherLabel": "子系统切换",
       "builtin": "内置",
       "custom": "自定义",
       "enabled": "已启用",
@@ -301,6 +353,7 @@
     },
     "actions": {
       "create": "新增菜单",
+      "createAction": "新增操作",
       "createSubsystem": "新增子系统",
       "inspect": "节点详情",
       "expand": "展开",
@@ -308,6 +361,8 @@
       "edit": "编辑",
       "delete": "删除",
       "addChild": "添加子节点",
+      "addPage": "新增页面",
+      "addPageName": "在{{name}}下新增页面",
       "addChildName": "添加{{name}}子节点",
       "editName": "编辑{{name}}",
       "deleteName": "删除{{name}}",
@@ -318,6 +373,7 @@
       "cancel": "取消",
       "confirmCreate": "确定新增",
       "save": "保存菜单",
+      "saveInline": "保存",
       "saveSubsystem": "保存子系统",
       "confirmDelete": "确认删除"
     },
@@ -338,6 +394,8 @@
       "desc": "子系统描述",
       "descPlaceholder": "如：组织 · 权限 · 审计",
       "icon": "图标",
+      "home": "子系统首页",
+      "homePlaceholder": "请选择首页路由",
       "enabled": "是否启用",
       "enabledHint": "停用后不会进入子系统切换入口",
       "errors": {
@@ -345,7 +403,8 @@
         "keyInvalid": "子系统标识只能使用小写字母、数字和连字符",
         "keyDuplicated": "子系统标识已存在",
         "nameRequired": "子系统名称不能为空",
-        "descRequired": "子系统描述不能为空"
+        "descRequired": "子系统描述不能为空",
+        "homeRequired": "请选择子系统首页"
       }
     },
     "form": {
@@ -388,11 +447,18 @@
     },
     "inspector": {
       "label": "节点详情",
-      "title": "节点详情",
+      "title": "菜单详情",
+      "basicInfo": "基本信息",
       "empty": "选择一个菜单节点后查看配置详情。",
       "emptyValue": "未配置",
       "visible": "已显示",
       "hidden": "已隐藏"
+    },
+    "actionSection": {
+      "label": "页面操作",
+      "title": "页面操作",
+      "desc": "该页面配置了 {{count}} 个操作权限",
+      "empty": "该页面暂未配置操作权限"
     },
     "toast": {
       "created": "菜单已创建",
@@ -402,6 +468,294 @@
       "deleted": "菜单已删除",
       "visibilityUpdated": "显示状态已更新",
       "failed": "操作失败"
+    }
+  },
+  "dictionaries": {
+    "title": "字典管理",
+    "breadcrumbGroup": "系统设置",
+    "catalogTitle": "字典目录",
+    "catalogSearch": "搜索字典名称、编码",
+    "itemSearch": "搜索字典项标签、值",
+    "builtin": "内置",
+    "emptyCatalog": "暂无字典",
+    "emptyItems": "暂无字典项",
+    "loadingItems": "正在加载字典项",
+    "error": "字典数据加载失败",
+    "columns": {
+      "label": "字典标签",
+      "value": "字典值",
+      "sort": "排序",
+      "status": "状态",
+      "remark": "说明",
+      "actions": "操作"
+    },
+    "status": { "enabled": "启用", "disabled": "停用" },
+    "colors": {
+      "primary": "主要",
+      "success": "成功",
+      "warning": "警告",
+      "danger": "危险",
+      "neutral": "中性"
+    },
+    "actions": {
+      "create": "新增字典",
+      "createDictionary": "创建字典",
+      "editDictionary": "编辑字典",
+      "deleteDictionary": "删除字典",
+      "createItem": "新增字典项",
+      "edit": "编辑",
+      "delete": "删除",
+      "more": "更多操作",
+      "cancel": "取消",
+      "save": "保存",
+      "saveItem": "保存字典项",
+      "confirmDelete": "确认删除",
+      "retry": "重试"
+    },
+    "form": {
+      "createTitle": "新增字典",
+      "editTitle": "编辑字典",
+      "name": "字典名称",
+      "code": "字典编码",
+      "remark": "用途说明"
+    },
+    "itemForm": {
+      "createTitle": "新增字典项",
+      "editTitle": "编辑字典项",
+      "label": "字典标签",
+      "value": "字典值",
+      "sort": "排序",
+      "color": "状态颜色",
+      "enabled": "启用该字典项",
+      "enabledHint": "停用后新业务数据不再使用该值"
+    },
+    "confirm": {
+      "deleteDictionaryTitle": "删除字典",
+      "deleteDictionaryDesc": "确认删除字典「{{name}}」及其全部字典项？",
+      "deleteItemTitle": "删除字典项",
+      "deleteItemDesc": "确认删除字典项「{{name}}」？"
+    },
+    "toast": {
+      "created": "字典已创建",
+      "updated": "字典已更新",
+      "deleted": "字典已删除",
+      "itemSaved": "字典项已保存",
+      "itemDeleted": "字典项已删除"
+    }
+  },
+  "messages": {
+    "title": "消息中心",
+    "breadcrumbGroup": "工作台",
+    "tabs": { "all": "全部", "unread": "未读", "read": "已读" },
+    "categories": { "approval": "待办审批", "security": "安全提醒", "system": "系统通知" },
+    "actions": { "readAll": "全部已读", "delete": "删除消息", "approve": "同意", "reject": "拒绝" },
+    "approval": { "approved": "已同意", "rejected": "已拒绝" },
+    "unread": "未读",
+    "read": "已读",
+    "from": "发件方 · {{from}}",
+    "empty": "暂无消息",
+    "toast": {
+      "allRead": "已全部标记为已读",
+      "deleted": "消息已删除",
+      "approved": "审批已同意",
+      "rejected": "审批已拒绝"
+    }
+  },
+  "logs": {
+    "title": "日志审计",
+    "breadcrumbGroup": "安全审计",
+    "tabs": { "operation": "操作日志", "login": "登录日志" },
+    "search": "搜索日志",
+    "filters": { "type": "操作类型", "result": "登录结果", "startDate": "开始日期", "endDate": "结束日期" },
+    "types": {
+      "all": "全部类型",
+      "create": "新增",
+      "edit": "编辑",
+      "del": "删除",
+      "export": "导出",
+      "perm": "权限变更",
+      "config": "配置"
+    },
+    "results": { "all": "全部结果", "ok": "成功", "fail": "失败" },
+    "columns": {
+      "time": "操作时间",
+      "operator": "操作人",
+      "module": "模块",
+      "type": "操作类型",
+      "target": "操作对象",
+      "ip": "IP 地址",
+      "loginTime": "登录时间",
+      "user": "用户",
+      "result": "结果",
+      "location": "地点",
+      "device": "设备"
+    },
+    "actions": { "export": "导出日志" },
+    "empty": { "operation": "暂无操作日志", "login": "暂无登录日志" },
+    "loading": "正在加载日志",
+    "total": "共 {{count}} 条记录"
+  },
+  "files": {
+    "title": "文件管理",
+    "breadcrumbGroup": "文件中心",
+    "root": "全部文件",
+    "search": "搜索文件",
+    "total": "{{count}} 项",
+    "folderUnit": "个文件",
+    "defaultFolderName": "新建文件夹",
+    "name": "名称",
+    "columns": { "name": "名称", "size": "大小", "owner": "拥有者", "date": "修改日期" },
+    "views": { "grid": "网格视图", "list": "列表视图" },
+    "actions": {
+      "upload": "上传文件",
+      "newFolder": "新建文件夹",
+      "openFolder": "打开文件夹",
+      "preview": "预览",
+      "download": "下载",
+      "rename": "重命名",
+      "share": "分享",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "storage": {
+      "title": "存储容量",
+      "used": "{{used}} GB / {{total}} GB 已用",
+      "document": "文档",
+      "image": "图片",
+      "video": "视频",
+      "other": "其他"
+    },
+    "upload": {
+      "title": "上传文件",
+      "drop": "点击或拖拽文件到此处上传",
+      "hint": "支持 PDF / 图片 / 文档 / 表格，单个不超过 100MB",
+      "input": "选择文件",
+      "submit": "开始上传",
+      "tooLarge": "单个文件不能超过 100MB"
+    },
+    "folderDialog": { "title": "新建文件夹" },
+    "renameDialog": { "title": "重命名文件" },
+    "deleteDialog": {
+      "title": "删除文件",
+      "description": "确认删除「{{name}}」？文件夹内的内容也会一并删除。"
+    },
+    "preview": {
+      "description": "文件预览与管理",
+      "image": "图片预览",
+      "document": "Mock 环境文档预览",
+      "type": "类型"
+    },
+    "toast": {
+      "uploaded": "文件上传成功",
+      "folderCreated": "文件夹已创建",
+      "renamed": "文件已重命名",
+      "deleted": "文件已删除",
+      "shared": "分享链接已复制",
+      "shareFailed": "分享链接复制失败，请重试",
+      "downloadFailed": "文件下载失败，请重试"
+    },
+    "empty": "当前目录暂无文件",
+    "loading": "正在加载文件"
+  },
+  "company": {
+    "title": "企业信息",
+    "breadcrumbGroup": "系统设置",
+    "sections": { "basic": "基础信息", "more": "更多信息", "contacts": "企业联系人" },
+    "verified": "已认证",
+    "unverified": "未认证",
+    "verifyHint": "完成企业认证可享受专属权益",
+    "fields": {
+      "name": "企业名称",
+      "domain": "企业域名",
+      "code": "企业编号",
+      "industry": "所属行业",
+      "scale": "企业规模",
+      "dataResidency": "数据驻留地",
+      "createdAt": "创建时间",
+      "contactName": "联系人姓名",
+      "contactEmail": "联系人邮箱",
+      "contactPhone": "联系人手机",
+      "landline": "座机",
+      "address": "企业地址",
+      "postalCode": "邮编"
+    },
+    "actions": { "edit": "编辑企业信息", "editShort": "编辑", "cancel": "取消", "save": "保存企业信息" },
+    "form": { "title": "编辑企业信息" },
+    "toast": { "saved": "企业信息已保存" }
+  },
+  "profile": {
+    "title": "个人中心",
+    "breadcrumbGroup": "首页",
+    "tabs": {
+      "info": "个人信息",
+      "security": "账号与安全",
+      "preferences": "偏好设置",
+      "devices": "登录设备"
+    },
+    "sections": {
+      "basic": "基本信息",
+      "work": "工作信息",
+      "bio": "个人简介",
+      "security": "账号与安全",
+      "preferences": "偏好设置",
+      "devices": "登录设备"
+    },
+    "fields": {
+      "name": "姓名",
+      "email": "邮箱",
+      "phone": "手机号",
+      "department": "部门",
+      "role": "角色",
+      "location": "所在地",
+      "employeeNo": "工号",
+      "title": "职位",
+      "joinedAt": "入职日期",
+      "manager": "直属上级",
+      "language": "语言",
+      "timezone": "时区",
+      "bio": "个人简介"
+    },
+    "emailVerified": "邮箱已验证",
+    "lastActive": "{{value}} 活跃",
+    "actions": {
+      "edit": "编辑资料",
+      "editShort": "编辑",
+      "cancel": "取消",
+      "save": "保存资料",
+      "savePreferences": "保存偏好",
+      "messages": "我的消息"
+    },
+    "form": { "title": "编辑个人资料" },
+    "password": {
+      "title": "修改密码",
+      "hint": "新密码至少 8 位，修改成功后请妥善保管。",
+      "loginPassword": "登录密码",
+      "lastUpdated": "上次更新 · 62 天前，建议 90 天更换一次",
+      "action": "修改密码",
+      "currentPassword": "当前密码",
+      "newPassword": "新密码",
+      "confirmPassword": "确认新密码",
+      "submit": "确认修改",
+      "failed": "密码修改失败"
+    },
+    "security": {
+      "twoFactor": { "title": "双重验证 (2FA)", "desc": "使用认证器 App 进行二次验证" },
+      "emailAlert": { "title": "安全邮件提醒", "desc": "异常登录、密码修改时发送邮件" },
+      "newDeviceAlert": { "title": "新设备登录提醒", "desc": "新设备首次登录时发送通知" }
+    },
+    "preferences": {
+      "language": "界面语言",
+      "timezone": "时区",
+      "languages": { "zh": "简体中文", "en": "English" },
+      "weeklyDigest": { "title": "每周摘要", "desc": "每周一发送工作与安全摘要" },
+      "compactNotifications": { "title": "精简通知", "desc": "合并相似通知，减少打扰" }
+    },
+    "devices": { "current": "当前设备", "remove": "下线设备", "removed": "设备已下线" },
+    "toast": {
+      "saved": "个人资料已保存",
+      "passwordChanged": "密码修改成功",
+      "preferencesSaved": "偏好设置已保存"
     }
   }
 }

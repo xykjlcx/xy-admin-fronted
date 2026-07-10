@@ -107,6 +107,7 @@
       "batchDisable": "Disable selected",
       "detail": "Details",
       "delete": "Delete",
+      "more": "More actions",
       "deleteName": "Delete {{name}}",
       "prev": "Previous",
       "next": "Next",
@@ -192,12 +193,11 @@
     "title": "Roles & Permissions",
     "breadcrumbGroup": "Organization & Permissions",
     "tabs": {
-      "roles": "Business roles",
-      "admins": "Admin permissions"
+      "roles": "Role management",
+      "auditLogs": "Audit logs"
     },
     "searchPlaceholder": "Search roles",
     "permissionSearchPlaceholder": "Search permissions...",
-    "adminIntro": "Admin roles determine the manageable scope of backend modules",
     "refreshing": "Updating",
     "empty": "No roles",
     "noPermissionResult": "No matching permissions",
@@ -206,9 +206,9 @@
       "custom": "Custom"
     },
     "detailTabs": {
-      "permissions": "Permissions",
-      "members": "Role members · {{count}}",
-      "logs": "Activity log"
+      "permissions": "Functional permissions",
+      "dataPermissions": "Data permissions",
+      "members": "Role members · {{count}}"
     },
     "permission": {
       "granted": "{{granted}} / {{total}} granted",
@@ -219,11 +219,62 @@
       "expandGroup": "Expand {{group}} permissions",
       "collapseGroup": "Collapse {{group}} permissions"
     },
-    "columns": {
-      "adminRole": "Role",
-      "admin": "Admin",
-      "scope": "Scope",
-      "actions": "Actions"
+    "dataPermission": {
+      "defaultScope": "Default role data scope",
+      "defaultScopeDesc": "Resources without an override inherit this scope",
+      "customDepartments": "Default visible departments",
+      "selectDepartments": "Select departments",
+      "visibleDepartments": "Visible departments",
+      "departmentsSelected": "{{count}} departments selected",
+      "selectDefaultDepartments": "Select default visible departments",
+      "selectResourceDepartments": "Select visible departments for {{resource}}",
+      "resourceScopeLabel": "Data scope for {{resource}}",
+      "notApplicable": "—",
+      "empty": "No configurable data resources",
+      "columns": {
+        "resource": "Data resource",
+        "scope": "Effective scope",
+        "departments": "Custom scope"
+      },
+      "scopes": {
+        "inherit": "Inherit role default",
+        "all": "All data",
+        "deptAndChildren": "Department and subdepartments",
+        "dept": "Current department only",
+        "self": "Own data only",
+        "custom": "Custom departments"
+      },
+      "resources": {
+        "members": "Members & departments",
+        "files": "File management",
+        "notices": "Notices",
+        "auditLogs": "Audit logs"
+      }
+    },
+    "auditLogs": {
+      "searchLabel": "Search audit logs",
+      "searchPlaceholder": "Search operator, role, or change",
+      "allRoles": "All roles",
+      "empty": "No matching audit logs",
+      "filters": {
+        "role": "Role",
+        "kind": "Change type"
+      },
+      "columns": {
+        "occurredAt": "Time",
+        "operator": "Operator",
+        "role": "Role",
+        "kind": "Change type",
+        "change": "Change"
+      },
+      "kinds": {
+        "all": "All types",
+        "create": "Role created",
+        "edit": "Role edited",
+        "grant": "Permission granted",
+        "remove": "Permission removed",
+        "dataScope": "Data permission"
+      }
     },
     "actions": {
       "addRole": "Add role",
@@ -232,38 +283,33 @@
       "collapse": "Collapse",
       "clear": "Clear",
       "grantAll": "Grant all",
+      "cancelAll": "Cancel all",
       "reset": "Reset",
-      "savePermissions": "Save permissions",
+      "save": "Save",
+      "savePermissions": "Save functional permissions",
+      "saveDataPermissions": "Save data permissions",
       "cancel": "Cancel",
       "confirmCreate": "Create",
       "confirmDelete": "Confirm delete",
-      "createAdmin": "Create admin role",
-      "detail": "Details",
-      "add": "Add",
       "removeMember": "Remove"
     },
     "dialog": {
       "addRoleTitle": "Add role",
       "deleteRoleTitle": "Delete role",
-      "deleteRoleDesc": "This role and its permissions will be removed.",
-      "addAdminTitle": "Create admin role"
+      "deleteRoleDesc": "This role and its permissions will be removed."
     },
     "form": {
       "roleName": "Role name",
       "roleNamePlaceholder": "e.g. Operations, Support",
       "roleDesc": "Role description",
-      "roleDescPlaceholder": "Optional role responsibilities",
-      "adminRoleName": "Role name",
-      "adminRoleNamePlaceholder": "e.g. File admin",
-      "adminMember": "Assigned admin",
-      "adminMemberPlaceholder": "Select member"
+      "roleDescPlaceholder": "Optional role responsibilities"
     },
     "toast": {
       "stub": "This flow will be connected in a later task",
       "created": "Role created. Configure permissions next.",
       "deleted": "Role deleted",
-      "permissionsSaved": "Permissions saved",
-      "adminCreated": "Admin role created"
+      "permissionsSaved": "Functional permissions saved",
+      "dataPermissionsSaved": "Data permissions saved"
     }
   },
   "menus": {
@@ -272,13 +318,19 @@
     "refreshing": "Updating",
     "searchLabel": "Search menus",
     "searchPlaceholder": "Search menu name, route, permission",
+    "workspaceLabel": "Menu configuration workspace",
     "treeTitle": "{{subsystem}} · Menu tree",
     "treeRegionLabel": "{{subsystem}} menu tree",
+    "treeLabel": "Menu navigation tree",
+    "treeToolbarLabel": "Menu tree toolbar",
+    "treeHeading": "Menu management",
+    "treeSummary": "{{count}} navigation nodes",
     "stats": "Dirs {{dirs}} · Menus {{menus}} · Actions {{actions}} · Hidden {{hidden}}",
     "subsystems": {
       "title": "Subsystems",
       "desc": "Select a subsystem to maintain its menu tree",
       "listLabel": "Subsystem list",
+      "switcherLabel": "Subsystem switcher",
       "builtin": "Built-in",
       "custom": "Custom",
       "enabled": "Enabled",
@@ -301,6 +353,7 @@
     },
     "actions": {
       "create": "New menu",
+      "createAction": "New action",
       "createSubsystem": "New subsystem",
       "inspect": "Node details",
       "expand": "Expand",
@@ -308,6 +361,8 @@
       "edit": "Edit",
       "delete": "Delete",
       "addChild": "Add child",
+      "addPage": "New page",
+      "addPageName": "Add page under {{name}}",
       "addChildName": "Add child to {{name}}",
       "editName": "Edit {{name}}",
       "deleteName": "Delete {{name}}",
@@ -318,6 +373,7 @@
       "cancel": "Cancel",
       "confirmCreate": "Create",
       "save": "Save menu",
+      "saveInline": "Save",
       "saveSubsystem": "Save subsystem",
       "confirmDelete": "Confirm delete"
     },
@@ -338,6 +394,8 @@
       "desc": "Subsystem description",
       "descPlaceholder": "e.g. Organization · Permissions · Audit",
       "icon": "Icon",
+      "home": "Subsystem home",
+      "homePlaceholder": "Select a home route",
       "enabled": "Enabled",
       "enabledHint": "Disabled subsystems are excluded from the subsystem switcher",
       "errors": {
@@ -345,7 +403,8 @@
         "keyInvalid": "Use lowercase letters, numbers, and hyphens only",
         "keyDuplicated": "Subsystem key already exists",
         "nameRequired": "Subsystem name is required",
-        "descRequired": "Subsystem description is required"
+        "descRequired": "Subsystem description is required",
+        "homeRequired": "Select a subsystem home route"
       }
     },
     "form": {
@@ -388,11 +447,18 @@
     },
     "inspector": {
       "label": "Node details",
-      "title": "Node details",
+      "title": "Menu details",
+      "basicInfo": "Basic information",
       "empty": "Select a menu node to inspect its configuration.",
       "emptyValue": "Not configured",
       "visible": "Visible",
       "hidden": "Hidden"
+    },
+    "actionSection": {
+      "label": "Page actions",
+      "title": "Page actions",
+      "desc": "{{count}} action permissions configured for this page",
+      "empty": "No action permissions configured for this page"
     },
     "toast": {
       "created": "Menu created",
@@ -402,6 +468,318 @@
       "deleted": "Menu deleted",
       "visibilityUpdated": "Visibility updated",
       "failed": "Action failed"
+    }
+  },
+  "dictionaries": {
+    "title": "Dictionary Management",
+    "breadcrumbGroup": "System Settings",
+    "catalogTitle": "Dictionary Catalog",
+    "catalogSearch": "Search name or code",
+    "itemSearch": "Search item label or value",
+    "builtin": "Built-in",
+    "emptyCatalog": "No dictionaries",
+    "emptyItems": "No dictionary items",
+    "loadingItems": "Loading dictionary items",
+    "error": "Failed to load dictionaries",
+    "columns": {
+      "label": "Label",
+      "value": "Value",
+      "sort": "Sort",
+      "status": "Status",
+      "remark": "Description",
+      "actions": "Actions"
+    },
+    "status": { "enabled": "Enabled", "disabled": "Disabled" },
+    "colors": {
+      "primary": "Primary",
+      "success": "Success",
+      "warning": "Warning",
+      "danger": "Danger",
+      "neutral": "Neutral"
+    },
+    "actions": {
+      "create": "New dictionary",
+      "createDictionary": "Create dictionary",
+      "editDictionary": "Edit dictionary",
+      "deleteDictionary": "Delete dictionary",
+      "createItem": "New item",
+      "edit": "Edit",
+      "delete": "Delete",
+      "more": "More actions",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saveItem": "Save item",
+      "confirmDelete": "Delete",
+      "retry": "Retry"
+    },
+    "form": {
+      "createTitle": "New dictionary",
+      "editTitle": "Edit dictionary",
+      "name": "Dictionary name",
+      "code": "Dictionary code",
+      "remark": "Description"
+    },
+    "itemForm": {
+      "createTitle": "New dictionary item",
+      "editTitle": "Edit dictionary item",
+      "label": "Item label",
+      "value": "Item value",
+      "sort": "Sort",
+      "color": "Status color",
+      "enabled": "Enable this item",
+      "enabledHint": "Disabled values cannot be used by new records"
+    },
+    "confirm": {
+      "deleteDictionaryTitle": "Delete dictionary",
+      "deleteDictionaryDesc": "Delete {{name}} and all of its items?",
+      "deleteItemTitle": "Delete dictionary item",
+      "deleteItemDesc": "Delete {{name}}?"
+    },
+    "toast": {
+      "created": "Dictionary created",
+      "updated": "Dictionary updated",
+      "deleted": "Dictionary deleted",
+      "itemSaved": "Dictionary item saved",
+      "itemDeleted": "Dictionary item deleted"
+    }
+  },
+  "messages": {
+    "title": "Message Center",
+    "breadcrumbGroup": "Workbench",
+    "tabs": { "all": "All", "unread": "Unread", "read": "Read" },
+    "categories": { "approval": "Approval", "security": "Security", "system": "System" },
+    "actions": {
+      "readAll": "Mark all read",
+      "delete": "Delete message",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "approval": { "approved": "Approved", "rejected": "Rejected" },
+    "unread": "Unread",
+    "read": "Read",
+    "from": "From · {{from}}",
+    "empty": "No messages",
+    "toast": {
+      "allRead": "All messages marked as read",
+      "deleted": "Message deleted",
+      "approved": "Approval accepted",
+      "rejected": "Approval rejected"
+    }
+  },
+  "logs": {
+    "title": "Audit Logs",
+    "breadcrumbGroup": "Security Audit",
+    "tabs": { "operation": "Operation Logs", "login": "Login Logs" },
+    "search": "Search logs",
+    "filters": {
+      "type": "Operation type",
+      "result": "Login result",
+      "startDate": "Start date",
+      "endDate": "End date"
+    },
+    "types": {
+      "all": "All types",
+      "create": "Create",
+      "edit": "Edit",
+      "del": "Delete",
+      "export": "Export",
+      "perm": "Permission",
+      "config": "Configure"
+    },
+    "results": { "all": "All results", "ok": "Success", "fail": "Failed" },
+    "columns": {
+      "time": "Operation time",
+      "operator": "Operator",
+      "module": "Module",
+      "type": "Operation type",
+      "target": "Target",
+      "ip": "IP address",
+      "loginTime": "Login time",
+      "user": "User",
+      "result": "Result",
+      "location": "Location",
+      "device": "Device"
+    },
+    "actions": { "export": "Export logs" },
+    "empty": { "operation": "No operation logs", "login": "No login logs" },
+    "loading": "Loading logs",
+    "total": "{{count}} records"
+  },
+  "files": {
+    "title": "File Management",
+    "breadcrumbGroup": "File Center",
+    "root": "All Files",
+    "search": "Search files",
+    "total": "{{count}} items",
+    "folderUnit": "files",
+    "defaultFolderName": "New Folder",
+    "name": "Name",
+    "columns": { "name": "Name", "size": "Size", "owner": "Owner", "date": "Modified" },
+    "views": { "grid": "Grid view", "list": "List view" },
+    "actions": {
+      "upload": "Upload file",
+      "newFolder": "New folder",
+      "openFolder": "Open folder",
+      "preview": "Preview",
+      "download": "Download",
+      "rename": "Rename",
+      "share": "Share",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "storage": {
+      "title": "Storage",
+      "used": "{{used}} GB / {{total}} GB used",
+      "document": "Documents",
+      "image": "Images",
+      "video": "Videos",
+      "other": "Other"
+    },
+    "upload": {
+      "title": "Upload file",
+      "drop": "Click or drag files here to upload",
+      "hint": "PDF, images, documents and spreadsheets up to 100MB",
+      "input": "Choose file",
+      "submit": "Start upload",
+      "tooLarge": "Each file must not exceed 100MB"
+    },
+    "folderDialog": { "title": "New folder" },
+    "renameDialog": { "title": "Rename file" },
+    "deleteDialog": {
+      "title": "Delete file",
+      "description": "Delete {{name}}? Folder contents will also be removed."
+    },
+    "preview": {
+      "description": "File preview and management",
+      "image": "Image preview",
+      "document": "Mock document preview",
+      "type": "Type"
+    },
+    "toast": {
+      "uploaded": "File uploaded",
+      "folderCreated": "Folder created",
+      "renamed": "File renamed",
+      "deleted": "File deleted",
+      "shared": "Share link copied",
+      "shareFailed": "Failed to copy the share link. Please retry.",
+      "downloadFailed": "File download failed. Please retry."
+    },
+    "empty": "No files in this folder",
+    "loading": "Loading files"
+  },
+  "company": {
+    "title": "Company Information",
+    "breadcrumbGroup": "System Settings",
+    "sections": { "basic": "Basic Information", "more": "More Information", "contacts": "Company Contact" },
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "verifyHint": "Verify your company to unlock organization benefits",
+    "fields": {
+      "name": "Company name",
+      "domain": "Domain",
+      "code": "Company ID",
+      "industry": "Industry",
+      "scale": "Company size",
+      "dataResidency": "Data residency",
+      "createdAt": "Created at",
+      "contactName": "Contact name",
+      "contactEmail": "Contact email",
+      "contactPhone": "Contact phone",
+      "landline": "Landline",
+      "address": "Address",
+      "postalCode": "Postal code"
+    },
+    "actions": {
+      "edit": "Edit company information",
+      "editShort": "Edit",
+      "cancel": "Cancel",
+      "save": "Save company information"
+    },
+    "form": { "title": "Edit company information" },
+    "toast": { "saved": "Company information saved" }
+  },
+  "profile": {
+    "title": "Profile",
+    "breadcrumbGroup": "Home",
+    "tabs": {
+      "info": "Personal Information",
+      "security": "Account & Security",
+      "preferences": "Preferences",
+      "devices": "Login Devices"
+    },
+    "sections": {
+      "basic": "Basic Information",
+      "work": "Work Information",
+      "bio": "About",
+      "security": "Account & Security",
+      "preferences": "Preferences",
+      "devices": "Login Devices"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "department": "Department",
+      "role": "Role",
+      "location": "Location",
+      "employeeNo": "Employee ID",
+      "title": "Title",
+      "joinedAt": "Joined",
+      "manager": "Manager",
+      "language": "Language",
+      "timezone": "Timezone",
+      "bio": "About"
+    },
+    "emailVerified": "Email verified",
+    "lastActive": "Active {{value}}",
+    "actions": {
+      "edit": "Edit profile",
+      "editShort": "Edit",
+      "cancel": "Cancel",
+      "save": "Save profile",
+      "savePreferences": "Save preferences",
+      "messages": "My messages"
+    },
+    "form": { "title": "Edit Profile" },
+    "password": {
+      "title": "Change Password",
+      "hint": "Use at least 8 characters and keep your password secure.",
+      "loginPassword": "Login password",
+      "lastUpdated": "Last updated 62 days ago",
+      "action": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "submit": "Change password",
+      "failed": "Failed to change password"
+    },
+    "security": {
+      "twoFactor": {
+        "title": "Two-factor authentication",
+        "desc": "Use an authenticator app for verification"
+      },
+      "emailAlert": {
+        "title": "Security email alerts",
+        "desc": "Email alerts for unusual sign-ins and password changes"
+      },
+      "newDeviceAlert": { "title": "New device alerts", "desc": "Notify when a new device signs in" }
+    },
+    "preferences": {
+      "language": "Interface language",
+      "timezone": "Timezone",
+      "languages": { "zh": "Simplified Chinese", "en": "English" },
+      "weeklyDigest": { "title": "Weekly digest", "desc": "Send work and security digest every Monday" },
+      "compactNotifications": {
+        "title": "Compact notifications",
+        "desc": "Group similar notifications to reduce noise"
+      }
+    },
+    "devices": { "current": "Current device", "remove": "Sign out device", "removed": "Device signed out" },
+    "toast": {
+      "saved": "Profile saved",
+      "passwordChanged": "Password changed",
+      "preferencesSaved": "Preferences saved"
     }
   }
 }
