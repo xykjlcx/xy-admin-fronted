@@ -84,14 +84,20 @@ create_fake_project() {
     'case " $* " in' \
     '  *" up "*)' \
     '    if [[ "${FAKE_DOCKER_UP_FAIL:-0}" == "1" ]]; then exit 42; fi' \
+    '    printf "running\n" >"$FAKE_DOCKER_STATE"' \
+    '    ;;' \
+    '  *" down "*)' \
+    '    rm -f "$FAKE_DOCKER_STATE"' \
+    '    ;;' \
+    '  *" ps -a -q "*)' \
+    '    if [[ -f "$FAKE_DOCKER_STATE" ]]; then printf "container-id\n"; fi' \
     '    ;;' \
     '  *" ps "*" postgres "*)' \
-    '    printf "{\"Service\":\"postgres\",\"State\":\"running\",\"Health\":\"%s\"}\n" "${FAKE_POSTGRES_HEALTH:-healthy}"' \
+    '    if [[ -f "$FAKE_DOCKER_STATE" ]]; then printf "{\"Service\":\"postgres\",\"State\":\"running\",\"Health\":\"%s\"}\n" "${FAKE_POSTGRES_HEALTH:-healthy}"; fi' \
     '    ;;' \
     '  *" ps "*" redis "*)' \
-    '    printf "{\"Service\":\"redis\",\"State\":\"running\",\"Health\":\"%s\"}\n" "${FAKE_REDIS_HEALTH:-healthy}"' \
+    '    if [[ -f "$FAKE_DOCKER_STATE" ]]; then printf "{\"Service\":\"redis\",\"State\":\"running\",\"Health\":\"%s\"}\n" "${FAKE_REDIS_HEALTH:-healthy}"; fi' \
     '    ;;' \
-    '  *" ps "*) printf "container-id\n" ;;' \
     'esac' \
     >"$project/test-bin/docker"
   chmod +x "$project/test-bin/docker"
@@ -134,6 +140,7 @@ run_dev() {
     REAL_CURL="$REAL_CURL" \
     REAL_NODE="$REAL_NODE" \
     FAKE_DOCKER_LOG="$project/docker.log" \
+    FAKE_DOCKER_STATE="$project/docker.state" \
     FAKE_CURL_LOG="$project/curl.log" \
     FAKE_SERVER_JS="$project/test-fixtures/server.cjs" \
     FAKE_FOREIGN_CWD="$project/outside" \
@@ -223,6 +230,7 @@ case_status_dependencies() {
   local project degraded healthy
   project="$(create_fake_project status)"
   cp "$project/backend/.env.example" "$project/backend/.env"
+  printf 'running\n' >"$project/docker.state"
 
   degraded="$(FAKE_POSTGRES_HEALTH=healthy FAKE_REDIS_HEALTH=unhealthy run_dev "$project" status)"
   [[ "$degraded" == *"postgres: healthy"* ]] || fail "status did not report PostgreSQL health: $degraded"
@@ -231,6 +239,35 @@ case_status_dependencies() {
 
   healthy="$(FAKE_POSTGRES_HEALTH=healthy FAKE_REDIS_HEALTH=healthy run_dev "$project" status)"
   [[ "$healthy" == *"dependencies: healthy"* ]] || fail "status did not require both dependencies healthy"
+}
+
+case_repeated_start_failure_preserves_stack() {
+  local project backend_pid frontend_pid output
+  project="$(create_fake_project repeated-start-failure)"
+  trap "stop_test_project '$project'" EXIT
+
+  run_dev "$project" start >/dev/null
+  backend_pid="$(sed -n '1p' "$project/.metabuilder-dev/backend.pid")"
+  frontend_pid="$(sed -n '1p' "$project/.metabuilder-dev/frontend.pid")"
+
+  if output="$(FAKE_DOCKER_UP_FAIL=1 run_dev "$project" start 2>&1)"; then
+    fail "repeated start unexpectedly succeeded after compose failed"
+  fi
+  [[ "$output" != *"MetaBuilder development services are ready"* ]] ||
+    fail "repeated start reported readiness after compose failed"
+  kill -0 "$backend_pid" 2>/dev/null || fail "repeated start failure killed the original backend"
+  kill -0 "$frontend_pid" 2>/dev/null || fail "repeated start failure killed the original frontend"
+  if grep -Fq ' down ' "$project/docker.log"; then
+    fail "repeated start failure removed the pre-existing compose stack"
+  fi
+
+  output="$(run_dev "$project" status)"
+  [[ "$output" == *"backend: running (pid $backend_pid)"* ]] ||
+    fail "original backend was not healthy after repeated start failure: $output"
+  [[ "$output" == *"frontend: running (pid $frontend_pid)"* ]] ||
+    fail "original frontend was not healthy after repeated start failure: $output"
+  [[ "$output" == *"dependencies: healthy"* ]] ||
+    fail "original compose dependencies were not healthy after repeated start failure: $output"
 }
 
 case_project_names() {
@@ -258,6 +295,7 @@ run_case() {
     readiness) (case_readiness_and_idempotence) ;;
     status) (case_status_dependencies) ;;
     project-name) (case_project_names) ;;
+    repeated-start-failure) (case_repeated_start_failure_preserves_stack) ;;
     *) fail "unknown lifecycle contract case: $name" ;;
   esac
   printf 'dev lifecycle contract %s: PASS\n' "$name"
@@ -266,7 +304,7 @@ run_case() {
 if [[ "$#" -eq 1 ]]; then
   run_case "$1"
 else
-  for test_case in foreign-port false-ready compose-cleanup readiness status project-name; do
+  for test_case in foreign-port false-ready compose-cleanup readiness status project-name repeated-start-failure; do
     run_case "$test_case"
   done
 fi

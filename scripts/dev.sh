@@ -17,7 +17,7 @@ FRONTEND_PORT=5173
 JAVA_BIN=""
 BACKEND_STARTED_THIS_RUN=0
 FRONTEND_STARTED_THIS_RUN=0
-COMPOSE_STARTED_THIS_RUN=0
+COMPOSE_CREATED_THIS_RUN=0
 
 usage() {
   printf 'Usage: %s {start|stop|status}\n' "$0" >&2
@@ -203,6 +203,10 @@ compose() {
     "$@"
 }
 
+compose_project_exists() {
+  [[ -n "$(compose ps -a -q 2>/dev/null || true)" ]]
+}
+
 java_major_version() {
   "$1" -version 2>&1 | sed -n '1s/.*version "\([0-9][0-9]*\).*/\1/p'
 }
@@ -324,7 +328,7 @@ cleanup_start_failure() {
   if [[ "$BACKEND_STARTED_THIS_RUN" -eq 1 ]]; then
     stop_process "$BACKEND_PID_FILE" backend
   fi
-  if [[ "$COMPOSE_STARTED_THIS_RUN" -eq 1 && -f "$ENV_FILE" ]] &&
+  if [[ "$COMPOSE_CREATED_THIS_RUN" -eq 1 && -f "$ENV_FILE" ]] &&
       command -v docker >/dev/null 2>&1; then
     compose down --remove-orphans >/dev/null 2>&1 || true
   fi
@@ -361,7 +365,7 @@ stop_process() {
 start_all() {
   BACKEND_STARTED_THIS_RUN=0
   FRONTEND_STARTED_THIS_RUN=0
-  COMPOSE_STARTED_THIS_RUN=0
+  COMPOSE_CREATED_THIS_RUN=0
 
   if ! require_command docker || ! require_command curl || ! require_command lsof; then
     cleanup_start_failure
@@ -378,7 +382,9 @@ start_all() {
     cleanup_start_failure
     return 1
   fi
-  COMPOSE_STARTED_THIS_RUN=1
+  if ! compose_project_exists; then
+    COMPOSE_CREATED_THIS_RUN=1
+  fi
   if ! compose up -d --wait --wait-timeout 90; then
     cleanup_start_failure
     return 1

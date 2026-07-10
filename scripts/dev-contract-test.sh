@@ -8,6 +8,7 @@ ENV_EXAMPLE="$ROOT_DIR/backend/.env.example"
 COMPOSE_FILE="$ROOT_DIR/compose.dev.yml"
 ADR_FILE="$ROOT_DIR/docs/adr/0001-metabuilder-backend-contract.md"
 APP_POM="$ROOT_DIR/backend/app/pom.xml"
+LIFECYCLE_CONTRACT="$ROOT_DIR/scripts/dev-lifecycle-contract-test.sh"
 
 fail() {
   printf 'FAIL: %s\n' "$1" >&2
@@ -29,7 +30,9 @@ assert_file "$ENV_EXAMPLE"
 assert_file "$COMPOSE_FILE"
 assert_file "$ADR_FILE"
 assert_file "$APP_POM"
+assert_file "$LIFECYCLE_CONTRACT"
 [[ -x "$DEV_SCRIPT" ]] || fail "$DEV_SCRIPT is not executable"
+[[ -x "$LIFECYCLE_CONTRACT" ]] || fail "$LIFECYCLE_CONTRACT is not executable"
 bash -n "$DEV_SCRIPT"
 
 for key in \
@@ -79,7 +82,7 @@ cp "$COMPOSE_FILE" "$TMP_DIR/project/compose.dev.yml"
 printf '#!/usr/bin/env bash\nexit 0\n' >"$TMP_DIR/bin/docker"
 chmod +x "$TMP_DIR/bin/docker" "$TMP_DIR/project/scripts/dev.sh"
 
-(cd "$TMP_DIR" && sleep 60) &
+(cd "$TMP_DIR" && exec sleep 60) </dev/null >/dev/null 2>&1 &
 SLEEP_PID=$!
 printf '%s\n' "$SLEEP_PID" >"$TMP_DIR/project/.metabuilder-dev/backend.pid"
 
@@ -87,3 +90,4 @@ PATH="$TMP_DIR/bin:$PATH" "$TMP_DIR/project/scripts/dev.sh" stop >/dev/null 2>&1
 kill -0 "$SLEEP_PID" 2>/dev/null || fail "stop killed a process outside the current repository"
 
 printf 'dev shell contract: PASS\n'
+"$LIFECYCLE_CONTRACT"

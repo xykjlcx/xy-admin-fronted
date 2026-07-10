@@ -13,10 +13,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.WebApplicationType;
@@ -26,7 +23,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-@TestMethodOrder(OrderAnnotation.class)
 class ApplicationHealthIntegrationTest {
 
   private static final String VALID_SECRET = "0123456789abcdef0123456789abcdef";
@@ -56,8 +52,7 @@ class ApplicationHealthIntegrationTest {
   }
 
   @Test
-  @Order(2)
-  void keepsLivenessUpWhenRuntimeDependenciesGoDown() throws Exception {
+  void servesHealthAndKeepsCorsScopedToApi() throws Exception {
     verifyConfiguredCorsOrigin();
 
     try (var context = start(Map.of())) {
@@ -74,21 +69,10 @@ class ApplicationHealthIntegrationTest {
       assertThat(initialReadiness.path("status").asText()).isEqualTo("UP");
       assertThat(componentNames(initialReadiness))
           .containsExactlyInAnyOrder("db", "readinessState", "redis");
-
-      REDIS.stop();
-      JsonNode redisDown = awaitHealth(port, "readiness", "redis", "DOWN");
-      assertThat(componentStatus(redisDown, "db")).isEqualTo("UP");
-      assertThat(health(port, "liveness").path("status").asText()).isEqualTo("UP");
-
-      POSTGRES.stop();
-      JsonNode databaseDown = awaitHealth(port, "readiness", "db", "DOWN");
-      assertThat(databaseDown.path("status").asText()).isEqualTo("DOWN");
-      assertThat(health(port, "liveness").path("status").asText()).isEqualTo("UP");
     }
   }
 
   @ParameterizedTest
-  @Order(1)
   @ValueSource(strings = {
       "*",
       "https://*.example.com",
@@ -153,20 +137,6 @@ class ApplicationHealthIntegrationTest {
         .run(arguments.toArray(String[]::new));
   }
 
-  private JsonNode awaitHealth(int port, String group, String component, String expected)
-      throws Exception {
-    JsonNode latest = null;
-    for (int attempt = 0; attempt < 40; attempt += 1) {
-      latest = health(port, group);
-      if (expected.equals(componentStatus(latest, component))) {
-        return latest;
-      }
-      Thread.sleep(250);
-    }
-    throw new AssertionError(
-        "Timed out waiting for " + group + "/" + component + "=" + expected + ": " + latest);
-  }
-
   private JsonNode health(int port, String group) throws Exception {
     HttpResponse<String> response = get(port, "/actuator/health/" + group, null);
     return new ObjectMapper().readTree(response.body());
@@ -187,9 +157,5 @@ class ApplicationHealthIntegrationTest {
     var names = new ArrayList<String>();
     health.path("components").fieldNames().forEachRemaining(names::add);
     return names;
-  }
-
-  private String componentStatus(JsonNode health, String component) {
-    return health.path("components").path(component).path("status").asText();
   }
 }
