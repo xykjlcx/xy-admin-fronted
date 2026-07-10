@@ -94,6 +94,23 @@ describe('desktop architecture guard', () => {
     ]);
   });
 
+  test('keeps host URL and legacy browser downloads out of the file business module', () => {
+    const violations = findDesktopBoundaryViolations(
+      new Map([
+        [
+          'src/modules/admin/files/list/FilesScene.tsx',
+          "import { downloadFile } from '@/lib/download';\nconst url = window.location.origin;\ndownloadFile(url, 'x');",
+        ],
+        ['src/lib/platform/web.ts', 'const base = window.location.origin;'],
+      ]),
+    );
+
+    expect(violations).toEqual([
+      'src/modules/admin/files/list/FilesScene.tsx: 文件业务必须通过 platform.files 使用宿主能力',
+      'src/modules/admin/files/list/FilesScene.tsx: 分享链接不得读取宿主 window.location.origin',
+    ]);
+  });
+
   test('allows the designated config, preload, and Renderer platform adapter boundaries', () => {
     expect(
       findDesktopBoundaryViolations(

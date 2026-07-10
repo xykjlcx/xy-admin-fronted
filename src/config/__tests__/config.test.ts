@@ -12,6 +12,7 @@ test('parseEnv supplies stable defaults for local development', () => {
     appEnv: 'development',
     appVersion: '0.1.0',
     apiBaseUrl: '',
+    webPublicBaseUrl: '',
     defaultLocale: 'zh-CN',
     requestTimeoutMs: 15000,
     enableMockOverride: undefined,

@@ -7,8 +7,12 @@ import {
   CredentialRestoreInputSchema,
   CredentialRestoreResultSchema,
   ExternalOpenInputSchema,
+  FileDownloadCancelInputSchema,
+  FileDownloadStartInputSchema,
+  FileDownloadStartResultSchema,
   IpcSuccessSchema,
   type CredentialRestoreResult,
+  type FileDownloadStartResult,
   type IpcSuccess,
 } from '../shared/schemas';
 import { assertTrustedSender } from './navigation-policy';
@@ -26,12 +30,16 @@ interface DesktopIpcDependencies {
     persist(token: string): Promise<void>;
     clear(): Promise<void>;
   };
+  files: {
+    start(input: { resourceId: string; suggestedName: string }): FileDownloadStartResult;
+    cancel(taskId: string): boolean;
+  };
 }
 
 type DesktopIpcHandler = (
   event: IpcSenderEvent,
   input: unknown,
-) => Promise<IpcSuccess | CredentialRestoreResult>;
+) => Promise<IpcSuccess | CredentialRestoreResult | FileDownloadStartResult>;
 
 function validateSender(event: IpcSenderEvent): void {
   assertTrustedSender(event.senderFrame?.url ?? '');
@@ -69,6 +77,17 @@ export function createDesktopIpcHandlers(
       validateSender(event);
       CredentialClearInputSchema.parse(input);
       await dependencies.credentials.clear();
+      return IpcSuccessSchema.parse({ ok: true });
+    },
+    [ipcChannels.fileDownloadStart]: async (event, input) => {
+      validateSender(event);
+      const descriptor = FileDownloadStartInputSchema.parse(input);
+      return FileDownloadStartResultSchema.parse(dependencies.files.start(descriptor));
+    },
+    [ipcChannels.fileDownloadCancel]: async (event, input) => {
+      validateSender(event);
+      const { taskId } = FileDownloadCancelInputSchema.parse(input);
+      dependencies.files.cancel(taskId);
       return IpcSuccessSchema.parse({ ok: true });
     },
   };

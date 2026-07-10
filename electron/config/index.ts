@@ -14,6 +14,7 @@ export interface DesktopEnvironment {
   windowChrome: WindowChromeMode;
   spikeMode: boolean;
   allowInsecureLocalhost: boolean;
+  downloadAllowedOrigins: string[];
 }
 
 type RawEnvironment = Record<string, string | undefined>;
@@ -41,12 +42,41 @@ function parseUrl(environment: RawEnvironment, key: string, requireHttps: boolea
   if (!requireHttps && url.protocol !== 'https:' && url.protocol !== 'http:') {
     throw new Error(`${key} 必须使用 HTTP 或 HTTPS`);
   }
+  if (url.search || url.hash) throw new Error(`${key} 禁止 query 与 hash`);
   return url;
 }
 
 function withTrailingSlash(url: URL): string {
   const value = url.toString();
   return value.endsWith('/') ? value : `${value}/`;
+}
+
+function parseDownloadAllowedOrigins(environment: RawEnvironment): string[] {
+  const raw = environment.DESKTOP_DOWNLOAD_ALLOWED_ORIGINS?.trim();
+  if (!raw) return [];
+  const origins = new Set<string>();
+  for (const entry of raw.split(',')) {
+    const value = entry.trim();
+    let url: URL;
+    try {
+      url = new URL(value);
+    } catch {
+      throw new Error('DESKTOP_DOWNLOAD_ALLOWED_ORIGINS 必须是逗号分隔的 HTTPS origin');
+    }
+    if (
+      url.protocol !== 'https:' ||
+      url.username ||
+      url.password ||
+      url.pathname !== '/' ||
+      url.search ||
+      url.hash ||
+      (url.port && url.port !== '443')
+    ) {
+      throw new Error('DESKTOP_DOWNLOAD_ALLOWED_ORIGINS 只接受无凭据、默认端口的 HTTPS origin');
+    }
+    origins.add(url.origin);
+  }
+  return [...origins];
 }
 
 export function parseDesktopEnvironment(environment: RawEnvironment): DesktopEnvironment {
@@ -85,6 +115,7 @@ export function parseDesktopEnvironment(environment: RawEnvironment): DesktopEnv
     windowChrome: windowChrome.data,
     spikeMode,
     allowInsecureLocalhost,
+    downloadAllowedOrigins: parseDownloadAllowedOrigins(environment),
   };
 }
 
@@ -98,6 +129,10 @@ export function readDesktopRendererEnvironment(): { enableMock: string | undefin
 
 export function readSpikeUserDataPathValue(): string | undefined {
   return process.env.SPIKE_USER_DATA_PATH;
+}
+
+export function readSpikeDownloadPathValue(): string | undefined {
+  return process.env.SPIKE_DOWNLOAD_PATH;
 }
 
 declare const __DESKTOP_BUILD_ENV__: DesktopEnvironment | undefined;

@@ -1,6 +1,7 @@
 import { Download, FileText, Link, Pencil, Trash2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { ProgressBar } from '@/components/ui/progress';
 import { QueryState } from '@/components/pro/QueryState';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { fileDetailQuery } from '../api';
@@ -12,10 +13,12 @@ export function FilePreviewSheet({
   labels,
   onOpenChange,
   onDownload,
+  onCancelDownload,
   onRename,
   onDelete,
   onShare,
   downloading = false,
+  downloadPercent = 0,
   sharing = false,
 }: {
   fileId: string;
@@ -23,6 +26,8 @@ export function FilePreviewSheet({
   labels: {
     previewDescription: string;
     download: string;
+    cancelDownload: string;
+    downloadProgress: string;
     rename: string;
     share: string;
     delete: string;
@@ -39,10 +44,12 @@ export function FilePreviewSheet({
   };
   onOpenChange: (open: boolean) => void;
   onDownload: () => void;
+  onCancelDownload: () => void;
   onRename: () => void;
   onDelete: () => void;
   onShare: () => void;
   downloading?: boolean;
+  downloadPercent?: number;
   sharing?: boolean;
 }) {
   const detail = useQuery(fileDetailQuery(fileId));
@@ -71,9 +78,9 @@ export function FilePreviewSheet({
             </SheetHeader>
             <div className="flex flex-wrap gap-2 px-4">
               {permissions.download && (
-                <Button variant="outline" size="sm" loading={downloading} onClick={onDownload}>
+                <Button variant="outline" size="sm" onClick={downloading ? onCancelDownload : onDownload}>
                   <Download data-icon="inline-start" />
-                  {labels.download}
+                  {downloading ? labels.cancelDownload : labels.download}
                 </Button>
               )}
               {permissions.rename && (
@@ -93,6 +100,17 @@ export function FilePreviewSheet({
                   <Trash2 data-icon="inline-start" />
                   {labels.delete}
                 </Button>
+              )}
+              {downloading && (
+                <div className="flex basis-full items-center gap-3">
+                  <ProgressBar
+                    className="h-2 flex-1"
+                    value={downloadPercent}
+                    max={100}
+                    aria-label={labels.downloadProgress}
+                  />
+                  <span className="w-10 text-right text-xs">{downloadPercent}%</span>
+                </div>
               )}
             </div>
             <div className="m-4 flex min-h-0 flex-1 items-center justify-center rounded-12 bg-surface-2 p-8 text-center">

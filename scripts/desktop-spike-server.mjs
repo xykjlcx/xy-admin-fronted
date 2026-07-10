@@ -25,7 +25,11 @@ function response(status, body, origin, headers = {}) {
 }
 
 export function createSpikeResponse(request) {
-  if (request.origin !== rendererOrigin)
+  const mainDownloadRequest =
+    request.origin === '' &&
+    request.method === 'GET' &&
+    (request.path === '/api/files/spike-file/download' || request.path === '/api/files/spike-file/content');
+  if (request.origin !== rendererOrigin && !mainDownloadRequest)
     return response(403, JSON.stringify({ error: 'origin denied' }), request.origin);
   if (request.method === 'OPTIONS') return response(204, '', request.origin);
 
@@ -51,6 +55,17 @@ export function createSpikeResponse(request) {
   const bearerToken = request.headers.authorization?.replace(/^Bearer\s+/, '') ?? '';
   const authorized = bearerToken === 'spike-session-token' || bearerToken === 'chrome-session-token';
   if (!authorized) return response(401, JSON.stringify({ error: 'unauthorized' }), request.origin);
+
+  if (request.method === 'GET' && request.path === '/api/files/spike-file/download') {
+    return response(302, '', request.origin, { location: '/api/files/spike-file/content' });
+  }
+  if (request.method === 'GET' && request.path === '/api/files/spike-file/content') {
+    const body = 'electron-download-evidence';
+    return response(200, body, request.origin, {
+      'content-type': 'application/octet-stream',
+      'content-length': String(Buffer.byteLength(body)),
+    });
+  }
 
   if (request.method === 'GET' && request.path === '/api/auth/me') {
     return response(

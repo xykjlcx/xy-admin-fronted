@@ -1,7 +1,7 @@
 import type { DesktopApi } from '../../../electron/shared/desktop-api';
-import type { AppPlatform } from './types';
+import { createPublicFileUrl, type AppPlatform } from './types';
 
-export function createDesktopPlatform(api: DesktopApi): AppPlatform {
+export function createDesktopPlatform(api: DesktopApi, webPublicBaseUrl: string): AppPlatform {
   return {
     runtime: 'desktop',
     window: {
@@ -14,6 +14,12 @@ export function createDesktopPlatform(api: DesktopApi): AppPlatform {
       restore: () => api.credentials.restore(),
       persist: (token) => api.credentials.persist(token),
       clear: (reason) => api.credentials.clear(reason),
+    },
+    files: {
+      save: (input) => api.files.save(input),
+      cancel: (taskId) => api.files.cancel(taskId),
+      subscribe: (listener) => api.files.subscribe(listener),
+      createShareUrl: (resourceId) => createPublicFileUrl(webPublicBaseUrl, resourceId),
     },
   };
 }

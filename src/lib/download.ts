@@ -1,5 +1,9 @@
-export async function downloadFile(url: string, filename: string) {
-  const response = await fetch(url);
+interface DownloadFileOptions {
+  signal?: AbortSignal;
+}
+
+export async function downloadFile(url: string, filename: string, options: DownloadFileOptions = {}) {
+  const response = options.signal ? await fetch(url, { signal: options.signal }) : await fetch(url);
   if (!response.ok) throw new Error(`Download failed with status ${response.status}`);
 
   const blob = await response.blob();
@@ -12,4 +16,5 @@ export async function downloadFile(url: string, filename: string) {
   } finally {
     URL.revokeObjectURL(objectUrl);
   }
+  return blob.size;
 }

@@ -13,6 +13,7 @@ describe('desktop IPC handlers', () => {
       openExternal: vi.fn(),
       allowedExternalHosts: new Set(['docs.example.com']),
       credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
+      files: { start: vi.fn(), cancel: vi.fn() },
     });
 
     await expect(handlers[ipcChannels.clipboardWrite](trustedEvent, { text: 'copied' })).resolves.toEqual({
@@ -33,6 +34,7 @@ describe('desktop IPC handlers', () => {
       openExternal,
       allowedExternalHosts: new Set(['docs.example.com']),
       credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
+      files: { start: vi.fn(), cancel: vi.fn() },
     });
 
     await expect(
@@ -58,6 +60,7 @@ describe('desktop IPC handlers', () => {
       openExternal: vi.fn(),
       allowedExternalHosts: new Set(),
       credentials,
+      files: { start: vi.fn(), cancel: vi.fn() },
     });
 
     await expect(handlers[ipcChannels.credentialRestore](trustedEvent, undefined)).resolves.toEqual({
@@ -76,5 +79,44 @@ describe('desktop IPC handlers', () => {
     ).rejects.toThrow('拒绝非 Renderer IPC sender');
     expect(credentials.persist).toHaveBeenCalledWith('next-token');
     expect(credentials.clear).toHaveBeenCalledTimes(1);
+  });
+
+  test('starts and cancels downloads only after sender and descriptor validation', async () => {
+    const taskId = '9ba560a3-94c6-438a-9d76-1e17627fd483';
+    const files = {
+      start: vi.fn().mockReturnValue({ taskId }),
+      cancel: vi.fn().mockReturnValue(true),
+    };
+    const handlers = createDesktopIpcHandlers({
+      writeClipboardText: vi.fn(),
+      openExternal: vi.fn(),
+      allowedExternalHosts: new Set(),
+      credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
+      files,
+    });
+
+    await expect(
+      handlers[ipcChannels.fileDownloadStart](trustedEvent, {
+        resourceId: 'report-1',
+        suggestedName: 'report.pdf',
+      }),
+    ).resolves.toEqual({ taskId });
+    await expect(handlers[ipcChannels.fileDownloadCancel](trustedEvent, { taskId })).resolves.toEqual({
+      ok: true,
+    });
+    await expect(
+      handlers[ipcChannels.fileDownloadStart](trustedEvent, {
+        resourceId: 'https://evil.example.com/file',
+        suggestedName: 'secret',
+      }),
+    ).rejects.toThrow();
+    await expect(
+      handlers[ipcChannels.fileDownloadStart](untrustedEvent, {
+        resourceId: 'report-1',
+        suggestedName: 'report.pdf',
+      }),
+    ).rejects.toThrow('拒绝非 Renderer IPC sender');
+    expect(files.start).toHaveBeenCalledTimes(1);
+    expect(files.cancel).toHaveBeenCalledWith(taskId);
   });
 });

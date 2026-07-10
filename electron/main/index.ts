@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs';
+import { statfs } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
@@ -13,14 +14,23 @@ import {
   session,
   shell,
 } from 'electron';
-import { getDesktopEnvironment, readRendererDevelopmentUrl, readSpikeUserDataPathValue } from '../config';
+import {
+  getDesktopEnvironment,
+  readRendererDevelopmentUrl,
+  readSpikeDownloadPathValue,
+  readSpikeUserDataPathValue,
+} from '../config';
 import { createWindowOptions } from './create-window';
 import { createAtomicCredentialFileStore, createCredentialVault } from './credential-vault';
+import { createDownloadManager } from './download-manager';
+import { requestDownloadWithElectronNet } from './download-net';
 import { registerDesktopIpcHandlers } from './ipc';
 import { decideNavigation } from './navigation-policy';
 import { buildRendererCsp, resolveRendererAssetPath } from './protocol';
-import { parseSpikeUserDataPath } from './spike-user-data';
+import { parseSpikeDownloadPath, parseSpikeUserDataPath } from './spike-user-data';
 import { bindWindowState } from './window-state';
+import { ipcEvents } from '../shared/ipc-channels';
+import { FileDownloadEventSchema } from '../shared/schemas';
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -37,6 +47,11 @@ protocol.registerSchemesAsPrivileged([
 const environment = getDesktopEnvironment();
 const spikeUserDataPath = parseSpikeUserDataPath(readSpikeUserDataPathValue(), environment.spikeMode);
 if (spikeUserDataPath) app.setPath('userData', spikeUserDataPath);
+const spikeDownloadPath = parseSpikeDownloadPath(
+  readSpikeDownloadPathValue(),
+  environment.spikeMode,
+  app.getPath('userData'),
+);
 const rendererRoot = path.join(app.getAppPath(), 'out/renderer');
 const allowedExternalHosts = new Set([new URL(environment.webPublicBaseUrl).hostname]);
 let mainWindow: BrowserWindow | null = null;
@@ -107,6 +122,13 @@ function registerSecurityPolicies(): void {
   session.defaultSession.setPermissionRequestHandler((_webContents, _permission, callback) =>
     callback(false),
   );
+  if (environment.allowInsecureLocalhost) {
+    // 仅 packaged Spike 显式启用：Main `net` 不依赖 Renderer 的 certificate-error 回调，
+    // 因此用 session verifier 接受 localhost 自签名证书，并明确拒绝其他 host。
+    session.defaultSession.setCertificateVerifyProc((request, callback) =>
+      callback(request.hostname === 'localhost' ? 0 : -2),
+    );
+  }
   app.on('certificate-error', (event, _webContents, urlValue, _error, _certificate, callback) => {
     const url = new URL(urlValue);
     if (environment.allowInsecureLocalhost && url.hostname === 'localhost') {
@@ -116,6 +138,12 @@ function registerSecurityPolicies(): void {
     }
     callback(false);
   });
+}
+
+async function availableDiskBytes(directory: string): Promise<number> {
+  const stats = await statfs(directory, { bigint: true });
+  const bytes = stats.bavail * stats.bsize;
+  return bytes > BigInt(Number.MAX_SAFE_INTEGER) ? Number.MAX_SAFE_INTEGER : Number(bytes);
 }
 
 async function startApplication(): Promise<void> {
@@ -149,11 +177,36 @@ async function startApplication(): Promise<void> {
     // 安全存储不可用或密文损坏时按无会话启动，禁止回退明文。
     console.error('Credential vault restore failed; starting without a session');
   }
+  const downloadManager = createDownloadManager({
+    apiBaseUrl: environment.apiBaseUrl,
+    approvedOrigins: new Set([environment.apiOrigin, ...environment.downloadAllowedOrigins]),
+    allowInsecureApi: environment.mode === 'development',
+    restoreCredential: () => credentialVault.restore(),
+    showSaveDialog: async (suggestedName) => {
+      if (spikeDownloadPath) return spikeDownloadPath;
+      const result = await dialog.showSaveDialog({
+        defaultPath: path.join(app.getPath('downloads'), suggestedName),
+        properties: ['createDirectory', 'showOverwriteConfirmation'],
+      });
+      return result.canceled ? null : (result.filePath ?? null);
+    },
+    request: requestDownloadWithElectronNet,
+    availableBytes: availableDiskBytes,
+    emit: (event) => {
+      const payload = FileDownloadEventSchema.parse(event);
+      for (const window of BrowserWindow.getAllWindows()) {
+        if (!window.isDestroyed() && !window.webContents.isDestroyed()) {
+          window.webContents.send(ipcEvents.fileDownloadChanged, payload);
+        }
+      }
+    },
+  });
   const disposeIpc = registerDesktopIpcHandlers({
     writeClipboardText: (text) => clipboard.writeText(text),
     openExternal: (url) => shell.openExternal(url),
     allowedExternalHosts,
     credentials: credentialVault,
+    files: downloadManager,
   });
   app.once('before-quit', disposeIpc);
   mainWindow = createMainWindow();

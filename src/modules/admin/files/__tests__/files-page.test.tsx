@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { waitFor } from '@testing-library/react';
 import { HttpResponse, http } from 'msw';
@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { FilesPage } from '@/modules/admin/files';
 import { fileHandlers } from '@/modules/admin/files/mocks';
 import { i18nInit } from '@/lib/i18n';
+import { platform } from '@/lib/platform';
 import { resetDb } from '@/mocks/db';
 
 const server = setupServer(...fileHandlers);
@@ -18,6 +19,7 @@ beforeAll(async () => {
 afterEach(() => {
   server.resetHandlers();
   resetDb();
+  vi.restoreAllMocks();
 });
 afterAll(() => server.close());
 
@@ -115,4 +117,45 @@ test('分享文件复制可回读深链，直接进入深链会自动打开文�
       `${window.location.origin}/admin/files?fileId=${encodeURIComponent(sharedFileId)}`,
     ),
   );
+});
+
+test('下载任务显示进度并可按 task id 取消', async () => {
+  const taskId = '9ba560a3-94c6-438a-9d76-1e17627fd483';
+  let listener: Parameters<typeof platform.files.subscribe>[0] | undefined;
+  vi.spyOn(platform.files, 'subscribe').mockImplementation((next) => {
+    listener = next;
+    return () => undefined;
+  });
+  const save = vi.spyOn(platform.files, 'save').mockResolvedValue({ taskId });
+  const cancel = vi.spyOn(platform.files, 'cancel').mockResolvedValue(undefined);
+
+  renderPage();
+  await userEvent.click(await screen.findByRole('button', { name: '预览 组织架构图.png' }));
+  await userEvent.click(await screen.findByRole('button', { name: '下载' }));
+  await waitFor(() =>
+    expect(save).toHaveBeenCalledWith({ resourceId: expect.any(String), suggestedName: '组织架构图.png' }),
+  );
+
+  act(() => listener?.({ taskId, status: 'progress', receivedBytes: 50, totalBytes: 100, percent: 50 }));
+  expect(screen.getByRole('progressbar', { name: '下载进度' })).toHaveAttribute('aria-valuenow', '50');
+  await userEvent.click(screen.getByRole('button', { name: '取消下载' }));
+  expect(cancel).toHaveBeenCalledWith(taskId);
+});
+
+test('保存框等待期间保持 single-flight，不重复创建下载任务', async () => {
+  let resolveSave: ((value: { taskId: string }) => void) | undefined;
+  const save = vi.spyOn(platform.files, 'save').mockReturnValue(
+    new Promise((resolve) => {
+      resolveSave = resolve;
+    }),
+  );
+  vi.spyOn(platform.files, 'subscribe').mockReturnValue(() => undefined);
+
+  renderPage();
+  await userEvent.click(await screen.findByRole('button', { name: '预览 组织架构图.png' }));
+  const downloadButton = await screen.findByRole('button', { name: '下载' });
+  await userEvent.click(downloadButton);
+  await userEvent.click(downloadButton);
+  expect(save).toHaveBeenCalledTimes(1);
+  act(() => resolveSave?.({ taskId: '9ba560a3-94c6-438a-9d76-1e17627fd483' }));
 });

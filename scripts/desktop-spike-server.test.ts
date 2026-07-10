@@ -88,4 +88,38 @@ describe('packaged Spike HTTPS API', () => {
       data: { company: { name: 'Packaged Chrome' } },
     });
   });
+
+  test('allows only an authenticated Main download without weakening Renderer CORS', () => {
+    const redirect = createSpikeResponse({
+      method: 'GET',
+      path: '/api/files/spike-file/download',
+      origin: '',
+      headers: { authorization: 'Bearer spike-session-token' },
+      body: '',
+    });
+    const content = createSpikeResponse({
+      method: 'GET',
+      path: '/api/files/spike-file/content',
+      origin: '',
+      headers: { authorization: 'Bearer spike-session-token' },
+      body: '',
+    });
+    const unauthorized = createSpikeResponse({
+      method: 'GET',
+      path: '/api/files/spike-file/download',
+      origin: '',
+      headers: {},
+      body: '',
+    });
+
+    expect(redirect).toMatchObject({
+      status: 302,
+      headers: { location: '/api/files/spike-file/content' },
+    });
+    expect(content.status).toBe(200);
+    expect(content.headers['content-length']).toBe(String(Buffer.byteLength(content.body)));
+    expect(content.body).toBe('electron-download-evidence');
+    expect(unauthorized.status).toBe(401);
+    expect(content.headers['access-control-allow-origin']).toBeUndefined();
+  });
 });

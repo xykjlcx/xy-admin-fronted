@@ -58,6 +58,18 @@ export function findDesktopBoundaryViolations(files) {
       if (/\bplatform\s*\.\s*window\b/.test(source) && !normalizedFile.startsWith('src/app/')) {
         violations.push(`${normalizedFile}: window platform 只能由 App/Shell 消费`);
       }
+      if (
+        normalizedFile.startsWith('src/modules/admin/files/') &&
+        (/(?:from\s+|import\s*\()['"]@\/lib\/download['"]/.test(source) || /\bdownloadFile\s*\(/.test(source))
+      ) {
+        violations.push(`${normalizedFile}: 文件业务必须通过 platform.files 使用宿主能力`);
+      }
+      if (
+        normalizedFile.startsWith('src/modules/admin/files/') &&
+        /\bwindow\s*\.\s*location\s*\.\s*origin\b/.test(source)
+      ) {
+        violations.push(`${normalizedFile}: 分享链接不得读取宿主 window.location.origin`);
+      }
     }
 
     if (normalizedFile.startsWith('electron/') && !testFile) {

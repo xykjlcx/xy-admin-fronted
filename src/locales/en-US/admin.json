@@ -622,6 +622,7 @@
       "openFolder": "Open folder",
       "preview": "Preview",
       "download": "Download",
+      "cancelDownload": "Cancel download",
       "rename": "Rename",
       "share": "Share",
       "delete": "Delete",
@@ -654,7 +655,8 @@
       "description": "File preview and management",
       "image": "Image preview",
       "document": "Mock document preview",
-      "type": "Type"
+      "type": "Type",
+      "downloadProgress": "Download progress"
     },
     "toast": {
       "uploaded": "File uploaded",
@@ -663,7 +665,8 @@
       "deleted": "File deleted",
       "shared": "Share link copied",
       "shareFailed": "Failed to copy the share link. Please retry.",
-      "downloadFailed": "File download failed. Please retry."
+      "downloadFailed": "File download failed. Please retry.",
+      "downloaded": "File downloaded"
     },
     "empty": "No files in this folder",
     "loading": "Loading files"

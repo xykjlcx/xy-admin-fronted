@@ -7,6 +7,7 @@ const productionEnv = {
   VITE_WEB_PUBLIC_BASE_URL: 'https://app.example.com',
   DESKTOP_UPDATE_BASE_URL: 'https://updates.example.com/stable',
   DESKTOP_WINDOW_CHROME: 'integrated',
+  DESKTOP_DOWNLOAD_ALLOWED_ORIGINS: 'https://cdn.example.com,https://objects.example.com',
 };
 
 describe('desktop environment', () => {
@@ -29,14 +30,28 @@ describe('desktop environment', () => {
       updateBaseUrl: 'https://updates.example.com/stable/',
       windowChrome: 'integrated',
       allowInsecureLocalhost: false,
+      downloadAllowedOrigins: ['https://cdn.example.com', 'https://objects.example.com'],
     });
   });
 
   test.each([
     [{ ...productionEnv, VITE_API_BASE_URL: '/api' }, 'VITE_API_BASE_URL'],
     [{ ...productionEnv, VITE_API_BASE_URL: 'http://api.example.com' }, 'VITE_API_BASE_URL'],
+    [{ ...productionEnv, VITE_API_BASE_URL: 'https://api.example.com?tenant=1' }, 'VITE_API_BASE_URL'],
     [{ ...productionEnv, DESKTOP_UPDATE_BASE_URL: '' }, 'DESKTOP_UPDATE_BASE_URL'],
     [{ ...productionEnv, DESKTOP_WINDOW_CHROME: 'frameless' }, 'DESKTOP_WINDOW_CHROME'],
+    [
+      { ...productionEnv, DESKTOP_DOWNLOAD_ALLOWED_ORIGINS: 'http://cdn.example.com' },
+      'DESKTOP_DOWNLOAD_ALLOWED_ORIGINS',
+    ],
+    [
+      { ...productionEnv, DESKTOP_DOWNLOAD_ALLOWED_ORIGINS: 'https://cdn.example.com/files' },
+      'DESKTOP_DOWNLOAD_ALLOWED_ORIGINS',
+    ],
+    [
+      { ...productionEnv, DESKTOP_DOWNLOAD_ALLOWED_ORIGINS: 'https://user@cdn.example.com' },
+      'DESKTOP_DOWNLOAD_ALLOWED_ORIGINS',
+    ],
   ])('rejects invalid production configuration', (env, key) => {
     expect(() => parseDesktopEnvironment(env)).toThrow(key);
   });

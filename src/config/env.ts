@@ -20,6 +20,7 @@ export interface ParsedEnv {
   appEnv: AppEnvName;
   appVersion: string;
   apiBaseUrl: string;
+  webPublicBaseUrl: string;
   defaultLocale: LocaleCode;
   requestTimeoutMs: number;
   enableMockOverride: boolean | undefined;
@@ -86,6 +87,7 @@ export function parseEnv(input: RawEnv): ParsedEnv {
     appEnv: parseAppEnv(mode, input.VITE_APP_ENV),
     appVersion: String(input.VITE_APP_VERSION || '0.1.0'),
     apiBaseUrl: String(input.VITE_API_BASE_URL || ''),
+    webPublicBaseUrl: String(input.VITE_WEB_PUBLIC_BASE_URL || ''),
     defaultLocale: parseLocale(input.VITE_DEFAULT_LOCALE),
     requestTimeoutMs: parsePositiveInteger('VITE_REQUEST_TIMEOUT_MS', input.VITE_REQUEST_TIMEOUT_MS, 15000),
     enableMockOverride: parseBooleanOverride('VITE_ENABLE_MOCK', input.VITE_ENABLE_MOCK),

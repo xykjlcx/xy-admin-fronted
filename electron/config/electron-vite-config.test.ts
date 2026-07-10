@@ -12,6 +12,7 @@ const environment: DesktopEnvironment = {
   windowChrome: 'native',
   spikeMode: false,
   allowInsecureLocalhost: false,
+  downloadAllowedOrigins: [],
 };
 
 describe('electron-vite build graph', () => {

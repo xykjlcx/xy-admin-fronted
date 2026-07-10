@@ -8,8 +8,14 @@ import {
   CredentialPersistInputSchema,
   CredentialRestoreResultSchema,
   ExternalOpenInputSchema,
+  FileDownloadCancelInputSchema,
+  FileDownloadEventSchema,
+  FileDownloadStartInputSchema,
+  FileDownloadStartResultSchema,
   IpcSuccessSchema,
   type CredentialClearInput,
+  type FileDownloadEvent,
+  type FileDownloadStartInput,
 } from '../shared/schemas';
 import { createWindowSnapshot, WindowSnapshotSchema, type WindowSnapshot } from '../shared/window-state';
 
@@ -23,9 +29,14 @@ let snapshot = createWindowSnapshot({
   scaleFactor: 1,
 });
 const windowStateListeners = new Set<(next: WindowSnapshot) => void>();
+const fileDownloadListeners = new Set<(event: FileDownloadEvent) => void>();
 ipcRenderer.on(ipcEvents.windowStateChanged, (_event, payload: unknown) => {
   snapshot = WindowSnapshotSchema.parse(payload);
   for (const listener of windowStateListeners) listener(snapshot);
+});
+ipcRenderer.on(ipcEvents.fileDownloadChanged, (_event, payload: unknown) => {
+  const downloadEvent = FileDownloadEventSchema.parse(payload);
+  for (const listener of fileDownloadListeners) listener(downloadEvent);
 });
 
 const desktopApi: DesktopApi = Object.freeze({
@@ -62,6 +73,22 @@ const desktopApi: DesktopApi = Object.freeze({
     clear: async (reason: CredentialClearInput['reason']) => {
       const input = CredentialClearInputSchema.parse({ reason });
       IpcSuccessSchema.parse(await ipcRenderer.invoke(ipcChannels.credentialClear, input));
+    },
+  }),
+  files: Object.freeze({
+    save: async (value: FileDownloadStartInput) => {
+      const input = FileDownloadStartInputSchema.parse(value);
+      return FileDownloadStartResultSchema.parse(
+        await ipcRenderer.invoke(ipcChannels.fileDownloadStart, input),
+      );
+    },
+    cancel: async (taskId: string) => {
+      const input = FileDownloadCancelInputSchema.parse({ taskId });
+      IpcSuccessSchema.parse(await ipcRenderer.invoke(ipcChannels.fileDownloadCancel, input));
+    },
+    subscribe: (listener: (event: FileDownloadEvent) => void) => {
+      fileDownloadListeners.add(listener);
+      return () => fileDownloadListeners.delete(listener);
     },
   }),
 });

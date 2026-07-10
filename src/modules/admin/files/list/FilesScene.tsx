@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Folder, FolderPlus, Grid3X3, List, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -13,8 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ProgressBar } from '@/components/ui/progress';
-import { downloadFile } from '@/lib/download';
-import { platform } from '@/lib/platform';
+import { platform, type FileDownloadEvent } from '@/lib/platform';
 import { matchPermission } from '@/lib/permission';
 import { fileApi, fileKeys, filesQuery, storageOverviewQuery, type FileEntryDto } from '../api';
 import { FilePreviewSheet } from '../detail';
@@ -47,6 +46,11 @@ export function FilesScene({
   const [nameMode, setNameMode] = useState<NameDialogMode>(null);
   const [name, setName] = useState('');
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [downloadState, setDownloadState] = useState<{ taskId: string; percent: number } | null>(null);
+  const [downloadStarting, setDownloadStarting] = useState(false);
+  const downloadStartingRef = useRef(false);
+  const activeDownloadTaskId = useRef<string | null>(null);
+  const deferredDownloadEvents = useRef(new Map<string, FileDownloadEvent>());
   const parentId = folderPath.at(-1)?.id ?? null;
   const selectedId = onFileChange ? (fileId ?? '') : localSelectedId;
   const setSelectedId = (nextId: string) => {
@@ -98,19 +102,67 @@ export function FilesScene({
       toast.success(t('files.toast.deleted'));
     },
   });
-  const download = useMutation({
-    mutationFn: async () => {
-      if (!selectedId) throw new Error('No file selected');
-      await downloadFile(`/api/files/${selectedId}/download`, selected?.name ?? 'file');
+  const applyDownloadEvent = useCallback(
+    (event: FileDownloadEvent) => {
+      if (event.status === 'progress') {
+        setDownloadState({ taskId: event.taskId, percent: event.percent });
+        return;
+      }
+      activeDownloadTaskId.current = null;
+      setDownloadState(null);
+      if (event.status === 'completed') toast.success(t('files.toast.downloaded'));
+      if (event.status === 'error') toast.error(t('files.toast.downloadFailed'));
     },
-    onError: () => toast.error(t('files.toast.downloadFailed')),
-  });
+    [t],
+  );
+  useEffect(
+    () =>
+      platform.files.subscribe((event) => {
+        if (activeDownloadTaskId.current !== event.taskId) {
+          if (downloadStartingRef.current) deferredDownloadEvents.current.set(event.taskId, event);
+          return;
+        }
+        applyDownloadEvent(event);
+      }),
+    [applyDownloadEvent],
+  );
+  const startDownload = async () => {
+    if (!selectedId || downloadState || downloadStartingRef.current) return;
+    downloadStartingRef.current = true;
+    setDownloadStarting(true);
+    try {
+      const result = await platform.files.save({
+        resourceId: selectedId,
+        suggestedName: selected?.name ?? 'file',
+      });
+      activeDownloadTaskId.current = result.taskId;
+      setDownloadState({ taskId: result.taskId, percent: 0 });
+      const deferred = deferredDownloadEvents.current.get(result.taskId);
+      if (deferred) {
+        deferredDownloadEvents.current.delete(result.taskId);
+        applyDownloadEvent(deferred);
+      }
+    } catch {
+      deferredDownloadEvents.current.clear();
+      toast.error(t('files.toast.downloadFailed'));
+    } finally {
+      downloadStartingRef.current = false;
+      setDownloadStarting(false);
+    }
+  };
+  const cancelDownload = async () => {
+    const taskId = activeDownloadTaskId.current;
+    if (!taskId) return;
+    try {
+      await platform.files.cancel(taskId);
+    } catch {
+      toast.error(t('files.toast.downloadFailed'));
+    }
+  };
   const share = useMutation({
     mutationFn: async () => {
       if (!selectedId) throw new Error('File is unavailable');
-      const url = new URL('/admin/files', window.location.origin);
-      url.searchParams.set('fileId', selectedId);
-      await platform.clipboard.writeText(url.toString());
+      await platform.clipboard.writeText(platform.files.createShareUrl(selectedId));
     },
     onSuccess: () => toast.success(t('files.toast.shared')),
     onError: () => toast.error(t('files.toast.shareFailed')),
@@ -338,6 +390,8 @@ export function FilesScene({
         labels={{
           previewDescription: t('files.preview.description'),
           download: t('files.actions.download'),
+          cancelDownload: t('files.actions.cancelDownload'),
+          downloadProgress: t('files.preview.downloadProgress'),
           rename: t('files.actions.rename'),
           share: t('files.actions.share'),
           delete: t('files.actions.delete'),
@@ -355,8 +409,10 @@ export function FilesScene({
         onOpenChange={(isOpen) => {
           if (!isOpen) setSelectedId('');
         }}
-        onDownload={() => download.mutate()}
-        downloading={download.isPending}
+        onDownload={() => void startDownload()}
+        onCancelDownload={() => void cancelDownload()}
+        downloading={downloadStarting || downloadState !== null}
+        downloadPercent={downloadState?.percent ?? 0}
         sharing={share.isPending}
         onRename={() => {
           setName(selected?.name ?? '');

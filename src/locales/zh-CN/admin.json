@@ -612,6 +612,7 @@
       "openFolder": "打开文件夹",
       "preview": "预览",
       "download": "下载",
+      "cancelDownload": "取消下载",
       "rename": "重命名",
       "share": "分享",
       "delete": "删除",
@@ -644,7 +645,8 @@
       "description": "文件预览与管理",
       "image": "图片预览",
       "document": "Mock 环境文档预览",
-      "type": "类型"
+      "type": "类型",
+      "downloadProgress": "下载进度"
     },
     "toast": {
       "uploaded": "文件上传成功",
@@ -653,7 +655,8 @@
       "deleted": "文件已删除",
       "shared": "分享链接已复制",
       "shareFailed": "分享链接复制失败，请重试",
-      "downloadFailed": "文件下载失败，请重试"
+      "downloadFailed": "文件下载失败，请重试",
+      "downloaded": "文件下载完成"
     },
     "empty": "当前目录暂无文件",
     "loading": "正在加载文件"

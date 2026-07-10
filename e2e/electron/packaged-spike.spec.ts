@@ -147,6 +147,94 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
     });
     expect(existsSync(credentialPath)).toBe(false);
 
+    // 设计文档允许在 Playwright 中 stub 原生保存框；这里只验证 Main/Preload/Renderer 联动，
+    // 真实 OS 对话框点击仍留给平台人工 smoke，验收报告不得把本证据写成真实点击。
+    const downloadPath = path.join(userDataPath, 'download-evidence.bin');
+    const downloadTaskId = await page.evaluate(async () => {
+      type DownloadEvent = { taskId: string; status: string; [key: string]: unknown };
+      const state = globalThis as typeof globalThis & { __spikeDownloadEvents?: DownloadEvent[] };
+      const api = (
+        window as Window & {
+          desktop?: {
+            credentials: {
+              persist(token: string): Promise<void>;
+              clear(reason: 'switch-account'): Promise<void>;
+            };
+            files: {
+              save(input: { resourceId: string; suggestedName: string }): Promise<{ taskId: string }>;
+              subscribe(listener: (event: DownloadEvent) => void): () => void;
+            };
+          };
+        }
+      ).desktop;
+      if (!api) throw new Error('Desktop API unavailable');
+      state.__spikeDownloadEvents = [];
+      api.files.subscribe((event) => state.__spikeDownloadEvents?.push(event));
+      await api.credentials.persist('spike-session-token');
+      return (
+        await api.files.save({
+          resourceId: 'spike-file',
+          suggestedName: '../../spike-report.bin',
+        })
+      ).taskId;
+    });
+    expect(downloadTaskId).toMatch(/^[0-9a-f-]{36}$/);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            (
+              globalThis as typeof globalThis & {
+                __spikeDownloadEvents?: Array<Record<string, unknown>>;
+              }
+            ).__spikeDownloadEvents?.at(-1)?.status,
+        ),
+      )
+      .toMatch(/^(?:completed|error)$/);
+    const terminalDownloadEvent = await page.evaluate(() =>
+      (
+        globalThis as typeof globalThis & {
+          __spikeDownloadEvents?: Array<Record<string, unknown>>;
+        }
+      ).__spikeDownloadEvents?.at(-1),
+    );
+    if (terminalDownloadEvent?.status !== 'completed') {
+      throw new Error(`Packaged download failed: ${JSON.stringify(terminalDownloadEvent)}`);
+    }
+    expect(terminalDownloadEvent).toMatchObject({ taskId: downloadTaskId, status: 'completed' });
+    expect(existsSync(downloadPath)).toBe(true);
+    expect(readFileSync(downloadPath, 'utf8')).toBe('electron-download-evidence');
+    const downloadEvents = await page.evaluate(
+      () =>
+        (globalThis as typeof globalThis & { __spikeDownloadEvents?: Array<Record<string, unknown>> })
+          .__spikeDownloadEvents ?? [],
+    );
+    expect(downloadEvents).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ taskId: downloadTaskId, status: 'progress', percent: 0 }),
+        expect.objectContaining({ taskId: downloadTaskId, status: 'progress', percent: 100 }),
+        expect.objectContaining({
+          taskId: downloadTaskId,
+          status: 'completed',
+          filename: 'spike-report.bin',
+          bytes: Buffer.byteLength('electron-download-evidence'),
+        }),
+      ]),
+    );
+    expect(downloadEvents.every((event) => !('targetPath' in event) && !('authorization' in event))).toBe(
+      true,
+    );
+    await page.evaluate(async () => {
+      const api = (
+        window as Window & {
+          desktop?: { credentials: { clear(reason: 'switch-account'): Promise<void> } };
+        }
+      ).desktop;
+      if (!api) throw new Error('Desktop API unavailable');
+      await api.credentials.clear('switch-account');
+    });
+    expect(existsSync(credentialPath)).toBe(false);
+
     const documentResponsePromise = page.waitForResponse((response) =>
       response.url().startsWith('app://renderer/index.html'),
     );
@@ -223,7 +311,7 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
     ).toBe('/admin/dashboard');
 
     const evidence = readEvidence(evidencePath);
-    expect(new Set(evidence.requests.map((item) => item.origin))).toEqual(new Set(['app://renderer']));
+    expect(new Set(evidence.requests.map((item) => item.origin))).toEqual(new Set(['app://renderer', '']));
     expect(
       evidence.requests.some((item) => item.preflight && item.requestedHeaders.includes('content-type')),
     ).toBe(true);
@@ -233,6 +321,17 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
     expect(
       evidence.requests.some((item) => item.path === '/api/dashboard/overview' && item.hasAuthorization),
     ).toBe(true);
+    expect(
+      evidence.requests
+        .filter((item) => item.path.startsWith('/api/files/spike-file'))
+        .map((item) => ({
+          path: item.path,
+          hasAuthorization: item.hasAuthorization,
+        })),
+    ).toEqual([
+      { path: '/api/files/spike-file/download', hasAuthorization: true },
+      { path: '/api/files/spike-file/content', hasAuthorization: true },
+    ]);
     expect(await page.evaluate(() => localStorage.getItem('auth'))).toBeNull();
     expect(existsSync(credentialPath)).toBe(false);
 

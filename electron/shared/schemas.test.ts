@@ -5,6 +5,10 @@ import {
   CredentialPersistInputSchema,
   CredentialRestoreResultSchema,
   ExternalOpenInputSchema,
+  FileDownloadCancelInputSchema,
+  FileDownloadEventSchema,
+  FileDownloadStartInputSchema,
+  FileDownloadStartResultSchema,
   IpcSuccessSchema,
 } from './schemas';
 
@@ -39,5 +43,80 @@ describe('desktop IPC schemas', () => {
     expect(() => CredentialPersistInputSchema.parse({ token: '' })).toThrow();
     expect(() => CredentialPersistInputSchema.parse({ token: 'x'.repeat(16_385) })).toThrow();
     expect(() => CredentialClearInputSchema.parse({ reason: 'other' })).toThrow();
+  });
+
+  test('accepts only a restricted file descriptor and opaque task ids', () => {
+    const taskId = '9ba560a3-94c6-438a-9d76-1e17627fd483';
+    expect(
+      FileDownloadStartInputSchema.parse({ resourceId: 'report:2026.07', suggestedName: 'Q2 报告.pdf' }),
+    ).toEqual({ resourceId: 'report:2026.07', suggestedName: 'Q2 报告.pdf' });
+    expect(FileDownloadStartResultSchema.parse({ taskId })).toEqual({ taskId });
+    expect(FileDownloadCancelInputSchema.parse({ taskId })).toEqual({ taskId });
+
+    expect(() =>
+      FileDownloadStartInputSchema.parse({
+        resourceId: '../secrets',
+        suggestedName: 'secret.txt',
+        targetPath: '/tmp/secret.txt',
+      }),
+    ).toThrow();
+    expect(() =>
+      FileDownloadStartInputSchema.parse({
+        resourceId: 'https://evil.example.com/file',
+        suggestedName: 'file.txt',
+      }),
+    ).toThrow();
+    expect(() => FileDownloadCancelInputSchema.parse({ taskId: 'predictable-id' })).toThrow();
+  });
+
+  test('validates progress, completion, cancellation, and bounded error events', () => {
+    const taskId = '9ba560a3-94c6-438a-9d76-1e17627fd483';
+    expect(
+      FileDownloadEventSchema.parse({
+        taskId,
+        status: 'progress',
+        receivedBytes: 512,
+        totalBytes: 1024,
+        percent: 50,
+      }),
+    ).toMatchObject({ status: 'progress', percent: 50 });
+    expect(
+      FileDownloadEventSchema.parse({
+        taskId,
+        status: 'completed',
+        filename: 'report.pdf',
+        bytes: 1024,
+      }),
+    ).toMatchObject({ status: 'completed', filename: 'report.pdf' });
+    expect(FileDownloadEventSchema.parse({ taskId, status: 'cancelled' })).toMatchObject({
+      status: 'cancelled',
+    });
+    expect(
+      FileDownloadEventSchema.parse({
+        taskId,
+        status: 'error',
+        code: 'MISSING_CONTENT_LENGTH',
+        message: '下载响应缺少 Content-Length',
+      }),
+    ).toMatchObject({ status: 'error', code: 'MISSING_CONTENT_LENGTH' });
+
+    expect(() =>
+      FileDownloadEventSchema.parse({
+        taskId,
+        status: 'completed',
+        filename: 'report.pdf',
+        bytes: 1024,
+        targetPath: '/Users/example/report.pdf',
+      }),
+    ).toThrow();
+    expect(() =>
+      FileDownloadEventSchema.parse({
+        taskId,
+        status: 'progress',
+        receivedBytes: 2048,
+        totalBytes: 1024,
+        percent: 200,
+      }),
+    ).toThrow();
   });
 });

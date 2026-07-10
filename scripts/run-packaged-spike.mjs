@@ -118,6 +118,7 @@ function runPackagedSpec(executable, spec, userDataPath, environment) {
     ...environment,
     SPIKE_APP_EXECUTABLE: executable,
     SPIKE_USER_DATA_PATH: userDataPath,
+    SPIKE_DOWNLOAD_PATH: path.join(userDataPath, 'download-evidence.bin'),
   });
 }
 
