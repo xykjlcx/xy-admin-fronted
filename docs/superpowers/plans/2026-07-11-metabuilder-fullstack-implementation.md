@@ -169,15 +169,18 @@ GREEN：只改路径，不改 UI 行为。
 
 新增：
 
-- UUIDv7 generator/value serializer
-- `AuthorizationState/Snapshot/Fence` 与 `DataScopePolicy`
-- AST/ArchUnit ID 语义守卫
+- shared-kernel `UuidV7` validator/parser + monotonic `UuidV7Generator`；Java/API 类型继续使用 `java.util.UUID`，不发明第二个 ID wrapper
+- infrastructure Jackson UUIDv7 module：wire 固定 canonical string，序列化/反序列化均拒绝非 v7
+- `AuthorizationState/Snapshot/Fence` 与不可变、可归一化/并集的 `DataScopePolicy`
+- JDK compiler AST + ArchUnit ID 语义守卫
 
-RED：UUID 时间排序、JSON/string round-trip、持久化/API/path/current-user ID 使用 Long 的负向 fixtures、system principal `0L` fixture、SELF/DEPT/CUSTOM 并集纯函数测试。
+UUIDv7 generator 固定 RFC 9562 version/variant 与 48-bit Unix millisecond 布局；同一毫秒内和时钟小幅回拨时仍保持单进程单调，序列空间耗尽不得静默重复。`AuthorizationSnapshot/Fence` 字段逐字遵守 v4 spec §5.2，roles/permissions/deptIds 防御性复制；revision 不得为负。`DataScopePolicy(all=true)` 归一化为不再携带 self/dept 条件；deny-all 是 `all=false/includeSelf=false/deptIds=empty`，并集遵守 ALL 短路、SELF/DEPT/CUSTOM OR 语义。
+
+RED：UUID version/variant/时间提取、同毫秒和回拨排序、序列溢出、JSON/string round-trip 与 v4 拒绝；持久化字段/API path/current-user ID 使用 Long 的独立负向 fixtures、只针对 principal/userId/loginId 语义的 `0L` AST fixture（不得全仓禁合法 long 零值）；SELF/DEPT/CUSTOM/ALL/deny-all 并集与集合不可变测试。
 
 GREEN：只移植 UUID-native shared/security/jOOQ 基础；不导入旧 Long domain。
 
-验证：局部 test + backend verify；独立对抗复审无阻断。
+验证：shared/infrastructure/app 局部 test + `backend/scripts/verify-p0a.sh` + backend verify；独立对抗复审无阻断。
 
 ## Task 9：前端 requestCore 的 json/void/blob/multipart
 
