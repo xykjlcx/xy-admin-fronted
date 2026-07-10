@@ -68,9 +68,9 @@ git diff --check
 RED：
 
 - `PageResult` JSON 字段必须恰为 `list/total`。
-- BatchResult 对空输入、部分缺失、重复 ID 有确定语义，单批 >500 拒绝。
+- BatchResult 对空结果、部分缺失、found/missing key 重叠有确定语义并做 defensive copy；单批 >500 的 adapter 行为留 Task 15 用批量 SQL 集成测试证明。
 - `admin-api` 不得依赖 Spring、jOOQ、Sa-Token 或 schema artifact。
-- download ticket 绑定 actor/file/operation/expiry 且不可复用页面 DTO。
+- capability ticket DTO 只暴露 token/expiresAt；`FileCatalogApi.issueDownloadTicket(fileId,actorId,purpose)` 与 `AttachmentApi.issueUploadTicket(policy,actorId,purpose)` 的签名必须保留绑定输入，实际 ticket store 的 actor/file/operation/expiry 约束留 Task 21 验证。
 
 GREEN：按 v4 §3.3/§11 的签名实现最小 immutable records/interfaces，不建万能 `AdminApi`。
 
