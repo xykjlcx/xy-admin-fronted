@@ -106,6 +106,8 @@ GREEN：两个显式 Flyway runner，history table 固定 `flyway_platform_histo
 - `TraceIdFilter`、security headers、MessageSource、GlobalExceptionHandler
 - json/void/blob/error 集成 fixtures
 
+依赖锁定 Spring Boot BOM `3.5.3`。shared-kernel 只新增无 Spring 依赖的 `BadRequest/Unauthorized/Forbidden/NotFound/Conflict/RateLimited` 领域异常子类；infrastructure 映射为 400/401/403/404/409/429。框架异常稳定 code：`request.validation.failed`、`request.malformed`、`request.type-mismatch`、`request.parameter.missing`、`request.multipart.missing`、`request.upload.too-large`、`request.method.not-allowed`、`request.media-type.unsupported`、`internal.server-error`。trace header 固定 `X-Trace-Id`，ProblemDetail 扩展为 `code/traceId`。
+
 RED：覆盖 validation、malformed JSON、type mismatch、missing param/part、upload too large、405、415、领域冲突、unknown 500；所有响应检查 status/content-type/code/traceId。
 
 GREEN：只实现错误方言与 filter 装配；非目标异常不得 catch 成 200 或通用 500。
