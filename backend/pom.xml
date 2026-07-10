@@ -45,6 +45,8 @@
     <spring-boot.version>3.5.3</spring-boot.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
     <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
+    <skipTests>false</skipTests>
+    <maven.test.skip>false</maven.test.skip>
   </properties>
 
   <dependencyManagement>
@@ -193,6 +195,27 @@
                 <requireMavenVersion>
                   <version>[3.9.0,)</version>
                 </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+          <execution>
+            <id>enforce-tests-during-verify</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireProperty>
+                  <property>skipTests</property>
+                  <regex>false</regex>
+                  <message>Maven verify must execute tests: -DskipTests is forbidden</message>
+                </requireProperty>
+                <requireProperty>
+                  <property>maven.test.skip</property>
+                  <regex>false</regex>
+                  <message>Maven verify must execute tests: -Dmaven.test.skip=true is forbidden</message>
+                </requireProperty>
               </rules>
             </configuration>
           </execution>
