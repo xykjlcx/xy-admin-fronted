@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { desktopDefaults } from '../../desktop.config';
 
 const windowChromeSchema = z.enum(['native', 'integrated']);
 
@@ -51,9 +52,18 @@ function withTrailingSlash(url: URL): string {
 export function parseDesktopEnvironment(environment: RawEnvironment): DesktopEnvironment {
   const mode = environment.NODE_ENV === 'production' ? 'production' : 'development';
   const requireHttps = mode === 'production';
-  const apiUrl = parseUrl(environment, 'VITE_API_BASE_URL', requireHttps);
-  const webPublicUrl = parseUrl(environment, 'VITE_WEB_PUBLIC_BASE_URL', requireHttps);
-  const updateUrl = parseUrl(environment, 'DESKTOP_UPDATE_BASE_URL', true);
+  const resolvedEnvironment =
+    mode === 'development'
+      ? {
+          VITE_API_BASE_URL: desktopDefaults.development.apiBaseUrl,
+          VITE_WEB_PUBLIC_BASE_URL: desktopDefaults.development.webPublicBaseUrl,
+          DESKTOP_UPDATE_BASE_URL: desktopDefaults.development.updateBaseUrl,
+          ...environment,
+        }
+      : environment;
+  const apiUrl = parseUrl(resolvedEnvironment, 'VITE_API_BASE_URL', requireHttps);
+  const webPublicUrl = parseUrl(resolvedEnvironment, 'VITE_WEB_PUBLIC_BASE_URL', requireHttps);
+  const updateUrl = parseUrl(resolvedEnvironment, 'DESKTOP_UPDATE_BASE_URL', true);
   const windowChrome = windowChromeSchema.safeParse(environment.DESKTOP_WINDOW_CHROME ?? 'native');
   if (!windowChrome.success) throw new Error('DESKTOP_WINDOW_CHROME 必须是 native 或 integrated');
 

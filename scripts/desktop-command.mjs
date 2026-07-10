@@ -56,7 +56,9 @@ export function createDesktopCommandPlan(parsed, platform = process.platform) {
   const buildSteps = [
     { executable: 'tsc', args: ['-b', '--noEmit'] },
     { executable: 'tsc', args: ['-p', 'tsconfig.desktop.json', '--noEmit'] },
+    { executable: 'node', args: ['scripts/desktop-boundary-guard.mjs'] },
     { executable: 'electron-vite', args: ['build'] },
+    { executable: 'node', args: ['scripts/verify-renderer-artifacts.mjs', 'desktop'] },
   ];
   if (parsed.command === 'build') return buildSteps;
   if (platform === 'darwin') {
@@ -69,6 +71,7 @@ export function createDesktopCommandPlan(parsed, platform = process.platform) {
 }
 
 function localBinary(executable) {
+  if (executable === 'node') return process.execPath;
   const extension = process.platform === 'win32' ? '.cmd' : '';
   return path.join(root, 'node_modules', '.bin', `${executable}${extension}`);
 }

@@ -4,4 +4,9 @@ export const desktopDefaults = {
   productName: 'Admin Scaffold Development',
   executableName: 'admin-scaffold-development',
   releaseIdentityConfigured: false,
+  development: {
+    apiBaseUrl: 'http://127.0.0.1:5173',
+    webPublicBaseUrl: 'http://127.0.0.1:5173',
+    updateBaseUrl: 'https://updates.invalid',
+  },
 } as const;

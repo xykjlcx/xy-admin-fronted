@@ -45,13 +45,17 @@ describe('desktop command parser', () => {
     expect(createDesktopCommandPlan(parsed, 'darwin')).toEqual([
       { executable: 'tsc', args: ['-b', '--noEmit'] },
       { executable: 'tsc', args: ['-p', 'tsconfig.desktop.json', '--noEmit'] },
+      { executable: 'node', args: ['scripts/desktop-boundary-guard.mjs'] },
       { executable: 'electron-vite', args: ['build'] },
+      { executable: 'node', args: ['scripts/verify-renderer-artifacts.mjs', 'desktop'] },
       { executable: 'electron-builder', args: ['--mac', '--arm64', '--x64'] },
     ]);
     expect(createDesktopCommandPlan(parsed, 'win32')).toEqual([
       { executable: 'tsc', args: ['-b', '--noEmit'] },
       { executable: 'tsc', args: ['-p', 'tsconfig.desktop.json', '--noEmit'] },
+      { executable: 'node', args: ['scripts/desktop-boundary-guard.mjs'] },
       { executable: 'electron-vite', args: ['build'] },
+      { executable: 'node', args: ['scripts/verify-renderer-artifacts.mjs', 'desktop'] },
       { executable: 'electron-builder', args: ['--win', '--x64'] },
     ]);
   });

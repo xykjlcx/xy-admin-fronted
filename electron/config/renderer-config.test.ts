@@ -29,6 +29,8 @@ describe('shared renderer config', () => {
 
     expect(config.base).toBe(base);
     expect(config.build?.outDir).toBe(outDir);
+    expect(config.build?.minify).toBe('esbuild');
+    expect(config.build?.sourcemap).toBe(false);
     expect(pluginNames).toEqual(
       expect.arrayContaining([
         'tanstack:router-generator',

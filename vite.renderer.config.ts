@@ -67,6 +67,8 @@ export function createRendererConfig(options: RendererConfigOptions): UserConfig
     build: {
       outDir: options.outDir,
       emptyOutDir: true,
+      minify: 'esbuild',
+      sourcemap: false,
       rollupOptions: { output: { manualChunks: rendererChunkName } },
     },
   };

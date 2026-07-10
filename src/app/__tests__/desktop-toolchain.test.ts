@@ -29,6 +29,7 @@ describe('desktop toolchain contract', () => {
     expect(packageJson.scripts['build:desktop']).toBeDefined();
     expect(packageJson.scripts['make:desktop']).toBeDefined();
     expect(packageJson.scripts['typecheck:desktop']).toBe('tsc -p tsconfig.desktop.json --noEmit');
+    expect(packageJson.scripts['guard:desktop']).toBe('node scripts/desktop-boundary-guard.mjs');
     expect(packageJson.scripts['test:desktop:unit']).toContain('--config vitest.desktop.config.ts');
     expect(packageJson.scripts['test:desktop']).toContain('scripts/run-packaged-spike.mjs');
   });
@@ -36,6 +37,11 @@ describe('desktop toolchain contract', () => {
   test('explicitly approves the esbuild install script required by Vite 7', () => {
     expect(pnpmWorkspace).toMatch(/allowBuilds:\s+[\s\S]*esbuild: true/);
     expect(pnpmWorkspace).toMatch(/onlyBuiltDependencies:\s+[\s\S]*- esbuild/);
+  });
+
+  test('explicitly approves the Electron binary installer required by desktop development', () => {
+    expect(pnpmWorkspace).toMatch(/allowBuilds:\s+[\s\S]*electron: true/);
+    expect(pnpmWorkspace).toMatch(/onlyBuiltDependencies:\s+[\s\S]*- electron/);
   });
 
   test('explicitly approves the Windows installer helper required by electron-builder', () => {
@@ -57,6 +63,7 @@ describe('desktop toolchain contract', () => {
       'vitest.desktop.config.ts',
       'tsconfig.desktop.json',
       'scripts/desktop-command.mjs',
+      'scripts/desktop-boundary-guard.mjs',
       'scripts/run-packaged-spike.mjs',
       'electron/main/index.ts',
       'electron/main/protocol.ts',

@@ -10,6 +10,16 @@ const productionEnv = {
 };
 
 describe('desktop environment', () => {
+  test('uses committed non-sensitive defaults only for local desktop development', () => {
+    expect(parseDesktopEnvironment({ NODE_ENV: 'development' })).toMatchObject({
+      mode: 'development',
+      apiBaseUrl: 'http://127.0.0.1:5173',
+      webPublicBaseUrl: 'http://127.0.0.1:5173/',
+      updateBaseUrl: 'https://updates.invalid/',
+      windowChrome: 'native',
+    });
+  });
+
   test('parses the production host configuration into stable origins', () => {
     expect(parseDesktopEnvironment(productionEnv)).toMatchObject({
       mode: 'production',
