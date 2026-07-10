@@ -1,0 +1,77 @@
+import { createCollection } from '@/mocks/db';
+import type { MessageDto } from '../api';
+
+const messageSeed: MessageDto[] = [
+  {
+    id: 'm1',
+    category: 'approval',
+    title: '新成员加入申请',
+    from: '高天翔',
+    occurredAt: '2026-06-30 14:35',
+    unread: true,
+    approvalStatus: 'pending',
+    body: '高天翔申请加入「前端组」，职务为前端工程师。请审核其入职信息并分配相应角色权限。',
+  },
+  {
+    id: 'm2',
+    category: 'security',
+    title: '角色权限变更待审核',
+    from: '系统',
+    occurredAt: '2026-06-30 12:10',
+    unread: true,
+    approvalStatus: null,
+    body: '管理员修改了「财务」角色的权限配置。此变更涉及敏感数据访问，请安全负责人确认。',
+  },
+  {
+    id: 'm3',
+    category: 'system',
+    title: '存储空间预警',
+    from: '系统',
+    occurredAt: '2026-06-30 09:20',
+    unread: true,
+    approvalStatus: null,
+    body: '企业云盘当前使用率已达 82%。为避免影响文件上传，建议清理冗余文件或升级存储套餐。',
+  },
+  {
+    id: 'm4',
+    category: 'security',
+    title: '异地登录提醒',
+    from: '安全中心',
+    occurredAt: '2026-06-29 03:22',
+    unread: false,
+    approvalStatus: null,
+    body: '检测到未知账号从境外 IP 尝试登录，已被系统拦截。如非本人操作，请忽略此消息。',
+  },
+  {
+    id: 'm5',
+    category: 'system',
+    title: '数据导出完成',
+    from: '系统',
+    occurredAt: '2026-06-28 16:40',
+    unread: false,
+    approvalStatus: null,
+    body: '您发起的成员活跃数据导出任务已完成，文件已保存至文件管理。',
+  },
+  {
+    id: 'm6',
+    category: 'approval',
+    title: '报销单待审批',
+    from: '黄志强',
+    occurredAt: '2026-06-28 10:05',
+    unread: false,
+    approvalStatus: 'pending',
+    body: '黄志强提交了一笔差旅报销申请，金额 ¥3,280，请财务负责人完成审批。',
+  },
+  {
+    id: 'm7',
+    category: 'system',
+    title: '系统维护通知',
+    from: '运维团队',
+    occurredAt: '2026-06-27 20:00',
+    unread: false,
+    approvalStatus: null,
+    body: '平台将进行例行维护，期间部分功能可能短暂不可用，请提前安排工作。',
+  },
+];
+
+export const messages = createCollection<MessageDto, 'id'>(messageSeed, 'id');
