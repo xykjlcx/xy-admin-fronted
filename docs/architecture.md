@@ -14,20 +14,45 @@
 - 状态就近：UI 状态住在「所有消费它的组件的最近公共父」（React 官方 lifting state），不无脑上提/下沉。
 - 一致性靠缓存：跨组件数据同步经 `invalidateQueries`，不经 props 传数据。
 
+### 0.1 Web / Electron 双宿主
+
+当前脚手架以同一份 `src/` 和同一份 `src/routeTree.gen.ts` 同时交付 Web 与 Electron。两种宿主共享 React Renderer、业务纵切包、路由、Query 缓存、主题和权限体系；宿主差异只通过 `src/lib/platform` 门面进入。
+
+```mermaid
+flowchart LR
+  Web["Web browser"] --> Renderer["Shared React Renderer<br/>src + routeTree.gen.ts"]
+  Main["Electron Main<br/>window / vault / download / update"] --> Preload["Typed sandboxed Preload"]
+  Preload --> Platform["src/lib/platform"]
+  Platform --> Renderer
+  Renderer --> Api["Remote HTTPS backend"]
+  Main --> Api
+  Main --> Feed["Generic HTTPS update feed"]
+```
+
+边界与依赖方向：
+
+- `vite.renderer.config.ts` 是 Web/Desktop Renderer 的共享配置工厂；`vite.config.ts` 交付 Web，`electron.vite.config.ts` 只组装 Main/Preload/Desktop Renderer。Web 用 browser history 与 `/` base，Desktop 用 hash history、`./` base 和 `app://renderer` 安全协议。
+- `electron/main` 是唯一可访问窗口、系统存储、文件、网络下载和更新器的 owner；`electron/preload` 只经 `contextBridge` 暴露有限的 typed API；IPC channel 与 Zod schema 集中在 `electron/shared`。
+- 业务层不知道 Electron：`src/**` 禁止 import `electron`/Node built-in、裸 `window.desktop` 和 `runtime === 'desktop'` 分支。Web/Desktop 适配由 `src/lib/platform` 完成，该约束由 `guard:desktop` 执行。
+- 会话由 `SessionCredentialService` 统一编排。Web 延续浏览器存储；Electron 只把密文写入 `userData/credentials`，使用 `safeStorage` 加密，Renderer `localStorage` 不存 token。
+- `desktop.config.ts` 是派生项目的桌面身份真值；`package.json.version` 是 Web/Desktop 版本唯一真值。生产 API、Web public base 和 update base 必须在构建时固定为无凭据 HTTPS URL。
+- Desktop 窗口支持 `native` 与 `integrated` 两种构建模式。Shell 只消费窗口安全区 CSS token，Web/native 值为 0，不在布局中写平台分支。
+- 更新使用构建期固定的 generic HTTPS feed `stable/{platform}/{arch}/`；Main 独占状态机、下载和安装命令。签名、公证/publisher、feed 结构与发布流程见 `docs/desktop.md`。
+
 ## 1. 分层职责
 
-| 层级 | 路径 | 职责 | 禁止事项 |
-| --- | --- | --- | --- |
-| App | `src/app` | Provider、QueryClient、Shell、布局注册、全局装配 | 放业务页面实现 |
-| Config | `src/config` | 环境变量校验、应用默认路由、存储 key、feature flags、request 默认策略、外观默认值 | 放运行时用户状态、业务菜单、业务 DTO、页面权限实现 |
-| Routes | `src/routes` | URL 协议、`staticData`、`validateSearch`、可选 loader、route context 适配 | 写页面 UI、写 Query/Mutation hook、发 toast、i18n 业务文案、直接依赖 module 子组件 |
-| Business（纵切包） | `src/modules/<key>/<business>` | 一个业务域的全部：入口骨架、api、mocks、model、list/detail/form 场景 | 被跨业务复用、承载基础 UI 抽象 |
-| Business API | `src/modules/<key>/<business>/api` | zod schema（唯一类型源）、query key factory、queryOptions、mutation hooks | 持有 React UI 状态 |
-| Business Mocks | `src/modules/<key>/<business>/mocks` | MSW handler、mock 数据规则 | 被生产代码直接依赖 |
-| UI | `src/components/ui` | shadcn/ui 基础原语 | 写业务权限、业务文案、业务请求 |
-| Pro | `src/components/pro` | 后台通用业务无关组件（DataTable、Tree、表格壳、状态徽标、过渡容器…） | 绑定具体模块 DTO、import `@/modules/**`、`useTranslation` |
-| Lib | `src/lib` | 纯函数、i18n、权限判断、图标注册、HTTP 基础设施 | 读写组件本地状态 |
-| Stores | `src/stores` | token、外观、折叠态等纯客户端状态 | 存服务端数据副本 |
+| 层级               | 路径                                 | 职责                                                                              | 禁止事项                                                                           |
+| ------------------ | ------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| App                | `src/app`                            | Provider、QueryClient、Shell、布局注册、全局装配                                  | 放业务页面实现                                                                     |
+| Config             | `src/config`                         | 环境变量校验、应用默认路由、存储 key、feature flags、request 默认策略、外观默认值 | 放运行时用户状态、业务菜单、业务 DTO、页面权限实现                                 |
+| Routes             | `src/routes`                         | URL 协议、`staticData`、`validateSearch`、可选 loader、route context 适配         | 写页面 UI、写 Query/Mutation hook、发 toast、i18n 业务文案、直接依赖 module 子组件 |
+| Business（纵切包） | `src/modules/<key>/<business>`       | 一个业务域的全部：入口骨架、api、mocks、model、list/detail/form 场景              | 被跨业务复用、承载基础 UI 抽象                                                     |
+| Business API       | `src/modules/<key>/<business>/api`   | zod schema（唯一类型源）、query key factory、queryOptions、mutation hooks         | 持有 React UI 状态                                                                 |
+| Business Mocks     | `src/modules/<key>/<business>/mocks` | MSW handler、mock 数据规则                                                        | 被生产代码直接依赖                                                                 |
+| UI                 | `src/components/ui`                  | shadcn/ui 基础原语                                                                | 写业务权限、业务文案、业务请求                                                     |
+| Pro                | `src/components/pro`                 | 后台通用业务无关组件（DataTable、Tree、表格壳、状态徽标、过渡容器…）              | 绑定具体模块 DTO、import `@/modules/**`、`useTranslation`                          |
+| Lib                | `src/lib`                            | 纯函数、i18n、权限判断、图标注册、HTTP 基础设施                                   | 读写组件本地状态                                                                   |
+| Stores             | `src/stores`                         | token、外观、折叠态等纯客户端状态                                                 | 存服务端数据副本                                                                   |
 
 依赖方向只能自上而下：`routes → modules/<key>/<business> → components/pro + components/ui + lib`。`components/ui`、`components/pro` 不反向依赖模块页面。
 
@@ -135,15 +160,15 @@ Route 文件只做边界装配：
 
 UI 状态住在「所有消费它的组件的最近公共父」，不多不少：
 
-| 状态 | 归属 | 理由 |
-| --- | --- | --- |
-| 表格行选择 / 分页页码 | `pro/DataTable` 内部 | 纯 UI，仅表格自身消费 |
-| 表单草稿 / 校验 | 表单 hook（RHF） | 提交即弃，仅表单消费 |
-| 弹窗开关 / 详情目标 / 删除目标 | 触发点与影响面的最近公共父（通常是 Scene，非顶层） | 触发在表格、影响面在场景 |
-| 当前部门 deptId | Scene | 左树与右表的最近公共父 |
-| 当前 tab | 页面入口 index | 三个 tab 面板的最近公共父 |
-| 筛选条件（status/keyword/page/deptId） | URL search（路由层） | 可分享/可后退/刷新不丢 |
-| 服务端数据 | queryClient 缓存 | 不 own 在组件，谁用谁 useQuery，按 key 复用 |
+| 状态                                   | 归属                                               | 理由                                        |
+| -------------------------------------- | -------------------------------------------------- | ------------------------------------------- |
+| 表格行选择 / 分页页码                  | `pro/DataTable` 内部                               | 纯 UI，仅表格自身消费                       |
+| 表单草稿 / 校验                        | 表单 hook（RHF）                                   | 提交即弃，仅表单消费                        |
+| 弹窗开关 / 详情目标 / 删除目标         | 触发点与影响面的最近公共父（通常是 Scene，非顶层） | 触发在表格、影响面在场景                    |
+| 当前部门 deptId                        | Scene                                              | 左树与右表的最近公共父                      |
+| 当前 tab                               | 页面入口 index                                     | 三个 tab 面板的最近公共父                   |
+| 筛选条件（status/keyword/page/deptId） | URL search（路由层）                               | 可分享/可后退/刷新不丢                      |
+| 服务端数据                             | queryClient 缓存                                   | 不 own 在组件，谁用谁 useQuery，按 key 复用 |
 
 关键：**状态触发在子组件，不代表状态该住在子组件**；应放在触发点与所有受影响组件的最近公共父，既不上提到无关顶层，也不下沉到兄弟组件无法共享处。多个子组件共享同一块复杂状态时，把状态提升到最近公共父或专用 Provider，再经清晰 props/context 下发。
 

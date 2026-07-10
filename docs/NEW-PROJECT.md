@@ -21,12 +21,14 @@ git checkout <latest-tag>          # 见 git tag -l 与 CHANGELOG.md，从最新
 - `src/config/app.ts`：`id`、`routes`（若默认落地页 / 登录路径不同）
 - `.env.development` / `.env.production` / `.env.demo`：`VITE_APP_ENV`、`VITE_API_BASE_URL`、`VITE_DEFAULT_LOCALE`
 - 品牌：`public/favicon.svg`、主题色（`src/styles/tokens.base.css` 的 accent、`src/config/appearance.ts` 默认）
+- Desktop：按 `docs/desktop.md` 替换 `desktop.config.ts` 的 appId/产品名/版权/Team ID/publisher 与 `build/icon.png`。占位身份可构建本地开发包，不能用于正式发布。
 
 ## 2. 删示例业务与假数据
 
 **保留（脚手架核心，不动）**：`src/app/`、`config/`、`lib/`、`components/`、`stores/`、`styles/`、`routes/__root.tsx`、`routes/_auth.tsx`、`routes/login.tsx`、`routes/403.tsx`。
 
 **替换 / 删除（示例业务）**：
+
 - `src/modules/admin/`：内核子系统。保留 auth / menu 基础设施与 Shell 依赖；`users` / `roles` / `menus` / `dashboard` 是示例页，按项目替换成真实业务。
 - mock 假数据：`src/modules/**/mocks/`、`src/mocks/db.ts` 里的假用户 / 部门（含中文假人名、假手机号）——**交付前必须换成项目数据或删除**。
 - `dashboard` 的假指标数据。
@@ -52,6 +54,8 @@ git rm docs/prototype-handoff.md
 见 `AGENTS.md`「子系统增删清单」——复制 `modules/admin/users/` 纵切结构，不发明第二种目录形态。
 
 ## 验证（跑到业务可用终态）
+
+需要 Desktop 时，注入生产 API/Web public/update 三个 HTTPS URL，分别执行 `native` 和 `integrated` 的 `build:desktop`；选定最终窗口模式后，只发布该模式对应的签名安装包和 feed。
 
 ```bash
 pnpm install && pnpm dev     # 能起、能登录、mock 通

@@ -113,6 +113,17 @@ src/
 - mock 只在开发态、demo 或 `VITE_ENABLE_MOCK=true` 时启用;生产构建**必须**剥离 faker/msw/mock worker。mock 随业务纵切(`<business>/mocks/`),在 `src/mocks` 总聚合点挂载。
 - 环境文件 `.env*` 不提交;开发默认已启用 mock,覆盖时只写本地 `.env.development`。
 
+## Web / Electron 双宿主
+
+- `src/` 与 `src/routeTree.gen.ts` 是 Web/Desktop 共享 Renderer 的唯一份业务代码和路由树;禁止新建 Desktop 专属路由树或复制业务页。
+- 业务层只经 `src/lib/platform` 使用宿主能力;`src/**` 禁止 import `electron`/Node built-in、裸 `window.desktop`、散落 `runtime === 'desktop'` 分支。
+- Main 只住 `electron/main`;Preload 只住 `electron/preload`,不暴露 `ipcRenderer`。IPC channel 必须来自 `electron/shared/ipc-channels.ts`,输入/输出/事件必须经 `electron/shared/schemas.ts` 的 Zod schema;Main 在任何副作用前验证 sender 和 payload。
+- BrowserWindow 必须保持 `sandbox:true`、`contextIsolation:true`、`nodeIntegration:false`、`webSecurity:true`;禁止放宽 CSP、导航、外链或 fuse profile 绕过问题。对外 URL 只允许构建期 allowlist 的无凭据 HTTPS host。
+- Electron token 不写 localStorage;必须通过 `SessionCredentialService → platform.credentials → typed Preload → safeStorage vault`。安全存储不可用时按无会话启动,不允许明文降级。
+- 窗口模式只由构建参数 `--window-chrome=native|integrated` 选择;Shell 只消费安全区 token,不直接读取 Electron/platform。
+- 生产桌面构建必须固定 HTTPS API/Web public/update base;更新源不接受 Renderer 动态修改。`desktop.config.ts` 的占位身份只用于开发包,正式发布必须配置固定 appId/Team ID/publisher 并注入签名凭据。
+- 新增桌面架构约束仍先 RED 后 GREEN;`pnpm guard:desktop` 不得 skip/放宽。原生对话框 stub、交叉构建、未签名包不得写成真实签名更新证据。运维与证据分级见 `docs/desktop.md`。
+
 ## 约定即测试(守卫哲学)
 
 - 架构约束不靠自觉靠守卫。凡新增架构约束,**先加守卫测试再让实现变绿**(见 `src/app/__tests__/module-boundaries.test.ts`)。
@@ -136,6 +147,8 @@ pnpm design:lint          # 涉及 DESIGN.md / flavor 值表时
 
 - 涉及生产构建:`tsc -b && vite build` 后 grep dist 断言无 `faker|msw|mockServiceWorker`。
 - UI 复刻类:`pnpm visual` 采集三档比例,diff 结论同步到任务文档。
+- 涉及 Electron 或共享 Renderer 时追加:`pnpm typecheck:desktop`、`pnpm test:desktop`、`pnpm build:web`、`pnpm build:desktop -- --window-chrome=native`、`pnpm build:desktop -- --window-chrome=integrated`。
+- 涉及安装包/更新/发布时再追加当前平台的两个 `pnpm make:desktop -- --window-chrome=...`,回读产物清单、fuse wire、签名身份和 metadata hash。未执行的平台保持 `pending`。
 
 ## 子系统增删清单
 
