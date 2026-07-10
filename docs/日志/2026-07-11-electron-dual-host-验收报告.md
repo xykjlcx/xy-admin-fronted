@@ -10,8 +10,8 @@
 | --- | -------------------------------------------------- | -------- | ---------------------------------------------------------------- |
 | 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`       |
 | 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts`；`pnpm guard:desktop`；双构建产物守卫  |
-| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 671 项、`theme:guard` 196 项、`build:web` 与产物扫描    |
-| 4   | 两种窗口模式与三套 Shell 安全区                    | pending  | Phase 4                                                          |
+| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 674 项、`theme:guard` 196 项、`build:web` 与产物扫描    |
+| 4   | 两种窗口模式与三套 Shell 安全区                    | 通过     | 双 packaged E2E；3 布局 × 3 比例截图与几何断言                   |
 | 5   | Electron 凭证安全存储与统一会话服务                | 通过     | Phase 3 单元测试、架构守卫与 packaged `safeStorage` E2E          |
 | 6   | 原生文件下载闭环                                   | pending  | Phase 5                                                          |
 | 7   | 更新状态机、feed、metadata 与真实更新              | pending  | Phase 6–7；真实签名更新需满足签名前提                            |
@@ -94,13 +94,31 @@
 - 阶段门禁：Desktop Vitest 14 个文件、70 项；packaged E2E 1 项（3.0 秒）；Web Vitest 114 个文件、671 项；theme guard 196 项；design lint 0 error；Web/Desktop TypeScript、ESLint 与双构建全部通过。
 - 产物回读：Web `totalBytes=1,413,812`、最大 JS `264,519` bytes；Desktop `totalBytes=1,412,469`、最大 JS `264,785` bytes。
 
+### Phase 4 — 窗口 chrome 与三布局安全区
+
+- 提交：`214ff10`。
+- 构建选择：`--window-chrome=native|integrated` 继续作为构建期参数；macOS integrated 使用 `hiddenInset`，Windows integrated 使用官方要求的 `titleBarStyle: hidden` + `titleBarOverlay.height: 56`，native 仍保留系统标准标题栏。
+- 宿主状态：Main 在 `did-finish-load`、maximize/unmaximize、enter/leave-full-screen、`display-metrics-changed` 时发布严格 Zod snapshot；Preload 只暴露 `getSnapshot/subscribe`，App 将状态投影为 root data attributes 与 3 个 CSS token。全屏时 inset/titlebar 归零，退出后恢复；窗口关闭前解绑，避免 destroyed webContents 拖住 app quit。
+- 三套 Shell 独立消费：
+  - `sidebar`：macOS 左 inset 由 `ShellHeader` start 消费；Windows 右 inset 由 Header actions 消费。
+  - `rail`：macOS 由 `NavMenuRail` 顶部窗口区消费；右侧 Header 不重复吃左 inset；Windows 不产生多余左上留白。
+  - `inset`：macOS 由 `NavMenuInset` brand 区消费；Windows 由 `inset-shell-header-suffix` 消费。
+  - integrated 顶带声明 `app-region: drag`；按钮、链接、输入、菜单和搜索区统一 `no-drag`。Web/native token 恒为 0，原布局位置不变。
+- packaged 自动化：
+  - `pnpm test:desktop` 顺序构建并启动 native 与 integrated 两个 packaged `.app`；native 协议/安全/鉴权用例 1 项通过，integrated chrome 用例 1 项通过。
+  - integrated 用真实 HTTPS Spike 会话进入 dashboard，遍历 sidebar/rail/inset × 90%/100%/108%，逐项断言 `--app-scale`、安全区、无横向溢出，并生成 9 张最终态截图到忽略目录 `test-results/electron-chrome/`。
+  - packaged 实测 maximize/unmaximize data state 正确；进入全屏后左右 inset 均为 0，退出后恢复 macOS 左 80 DIP。Windows 分支按右 138 DIP 自动切换断言，当前平台未伪装为 Windows 通过。
+- 对抗性修正：首次状态接线在 `closed` 后访问已销毁 webContents，导致 Playwright close 超时；解绑前移到 `close` 后同一 native packaged 用例恢复至约 2.9 秒。截图首轮捕获到 PageTransition 淡入帧；等待 350 ms 动画稳定后重采，视觉抽查清晰。
+- 阶段门禁：Desktop Vitest 16 个文件、78 项；Web Vitest 115 个文件、674 项；theme guard 196 项；design lint 0 error；Web/Desktop TypeScript、ESLint、Web build、双 packaged E2E 全通过。
+- 产物回读：Web `totalBytes=1,416,658`、最大 JS `264,519` bytes；integrated Desktop `totalBytes=1,415,321`、最大 JS `264,785` bytes。
+
 ## 平台证据矩阵
 
-| 平台        | build                | install | backend                  | update  | uninstall | 签名            |
-| ----------- | -------------------- | ------- | ------------------------ | ------- | --------- | --------------- |
-| macOS arm64 | packaged `.app` 通过 | pending | packaged HTTPS/CORS 通过 | pending | pending   | 未签名；pending |
-| macOS x64   | pending              | pending | pending                  | pending | pending   | pending         |
-| Windows x64 | pending              | pending | pending                  | pending | pending   | pending         |
+| 平台        | build                                  | install | backend                  | update  | uninstall | 签名            |
+| ----------- | -------------------------------------- | ------- | ------------------------ | ------- | --------- | --------------- |
+| macOS arm64 | native/integrated packaged `.app` 通过 | pending | packaged HTTPS/CORS 通过 | pending | pending   | 未签名；pending |
+| macOS x64   | pending                                | pending | pending                  | pending | pending   | pending         |
+| Windows x64 | pending                                | pending | pending                  | pending | pending   | pending         |
 
 ## 偏差记录
 
@@ -109,6 +127,6 @@
 
 ## Pending 与后续人工动作
 
-- 当前报告已完成 Phase 0–3 证据；Phase 4–8 继续实施。
+- 当前报告已完成 Phase 0–4 证据；Phase 5–8 继续实施。
 - macOS x64、Windows x64 的真实安装、远程后端、更新、卸载和签名保持 pending，不能由当前 arm64 结果替代。
 - 当前机器没有 Developer ID identity，macOS 真实旧版到新版签名更新闭环保持 pending，不声明通过。
