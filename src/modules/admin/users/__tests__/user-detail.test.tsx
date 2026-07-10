@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { beforeAll } from 'vitest';
 import { UsersPage } from '@/modules/admin/users';
@@ -58,4 +59,25 @@ test('clicking member detail opens independently queried profile and permission 
 
   await userEvent.click(screen.getByRole('tab', { name: '权限' }));
   expect(screen.getByText('权限数据源待定')).toBeInTheDocument();
+});
+
+test('detail request failure shows an error message and retry recovers the profile', async () => {
+  // 首次详情请求失败，重试时落到默认 handler 成功
+  server.use(
+    http.get('/api/users/:id', () => new HttpResponse(null, { status: 500 }), { once: true }),
+  );
+  renderUsersPage();
+
+  expect(await screen.findByText('李长昕')).toBeInTheDocument();
+  const detailButton = screen.getAllByRole('button', { name: '详情' })[0];
+  if (!detailButton) throw new Error('detail button missing');
+  await userEvent.click(detailButton);
+
+  const alert = await screen.findByRole('alert');
+  expect(within(alert).getByText('加载成员详情失败')).toBeInTheDocument();
+
+  await userEvent.click(within(alert).getByRole('button', { name: '重试' }));
+
+  const dialog = await screen.findByRole('dialog', { name: '李长昕' });
+  expect(within(dialog).getByText('超级管理员')).toBeInTheDocument();
 });

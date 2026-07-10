@@ -160,9 +160,11 @@
     "dialog": {
       "createTitle": "Add member",
       "editTitle": "Edit member",
+      "userFormDesc": "Manage the member's basic info, department and role",
       "createDeptTitle": "Create department",
       "createChildDeptTitle": "Add child department",
       "editDeptTitle": "Edit department",
+      "deptFormDesc": "Set the department name and its parent",
       "deleteTitle": "Confirm deletion",
       "deleteDesc": "This member will be removed from the current list.",
       "detailFallback": "Member details"
@@ -181,7 +183,9 @@
       "status": "Status",
       "profileTab": "Profile",
       "permissionTab": "Permissions",
-      "permissionPending": "Permission data source pending"
+      "permissionPending": "Permission data source pending",
+      "loadFailed": "Failed to load member details",
+      "retry": "Retry"
     }
   },
   "roles": {
@@ -298,6 +302,7 @@
     "actions": {
       "create": "New menu",
       "createSubsystem": "New subsystem",
+      "inspect": "Node details",
       "expand": "Expand",
       "collapse": "Collapse",
       "edit": "Edit",

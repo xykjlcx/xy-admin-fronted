@@ -57,12 +57,36 @@ export function deptIndentClass(depth: number) {
 
 export function buildDepthMap(depts: DeptDto[]) {
   const byId = new Map(depts.map((dept) => [dept.id, dept]));
-  const getDepth = (dept: DeptDto): number => {
+  const getDepth = (dept: DeptDto, path: Set<string>): number => {
     if (!dept.parentId) return 0;
+    // 环防御：父链回指到已在路径中的节点，按 0 处理并停止递归，不抛错
+    if (path.has(dept.id)) return 0;
+    path.add(dept.id);
     const parent = byId.get(dept.parentId);
-    return parent ? getDepth(parent) + 1 : 0;
+    return parent ? getDepth(parent, path) + 1 : 0;
   };
-  return new Map(depts.map((dept) => [dept.id, getDepth(dept)]));
+  return new Map(depts.map((dept) => [dept.id, getDepth(dept, new Set())]));
+}
+
+/** 返回 rootId 自身及其全部子孙的 id 集合（按 parentId 关系向下遍历，天然防环） */
+export function collectDeptSubtreeIds(depts: DeptDto[], rootId: string): Set<string> {
+  const childrenByParent = new Map<string, DeptDto[]>();
+  for (const dept of depts) {
+    if (!dept.parentId) continue;
+    const siblings = childrenByParent.get(dept.parentId);
+    if (siblings) siblings.push(dept);
+    else childrenByParent.set(dept.parentId, [dept]);
+  }
+
+  const ids = new Set<string>();
+  const stack: string[] = [rootId];
+  while (stack.length > 0) {
+    const id = stack.pop();
+    if (id === undefined || ids.has(id)) continue;
+    ids.add(id);
+    for (const child of childrenByParent.get(id) ?? []) stack.push(child.id);
+  }
+  return ids;
 }
 
 export function statusTone(status: UserDto['status']): StatusBadgeTone {

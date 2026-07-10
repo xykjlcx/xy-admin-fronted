@@ -95,35 +95,37 @@ export interface CreateAdminRoleInput {
 
 export const rolesQuery = queryOptions({
   queryKey: ['iam', 'roles'],
-  queryFn: () => http.get('/api/roles', undefined, rolesContract),
+  queryFn: ({ signal }) => http.get('/api/roles', undefined, rolesContract, { signal }),
 });
 
 export const permissionTreeQuery = queryOptions({
   queryKey: ['iam', 'permissions', 'tree'],
-  queryFn: () => http.get('/api/permissions/tree', undefined, permissionTreeContract),
+  queryFn: ({ signal }) => http.get('/api/permissions/tree', undefined, permissionTreeContract, { signal }),
 });
 
 export const rolePermissionsQuery = (roleId: string) =>
   queryOptions({
     queryKey: ['iam', 'rolePermissions', roleId],
-    queryFn: () => http.get(`/api/roles/${roleId}/permissions`, undefined, rolePermissionsContract),
+    queryFn: ({ signal }) =>
+      http.get(`/api/roles/${roleId}/permissions`, undefined, rolePermissionsContract, { signal }),
   });
 
 export const roleMembersQuery = (roleId: string) =>
   queryOptions({
     queryKey: ['iam', 'roleMembers', roleId],
-    queryFn: () => http.get(`/api/roles/${roleId}/members`, undefined, roleMembersContract),
+    queryFn: ({ signal }) =>
+      http.get(`/api/roles/${roleId}/members`, undefined, roleMembersContract, { signal }),
   });
 
 export const roleLogsQuery = (roleId: string) =>
   queryOptions({
     queryKey: ['iam', 'roleLogs', roleId],
-    queryFn: () => http.get(`/api/roles/${roleId}/logs`, undefined, roleLogsContract),
+    queryFn: ({ signal }) => http.get(`/api/roles/${roleId}/logs`, undefined, roleLogsContract, { signal }),
   });
 
 export const adminRolesQuery = queryOptions({
   queryKey: ['iam', 'adminRoles'],
-  queryFn: () => http.get('/api/admin-roles', undefined, adminRolesContract),
+  queryFn: ({ signal }) => http.get('/api/admin-roles', undefined, adminRolesContract, { signal }),
 });
 
 export const roleApi = {

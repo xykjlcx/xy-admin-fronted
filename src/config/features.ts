@@ -9,10 +9,10 @@ export function createFeatureConfig(source: ParsedEnv) {
     isDev: source.dev,
     isProd: source.prod,
     isDemo,
-    enableMock:
-      source.enableMockOverride === true ||
-      isDemo ||
-      (source.dev && source.enableMockOverride !== false),
+    // 与 env.ts 的 shouldStartMockWorker 同语义：demo 恒开；dev 默认开、可显式关；生产恒关。
+    // 运行时语义判断读这里；入口 worker 是否加载走 env.ts 的静态表达式（负责生产包剥离）。
+    // 生产 + VITE_ENABLE_MOCK=true 必须是 false——worker 已被构建剥离，报 true 会误导消费方。
+    enableMock: source.mode === 'demo' || (source.dev && source.enableMockOverride !== false),
     enableDevtools: source.enableDevtoolsOverride ?? source.dev,
     enableVisualDebug: source.enableVisualDebugOverride ?? false,
     // stub chrome（搜索框/通知铃铛等未接真的假部件）：接真前只在开发/demo 预览，

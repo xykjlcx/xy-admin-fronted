@@ -752,6 +752,9 @@ function ThemeStatesRoute() {
                       enabled: true,
                       rowSelection: state.rowSelection,
                       onRowSelectionChange: noopDataTableRowSelectionChange,
+                      selectAllAriaLabel: t('dev.themeStates.dataTableSelectAll'),
+                      rowSelectAriaLabel: (row) =>
+                        t('dev.themeStates.dataTableSelectRow', { name: t(row.nameKey) }),
                       renderBulkBar: (ids) => (
                         <div className="mb-3 rounded-8 bg-(--table-row-bg-selected) px-3 py-2 text-sm text-text-2">
                           {ids.length}

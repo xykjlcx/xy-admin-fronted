@@ -3,9 +3,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { setupServer } from 'msw/node';
-import { beforeAll } from 'vitest';
+import { beforeAll, vi } from 'vitest';
 import { UsersPage } from '@/modules/admin/users';
+import { UserFormDialog } from '@/modules/admin/users/form/UserFormDialog';
 import { usersModuleHandlers } from '@/modules/admin/users/mocks';
+import type { DeptDto } from '@/modules/admin/users/api';
 import type { UsersSearch } from '@/modules/admin/users/types';
 import { i18nInit } from '@/lib/i18n';
 import { resetDb } from '@/mocks/db';
@@ -63,5 +65,40 @@ test('create form validation is driven by zod email validity before submit', asy
 
   await userEvent.clear(screen.getByPlaceholderText('邮箱'));
   await userEvent.type(screen.getByPlaceholderText('邮箱'), 'tester@example.com');
+  await waitFor(() => expect(saveButton).toBeEnabled());
+});
+
+const formDepts: DeptDto[] = [{ id: 'rd', parentId: null, name: '研发', sort: 1, memberCount: 0 }];
+
+test('save button stays disabled while the submit is in flight and re-enables on completion', async () => {
+  let resolveSubmit!: () => void;
+  const pending = new Promise<void>((resolve) => {
+    resolveSubmit = resolve;
+  });
+  const onCreateUser = vi.fn(() => pending);
+
+  render(
+    <UserFormDialog
+      state={{ kind: 'create' }}
+      depts={formDepts}
+      onOpenChange={() => undefined}
+      onCreateUser={onCreateUser}
+      onUpdateUser={() => undefined}
+    />,
+  );
+
+  await userEvent.type(screen.getByPlaceholderText('姓名'), '测试成员');
+  await userEvent.type(screen.getByPlaceholderText('角色'), '测试工程师');
+  await userEvent.type(screen.getByPlaceholderText('手机号'), '+86 130 0000 0000');
+  await userEvent.type(screen.getByPlaceholderText('邮箱'), 'tester@example.com');
+
+  const saveButton = screen.getByRole('button', { name: '保存' });
+  await waitFor(() => expect(saveButton).toBeEnabled());
+
+  await userEvent.click(saveButton);
+  await waitFor(() => expect(saveButton).toBeDisabled());
+  expect(onCreateUser).toHaveBeenCalledTimes(1);
+
+  resolveSubmit();
   await waitFor(() => expect(saveButton).toBeEnabled());
 });

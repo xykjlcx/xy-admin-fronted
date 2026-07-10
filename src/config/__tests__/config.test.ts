@@ -5,6 +5,8 @@ import {
   createRequestConfig,
   parseEnv,
 } from '@/config';
+// computeShouldStartMockWorker 未从 config barrel 导出（属入口门控内部实现），直接从 env 模块引入。
+import { computeShouldStartMockWorker } from '@/config/env';
 
 test('parseEnv supplies stable defaults for local development', () => {
   const parsed = parseEnv({ MODE: 'development', DEV: true, PROD: false });
@@ -30,12 +32,31 @@ test('feature config preserves mock gating rules', () => {
     ).enableMock,
   ).toBe(false);
   expect(createFeatureConfig(parseEnv({ MODE: 'production', DEV: false, PROD: true })).enableMock).toBe(false);
+  // 生产 + 显式开 mock 也必须是 false：worker 已被构建剥离，与 shouldStartMockWorker 保持同一真相
   expect(
     createFeatureConfig(
       parseEnv({ MODE: 'production', DEV: false, PROD: true, VITE_ENABLE_MOCK: 'true' }),
     ).enableMock,
-  ).toBe(true);
+  ).toBe(false);
   expect(createFeatureConfig(parseEnv({ MODE: 'demo', DEV: false, PROD: true })).enableMock).toBe(true);
+});
+
+test('mock worker gate: 生产模式恒关，VITE_ENABLE_MOCK=true 不再能拉起 mock', () => {
+  // 核心防呆：生产构建即便显式开 mock 也不启动 worker，避免 MSW/faker 进生产包 + 死局。
+  // computeShouldStartMockWorker 与 env.ts 里 shouldStartMockWorker 的 import.meta.env 内联表达式同构。
+  expect(computeShouldStartMockWorker({ mode: 'production', dev: false, enableMock: 'true' })).toBe(false);
+  expect(computeShouldStartMockWorker({ mode: 'production', dev: false, enableMock: 'false' })).toBe(false);
+  expect(computeShouldStartMockWorker({ mode: 'production', dev: false, enableMock: undefined })).toBe(false);
+});
+
+test('mock worker gate: demo 恒开、dev 默认开可显式关', () => {
+  // demo 构建时 DEV=false，但 demo 场景 mock 就是后端，必须恒开（忽略 VITE_ENABLE_MOCK）。
+  expect(computeShouldStartMockWorker({ mode: 'demo', dev: false, enableMock: undefined })).toBe(true);
+  expect(computeShouldStartMockWorker({ mode: 'demo', dev: false, enableMock: 'false' })).toBe(true);
+  // dev：默认开，可用 VITE_ENABLE_MOCK=false 显式关。
+  expect(computeShouldStartMockWorker({ mode: 'development', dev: true, enableMock: undefined })).toBe(true);
+  expect(computeShouldStartMockWorker({ mode: 'development', dev: true, enableMock: 'true' })).toBe(true);
+  expect(computeShouldStartMockWorker({ mode: 'development', dev: true, enableMock: 'false' })).toBe(false);
 });
 
 test('feature config gates dev-only surfaces by environment', () => {

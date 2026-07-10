@@ -80,10 +80,23 @@ export function parseEnv(input: RawEnv): ParsedEnv {
 
 export const env = parseEnv(import.meta.env);
 
-// 入口 mock worker 开关必须保留为 import.meta.env 直连表达式。
-// 如果这里改成读取 featuresConfig.enableMock，Vite 无法静态推断，生产包可能重新带上 MSW/faker chunk。
+// 与下方 shouldStartMockWorker 内联表达式同构的纯谓词，仅供单测覆盖门控逻辑。
+// ⚠️ shouldStartMockWorker 不能改成调用本函数：那样 Vite 无法把 import.meta.env 静态求值为
+// 常量，startMockWorkerIfEnabled 里的 mocks 动态导入就 tree-shake 不掉，MSW/faker 会重回生产包。
+// 两处逻辑必须手动保持一致。
+export function computeShouldStartMockWorker(source: {
+  mode: string;
+  dev: boolean;
+  enableMock: string | undefined;
+}): boolean {
+  // 语义：demo 恒开；dev 默认开、可用 VITE_ENABLE_MOCK=false 显式关；生产恒关。
+  return source.mode === 'demo' || (source.dev && source.enableMock !== 'false');
+}
+
+// 入口 mock worker 开关必须保留为 import.meta.env 直连、可静态分析的表达式（理由见上）。
+// 生产模式下即便 VITE_ENABLE_MOCK=true 也恒为 false —— 生产构建不允许 mock 接管网络，
+// 避免 MSW/faker 被打进生产包（配合 vite.config.ts 的构建期防呆双重兜底）。
 export const shouldStartMockWorker =
-  import.meta.env.VITE_ENABLE_MOCK === 'true' ||
   import.meta.env.MODE === 'demo' ||
   (import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK !== 'false');
 

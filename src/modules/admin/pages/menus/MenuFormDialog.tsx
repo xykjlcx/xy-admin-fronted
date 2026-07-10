@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SelectControl, type SelectOption } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { lv } from '@/lib/localized';
+import { lv, mergeLocalized } from '@/lib/localized';
 import { nextSiblingSort } from './menu-management-model';
 import type { ManagedMenuType, UpdateMenuInput } from '@/modules/admin/api/menu.api';
 import type { MenuRecord } from '@/modules/types';
@@ -185,6 +185,7 @@ export function MenuFormDialog({
     buildInitialDraft({ mode, subsystemKey, menus, locale, initialMenu, initialParentId, initialType }),
   );
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const editingId = initialMenu?.id;
   const typeLocked = !!initialMenu && menus.some((menu) => menu.parentId === initialMenu.id);
   const rootParentLabel = t('menus.form.rootParent');
@@ -232,18 +233,27 @@ export function MenuFormDialog({
       setError(t('menus.form.errors.parentRequired'));
       return;
     }
+    // 防重复提交：在途时直接忽略后续点击，避免慢网下连点创建出多条。
+    if (submitting) return;
 
-    await onSubmit({
-      parentId: draft.type === 'dir' ? null : draft.parentId || null,
-      type: draft.type,
-      label: { 'zh-CN': name },
-      icon: draft.icon,
-      shortLabel: draft.shortLabel.trim() ? { 'zh-CN': draft.shortLabel.trim() } : undefined,
-      path: draft.type === 'menu' ? (draft.path as MenuRecord['path']) : undefined,
-      permission: permission || undefined,
-      visible: draft.visible,
-      sort: Number(draft.sort) || nextSiblingSort(menus, subsystemKey, draft.parentId || null),
-    });
+    // 合并语义：编辑时只改当前 locale 的键，保留其他语言，避免双语数据被整体覆盖。
+    const mergedShortLabel = mergeLocalized(initialMenu?.shortLabel, locale, draft.shortLabel);
+    setSubmitting(true);
+    try {
+      await onSubmit({
+        parentId: draft.type === 'dir' ? null : draft.parentId || null,
+        type: draft.type,
+        label: mergeLocalized(initialMenu?.label, locale, name),
+        icon: draft.icon,
+        shortLabel: Object.keys(mergedShortLabel).length ? mergedShortLabel : undefined,
+        path: draft.type === 'menu' ? (draft.path as MenuRecord['path']) : undefined,
+        permission: permission || undefined,
+        visible: draft.visible,
+        sort: Number(draft.sort) || nextSiblingSort(menus, subsystemKey, draft.parentId || null),
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -377,6 +387,7 @@ export function MenuFormDialog({
           </Button>
           <Button
             className={formActionButtonClassName}
+            loading={submitting}
             onClick={() => {
               void submit();
             }}

@@ -2,7 +2,7 @@ import { http } from 'msw';
 import { biz, ok } from '@/mocks/http';
 import { genId } from '@/mocks/db';
 import { CreateDeptSchema, UpdateDeptSchema } from '@/modules/admin/users/api';
-import { countDeptMembers, depts } from './db';
+import { collectDeptIds, countDeptMembers, depts } from './db';
 
 export const deptHandlers = [
   http.get('/api/depts', () =>
@@ -29,8 +29,13 @@ export const deptHandlers = [
   }),
 
   http.put('/api/depts/:id', async ({ params, request }) => {
+    const id = String(params.id);
     const patch = UpdateDeptSchema.parse(await request.json());
-    const updated = depts.update(String(params.id), patch);
+    // 拒绝把部门挂到自身或其下级，避免造出环形父链
+    if (patch.parentId != null && collectDeptIds(id).has(patch.parentId)) {
+      return biz(4001, '不能选择自身或下级部门作为上级');
+    }
+    const updated = depts.update(id, patch);
     return updated ? ok({ ...updated, memberCount: countDeptMembers(updated.id) }) : biz(4040, '部门不存在');
   }),
 ];

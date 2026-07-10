@@ -5,7 +5,7 @@ import {
   createRouter,
   RouterProvider,
 } from '@tanstack/react-router';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { beforeAll } from 'vitest';
 import { NavMenuInset } from '@/app/shell/widgets/NavMenuInset';
 import { i18nInit } from '@/lib/i18n';
@@ -67,13 +67,13 @@ const tree = [
   },
 ] satisfies MenuNode[];
 
-function renderInsetNav(footer?: React.ReactNode) {
+function renderInsetNav(footer?: React.ReactNode, collapsed = false) {
   const rootRoute = createRootRoute({
     component: () => (
       <NavMenuInset
         tree={tree}
         subsystems={subsystems}
-        collapsed={false}
+        collapsed={collapsed}
         footer={footer}
       />
     ),
@@ -104,12 +104,11 @@ test('Inset 侧栏不渲染折叠按钮，折叠入口由主内容区承载', as
   expect(screen.queryByText('收起导航')).not.toBeInTheDocument();
 });
 
-test('Inset 侧栏内置轻量搜索入口', async () => {
+test('Inset 侧栏不内置全局搜索入口', async () => {
   renderInsetNav();
 
-  const search = await screen.findByRole('searchbox', { name: '搜索功能导航、组织数据、角色详情等' });
-  expect(search).toBeInTheDocument();
-  expect(search.closest('[data-slot="input-group"]')).toHaveAttribute('data-variant', 'sidebar');
+  expect(await screen.findByRole('link', { name: '企业概览' })).toBeInTheDocument();
+  expect(screen.queryByRole('searchbox', { name: '搜索功能导航、组织数据、角色详情等' })).not.toBeInTheDocument();
 });
 
 test('Inset 侧栏只有 active 菜单项有边框和阴影', async () => {
@@ -124,6 +123,27 @@ test('Inset 侧栏只有 active 菜单项有边框和阴影', async () => {
   expect(inactive).not.toHaveClass('border');
   expect(inactive).not.toHaveClass('border-transparent');
   expect(inactive).not.toHaveClass('shadow-(--nav-item-shadow-current)');
+});
+
+test('折叠态整个侧栏 inert + aria-hidden，链接不进焦点序与无障碍树', async () => {
+  renderInsetNav(undefined, true);
+
+  // 折叠态没有可见链接可等待，等 aside 本体挂载完成
+  await waitFor(() => expect(document.querySelector('aside')).not.toBeNull());
+  const aside = document.querySelector('aside');
+  // 折叠只是 w-0 视觉压缩，链接仍在 DOM——必须靠 inert 掐掉键盘焦点与读屏可达性
+  expect(aside).toHaveAttribute('inert');
+  expect(aside).toHaveAttribute('aria-hidden', 'true');
+  expect(screen.queryByRole('link', { name: '企业概览' })).not.toBeInTheDocument();
+});
+
+test('展开态侧栏无 inert，链接正常可达', async () => {
+  renderInsetNav();
+
+  expect(await screen.findByRole('link', { name: '企业概览' })).toBeInTheDocument();
+  const aside = document.querySelector('aside');
+  expect(aside).not.toHaveAttribute('inert');
+  expect(aside).not.toHaveAttribute('aria-hidden');
 });
 
 test('Inset 侧栏支持底部壳层动作槽位', async () => {

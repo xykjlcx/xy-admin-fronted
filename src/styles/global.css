@@ -231,11 +231,12 @@
     --page-surface-border: transparent;
     --page-surface-shadow: none;
     --page-pane-divider: transparent;
-    --page-section-divider: color-mix(in srgb, var(--border) 70%, transparent);
+    --page-section-divider: color-mix(in srgb, var(--border) 45%, transparent);
+    --page-inset-section-divider: var(--page-section-divider);
     --page-breadcrumb-divider: color-mix(in srgb, var(--border) 70%, transparent);
     --table-shell-border: transparent;
-    --table-row-border: color-mix(in srgb, var(--table-border) 72%, transparent);
-    --tabs-line-border: color-mix(in srgb, var(--border) 70%, transparent);
+    --table-row-border: color-mix(in srgb, var(--table-border) 54%, transparent);
+    --tabs-line-border: transparent;
     --page-tabs-px: var(--page-side-px);
     --page-tabs-pt: calc(12px * var(--app-scale));
     --page-tabs-gap: calc(24px * var(--app-scale));

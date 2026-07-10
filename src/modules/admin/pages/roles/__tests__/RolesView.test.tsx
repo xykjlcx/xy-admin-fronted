@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, vi } from 'vitest';
 import { i18nInit } from '@/lib/i18n';
@@ -303,4 +303,41 @@ test('管理员权限 tab 可以新增管理员角色', async () => {
   await userEvent.click(screen.getByRole('button', { name: '确定创建' }));
 
   expect(onCreateAdminRole).toHaveBeenCalledWith({ name: '客服管理员', admin: '王思远' });
+});
+
+test('业务角色创建提交在途时禁用确定按钮，防止重复创建', async () => {
+  let release!: () => void;
+  const onCreateRole = vi.fn(() => new Promise<void>((resolve) => { release = resolve; }));
+  renderRolesView({ permissions: ['*:*:*'], onCreateRole });
+
+  await userEvent.click(screen.getByRole('button', { name: '新增角色' }));
+  await userEvent.type(screen.getByPlaceholderText('如：运营、客服'), '客服');
+  const confirmButton = screen.getByRole('button', { name: '确定创建' });
+  await userEvent.click(confirmButton);
+
+  expect(confirmButton).toBeDisabled();
+  expect(onCreateRole).toHaveBeenCalledTimes(1);
+
+  release();
+  await waitFor(() => expect(screen.queryByRole('button', { name: '确定创建' })).not.toBeInTheDocument());
+});
+
+test('管理员角色创建提交在途时禁用确定按钮，防止重复创建', async () => {
+  let release!: () => void;
+  const onCreateAdminRole = vi.fn(() => new Promise<void>((resolve) => { release = resolve; }));
+  renderRolesView({ permissions: ['*:*:*'], onCreateAdminRole });
+
+  await userEvent.click(screen.getByRole('tab', { name: '管理员权限' }));
+  await userEvent.click(screen.getByRole('button', { name: '创建管理员角色' }));
+  await userEvent.type(screen.getByPlaceholderText('如：文件管理员'), '客服管理员');
+  await userEvent.click(screen.getByRole('combobox', { name: '指派管理员' }));
+  await userEvent.click(await screen.findByRole('option', { name: '王思远' }));
+  const confirmButton = screen.getByRole('button', { name: '确定创建' });
+  await userEvent.click(confirmButton);
+
+  expect(confirmButton).toBeDisabled();
+  expect(onCreateAdminRole).toHaveBeenCalledTimes(1);
+
+  release();
+  await waitFor(() => expect(screen.queryByRole('button', { name: '确定创建' })).not.toBeInTheDocument());
 });

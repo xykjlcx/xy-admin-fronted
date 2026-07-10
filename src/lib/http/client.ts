@@ -16,6 +16,9 @@ export function bindTokenGetter(fn: () => string | null) {
 export interface HttpRequestOptions {
   signal?: AbortSignal;
   timeoutMs?: number;
+  // 401 处理策略：默认 'expire'（广播会话过期 + 抛 AuthExpiredError）。
+  // 登录等“401 表示业务失败（密码错）”的接口传 'reject'，只抛普通 HttpError(401)，不触发全局登出。
+  on401?: 'expire' | 'reject';
 }
 
 function toQueryString(params: Record<string, unknown>): string {
@@ -63,9 +66,9 @@ function createAbortController(options?: HttpRequestOptions) {
 async function request<T>(
   method: string,
   url: string,
-  body?: unknown,
-  params?: Record<string, unknown>,
-  contract?: ApiContract<T>,
+  body: unknown,
+  params: Record<string, unknown> | undefined,
+  contract: ApiContract<T>,
   options?: HttpRequestOptions,
 ): Promise<T> {
   const qs = params ? toQueryString(params) : '';
@@ -92,9 +95,11 @@ async function request<T>(
     abort.dispose();
   }
   if (res.status === requestConfig.authExpiredStatus) {
-    // 401 是全局身份事件，不在具体页面里各自处理；mount.tsx 订阅后统一清状态并跳登录。
+    // on401:'reject' 显式声明本接口的 401 是业务失败（如登录密码错），不当会话过期广播。
+    if (options?.on401 === 'reject') throw new HttpError(res.status, 'unauthorized');
+    // 默认：401 是全局身份事件，不在具体页面里各自处理；mount.tsx 订阅后统一清状态并跳登录。
     authEvents.emit('expired');
-    throw new AuthExpiredError('登录已过期');
+    throw new AuthExpiredError('auth expired');
   }
   if (!res.ok) throw new HttpError(res.status, res.statusText);
   let raw: unknown;
@@ -106,8 +111,7 @@ async function request<T>(
   const env = adapter.parseEnvelope<T>(raw);
   if (typeof env.code !== 'number') throw new HttpError(res.status, 'unexpected response shape');
   if (!requestConfig.successCodes.includes(env.code)) throw new BizError(env.code, env.message);
-  if (!contract) return env.data;
-  // TypeScript 只能约束前端编译期，不能证明后端或 mock 实际返回 shape。
+  // contract 必填：TypeScript 只能约束前端编译期，不能证明后端或 mock 实际返回 shape。
   // 所有关键接口在这里做运行时契约校验，字段漂移时尽早失败，而不是让页面静默渲染错数据。
   const result = contract.response.safeParse(env.data);
   if (!result.success) {
@@ -115,19 +119,21 @@ async function request<T>(
   }
   return result.data as T;
 }
+// contract 为必填参数：任何请求都必须声明运行时响应契约，编译期类型无法证明后端/mock 的实际 shape。
+// params/body 保持在 contract 之前（仍可传 undefined），维持既有调用点参数顺序。
 export const http = {
   get: <T>(
     url: string,
-    params?: Record<string, unknown>,
-    contract?: ApiContract<T>,
+    params: Record<string, unknown> | undefined,
+    contract: ApiContract<T>,
     options?: HttpRequestOptions,
   ) => request<T>('GET', url, undefined, params, contract, options),
-  post: <T>(url: string, body?: unknown, contract?: ApiContract<T>, options?: HttpRequestOptions) =>
+  post: <T>(url: string, body: unknown, contract: ApiContract<T>, options?: HttpRequestOptions) =>
     request<T>('POST', url, body, undefined, contract, options),
-  put: <T>(url: string, body?: unknown, contract?: ApiContract<T>, options?: HttpRequestOptions) =>
+  put: <T>(url: string, body: unknown, contract: ApiContract<T>, options?: HttpRequestOptions) =>
     request<T>('PUT', url, body, undefined, contract, options),
-  patch: <T>(url: string, body?: unknown, contract?: ApiContract<T>, options?: HttpRequestOptions) =>
+  patch: <T>(url: string, body: unknown, contract: ApiContract<T>, options?: HttpRequestOptions) =>
     request<T>('PATCH', url, body, undefined, contract, options),
-  del: <T>(url: string, contract?: ApiContract<T>, options?: HttpRequestOptions) =>
+  del: <T>(url: string, contract: ApiContract<T>, options?: HttpRequestOptions) =>
     request<T>('DELETE', url, undefined, undefined, contract, options),
 };

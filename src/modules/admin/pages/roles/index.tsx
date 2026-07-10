@@ -165,7 +165,12 @@ export function RolesView({
 
   const confirmDeleteRole = async () => {
     if (!deleteTarget) return;
-    await onDeleteRole(deleteTarget.id);
+    try {
+      await onDeleteRole(deleteTarget.id);
+    } catch {
+      // 失败时保留弹窗，错误 toast 由全局 MutationCache 兜底。
+      return;
+    }
     setDeleteTarget(null);
   };
 

@@ -17,7 +17,7 @@ const deptContract = defineApiContract({ response: DeptSchema });
 export const deptsQuery = queryOptions({
   queryKey: deptKeys.all,
   staleTime: 5 * 60 * 1000,
-  queryFn: () => http.get('/api/depts', undefined, deptsContract),
+  queryFn: ({ signal }) => http.get('/api/depts', undefined, deptsContract, { signal }),
 });
 
 export const deptApi = {

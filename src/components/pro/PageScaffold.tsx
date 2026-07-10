@@ -1,13 +1,17 @@
-import { createContext, Fragment, useContext, type ComponentProps, type ReactNode } from 'react';
+import { createContext, Fragment, useContext, useLayoutEffect, type ComponentProps, type ReactNode } from 'react';
 import { AnimatedTabs } from '@/components/pro/AnimatedTabs';
 import { cn } from '@/lib/utils';
 
 export interface PageBreadcrumbItem {
-  label: ReactNode;
+  // 收窄为 string：header 模式下 label 会被逐项比较去重（use-shell-breadcrumbs），
+  // ReactNode 每次渲染都是新引用，会击穿比较造成 Shell header 空转重渲染。
+  label: string;
 }
 
 interface PageFrameChromeValue {
   breadcrumbPrefix?: ReactNode;
+  breadcrumbPlacement?: 'frame' | 'header';
+  onHeaderBreadcrumbsChange?: (breadcrumbs: PageBreadcrumbItem[]) => void;
 }
 
 const PageFrameChromeContext = createContext<PageFrameChromeValue>({});
@@ -34,7 +38,24 @@ export function PageFrame({
   style,
   ...props
 }: PageFrameProps) {
-  const { breadcrumbPrefix } = useContext(PageFrameChromeContext);
+  const {
+    breadcrumbPrefix,
+    breadcrumbPlacement = 'frame',
+    onHeaderBreadcrumbsChange,
+  } = useContext(PageFrameChromeContext);
+  const renderFrameBreadcrumb = breadcrumbPlacement === 'frame';
+
+  // 发布与清空拆成两个 effect：页面每次渲染传入的 breadcrumbs 是新数组字面量，
+  // 若发布 effect 自带清空 cleanup，会先发 [] 再发新值，击穿 useShellBreadcrumbs 的相等短路，
+  // 导致 Shell header 随页面每次渲染空转。拆开后清空只在卸载/placement 切换时发生。
+  useLayoutEffect(() => {
+    if (breadcrumbPlacement !== 'header') return;
+    onHeaderBreadcrumbsChange?.(breadcrumbs);
+  }, [breadcrumbPlacement, breadcrumbs, onHeaderBreadcrumbsChange]);
+  useLayoutEffect(() => {
+    if (breadcrumbPlacement !== 'header') return;
+    return () => onHeaderBreadcrumbsChange?.([]);
+  }, [breadcrumbPlacement, onHeaderBreadcrumbsChange]);
 
   return (
     <section
@@ -45,27 +66,31 @@ export function PageFrame({
       )}
       style={style}
     >
-      <div
-        data-slot="page-breadcrumb"
-        className="mb-(--page-breadcrumb-mb) flex items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3"
-      >
-        {breadcrumbPrefix && (
-          <>
-            {breadcrumbPrefix}
-            <span
-              aria-hidden="true"
-              data-slot="page-breadcrumb-divider"
-              className="h-4 w-px bg-(--page-breadcrumb-divider)"
-            />
-          </>
-        )}
-        {breadcrumbs.map((item, index) => (
-          <Fragment key={index}>
-            {index > 0 && <span>›</span>}
-            <span className={cn(index === breadcrumbs.length - 1 && 'text-text')}>{item.label}</span>
-          </Fragment>
-        ))}
-      </div>
+      {renderFrameBreadcrumb && (
+        <div
+          data-slot="page-breadcrumb"
+          className="mb-(--page-breadcrumb-mb) flex min-h-[calc(32px*var(--app-scale))] items-center gap-2 text-[calc(13px*var(--app-scale))] text-text-3"
+        >
+          <div data-slot="page-breadcrumb-start" className="flex min-w-0 items-center gap-2">
+            {breadcrumbPrefix && (
+              <>
+                {breadcrumbPrefix}
+                <span
+                  aria-hidden="true"
+                  data-slot="page-breadcrumb-divider"
+                  className="h-4 w-px bg-(--page-breadcrumb-divider)"
+                />
+              </>
+            )}
+            {breadcrumbs.map((item, index) => (
+              <Fragment key={index}>
+                {index > 0 && <span>›</span>}
+                <span className={cn('truncate', index === breadcrumbs.length - 1 && 'text-text')}>{item.label}</span>
+              </Fragment>
+            ))}
+          </div>
+        </div>
+      )}
       {children}
     </section>
   );

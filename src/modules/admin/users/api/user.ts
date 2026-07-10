@@ -24,14 +24,14 @@ const nullContract = defineApiContract({ response: NullSchema });
 export const usersQuery = (params: UsersQueryParams) =>
   queryOptions({
     queryKey: userKeys.list(params),
-    queryFn: () => http.get('/api/users', { ...params }, usersContract),
+    queryFn: ({ signal }) => http.get('/api/users', { ...params }, usersContract, { signal }),
     placeholderData: keepPreviousData,
   });
 
 export const userDetailQuery = (id: string) =>
   queryOptions({
     queryKey: userKeys.detail(id),
-    queryFn: () => http.get(`/api/users/${id}`, undefined, userDetailContract),
+    queryFn: ({ signal }) => http.get(`/api/users/${id}`, undefined, userDetailContract, { signal }),
   });
 
 export const userApi = {

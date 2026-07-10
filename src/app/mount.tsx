@@ -6,7 +6,7 @@ import { Providers } from './providers';
 import { RouteError } from './RouteError';
 import { queryClient } from './query';
 import { authEvents } from '@/lib/http/events';
-import { resetAuth } from '@/lib/reset-auth';
+import { resetSession } from '@/lib/reset-auth';
 import { i18nInit } from '@/lib/i18n';
 import { assertMenuPathsValid } from '@/modules/registry';
 import { appConfig, featuresConfig } from '@/config';
@@ -31,14 +31,20 @@ declare module '@tanstack/react-router' {
 // 必须在 createRouter 之后跑——fullPath 由路由树初始化时计算，此时 routesByPath 才完整。
 if (featuresConfig.isDev) assertMenuPathsValid(Object.keys(router.routesByPath));
 
-// 401 统一处理：清 token + auth 缓存 → 回登录（事件解耦，spec §9；http 层不感知路由）。
-// 退订接 HMR dispose，防开发期 mount 模块反复求值导致订阅堆积。logout 接线在 Task 11，同用 resetAuth。
+// 401 统一处理：先导航回登录、再清缓存（事件解耦，spec §9；http 层不感知路由）。
+// 顺序很关键：clear 会让 _auth 里挂载中的 useSuspenseQuery 用空 token 立即重拉，
+// 所以必须等导航离开受保护树后再 resetSession(null)。
+// 退订接 HMR dispose，防开发期 mount 模块反复求值导致订阅堆积。
 const offAuthExpired = authEvents.on('expired', () => {
-  resetAuth(null);
-  void router.navigate({
-    to: appConfig.routes.login,
-    search: { redirect: location.pathname + location.search },
-  });
+  // 已在登录页时忽略：登出/过期后残留请求可能带空 token 再触发 401，
+  // 不能再 navigate 或覆写 redirect（否则 redirect 会指向 /login 自身）。
+  if (router.state.location.pathname === appConfig.routes.login) return;
+  // 先捕获来源路径：导航后 window.location 会变成 /login，redirect 必须用导航前的值。
+  const redirect = location.pathname + location.search;
+  void (async () => {
+    await router.navigate({ to: appConfig.routes.login, search: { redirect } });
+    await resetSession(null);
+  })();
 });
 import.meta.hot?.dispose(offAuthExpired);
 

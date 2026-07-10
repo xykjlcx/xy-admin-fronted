@@ -73,14 +73,14 @@ export interface CreateSubsystemInput extends UpdateSubsystemInput {
 export const subsystemsQuery = queryOptions({
   queryKey: ['nav', 'subsystems'],
   staleTime: Infinity,
-  queryFn: () => http.get('/api/subsystems', undefined, subsystemsContract),
+  queryFn: ({ signal }) => http.get('/api/subsystems', undefined, subsystemsContract, { signal }),
 });
 
 export const menusQuery = (subsystem: string) =>
   queryOptions({
     queryKey: ['nav', 'menus', subsystem],
     staleTime: Infinity,
-    queryFn: () => http.get('/api/menus', { subsystem }, menusContract),
+    queryFn: ({ signal }) => http.get('/api/menus', { subsystem }, menusContract, { signal }),
   });
 
 export const menuApi = {

@@ -1,4 +1,4 @@
-import { useMemo, type JSX, type ReactNode } from 'react';
+import { useMemo, useRef, type JSX, type ReactNode } from 'react';
 import {
   flexRender,
   getCoreRowModel,
@@ -23,14 +23,16 @@ import { Pagination } from './Pagination';
 type DataTableAlign = 'start' | 'center' | 'end';
 type DataTableLoadingColumn = { id: string; align?: DataTableAlign };
 
-export interface DataTableSelection {
+export interface DataTableSelection<T> {
   enabled: boolean;
   rowSelection: RowSelectionState;
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
   /** 批量操作条渲染：传入当前页选中 id，返回操作区 ReactNode；无选中时不渲染 */
   renderBulkBar?: (selectedVisibleIds: string[]) => ReactNode;
-  selectAllAriaLabel?: string;
-  rowSelectAriaLabel?: string;
+  /** 表头全选框可访问名称（必填，保证读屏可用） */
+  selectAllAriaLabel: string;
+  /** 行选择框可访问名称（必填，按行数据生成，如带成员名） */
+  rowSelectAriaLabel: (row: T) => string;
 }
 
 export interface DataTablePagination {
@@ -51,7 +53,7 @@ export interface DataTableProps<T> {
   data: T[];
   rowKey: (row: T) => string;
   loading?: boolean;
-  selection?: DataTableSelection;
+  selection?: DataTableSelection<T>;
   pagination?: DataTablePagination;
   onRowClick?: (row: T) => void;
   emptyText: string;
@@ -85,6 +87,12 @@ export function DataTable<T>({
   const rowSelection = selectionEnabled ? selection.rowSelection : emptyRowSelection;
   const onRowSelectionChange = selectionEnabled ? selection.onRowSelectionChange : undefined;
 
+  // selection（含 aria-label 取值函数）经 ref 读取，让 selectionColumn 保持稳定 deps=[]：
+  // 否则消费方每次渲染传入的内联 rowSelectAriaLabel 会重建列定义，触发整表 DOM 重挂。
+  // header/cell 由 flexRender 每次渲染重新调用，从 ref 读到的始终是最新 selection。
+  const selectionRef = useRef(selection);
+  selectionRef.current = selection;
+
   const selectionColumn = useMemo<ColumnDef<T>>(
     () => ({
       id: rowSelectionColumnId,
@@ -100,7 +108,7 @@ export function DataTable<T>({
               checked={allSelected}
               indeterminate={someSelected && !allSelected}
               onCheckedChange={(checked) => table.toggleAllPageRowsSelected(checked)}
-              aria-label={selection?.selectAllAriaLabel}
+              aria-label={selectionRef.current?.selectAllAriaLabel}
               onClick={(event) => event.stopPropagation()}
             />
           </div>
@@ -111,13 +119,13 @@ export function DataTable<T>({
           <Checkbox
             checked={row.getIsSelected()}
             onCheckedChange={(checked) => row.toggleSelected(checked)}
-            aria-label={selection?.rowSelectAriaLabel}
+            aria-label={selectionRef.current?.rowSelectAriaLabel(row.original)}
             onClick={(event) => event.stopPropagation()}
           />
         </div>
       ),
     }),
-    [selection?.rowSelectAriaLabel, selection?.selectAllAriaLabel],
+    [],
   );
 
   const tableColumns = useMemo(

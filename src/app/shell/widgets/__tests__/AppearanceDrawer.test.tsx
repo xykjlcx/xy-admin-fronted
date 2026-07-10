@@ -67,7 +67,7 @@ test('点风格卡套用完整视觉预设：切 claude 后 radius/zoom 被重�
   expect(s.zoom).toBe('md');        // 被完整预设覆盖
 });
 
-test('分组标题 Preset/Theme/Shell 均渲染', async () => {
+test('外观设置展示六个配置步骤', async () => {
   const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
   render(
     <TooltipProvider>
@@ -75,7 +75,36 @@ test('分组标题 Preset/Theme/Shell 均渲染', async () => {
     </TooltipProvider>,
   );
   await user.click(screen.getByRole('button', { name: '外观设置' }));
+  expect(await screen.findByText(i18n.t('shell.appearanceDrawer.layout'))).toBeInTheDocument();
   expect(await screen.findByText(i18n.t('shell.appearanceDrawer.groupPreset'))).toBeInTheDocument();
-  expect(screen.getByText(i18n.t('shell.appearanceDrawer.groupTheme'))).toBeInTheDocument();
-  expect(screen.getByText(i18n.t('shell.appearanceDrawer.groupShell'))).toBeInTheDocument();
+  expect(screen.getByText(i18n.t('shell.appearanceDrawer.accent'))).toBeInTheDocument();
+  expect(screen.getByText(i18n.t('shell.appearanceDrawer.zoom'))).toBeInTheDocument();
+  expect(screen.getByText(i18n.t('shell.appearanceDrawer.pageAnim'))).toBeInTheDocument();
+  expect(screen.getByText(i18n.t('shell.appearanceDrawer.radius'))).toBeInTheDocument();
+});
+
+test('外观设置按导航布局优先的六步顺序渲染，导航布局使用两列容器', async () => {
+  const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+  render(
+    <TooltipProvider>
+      <AppearanceDrawer />
+    </TooltipProvider>,
+  );
+
+  await user.click(screen.getByRole('button', { name: '外观设置' }));
+
+  const orderedSteps = [
+    i18n.t('shell.appearanceDrawer.layout'),
+    i18n.t('shell.appearanceDrawer.groupPreset'),
+    i18n.t('shell.appearanceDrawer.accent'),
+    i18n.t('shell.appearanceDrawer.zoom'),
+    i18n.t('shell.appearanceDrawer.pageAnim'),
+    i18n.t('shell.appearanceDrawer.radius'),
+  ].map((label) => screen.getByText(label));
+
+  for (let i = 0; i < orderedSteps.length - 1; i += 1) {
+    expect(orderedSteps[i]!.compareDocumentPosition(orderedSteps[i + 1]!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  }
+
+  expect(screen.getByRole('button', { name: /侧栏树/ }).parentElement).toHaveClass('grid-cols-2');
 });

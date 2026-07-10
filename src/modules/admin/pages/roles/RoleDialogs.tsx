@@ -20,6 +20,7 @@ export function CreateRoleDialog({
 }) {
   const { t } = useTranslation('admin');
   const [roleDraft, setRoleDraft] = useState<CreateRoleInput>({ ...emptyRoleDraft });
+  const [submitting, setSubmitting] = useState(false);
   const close = () => {
     onOpenChange(false);
     setRoleDraft({ ...emptyRoleDraft });
@@ -27,7 +28,17 @@ export function CreateRoleDialog({
   const submitCreateRole = async () => {
     const dto = { name: roleDraft.name.trim(), desc: roleDraft.desc?.trim() };
     if (!dto.name) return;
-    await onCreateRole(dto);
+    // 防重复提交：在途时忽略后续点击，避免慢网下连点创建出多条角色。
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await onCreateRole(dto);
+    } catch {
+      // 失败时保留弹窗，错误 toast 由全局 MutationCache 兜底。
+      return;
+    } finally {
+      setSubmitting(false);
+    }
     close();
   };
 
@@ -65,7 +76,7 @@ export function CreateRoleDialog({
           <Button variant="outline" onClick={close}>
             {t('roles.actions.cancel')}
           </Button>
-          <Button onClick={submitCreateRole} disabled={!roleDraft.name.trim()}>
+          <Button onClick={submitCreateRole} loading={submitting} disabled={!roleDraft.name.trim()}>
             {t('roles.actions.confirmCreate')}
           </Button>
         </DialogFooter>
@@ -87,6 +98,7 @@ export function CreateAdminRoleDialog({
 }) {
   const { t } = useTranslation('admin');
   const [adminDraft, setAdminDraft] = useState<CreateAdminRoleInput>({ ...emptyAdminDraft });
+  const [submitting, setSubmitting] = useState(false);
   const close = () => {
     onOpenChange(false);
     setAdminDraft({ ...emptyAdminDraft });
@@ -94,7 +106,17 @@ export function CreateAdminRoleDialog({
   const submitCreateAdminRole = async () => {
     const dto = { name: adminDraft.name.trim(), admin: adminDraft.admin, scope: adminDraft.scope?.trim() || undefined };
     if (!dto.name || !dto.admin) return;
-    await onCreateAdminRole(dto);
+    // 防重复提交：在途时忽略后续点击，避免慢网下连点创建出多条管理员角色。
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await onCreateAdminRole(dto);
+    } catch {
+      // 失败时保留弹窗，错误 toast 由全局 MutationCache 兜底。
+      return;
+    } finally {
+      setSubmitting(false);
+    }
     close();
   };
 
@@ -136,7 +158,11 @@ export function CreateAdminRoleDialog({
           <Button variant="outline" onClick={close}>
             {t('roles.actions.cancel')}
           </Button>
-          <Button onClick={submitCreateAdminRole} disabled={!adminDraft.name.trim() || !adminDraft.admin}>
+          <Button
+            onClick={submitCreateAdminRole}
+            loading={submitting}
+            disabled={!adminDraft.name.trim() || !adminDraft.admin}
+          >
             {t('roles.actions.confirmCreate')}
           </Button>
         </DialogFooter>

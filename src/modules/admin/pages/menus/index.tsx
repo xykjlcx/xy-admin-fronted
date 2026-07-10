@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
-import { ChevronsDown, ChevronsUp, Edit3, Plus, Trash2 } from 'lucide-react';
+import { ChevronsDown, ChevronsUp, Edit3, PanelRight, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
@@ -12,9 +12,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { SelectControl, type SelectOption } from '@/components/ui/select';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { Icon } from '@/lib/icon-registry';
-import { lv } from '@/lib/localized';
+import { lv, mergeLocalized } from '@/lib/localized';
 import { matchPermission } from '@/lib/permission';
 import { cn } from '@/lib/utils';
 import {
@@ -130,10 +131,6 @@ function subsystemDraft(state: ActiveSubsystemFormState, locale: string): Subsys
   };
 }
 
-function localizedDraft(value: string) {
-  return { 'zh-CN': value.trim() };
-}
-
 function nextSubsystemSort(subsystems: Subsystem[]) {
   return Math.max(0, ...subsystems.map((subsystem) => subsystem.sort)) + 1;
 }
@@ -161,6 +158,7 @@ function SubsystemFormDialog({
 }) {
   const [draft, setDraft] = useState<SubsystemDraft>(() => subsystemDraft(state, locale));
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const iconOptions: SelectOption[] = subsystemIconOptions.map((option) => ({
     value: option.value,
     label: t(option.labelKey),
@@ -192,36 +190,45 @@ function SubsystemFormDialog({
       return;
     }
 
-    if (creating) {
+    // 防重复提交：在途时忽略后续点击，避免慢网下连点创建出多条子系统。
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      if (creating) {
+        // 新建：只写当前 locale，不预填其他语言（合并语义在编辑时才有既有数据可保留）。
+        await onSubmit({
+          mode: 'create',
+          dto: {
+            key,
+            label: mergeLocalized(undefined, locale, name),
+            desc: mergeLocalized(undefined, locale, desc),
+            icon: draft.icon,
+            color: DEFAULT_SUBSYSTEM_COLOR,
+            home: DEFAULT_SUBSYSTEM_HOME,
+            builtin: false,
+            enabled: draft.enabled,
+            sort: nextSubsystemSort(subsystems),
+          },
+        });
+        return;
+      }
+
       await onSubmit({
-        mode: 'create',
+        mode: 'edit',
+        key: state.subsystem.key,
         dto: {
-          key,
-          label: localizedDraft(name),
-          desc: localizedDraft(desc),
+          // 合并语义：只改当前 locale，保留 state.subsystem 里其他语言的 label/desc。
+          label: mergeLocalized(state.subsystem.label, locale, name),
+          desc: mergeLocalized(state.subsystem.desc, locale, desc),
           icon: draft.icon,
-          color: DEFAULT_SUBSYSTEM_COLOR,
-          home: DEFAULT_SUBSYSTEM_HOME,
-          builtin: false,
+          color: state.subsystem.color,
+          home: state.subsystem.home,
           enabled: draft.enabled,
-          sort: nextSubsystemSort(subsystems),
         },
       });
-      return;
+    } finally {
+      setSubmitting(false);
     }
-
-    await onSubmit({
-      mode: 'edit',
-      key: state.subsystem.key,
-      dto: {
-        label: localizedDraft(name),
-        desc: localizedDraft(desc),
-        icon: draft.icon,
-        color: state.subsystem.color,
-        home: state.subsystem.home,
-        enabled: draft.enabled,
-      },
-    });
   };
 
   return (
@@ -302,7 +309,9 @@ function SubsystemFormDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t('menus.actions.cancel')}
           </Button>
-          <Button onClick={submit}>{t('menus.actions.saveSubsystem')}</Button>
+          <Button loading={submitting} onClick={submit}>
+            {t('menus.actions.saveSubsystem')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -318,21 +327,7 @@ function MenuInspectorRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function MenuNodeInspector({
-  menu,
-  parent,
-  hasChildren,
-  locale,
-  t,
-  canCreate,
-  canUpdate,
-  canDelete,
-  canToggle,
-  onAddChild,
-  onEdit,
-  onDelete,
-  onSetVisibility,
-}: {
+interface MenuInspectorProps {
   menu: MenuRecord | null;
   parent: MenuRecord | null;
   hasChildren: boolean;
@@ -346,19 +341,27 @@ function MenuNodeInspector({
   onEdit: (menu: MenuRecord) => void;
   onDelete: (menu: MenuRecord) => void;
   onSetVisibility: (id: string, visible: boolean) => void;
-}) {
+}
+
+function MenuInspectorContent({
+  menu,
+  parent,
+  hasChildren,
+  locale,
+  t,
+  canCreate,
+  canUpdate,
+  canDelete,
+  canToggle,
+  onAddChild,
+  onEdit,
+  onDelete,
+  onSetVisibility,
+}: MenuInspectorProps) {
   const emptyValue = t('menus.inspector.emptyValue');
 
   if (!menu) {
-    return (
-      <aside
-        aria-label={t('menus.inspector.label')}
-        className="hidden w-[calc(286px*var(--app-scale))] shrink-0 flex-col border-l border-(--page-section-divider) px-4 py-5 2xl:flex"
-      >
-        <div className="text-sm font-semibold text-text">{t('menus.inspector.title')}</div>
-        <p className="mt-2 text-sm leading-6 text-text-3">{t('menus.inspector.empty')}</p>
-      </aside>
-    );
+    return <p className="mt-2 text-sm leading-6 text-text-3">{t('menus.inspector.empty')}</p>;
   }
 
   const name = menuLabel(menu, locale);
@@ -366,12 +369,8 @@ function MenuNodeInspector({
   const typeTone = menuTypeToneClass[menu.type];
 
   return (
-    <aside
-      aria-label={t('menus.inspector.label')}
-      className="hidden w-[calc(286px*var(--app-scale))] shrink-0 flex-col border-l border-(--page-section-divider) px-4 py-5 2xl:flex"
-    >
-      <div className="min-w-0">
-        <div className="rounded-12 bg-(--table-header-bg) p-3">
+    <div className="min-w-0">
+      <div className="rounded-12 bg-(--table-header-bg) p-3">
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2">
               <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-10', typeTone)}>
@@ -450,7 +449,42 @@ function MenuNodeInspector({
           )}
         </div>
       </div>
+  );
+}
+
+// ≥1536px：右侧常驻栏。菜单编辑/加子级/删除的唯一入口在此，窄屏改走 MenuInspectorSheet。
+function MenuNodeInspector(props: MenuInspectorProps) {
+  return (
+    <aside
+      aria-label={props.t('menus.inspector.label')}
+      className="hidden w-[calc(286px*var(--app-scale))] shrink-0 flex-col border-l border-(--page-section-divider) px-4 py-5 2xl:flex"
+    >
+      {!props.menu && (
+        <div className="text-sm font-semibold text-text">{props.t('menus.inspector.title')}</div>
+      )}
+      <MenuInspectorContent {...props} />
     </aside>
+  );
+}
+
+// <1536px：常驻栏隐藏，用抽屉承载同一份节点详情与操作，保证编辑/加子级/删除在窄屏可达。
+function MenuInspectorSheet({
+  open,
+  onOpenChange,
+  ...props
+}: MenuInspectorProps & { open: boolean; onOpenChange: (open: boolean) => void }) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="w-[calc(320px*var(--app-scale))] max-w-[90vw] gap-0 overflow-y-auto px-4 py-5"
+      >
+        <SheetTitle className="mb-3 text-sm font-semibold text-text">
+          {props.t('menus.inspector.title')}
+        </SheetTitle>
+        <MenuInspectorContent {...props} />
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -576,6 +610,7 @@ export function MenusView({
   const [subsystemFormState, setSubsystemFormState] = useState<SubsystemFormState>(null);
   const [deleteTarget, setDeleteTarget] = useState<MenuRecord | null>(null);
   const [selectedMenuId, setSelectedMenuId] = useState<string | null>(null);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
   const activeSubsystem = subsystems.find((subsystem) => subsystem.key === activeSubsystemKey) ?? subsystems[0];
   const activeKey = activeSubsystem?.key ?? activeSubsystemKey;
   const stats = useMemo(() => countMenuStats(menus), [menus]);
@@ -611,10 +646,17 @@ export function MenusView({
   const closeForm = () => setFormState(null);
   const submitForm = async (dto: UpdateMenuInput) => {
     if (!formState) return;
-    if (formState.mode === 'create') {
-      await onCreateMenu({ subsystemKey: activeKey, ...dto });
-    } else {
-      await onUpdateMenu(formState.menu.id, dto);
+    // 权限前置校验：即使 UI 入口被隐藏，也阻断无权限用户绕过直接提交。
+    if (formState.mode === 'create' ? !canCreate : !canUpdate) return;
+    try {
+      if (formState.mode === 'create') {
+        await onCreateMenu({ subsystemKey: activeKey, ...dto });
+      } else {
+        await onUpdateMenu(formState.menu.id, dto);
+      }
+    } catch {
+      // 失败时保留弹窗，错误 toast 由全局 MutationCache 兜底。
+      return;
     }
     closeForm();
   };
@@ -623,16 +665,27 @@ export function MenusView({
       | { mode: 'create'; dto: CreateSubsystemInput }
       | { mode: 'edit'; key: string; dto: UpdateSubsystemInput },
   ) => {
-    if (payload.mode === 'create') {
-      await onCreateSubsystem(payload.dto);
-    } else {
-      await onUpdateSubsystem(payload.key, payload.dto);
+    // 权限前置校验：新建看 canCreate，编辑看 canUpdate，防绕过。
+    if (payload.mode === 'create' ? !canCreate : !canUpdate) return;
+    try {
+      if (payload.mode === 'create') {
+        await onCreateSubsystem(payload.dto);
+      } else {
+        await onUpdateSubsystem(payload.key, payload.dto);
+      }
+    } catch {
+      return;
     }
     setSubsystemFormState(null);
   };
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    await onDeleteMenu(deleteTarget.id);
+    if (!canDelete) return;
+    try {
+      await onDeleteMenu(deleteTarget.id);
+    } catch {
+      return;
+    }
     setDeleteTarget(null);
   };
 
@@ -686,17 +739,19 @@ export function MenusView({
                         </span>
                       </span>
                     </button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100"
-                      aria-label={t('menus.actions.editSubsystem', { name: label })}
-                      title={t('menus.actions.edit')}
-                      onClick={() => setSubsystemFormState({ mode: 'edit', subsystem })}
-                    >
-                      <Edit3 className="size-3.5" />
-                    </Button>
+                    {canUpdate && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-xs"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100"
+                        aria-label={t('menus.actions.editSubsystem', { name: label })}
+                        title={t('menus.actions.edit')}
+                        onClick={() => setSubsystemFormState({ mode: 'edit', subsystem })}
+                      >
+                        <Edit3 className="size-3.5" />
+                      </Button>
+                    )}
                   </div>
                 );
               })}
@@ -718,7 +773,7 @@ export function MenusView({
 
           <section
             aria-label={t('menus.treeRegionLabel', { subsystem: activeSubsystemName })}
-            className="flex min-w-0 flex-1 border-l border-(--page-section-divider)"
+            className="flex min-w-0 flex-1 border-l border-(--page-inset-section-divider)"
           >
             <div className="flex min-w-0 flex-1 flex-col px-6 py-[calc(20px*var(--app-scale))]">
               <div className="mb-3 flex items-center gap-3">
@@ -732,6 +787,15 @@ export function MenusView({
                   {refreshing && <span className="ml-2">{t('menus.refreshing')}</span>}
                 </div>
                 <div className="flex-1" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="2xl:hidden"
+                  onClick={() => setInspectorOpen(true)}
+                >
+                  <PanelRight data-icon="inline-start" />
+                  {t('menus.actions.inspect')}
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
@@ -793,6 +857,35 @@ export function MenusView({
               onAddChild={openAddChild}
               onEdit={(menu) => setFormState({ mode: 'edit', menu })}
               onDelete={setDeleteTarget}
+              onSetVisibility={(id, visible) => {
+                void onSetMenuVisibility(id, visible);
+              }}
+            />
+
+            <MenuInspectorSheet
+              open={inspectorOpen}
+              onOpenChange={setInspectorOpen}
+              menu={selectedMenu}
+              parent={selectedParent}
+              hasChildren={selectedHasChildren}
+              locale={locale}
+              t={t}
+              canCreate={canCreate}
+              canUpdate={canUpdate}
+              canDelete={canDelete}
+              canToggle={canToggle}
+              onAddChild={(menu) => {
+                openAddChild(menu);
+                setInspectorOpen(false);
+              }}
+              onEdit={(menu) => {
+                setFormState({ mode: 'edit', menu });
+                setInspectorOpen(false);
+              }}
+              onDelete={(menu) => {
+                setDeleteTarget(menu);
+                setInspectorOpen(false);
+              }}
               onSetVisibility={(id, visible) => {
                 void onSetMenuVisibility(id, visible);
               }}

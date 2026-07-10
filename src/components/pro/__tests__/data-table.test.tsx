@@ -70,6 +70,8 @@ function ControlledSelectionTable({
         enabled: true,
         rowSelection,
         onRowSelectionChange: handleRowSelectionChange,
+        selectAllAriaLabel: '选择本页',
+        rowSelectAriaLabel: (row) => `选择${row.name}`,
         renderBulkBar: (ids) => <div>当前页已选 {ids.join(',')}</div>,
       }}
     />
@@ -134,6 +136,14 @@ test('DataTable uses controlled TanStack row selection scoped to current page', 
   expect(screen.queryByText('当前页已选 u1')).not.toBeInTheDocument();
 });
 
+test('DataTable selection checkboxes expose provided accessible names', () => {
+  render(<ControlledSelectionTable data={pageOneRows} />);
+
+  expect(screen.getByRole('checkbox', { name: '选择本页' })).toBeInTheDocument();
+  expect(screen.getByRole('checkbox', { name: '选择李长昕' })).toBeInTheDocument();
+  expect(screen.getByRole('checkbox', { name: '选择王思远' })).toBeInTheDocument();
+});
+
 test('DataTable ignores external row selection state when selection is disabled', () => {
   render(
     <DataTable
@@ -146,6 +156,8 @@ test('DataTable ignores external row selection state when selection is disabled'
         enabled: false,
         rowSelection: { u1: true },
         onRowSelectionChange: () => undefined,
+        selectAllAriaLabel: '选择本页',
+        rowSelectAriaLabel: (row) => `选择${row.name}`,
         renderBulkBar: (ids) => <div>当前页已选 {ids.join(',')}</div>,
       }}
     />,
@@ -242,6 +254,8 @@ test('DataTable loading skeleton follows visible column roles instead of assumin
         enabled: true,
         rowSelection: {},
         onRowSelectionChange: () => undefined,
+        selectAllAriaLabel: '选择本页',
+        rowSelectAriaLabel: (row) => `选择${row.name}`,
       }}
     />,
   );

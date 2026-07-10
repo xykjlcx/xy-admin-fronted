@@ -12,7 +12,9 @@ import {
   Users,
 } from 'lucide-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -52,6 +54,17 @@ const quickEntries = [
   { key: 'reports', icon: BarChart3, tone: 'danger' },
 ] as const;
 
+// 有真实页面的快捷入口直接导航；没有的走 stub toast（不留无反馈的假按钮）。
+// search 传目标路由的默认值：两条路由的 validateSearch 均为必填结构（catch 只兜运行时）。
+const quickEntryNav = {
+  members: { to: '/admin/users', search: { page: 1, pageSize: 10, status: 'all', keyword: '' } },
+  roles: { to: '/admin/roles', search: { roleId: '' } },
+} as const satisfies Partial<Record<(typeof quickEntries)[number]['key'], object>>;
+
+function isNavEntry(key: (typeof quickEntries)[number]['key']): key is keyof typeof quickEntryNav {
+  return key in quickEntryNav;
+}
+
 const todoItems = [
   { key: 'phone', icon: Phone, tone: 'primary', statusTone: 'primary' },
   { key: 'onboard', icon: Check, tone: 'success', statusTone: 'danger' },
@@ -77,6 +90,9 @@ const toneClass = {
 
 export function DashboardView({ overview }: DashboardViewProps) {
   const { t } = useTranslation('admin');
+  const { t: tCommon } = useTranslation();
+  const navigate = useNavigate();
+  const stub = () => toast(tCommon('shell.toast.stub'));
 
   return (
     <section
@@ -132,6 +148,10 @@ export function DashboardView({ overview }: DashboardViewProps) {
                 key={item.key}
                 type="button"
                 className="flex flex-col items-center gap-3 rounded-10 p-2 text-sm text-text-2 transition-colors hover:bg-bg"
+                onClick={() => {
+                  if (isNavEntry(item.key)) void navigate(quickEntryNav[item.key]);
+                  else stub();
+                }}
               >
                 <span
                   className={cn(
@@ -170,6 +190,7 @@ export function DashboardView({ overview }: DashboardViewProps) {
                       'rounded-8 px-3 py-1.5',
                       key === 'halfYear' ? 'bg-(--accent-emphasis) text-white shadow-card-sm' : 'hover:text-text',
                     )}
+                    onClick={stub}
                   >
                     {t(`dashboard.trend.ranges.${key}`)}
                   </button>
@@ -245,6 +266,7 @@ export function DashboardView({ overview }: DashboardViewProps) {
 
 function CompanyBanner({ overview }: { overview: DashboardOverviewDto }) {
   const { t } = useTranslation('admin');
+  const { t: tCommon } = useTranslation();
 
   return (
     <Card className="flex-row items-center justify-between px-(--card-spacing)">
@@ -264,7 +286,7 @@ function CompanyBanner({ overview }: { overview: DashboardOverviewDto }) {
           <p className="mt-2 text-sm text-text-2">{overview.company.meta}</p>
         </div>
       </div>
-      <Button type="button" size="sm">
+      <Button type="button" size="sm" onClick={() => toast(tCommon('shell.toast.stub'))}>
         {t('dashboard.company.action')}
       </Button>
     </Card>

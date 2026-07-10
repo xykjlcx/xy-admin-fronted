@@ -1,20 +1,22 @@
-import { PanelLeft, Settings2 } from 'lucide-react';
+import { PanelLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ShellLayoutProps } from './types';
-import { NotificationBell, SHELL_NOTIFICATION_UNREAD } from '../widgets/NotificationBell';
+import { useShellBreadcrumbs } from './use-shell-breadcrumbs';
+import { ShellBreadcrumbs } from '../widgets/ShellHeader';
 import { AppearanceDrawer } from '../widgets/AppearanceDrawer';
 import { DarkModeToggle } from '../widgets/DarkModeToggle';
+import { GlobalSearch } from '../widgets/GlobalSearch';
 import { LanguageMenu } from '../widgets/LanguageMenu';
+import { NotificationBell } from '../widgets/NotificationBell';
 import { NavMenuInset } from '../widgets/NavMenuInset';
 import { UserMenu } from '../widgets/UserMenu';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { PageFrameChromeProvider } from '@/components/pro/PageScaffold';
 import { PageTransition } from '@/components/pro/PageTransition';
 import { cn } from '@/lib/utils';
 
 // 嵌入式布局（原型 L167-219 + shellStyle inset L4814）：整屏 canvas 底，通顶侧栏在左，
-// 内容区是浮起白卡；全局搜索与快捷动作在侧栏，折叠入口通过 PageFrame 注入到面包屑左侧。
+// 内容区是浮起白卡；全局搜索、快捷动作、折叠入口和面包屑统一放在内容卡顶栏。
 export function InsetLayout({
   menuTree,
   subsystems,
@@ -23,6 +25,7 @@ export function InsetLayout({
   children,
 }: ShellLayoutProps) {
   const { t } = useTranslation();
+  const { breadcrumbs, chrome } = useShellBreadcrumbs();
   const toggleLabel = t(collapsed ? 'shell.nav.expand' : 'shell.nav.collapse');
 
   return (
@@ -31,81 +34,58 @@ export function InsetLayout({
         tree={menuTree}
         subsystems={subsystems}
         collapsed={collapsed}
-        footer={<InsetSidebarDock collapsed={collapsed} />}
+        footer={<UserMenu variant="sidebar" />}
       />
-      <div className="relative m-2 ml-1 flex min-w-0 flex-1 flex-col overflow-hidden rounded-14 border border-border bg-surface shadow-inset-card">
-        <main id="shell-main" className="min-w-0 flex-1 overflow-y-auto">
-          <PageFrameChromeProvider
-            value={{
-              breadcrumbPrefix: (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 shrink-0 text-text-3 hover:text-text"
-                  onClick={() => onCollapsedChange(!collapsed)}
-                  aria-label={toggleLabel}
-                  title={toggleLabel}
-                >
-                  <PanelLeft className="size-4" />
-                </Button>
-              ),
-            }}
+      <div
+        data-slot="inset-shell-surface"
+        className={cn(
+          'relative m-2 flex min-w-0 flex-1 flex-col overflow-hidden rounded-14 border border-border bg-surface shadow-inset-card',
+          !collapsed && 'ml-1',
+        )}
+      >
+        {/* 三列 grid 而非绝对定位居中：中列搜索参与布局，窄屏下左右两列有真实空间约束，
+            面包屑靠 min-w-0 截断、搜索靠自身 max-w 收缩，三区永不重叠 */}
+        <div
+          data-slot="inset-shell-header"
+          className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-(--page-breadcrumb-divider) px-(--page-frame-px)"
+        >
+          <div data-slot="inset-shell-header-start" className="flex min-w-0 items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8 shrink-0 text-text-3 hover:text-text"
+              onClick={() => onCollapsedChange(!collapsed)}
+              aria-label={toggleLabel}
+              title={toggleLabel}
+            >
+              <PanelLeft className="size-4" />
+            </Button>
+            {breadcrumbs.length > 0 && (
+              <span aria-hidden="true" className="h-4 w-px bg-(--page-breadcrumb-divider)" />
+            )}
+            <ShellBreadcrumbs breadcrumbs={breadcrumbs} />
+          </div>
+          <div
+            data-slot="inset-shell-header-center"
+            className="flex min-w-0 items-center justify-center"
           >
+            <GlobalSearch />
+          </div>
+          <div data-slot="inset-shell-header-suffix" className="flex items-center justify-end gap-1.5">
+            <NotificationBell />
+            <AppearanceDrawer />
+            <DarkModeToggle />
+            <LanguageMenu />
+            {/* 折叠时侧栏 footer 的用户菜单不可达，这里兜底一个 icon 入口，保证登出/个人中心永远可达 */}
+            {collapsed && <UserMenu variant="icon" />}
+          </div>
+        </div>
+        <main id="shell-main" className="min-w-0 flex-1 overflow-y-auto">
+          <PageFrameChromeProvider value={chrome}>
             <PageTransition>{children}</PageTransition>
           </PageFrameChromeProvider>
         </main>
       </div>
     </div>
-  );
-}
-
-function InsetSidebarDock({ collapsed }: { collapsed: boolean }) {
-  const { t } = useTranslation();
-
-  return (
-    <div className={cn('border-t border-border pt-3', collapsed ? 'flex flex-col items-center gap-2' : 'space-y-2')}>
-      {collapsed ? (
-        <CollapsedQuickActions label={t('shell.quickActions')} />
-      ) : (
-        <div className="grid grid-cols-4 gap-1 rounded-12 bg-surface p-1 shadow-card-sm">
-          <NotificationBell />
-          <AppearanceDrawer />
-          <DarkModeToggle />
-          <LanguageMenu side="right" align="start" />
-        </div>
-      )}
-      <UserMenu variant={collapsed ? 'icon' : 'sidebar'} />
-    </div>
-  );
-}
-
-function CollapsedQuickActions({ label }: { label: string }) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative bg-surface shadow-card-sm"
-          aria-label={label}
-          title={label}
-        >
-          <Settings2 className="size-5" />
-          {SHELL_NOTIFICATION_UNREAD > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-[calc(15px*var(--app-scale))] min-w-[calc(15px*var(--app-scale))] items-center justify-center rounded-full border-[1.5px] border-surface bg-danger px-1 text-[calc(10px*var(--app-scale))] font-semibold text-white">
-              {SHELL_NOTIFICATION_UNREAD}
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent side="right" align="end" sideOffset={8} className="w-auto rounded-12 p-1">
-        <div className="grid grid-cols-4 gap-1">
-          <NotificationBell />
-          <AppearanceDrawer />
-          <DarkModeToggle />
-          <LanguageMenu side="right" align="start" />
-        </div>
-      </PopoverContent>
-    </Popover>
   );
 }

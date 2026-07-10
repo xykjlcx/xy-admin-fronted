@@ -67,9 +67,10 @@ function UserFormDialogContent({
   return (
     <FormDialogContent
       title={title}
+      description={t('users.dialog.userFormDesc')}
       cancelText={t('users.actions.cancel')}
       submitText={t('users.actions.save')}
-      submitDisabled={!formState.isValid}
+      submitDisabled={!formState.isValid || formState.isSubmitting}
       onCancel={() => onOpenChange(false)}
       onSubmit={() => {
         void submit();

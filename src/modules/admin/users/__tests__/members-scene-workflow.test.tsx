@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { setupServer } from 'msw/node';
-import { beforeAll } from 'vitest';
+import { beforeAll, vi } from 'vitest';
 import { UsersPage } from '@/modules/admin/users';
 import { usersModuleHandlers } from '@/modules/admin/users/mocks';
 import type { UsersSearch } from '@/modules/admin/users/types';
@@ -157,4 +157,29 @@ test('left variant passes undefined write callbacks and keeps detail read entry 
   expect(screen.queryByRole('button', { name: '添加成员' })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '编辑' })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '删除徐若琳' })).not.toBeInTheDocument();
+});
+
+test('out-of-range page index auto-corrects to the last available page', async () => {
+  const onSearchChange = vi.fn();
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <UsersPage
+        permissions={fullPermissions}
+        search={{ ...defaultSearch, page: 5 }}
+        onSearchChange={onSearchChange}
+      />
+    </QueryClientProvider>,
+  );
+
+  // 14 名非离职成员 / 每页 10 → 末页为第 2 页；直接访问第 5 页应回正
+  await waitFor(() => expect(onSearchChange).toHaveBeenCalledWith({ page: 2 }));
+});
+
+test('member selection checkboxes expose accessible names for header and rows', async () => {
+  renderUsersPage();
+
+  await screen.findByText('李长昕');
+  expect(screen.getByRole('checkbox', { name: '选择本页成员' })).toBeInTheDocument();
+  expect(screen.getByRole('checkbox', { name: '选择李长昕' })).toBeInTheDocument();
 });

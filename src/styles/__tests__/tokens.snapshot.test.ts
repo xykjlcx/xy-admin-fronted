@@ -39,7 +39,10 @@ const shellHeaderSource = readFileSync('src/app/shell/widgets/ShellHeader.tsx', 
 const navMenuSidebarSource = readFileSync('src/app/shell/widgets/NavMenuSidebar.tsx', 'utf8');
 const navMenuRailSource = readFileSync('src/app/shell/widgets/NavMenuRail.tsx', 'utf8');
 const navMenuInsetSource = readFileSync('src/app/shell/widgets/NavMenuInset.tsx', 'utf8');
+const insetLayoutSource = readFileSync('src/app/shell/layouts/InsetLayout.tsx', 'utf8');
+const shellBreadcrumbsHookSource = readFileSync('src/app/shell/layouts/use-shell-breadcrumbs.ts', 'utf8');
 const subsystemSwitcherSource = readFileSync('src/app/shell/widgets/SubsystemSwitcher.tsx', 'utf8');
+const userMenuSource = readFileSync('src/app/shell/widgets/UserMenu.tsx', 'utf8');
 const membersTableSource = readFileSync('src/modules/admin/users/list/MembersTable.tsx', 'utf8');
 const membersSceneSource = readFileSync('src/modules/admin/users/list/MembersScene.tsx', 'utf8');
 const deptSceneSource = readFileSync('src/modules/admin/users/list/DeptScene.tsx', 'utf8');
@@ -928,6 +931,7 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
     '--side-list-border: var(--border);',
     '--page-pane-divider: var(--side-list-border);',
     '--page-section-divider: var(--border);',
+    '--page-inset-section-divider: transparent;',
     '--page-breadcrumb-divider: var(--border);',
     '--side-list-item-bg-hover: var(--fill-hover);',
     '--side-list-item-bg-active: var(--fill-selected);',
@@ -985,6 +989,9 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(pageScaffoldSource).toContain('data-slot="page-breadcrumb-divider"');
   expect(pageScaffoldSource).toContain('bg-(--page-breadcrumb-divider)');
   expect(pageScaffoldSource).toContain('mb-(--page-breadcrumb-mb)');
+  expect(pageScaffoldSource).not.toContain('breadcrumbCenter');
+  expect(pageScaffoldSource).not.toContain('breadcrumbSuffix');
+  expect(pageScaffoldSource).not.toContain('breadcrumbSeparated');
   expect(pageScaffoldSource).toContain('flex-(--page-surface-flex)');
   expect(pageScaffoldSource).toContain('min-h-(--page-surface-min-h)');
   expect(pageScaffoldSource).toContain('border-(--page-surface-border)');
@@ -1039,11 +1046,12 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(globalCss).toContain('--page-surface-border: transparent;');
   expect(globalCss).toContain('--page-surface-shadow: none;');
   expect(globalCss).toContain('--page-pane-divider: transparent;');
-  expect(globalCss).toContain('--page-section-divider: color-mix(in srgb, var(--border) 70%, transparent);');
+  expect(globalCss).toContain('--page-section-divider: color-mix(in srgb, var(--border) 45%, transparent);');
+  expect(globalCss).toContain('--page-inset-section-divider: var(--page-section-divider);');
   expect(globalCss).toContain('--page-breadcrumb-divider: color-mix(in srgb, var(--border) 70%, transparent);');
   expect(globalCss).toContain('--table-shell-border: transparent;');
-  expect(globalCss).toContain('--table-row-border: color-mix(in srgb, var(--table-border) 72%, transparent);');
-  expect(globalCss).toContain('--tabs-line-border: color-mix(in srgb, var(--border) 70%, transparent);');
+  expect(globalCss).toContain('--table-row-border: color-mix(in srgb, var(--table-border) 54%, transparent);');
+  expect(globalCss).toContain('--tabs-line-border: transparent;');
   expect(dataTableSource).toContain('border-(--table-shell-border)');
   expect(dataTableSource).toContain('border-(--table-row-border)');
   expect(deptTreeSource).toContain('border-(--page-pane-divider)');
@@ -1053,9 +1061,32 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(deptSceneSource).not.toContain('border-(--page-section-divider)');
   expect(menusPageSource).toContain('border-(--page-pane-divider)');
   expect(menusPageSource).toContain('border-(--page-section-divider)');
+  expect(menusPageSource).toContain('border-(--page-inset-section-divider)');
   expect(navMenuInsetSource).not.toContain("aria-label={t('shell.nav.collapse')}");
-  expect(navMenuInsetSource).toContain('variant="sidebar"');
-  expect(navMenuInsetSource).not.toContain('containerClassName="mb-3 h-9 w-full bg-surface"');
+  expect(navMenuInsetSource).not.toContain('SearchField');
+  expect(navMenuInsetSource).not.toContain('variant="sidebar"');
+  expect(pageScaffoldSource).toContain("breadcrumbPlacement === 'frame'");
+  expect(pageScaffoldSource).toContain('onHeaderBreadcrumbsChange?.(breadcrumbs)');
+  expect(shellHeaderSource).toContain('ShellBreadcrumbs');
+  expect(insetLayoutSource).toContain('data-slot="inset-shell-header"');
+  // header placement 字面量收敛进 use-shell-breadcrumbs 的 chrome（memo 稳定引用），布局只消费
+  expect(shellBreadcrumbsHookSource).toContain("breadcrumbPlacement: 'header' as const");
+  expect(insetLayoutSource).toContain('value={chrome}');
+  // header 三列 grid（禁绝对定位居中——窄屏会与两侧重叠）
+  expect(insetLayoutSource).toContain('grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]');
+  expect(shellHeaderSource).toContain('grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]');
+  expect(shellHeaderSource).not.toContain('absolute left-1/2');
+  // 折叠侧栏必须 inert 退出焦点序；header suffix 兜底用户菜单入口
+  expect(navMenuInsetSource).toContain('inert={collapsed || undefined}');
+  expect(insetLayoutSource).toContain('{collapsed && <UserMenu variant="icon" />}');
+  expect(insetLayoutSource).toContain('footer={<UserMenu variant="sidebar" />}');
+  expect(insetLayoutSource).toContain('<AppearanceDrawer />');
+  expect(insetLayoutSource).toContain('<DarkModeToggle />');
+  expect(insetLayoutSource).toContain('<LanguageMenu />');
+  expect(insetLayoutSource).not.toContain('<HeaderActions />');
+  expect(navMenuInsetSource).toContain('{footer && !collapsed && (');
+  expect(userMenuSource).toContain("const suppressSidebarFocusRestore = variant === 'sidebar';");
+  expect(userMenuSource).toContain('if (!suppressSidebarFocusRestore || !pointerTriggeredRef.current) return;');
   expect(sideListSource).toContain('bg-(--side-list-bg)');
   expect(sideListSource).toContain('border-(--page-pane-divider)');
   expect(sideListSource).toContain('hover:bg-(--side-list-item-bg-hover)');

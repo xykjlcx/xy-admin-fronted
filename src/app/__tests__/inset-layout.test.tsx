@@ -7,7 +7,7 @@ import {
   RouterProvider,
   createRouter,
 } from '@tanstack/react-router';
-import { act, render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, afterEach } from 'vitest';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -29,9 +29,15 @@ afterEach(() => {
   });
 });
 
-function renderShellWithInsetLayout({ collapsed = false }: { collapsed?: boolean } = {}) {
+function renderShellWithLayout({
+  layout = 'inset',
+  collapsed = false,
+}: {
+  layout?: 'sidebar' | 'inset';
+  collapsed?: boolean;
+} = {}) {
   act(() => {
-    useAppearance.setState({ layout: 'inset', collapsed: { inset: collapsed } });
+    useAppearance.setState({ layout, collapsed: { [layout]: collapsed } });
   });
 
   const queryClient = new QueryClient({
@@ -77,41 +83,92 @@ function renderShellWithInsetLayout({ collapsed = false }: { collapsed?: boolean
   );
 }
 
-test('Inset 布局把全局动作和用户入口放在侧栏底部', async () => {
-  renderShellWithInsetLayout();
+test('Inset 布局把子系统切换和用户入口放回侧栏', async () => {
+  const user = userEvent.setup();
+  renderShellWithLayout();
 
   expect(await screen.findByText('Users content')).toBeInTheDocument();
   const shell = document.querySelector('[data-shell-layout="inset"]')!;
   const aside = shell.querySelector('aside')!;
   const main = shell.querySelector('#shell-main') as HTMLElement;
-  const footer = await screen.findByTestId('inset-sidebar-footer');
-  const collapseButton = await within(main).findByRole('button', { name: '收起导航' });
-  const breadcrumb = main.querySelector('[data-slot="page-breadcrumb"]')!;
+  const surface = shell.querySelector('[data-slot="inset-shell-surface"]') as HTMLElement;
+  const header = shell.querySelector('[data-slot="inset-shell-header"]') as HTMLElement;
+  const headerStart = header.querySelector('[data-slot="inset-shell-header-start"]') as HTMLElement;
+  const headerCenter = header.querySelector('[data-slot="inset-shell-header-center"]') as HTMLElement;
+  const headerSuffix = header.querySelector('[data-slot="inset-shell-header-suffix"]') as HTMLElement;
+  const collapseButton = await within(header).findByRole('button', { name: '收起导航' });
+  const sidebarFooter = await screen.findByTestId('inset-sidebar-footer');
 
-  expect(aside).toContainElement(footer);
-  expect(main.parentElement).not.toContainElement(footer);
   expect(aside).not.toContainElement(collapseButton);
-  expect(breadcrumb).toContainElement(collapseButton);
-  expect(breadcrumb.querySelector('[data-slot="page-breadcrumb-divider"]')).toHaveClass('bg-(--page-breadcrumb-divider)');
-  expect(within(footer).getByRole('button', { name: '消息通知' })).toBeInTheDocument();
-  expect(within(footer).getByRole('button', { name: '外观设置' })).toBeInTheDocument();
-  expect(within(footer).getByText('测试用户')).toBeInTheDocument();
+  expect(aside).toHaveClass('w-[calc(248px*var(--app-scale))]');
+  expect(surface).toHaveClass('m-2');
+  expect(surface).toHaveClass('ml-1');
+  expect(header).toHaveClass('border-b');
+  expect(headerStart).toContainElement(collapseButton);
+  expect(within(headerStart).queryByRole('button', { name: /后台管理/ })).not.toBeInTheDocument();
+  expect(within(headerStart).getByText('组织与权限')).toBeInTheDocument();
+  expect(within(headerStart).getByText('成员与部门')).toBeInTheDocument();
+  expect(within(headerCenter).getByRole('searchbox', { name: '搜索功能导航、组织数据、角色详情等' })).toBeInTheDocument();
+  const sidebarSwitcher = within(aside).getByRole('button', { name: /后台管理/ });
+  expect(sidebarSwitcher).toHaveClass('px-2');
+  expect(sidebarSwitcher).toHaveClass('py-2');
+  const sidebarUser = within(sidebarFooter).getByRole('button', { name: /测试用户/ });
+  expect(sidebarFooter).toHaveClass('pb-3');
+  expect(sidebarFooter).toHaveClass('border-t');
+  expect(sidebarUser).toHaveClass('outline-none');
+  expect(sidebarUser).toHaveClass('focus-visible:bg-(--nav-item-bg-hover)');
+  expect(sidebarUser).toHaveClass('focus-visible:shadow-none');
+  expect(sidebarUser).not.toHaveClass('focus-visible:ring-(--button-ring)');
+  expect(sidebarUser).toHaveClass('hover:bg-(--nav-item-bg-hover)');
+  expect(sidebarUser).not.toHaveClass('bg-surface/75');
+  expect(within(headerSuffix).getByRole('button', { name: '消息通知' })).toBeInTheDocument();
+  expect(within(headerSuffix).getByRole('button', { name: '外观设置' })).toBeInTheDocument();
+  expect(within(headerSuffix).queryByText('测试用户')).not.toBeInTheDocument();
+  expect(main.querySelector('[data-slot="page-breadcrumb"]')).not.toBeInTheDocument();
+
+  await user.click(sidebarUser);
+  expect(await screen.findByText('个人中心')).toBeInTheDocument();
+  await user.keyboard('{Escape}');
+  await waitFor(() => {
+    expect(sidebarUser).not.toHaveFocus();
+  });
 });
 
-test('Inset 折叠侧栏把全局动作收进单个快捷入口', async () => {
-  renderShellWithInsetLayout({ collapsed: true });
+test('Inset 折叠侧栏时完整隐藏侧栏顶部和底部内容', async () => {
+  renderShellWithLayout({ collapsed: true });
 
   expect(await screen.findByText('Users content')).toBeInTheDocument();
-  const footer = await screen.findByTestId('inset-sidebar-footer');
+  const shell = document.querySelector('[data-shell-layout="inset"]')!;
+  const aside = shell.querySelector('aside')!;
+  const surface = shell.querySelector('[data-slot="inset-shell-surface"]') as HTMLElement;
+  const headerSuffix = document.querySelector('[data-slot="inset-shell-header-suffix"]') as HTMLElement;
 
-  expect(within(footer).getByRole('button', { name: '快捷操作' })).toBeInTheDocument();
-  expect(within(footer).queryByRole('button', { name: '消息通知' })).not.toBeInTheDocument();
-  expect(within(footer).queryByRole('button', { name: '外观设置' })).not.toBeInTheDocument();
+  expect(aside).toHaveClass('w-0');
+  expect(aside).toHaveClass('px-0');
+  expect(aside).toHaveClass('overflow-hidden');
+  // 折叠的侧栏必须整体退出焦点序与无障碍树（链接仍在 DOM，仅视觉压缩不够）
+  expect(aside).toHaveAttribute('inert');
+  expect(aside).toHaveAttribute('aria-hidden', 'true');
+  expect(surface).toHaveClass('m-2');
+  expect(surface).not.toHaveClass('ml-1');
+  expect(within(headerSuffix).getByRole('button', { name: '消息通知' })).toBeInTheDocument();
+  expect(within(headerSuffix).getByRole('button', { name: '外观设置' })).toBeInTheDocument();
+  expect(within(headerSuffix).getByRole('button', { name: '深色模式' })).toBeInTheDocument();
+  expect(within(headerSuffix).getByRole('button', { name: '语言 / Language' })).toBeInTheDocument();
+  // 折叠后侧栏 footer 的用户菜单不可达，header suffix 必须兜底 icon 入口（登出/个人中心永远可达）
+  expect(within(headerSuffix).getByRole('button', { name: /测试用户/ })).toBeInTheDocument();
+});
 
-  await userEvent.click(within(footer).getByRole('button', { name: '快捷操作' }));
+test('Sidebar 布局用子系统切换和页面面包屑替代左上角品牌位', async () => {
+  renderShellWithLayout({ layout: 'sidebar' });
 
-  expect(await screen.findByRole('button', { name: '消息通知' })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: '外观设置' })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: '深色模式' })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: '语言 / Language' })).toBeInTheDocument();
+  expect(await screen.findByText('Users content')).toBeInTheDocument();
+  const header = document.querySelector('header') as HTMLElement;
+  const main = document.querySelector('#shell-main') as HTMLElement;
+
+  expect(within(header).queryByText('Ship Any')).not.toBeInTheDocument();
+  expect(within(header).getByRole('button', { name: /后台管理/ })).toBeInTheDocument();
+  expect(within(header).getByText('组织与权限')).toBeInTheDocument();
+  expect(within(header).getByText('成员与部门')).toBeInTheDocument();
+  expect(main.querySelector('[data-slot="page-breadcrumb"]')).not.toBeInTheDocument();
 });

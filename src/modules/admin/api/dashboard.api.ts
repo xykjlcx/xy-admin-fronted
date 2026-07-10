@@ -45,5 +45,5 @@ export type DashboardOverviewDto = z.infer<typeof DashboardOverviewSchema>;
 export const dashboardOverviewQuery = queryOptions({
   queryKey: ['dashboard', 'overview'],
   staleTime: 60_000,
-  queryFn: () => http.get('/api/dashboard/overview', undefined, dashboardOverviewContract),
+  queryFn: ({ signal }) => http.get('/api/dashboard/overview', undefined, dashboardOverviewContract, { signal }),
 });

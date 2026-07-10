@@ -41,3 +41,51 @@ test('PageFrame 支持 shell 注入面包屑前置操作和分割线', () => {
   expect(divider).toHaveClass('bg-(--page-breadcrumb-divider)');
   expect(screen.getByText('菜单管理')).toBeInTheDocument();
 });
+
+test('PageFrame 支持把面包屑交给 shell header 承载', () => {
+  const onHeaderBreadcrumbsChange = vi.fn();
+  const { container, unmount } = render(
+    <PageFrameChromeProvider
+      value={{
+        breadcrumbPlacement: 'header',
+        onHeaderBreadcrumbsChange,
+      }}
+    >
+      <PageFrame breadcrumbs={[{ label: '组织与权限' }, { label: '成员与部门' }]}>
+        <PageSurface>成员列表</PageSurface>
+      </PageFrame>
+    </PageFrameChromeProvider>,
+  );
+
+  expect(container.querySelector('[data-slot="page-breadcrumb"]')).not.toBeInTheDocument();
+  expect(onHeaderBreadcrumbsChange).toHaveBeenCalledWith([{ label: '组织与权限' }, { label: '成员与部门' }]);
+
+  unmount();
+
+  expect(onHeaderBreadcrumbsChange).toHaveBeenLastCalledWith([]);
+});
+
+test('header 模式重渲染只发布新值，不先清空再发布（防 Shell header 空转）', () => {
+  const onHeaderBreadcrumbsChange = vi.fn();
+  const chrome = { breadcrumbPlacement: 'header' as const, onHeaderBreadcrumbsChange };
+  const view = (label: string) => (
+    <PageFrameChromeProvider value={chrome}>
+      {/* 模拟页面写法：breadcrumbs 每次渲染都是新数组字面量 */}
+      <PageFrame breadcrumbs={[{ label }]}>
+        <PageSurface>内容</PageSurface>
+      </PageFrame>
+    </PageFrameChromeProvider>
+  );
+  const { rerender } = render(view('组织与权限'));
+
+  expect(onHeaderBreadcrumbsChange).toHaveBeenCalledTimes(1);
+
+  // 同内容重渲染：会再次发布（引用变化），但绝不发 []——由接收端做内容级去重
+  rerender(view('组织与权限'));
+  expect(onHeaderBreadcrumbsChange).not.toHaveBeenCalledWith([]);
+
+  // 内容变化：发布新值，依然没有中间的 [] 清空
+  rerender(view('成员与部门'));
+  expect(onHeaderBreadcrumbsChange).toHaveBeenLastCalledWith([{ label: '成员与部门' }]);
+  expect(onHeaderBreadcrumbsChange).not.toHaveBeenCalledWith([]);
+});

@@ -160,9 +160,11 @@
     "dialog": {
       "createTitle": "添加成员",
       "editTitle": "编辑成员",
+      "userFormDesc": "维护成员的基础信息、部门与角色",
       "createDeptTitle": "新建部门",
       "createChildDeptTitle": "新增子部门",
       "editDeptTitle": "编辑部门",
+      "deptFormDesc": "设置部门名称与上级部门",
       "deleteTitle": "确认删除成员",
       "deleteDesc": "删除后该成员会从当前列表移除。",
       "detailFallback": "成员详情"
@@ -181,7 +183,9 @@
       "status": "状态",
       "profileTab": "基础信息",
       "permissionTab": "权限",
-      "permissionPending": "权限数据源待定"
+      "permissionPending": "权限数据源待定",
+      "loadFailed": "加载成员详情失败",
+      "retry": "重试"
     }
   },
   "roles": {
@@ -298,6 +302,7 @@
     "actions": {
       "create": "新增菜单",
       "createSubsystem": "新增子系统",
+      "inspect": "节点详情",
       "expand": "展开",
       "collapse": "折叠",
       "edit": "编辑",

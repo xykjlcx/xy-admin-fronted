@@ -6,6 +6,7 @@ import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { SelectControl } from '@/components/ui/select';
 import { useDeptForm } from './useDeptForm';
+import { collectDeptSubtreeIds } from '../model';
 import type { CreateDeptInput, DeptDto, UpdateDeptInput } from '../api';
 import type { DeptFormState } from '../types';
 
@@ -67,9 +68,12 @@ function DeptFormDialogContent({
   const { t } = useTranslation('admin');
   const form = useDeptForm({ state });
   const { control, formState, handleSubmit, register } = form;
+  // 编辑态排除自身及其全部子孙，防止把部门挂到自己的下级从而造环
+  const excludedIds = state.kind === 'edit' ? collectDeptSubtreeIds(depts, state.dept.id) : undefined;
+  const selectableDepts = excludedIds ? depts.filter((dept) => !excludedIds.has(dept.id)) : depts;
   const parentOptions = [
     { value: '', label: t('users.deptList.root') },
-    ...depts.map((dept) => ({ value: dept.id, label: dept.name })),
+    ...selectableDepts.map((dept) => ({ value: dept.id, label: dept.name })),
   ];
   const submit = handleSubmit(async (values) => {
     const dto: CreateDeptInput = {
@@ -88,9 +92,10 @@ function DeptFormDialogContent({
   return (
     <FormDialogContent
       title={title}
+      description={t('users.dialog.deptFormDesc')}
       cancelText={t('users.actions.cancel')}
       submitText={t('users.actions.save')}
-      submitDisabled={!formState.isValid}
+      submitDisabled={!formState.isValid || formState.isSubmitting}
       onCancel={() => onOpenChange(false)}
       onSubmit={() => {
         void submit();

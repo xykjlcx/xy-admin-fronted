@@ -25,7 +25,8 @@ import {
   InputGroupSuffix,
 } from '@/components/ui/input';
 import { authApi } from '@/modules/admin/api/auth.api';
-import { resetAuth } from '@/lib/reset-auth';
+import { resetSession } from '@/lib/reset-auth';
+import { HttpError } from '@/lib/http/errors';
 import { cn } from '@/lib/utils';
 import { appConfig } from '@/config';
 import { useAppearance } from '@/stores/appearance';
@@ -73,6 +74,10 @@ function LoginPage() {
     defaultValues: { username: '', password: '' },
   });
 
+  // 未接通的入口（忘记密码/SSO/注册等）统一走表单提示条反馈——routes 层禁 sonner，
+  // 与 sms/qr 提交时的 passwordLoginOnly 同一反馈通道，不留无反馈的死按钮。
+  const onStubEntry = () => setError('root', { message: t('auth.stubEntry') });
+
   const onSubmit = handleSubmit(async (dto) => {
     if (tab !== 'password') {
       setError('root', { message: t('auth.passwordLoginOnly') });
@@ -80,12 +85,18 @@ function LoginPage() {
     }
     try {
       const { token } = await authApi.login(dto);
-      resetAuth(token); // 清上个账号的 me 缓存 + 存新 token，防权限串号
+      await resetSession(token); // 存新 token + 清空上个账号全部缓存，防权限/数据串号
       await router.invalidate(); // 关键：登录后 beforeLoad 不会自动重跑（spec §9）
       // to 来自守卫写入的 pathname+search，可能带 ?query；safeInternalPath 做同源校验防开放重定向
       void nav({ href: safeInternalPath(to) });
     } catch (e) {
-      setError('root', { message: (e as Error).message });
+      // 真后端用标准 401 表示密码错（login 传 on401:'reject' → HttpError 401），映射为明确文案；
+      // mock 用业务码返回，走 else 显示后端/mock 的 message。
+      if (e instanceof HttpError && e.status === 401) {
+        setError('root', { message: t('auth.invalidCredentials') });
+      } else {
+        setError('root', { message: (e as Error).message });
+      }
     }
   });
 
@@ -146,6 +157,7 @@ function LoginPage() {
                   register={register}
                   showPassword={showPassword}
                   onTogglePassword={() => setShowPassword((value) => !value)}
+                  onStubEntry={onStubEntry}
                 />
               ) : (
                 <SmsFields />
@@ -180,6 +192,7 @@ function LoginPage() {
                     key={item}
                     type="button"
                     className="flex h-[calc(44px*var(--app-scale))] items-center justify-center gap-2 rounded-10 border border-border text-[calc(13px*var(--app-scale))] text-text-2 transition-colors hover:border-(--accent-emphasis) hover:text-text"
+                    onClick={onStubEntry}
                   >
                     {item === 'WeCom' ? (
                       <MessageSquare className="size-4 text-success" />
@@ -195,7 +208,7 @@ function LoginPage() {
 
               <p className="mt-[calc(22px*var(--app-scale))] text-center text-[calc(13px*var(--app-scale))] text-text-3">
                 {t('auth.noAccount')}{' '}
-                <button type="button" className="font-medium text-(--accent-emphasis)">
+                <button type="button" className="font-medium text-(--accent-emphasis)" onClick={onStubEntry}>
                   {t('auth.register')}
                 </button>
               </p>
@@ -263,10 +276,12 @@ function PasswordFields({
   register,
   showPassword,
   onTogglePassword,
+  onStubEntry,
 }: {
   register: ReturnType<typeof useForm<{ username: string; password: string }>>['register'];
   showPassword: boolean;
   onTogglePassword: () => void;
+  onStubEntry: () => void;
 }) {
   const { t } = useTranslation();
   const passwordToggleLabel = showPassword ? t('auth.hidePassword') : t('auth.showPassword');
@@ -294,7 +309,11 @@ function PasswordFields({
           >
             {t('auth.password')}
           </label>
-          <button type="button" className="text-[calc(13px*var(--app-scale))] text-(--accent-emphasis)">
+          <button
+            type="button"
+            className="text-[calc(13px*var(--app-scale))] text-(--accent-emphasis)"
+            onClick={onStubEntry}
+          >
             {t('auth.forgotPassword')}
           </button>
         </div>

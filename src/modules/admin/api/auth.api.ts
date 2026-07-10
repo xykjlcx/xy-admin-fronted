@@ -1,4 +1,4 @@
-import { http, bindTokenGetter } from '@/lib/http/client';
+import { http, bindTokenGetter, type HttpRequestOptions } from '@/lib/http/client';
 import { queryOptions } from '@tanstack/react-query';
 import { z } from 'zod';
 import { useAuth } from '@/stores/auth';
@@ -24,14 +24,15 @@ const logoutContract = defineApiContract({ response: NullSchema });
 export type MeDto = z.infer<typeof MeSchema>;
 
 export const authApi = {
+  // on401:'reject'：登录失败的 401（密码错）当业务失败处理，不广播会话过期、不触发全局登出。
   login: (dto: { username: string; password: string }) =>
-    http.post('/api/auth/login', dto, loginContract),
-  me: () => http.get('/api/auth/me', undefined, meContract),
+    http.post('/api/auth/login', dto, loginContract, { on401: 'reject' }),
+  me: (options?: HttpRequestOptions) => http.get('/api/auth/me', undefined, meContract, options),
   logout: () => http.post('/api/auth/logout', undefined, logoutContract),
 };
 
 export const meQuery = queryOptions({
   queryKey: ['auth', 'me'],
-  queryFn: authApi.me,
+  queryFn: ({ signal }) => authApi.me({ signal }),
   staleTime: 5 * 60_000,
 });

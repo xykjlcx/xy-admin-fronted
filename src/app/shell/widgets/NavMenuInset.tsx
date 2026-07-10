@@ -1,9 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
-import { SearchField } from '@/components/pro/SearchField';
-import { featuresConfig } from '@/config';
 import { cn } from '@/lib/utils';
 import { lv } from '@/lib/localized';
 import { Icon } from '@/lib/icon-registry';
@@ -24,34 +21,27 @@ export function NavMenuInset({
   collapsed: boolean;
   footer?: ReactNode;
 }) {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { pathname } = useLocation();
   const groups = tree.map((n) => ({ node: n, pages: n.children?.length ? n.children : [n] }));
 
+  // 折叠只是视觉压缩（w-0 + overflow-hidden），链接仍在 DOM——必须 inert 掐掉焦点与无障碍树，
+  // 否则键盘用户会 Tab 进一排不可见链接。
   return (
     <aside
+      inert={collapsed || undefined}
+      aria-hidden={collapsed || undefined}
       className={cn(
-        'flex shrink-0 flex-col pt-3 transition-[width] duration-200',
-        collapsed ? 'w-16 px-3' : 'w-[calc(248px*var(--app-scale))] pl-3 pr-2.5',
+        'flex shrink-0 flex-col pt-3 transition-[width,padding] duration-200',
+        collapsed ? 'w-0 overflow-hidden px-0' : 'w-[calc(248px*var(--app-scale))] pl-3 pr-2.5',
       )}
     >
-      <div className={cn('mb-3 flex gap-1.5', collapsed ? 'flex-col items-center' : 'items-center')}>
-        <div className="min-w-0 flex-1">
-          <SubsystemSwitcher subsystems={subsystems} variant="brand" collapsed={collapsed} />
+      {!collapsed && (
+        <div className="mb-3 flex items-center">
+          <div className="min-w-0 flex-1">
+            <SubsystemSwitcher subsystems={subsystems} variant="brand" />
+          </div>
         </div>
-      </div>
-      {!collapsed && featuresConfig.showStubChrome && (
-        <SearchField
-          variant="sidebar"
-          readOnly
-          aria-label={t('shell.search')}
-          placeholder={t('shell.search')}
-          containerClassName="mb-3 h-9 w-full"
-          onFocus={(event) => {
-            event.currentTarget.blur();
-            toast(t('shell.toast.search'));
-          }}
-        />
       )}
       <div className="min-h-0 flex-1 overflow-y-auto">
         {groups.map((g) => (
@@ -83,8 +73,11 @@ export function NavMenuInset({
           </div>
         ))}
       </div>
-      {footer && (
-        <div data-testid="inset-sidebar-footer" className="mt-3 shrink-0 pb-3">
+      {footer && !collapsed && (
+        <div
+          data-testid="inset-sidebar-footer"
+          className="mt-3 shrink-0 border-t border-(--page-section-divider) pb-3 pt-3"
+        >
           {footer}
         </div>
       )}

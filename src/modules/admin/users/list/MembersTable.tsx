@@ -1,4 +1,4 @@
-import { useMemo, type JSX, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, type JSX, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
@@ -49,12 +49,22 @@ export function MembersTable({
   const { data: depts = [] } = useQuery(deptsQuery);
   const usersPage = usersResult.data ?? emptyUsersPage;
   const pageCount = Math.max(1, Math.ceil(usersPage.total / search.pageSize));
+  // 直接访问越界页码（总数>0 但当前页超出末页）时回正到最后一页，避免「有数据却空表」
+  useEffect(() => {
+    if (!usersResult.isPending && usersPage.total > 0 && search.page > pageCount) {
+      onSearchChange({ page: pageCount });
+    }
+  }, [usersResult.isPending, usersPage.total, search.page, pageCount, onSearchChange]);
   const deptById = useMemo(() => new Map(depts.map((dept) => [dept.id, dept])), [depts]);
   let selectedDeptLabel = t('users.allMembers');
   if (variant === 'left') selectedDeptLabel = t('users.tabs.left');
   else if (search.deptId) selectedDeptLabel = deptById.get(search.deptId)?.name ?? selectedDeptLabel;
   const canDisable = !!onBatchDisable && matchPermission(permissions, 'iam:user:resign');
   const selectionEnabled = variant === 'members' && canDisable;
+  const rowSelectAriaLabel = useCallback(
+    (user: UserDto) => t('users.selectUser', { name: user.name }),
+    [t],
+  );
 
   const handleBatchDisable = async (ids: string[]) => {
     if (!onBatchDisable) return;
@@ -83,6 +93,8 @@ export function MembersTable({
           enabled: selectionEnabled,
           rowSelection,
           onRowSelectionChange,
+          selectAllAriaLabel: t('users.selectPage'),
+          rowSelectAriaLabel,
           renderBulkBar: (selectedVisibleIds) => (
             <div className="mb-4 flex items-center justify-between rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
               <span className="text-[calc(13px*var(--app-scale))] text-text-2">
