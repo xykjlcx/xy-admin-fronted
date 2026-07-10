@@ -135,14 +135,19 @@ GREEN：`scripts/dev.sh start|stop|status` 用 PID 文件管理当前仓 backend
 
 新增：
 
-- app ArchUnit：模块方向、admin 包纵切、lastmile 禁 platform schema/admin implementation、security 依赖隔离、infra slice allow-list
-- 负向 fixture 与 Maven skip-tests 防绕过检查
+- app ArchUnit 规则与生产扫描：模块方向、admin 包纵切、lastmile 禁 platform schema/admin implementation、security 依赖隔离、infra slice allow-list
+- 每条规则独立负向 fixture、Maven skip-tests 防绕过检查、lastmile effective dependency graph 检查
+- `backend/scripts/verify-p0a.sh` 统一执行 P0a 的结构、动态运行脚本与 Maven 门禁
+
+模块方向锁定为：`app` 是唯一可依赖 `modules/admin` 与 `modules/lastmile` 实现的装配模块；admin 与 lastmile 不得互相依赖；lastmile 不得依赖 platform schema；shared-kernel/admin-api/api-contract/schema 不得反向依赖 app、infrastructure 或业务实现，两个 schema owner 不得交叉依赖；infrastructure 不得依赖业务实现或任一 schema。除 marker 外，`com.metabuild.modules.admin` 下业务类必须先出现业务域段，禁止直接落入 `controller/service/repository/dto/model/config/api` 横切根包。Sa-Token 的第三方类型只允许 `com.metabuild.infrastructure.security..` 引用。infrastructure 直接 slice 只允许 `web/exception/i18n/observability/jooq/security`，新增 slice 必须先修订架构决策与守卫。
+
+Maven parent 在 `verify` 阶段要求 `skipTests=false` 且 `maven.test.skip=false`；`package -DskipTests` 仍允许给本地 dev 打包。contract 必须实际证明 `verify -DskipTests` 与 `verify -Dmaven.test.skip=true` 失败、正常 verify 成功。lastmile guard 必须读取 Maven effective dependency tree，证明内部 artifact closure 恰好为 `metabuilder-admin-api/metabuilder-shared-kernel/metabuilder-schema-lastmile`，不能只解析 raw POM direct dependencies。
 
 RED：每条规则先用一个违规 fixture 证明会失败。
 
 GREEN：清除 fixture 违规，运行 Task 1-5 全量 verify；对 P0a 做 issue-first 对抗 review，修完再通过。
 
-验证：`backend/mvnw -f backend/pom.xml verify`、`git diff --check`、工作树确认未夹带用户 UI 文件。
+验证：`backend/scripts/verify-p0a.sh`、`backend/mvnw -f backend/pom.xml verify`、两种 skip mutation、`git diff --check`、工作树确认未夹带用户 UI 文件。
 
 ## Task 7：P0b monorepo 归位
 
