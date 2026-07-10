@@ -6,25 +6,27 @@ import { Empty } from '@/components/ui/empty';
 import { Skeleton } from '@/components/ui/skeleton';
 import type {
   PermissionTreeGroupDto,
+  RoleDataPermission,
   RoleDto,
-  RoleLogDto,
   RoleMemberDto,
   RolePermissionMap,
-} from '@/modules/admin/api/role.api';
-import { RoleTypeChip } from './RoleTypeChip';
+} from '@/modules/admin/roles/api';
+import type { DeptDto } from '@/modules/admin/users/api';
+import { RoleDataPermissionEditor } from './RoleDataPermissionEditor';
+import { RoleTypeChip } from '../components/RoleTypeChip';
 import { RolePermissionEditor } from './RolePermissionEditor';
 import { RoleMembersPanel } from './RoleMembersPanel';
-import { RoleLogsPanel } from './RoleLogsPanel';
-import type { DetailTab } from './types';
+import type { DetailTab } from '../types';
 
 export function RoleDetailsPanel({
   activeRole,
   currentRoleId,
   detailTab,
   roleMembers,
-  roleLogs,
   permissionTree,
   rolePermissions,
+  roleDataPermission,
+  departments,
   roleDetailLoading,
   roleDetailRefreshing,
   canDeleteRole,
@@ -32,14 +34,16 @@ export function RoleDetailsPanel({
   onDetailTabChange,
   onDeleteRole,
   onSaveRolePermissions,
+  onSaveRoleDataPermissions,
 }: {
   activeRole: RoleDto | undefined;
   currentRoleId: string;
   detailTab: DetailTab;
   roleMembers: RoleMemberDto[];
-  roleLogs: RoleLogDto[];
   permissionTree: PermissionTreeGroupDto[];
   rolePermissions: RolePermissionMap;
+  roleDataPermission: RoleDataPermission;
+  departments: Pick<DeptDto, 'id' | 'name'>[];
   roleDetailLoading: boolean;
   roleDetailRefreshing: boolean;
   canDeleteRole: boolean;
@@ -47,12 +51,13 @@ export function RoleDetailsPanel({
   onDetailTabChange: (tab: DetailTab) => void;
   onDeleteRole: (role: RoleDto) => void;
   onSaveRolePermissions: (id: string, permissions: RolePermissionMap) => void | Promise<void>;
+  onSaveRoleDataPermissions: (id: string, permission: RoleDataPermission) => void | Promise<void>;
 }) {
   const { t } = useTranslation('admin');
   const detailTabItems: AnimatedTabItem<DetailTab>[] = [
     { value: 'permissions', label: t('roles.detailTabs.permissions') },
+    { value: 'dataPermissions', label: t('roles.detailTabs.dataPermissions') },
     { value: 'members', label: t('roles.detailTabs.members', { count: roleMembers.length }) },
-    { value: 'logs', label: t('roles.detailTabs.logs') },
   ];
 
   if (!activeRole) {
@@ -60,12 +65,12 @@ export function RoleDetailsPanel({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div data-role-detail-layout className="flex min-h-full flex-col">
       <div className="mb-1 flex items-center gap-2.5">
-        <h1 className="text-[calc(18px*var(--app-scale))] font-bold text-text">{activeRole.name}</h1>
+        <h1 className="text-base font-bold text-text">{activeRole.name}</h1>
         <RoleTypeChip type={activeRole.type} label={t(`roles.roleTypes.${activeRole.type}`)} />
         <div className="flex-1" />
-        {activeRole.type === 'custom' && canDeleteRole && (
+        {activeRole.type === 'custom' && canDeleteRole ? (
           <Button
             type="button"
             variant="text"
@@ -76,16 +81,16 @@ export function RoleDetailsPanel({
             <Trash2 data-icon="inline-start" />
             {t('roles.actions.deleteRole')}
           </Button>
-        )}
+        ) : null}
       </div>
-      <p className="mb-4 text-[calc(13px*var(--app-scale))] text-text-3">{activeRole.desc}</p>
+      <p className="mb-3 text-[calc(13px*var(--app-scale))] text-text-3">{activeRole.desc}</p>
 
       <AnimatedTabs
         value={detailTab}
         items={detailTabItems}
         onValueChange={onDetailTabChange}
         variant="content"
-        className="mb-[calc(18px*var(--app-scale))]"
+        className="mb-4"
         trailing={
           roleDetailLoading || roleDetailRefreshing ? (
             <span className="mb-2.5 text-[calc(12px*var(--app-scale))] text-(--accent-emphasis)">
@@ -96,24 +101,29 @@ export function RoleDetailsPanel({
       />
 
       {roleDetailLoading ? (
-        <div data-role-tab-content-scroll className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6 pr-1">
+        <div data-role-tab-content-scroll className="pb-6 pr-1">
           <RoleDetailLoadingState label={t('roles.refreshing')} />
         </div>
       ) : detailTab === 'permissions' ? (
         <RolePermissionEditor
+          key={currentRoleId}
           roleId={currentRoleId}
           permissionTree={permissionTree}
           rolePermissions={rolePermissions}
           canGrant={canGrant}
           onSave={onSaveRolePermissions}
         />
-      ) : detailTab === 'members' ? (
-        <div data-role-tab-content-scroll className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6 pr-1">
-          <RoleMembersPanel members={roleMembers} />
-        </div>
+      ) : detailTab === 'dataPermissions' ? (
+        <RoleDataPermissionEditor
+          roleId={currentRoleId}
+          permission={roleDataPermission}
+          departments={departments}
+          canGrant={canGrant}
+          onSave={onSaveRoleDataPermissions}
+        />
       ) : (
-        <div data-role-tab-content-scroll className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6 pr-1">
-          <RoleLogsPanel logs={roleLogs} />
+        <div data-role-tab-content-scroll className="pb-6 pr-1">
+          <RoleMembersPanel members={roleMembers} />
         </div>
       )}
     </div>
@@ -122,15 +132,15 @@ export function RoleDetailsPanel({
 
 function RoleDetailLoadingState({ label }: { label: string }) {
   return (
-    <div role="status" aria-label={label} className="flex flex-col gap-3">
+    <div role="status" aria-label={label} className="flex flex-col gap-2.5">
       {Array.from({ length: 4 }).map((_, rowIndex) => (
         <div
           key={rowIndex}
           data-testid="role-detail-loading-row"
-          className="rounded-10 border border-border p-4"
+          className="rounded-10 border border-border p-3"
         >
           <Skeleton className="h-3 w-40" />
-          <div className="mt-4 grid grid-cols-4 gap-2">
+          <div className="mt-3 grid grid-cols-4 gap-2">
             {Array.from({ length: 4 }).map((__, itemIndex) => (
               <Skeleton key={itemIndex} className="h-[calc(30px*var(--app-scale))] rounded-7" />
             ))}

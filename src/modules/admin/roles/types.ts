@@ -1,18 +1,13 @@
 import type {
-  AdminRoleDto,
-  CreateAdminRoleInput,
   CreateRoleInput,
   PermissionTreeGroupDto,
+  RoleAuditLogDto,
+  RoleDataPermission,
   RoleDto,
-  RoleLogDto,
   RoleMemberDto,
   RolePermissionMap,
-} from '@/modules/admin/api/role.api';
-
-export interface SelectableMemberDto {
-  id: string;
-  name: string;
-}
+} from '@/modules/admin/roles/api';
+import type { DeptDto } from '@/modules/admin/users/api';
 
 export interface RolesViewProps {
   permissions: string[];
@@ -20,21 +15,22 @@ export interface RolesViewProps {
   activeRoleId: string;
   permissionTree: PermissionTreeGroupDto[];
   rolePermissions: RolePermissionMap;
+  roleDataPermission: RoleDataPermission;
+  departments: Pick<DeptDto, 'id' | 'name'>[];
   roleMembers: RoleMemberDto[];
-  roleLogs: RoleLogDto[];
-  adminRoles: AdminRoleDto[];
-  selectableMembers: SelectableMemberDto[];
+  roleAuditLogs: RoleAuditLogDto[];
   roleDetailLoading?: boolean;
   roleDetailRefreshing?: boolean;
+  roleAuditLogsLoading?: boolean;
   onActiveRoleChange: (id: string) => void;
   onCreateRole: (dto: CreateRoleInput) => void | Promise<void>;
   onDeleteRole: (id: string) => void | Promise<void>;
   onSaveRolePermissions: (id: string, permissions: RolePermissionMap) => void | Promise<void>;
-  onCreateAdminRole: (dto: CreateAdminRoleInput) => void | Promise<void>;
+  onSaveRoleDataPermissions: (id: string, permission: RoleDataPermission) => void | Promise<void>;
 }
 
-export type PageTab = 'roles' | 'admins';
-export type DetailTab = 'permissions' | 'members' | 'logs';
+export type PageTab = 'roles' | 'auditLogs';
+export type DetailTab = 'permissions' | 'dataPermissions' | 'members';
 export type TriState = 'none' | 'some' | 'all';
 export type PermissionDraftUpdater = RolePermissionMap | ((current: RolePermissionMap) => RolePermissionMap);
 

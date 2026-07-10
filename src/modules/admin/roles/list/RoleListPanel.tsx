@@ -5,8 +5,8 @@ import { SearchField } from '@/components/pro/SearchField';
 import { Button } from '@/components/ui/button';
 import { Empty } from '@/components/ui/empty';
 import { cn } from '@/lib/utils';
-import type { RoleDto } from '@/modules/admin/api/role.api';
-import { RoleTypeChip } from './RoleTypeChip';
+import type { RoleDto } from '@/modules/admin/roles/api';
+import { RoleTypeChip } from '../components/RoleTypeChip';
 
 export function RoleListPanel({
   roles,
@@ -26,11 +26,16 @@ export function RoleListPanel({
   const visibleRoles = useMemo(() => {
     const keyword = roleKeyword.trim().toLowerCase();
     if (!keyword) return roles;
-    return roles.filter((role) => role.name.toLowerCase().includes(keyword) || role.desc.toLowerCase().includes(keyword));
+    return roles.filter(
+      (role) => role.name.toLowerCase().includes(keyword) || role.desc.toLowerCase().includes(keyword),
+    );
   }, [roleKeyword, roles]);
 
   return (
-    <aside className="flex min-h-0 w-[calc(280px*var(--app-scale))] shrink-0 flex-col border-r border-(--page-pane-divider) bg-(--side-list-bg) px-3 py-4">
+    <aside
+      data-role-list-panel
+      className="flex min-h-0 w-[calc(280px*var(--app-scale))] shrink-0 flex-col bg-(--side-list-bg) px-3 py-4"
+    >
       <SearchField
         containerClassName="mb-3"
         placeholder={t('roles.searchPlaceholder')}
@@ -46,7 +51,7 @@ export function RoleListPanel({
               type="button"
               variant="ghost"
               className={cn(
-                'my-0.5 flex h-11 w-full items-center gap-2 rounded-8 px-3 text-left text-sm transition-colors hover:bg-bg',
+                'my-0.5 flex h-11 w-full items-center gap-2 rounded-8 px-3 text-left text-sm transition-none hover:bg-bg',
                 role.id === currentRoleId
                   ? 'bg-(--side-list-item-bg-active) font-semibold text-(--side-list-item-fg-active)'
                   : 'text-text hover:bg-(--side-list-item-bg-hover)',
@@ -64,13 +69,7 @@ export function RoleListPanel({
       </div>
 
       {canCreateRole && (
-        <Button
-          type="button"
-          variant="dashed"
-          className="mt-3 h-10"
-          block
-          onClick={onCreateRole}
-        >
+        <Button type="button" variant="dashed" className="mt-3 h-10" block onClick={onCreateRole}>
           <Plus data-icon="inline-start" />
           {t('roles.actions.addRole')}
         </Button>

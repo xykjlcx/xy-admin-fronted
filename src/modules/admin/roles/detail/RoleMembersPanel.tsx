@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { RoleMemberDto } from '@/modules/admin/api/role.api';
-import { avatarClasses, initials } from './model';
+import type { RoleMemberDto } from '@/modules/admin/roles/api';
+import { avatarClasses, initials } from '../model';
 
 export function RoleMembersPanel({ members }: { members: RoleMemberDto[] }) {
   const { t } = useTranslation('admin');
@@ -10,10 +10,10 @@ export function RoleMembersPanel({ members }: { members: RoleMemberDto[] }) {
   return (
     <div className="grid grid-cols-2 gap-3">
       {members.map((member, index) => (
-        <div key={member.id} className="flex items-center gap-3 rounded-10 border border-border px-4 py-3.5">
+        <div key={member.id} className="flex items-center gap-2.5 rounded-10 border border-border px-3 py-2.5">
           <div
             className={cn(
-              'flex size-[calc(32px*var(--app-scale))] shrink-0 items-center justify-center rounded-full text-[calc(13px*var(--app-scale))] font-semibold text-white',
+              'flex size-[calc(30px*var(--app-scale))] shrink-0 items-center justify-center rounded-full text-[calc(13px*var(--app-scale))] font-semibold text-white',
               avatarClasses[index % avatarClasses.length],
             )}
           >

@@ -1,28 +1,52 @@
 import { http } from 'msw';
 import { biz, ok } from '@/mocks/http';
-import { createCollection, genId } from '@/mocks/db';
+import { genId } from '@/mocks/db';
 import type {
-  AdminRoleDto,
-  CreateAdminRoleInput,
   CreateRoleInput,
   PermissionTreeGroupDto,
+  RoleAuditLogDto,
+  RoleDataPermission,
   RoleDto,
-  RoleLogDto,
   RoleMemberDto,
   RolePermissionMap,
-} from '@/modules/admin/api/role.api';
-
-interface RolePermissionRow {
-  roleId: string;
-  permissions: RolePermissionMap;
-}
+} from '@/modules/admin/roles/api';
+import { normalizeRoleDataPermission } from '@/modules/admin/roles/api';
+import { createRoleMockDb, type RoleDataPermissionRow, type RolePermissionRow } from './db';
 
 const roleSeed: RoleDto[] = [
+  {
+    id: 'superadmin',
+    name: '超级管理员',
+    type: 'system',
+    desc: '负责平台全部功能、数据与安全策略管理',
+    memberDeptId: 'rd',
+  },
+  {
+    id: 'platform-owner',
+    name: '平台负责人',
+    type: 'system',
+    desc: '负责平台运营配置与跨部门业务协同',
+    memberDeptId: 'rd',
+  },
   { id: 'hr', name: '人事', type: 'system', desc: '负责人力资源相关审批与成员管理', memberDeptId: 'hr' },
   { id: 'fin', name: '财务', type: 'system', desc: '负责报销、预算等财务流程审批', memberDeptId: 'fin' },
   { id: 'it', name: 'IT', type: 'system', desc: '负责系统配置、账号与设备管理', memberDeptId: 'rd' },
   { id: 'legal', name: '法务', type: 'system', desc: '负责合同与合规相关流程审核', memberDeptId: 'admin' },
   { id: 'ops', name: '运营', type: 'custom', desc: '负责内容与文件资产的日常运营', memberDeptId: 'mkt' },
+  {
+    id: 'audit-reviewer',
+    name: '日志审计员',
+    type: 'custom',
+    desc: '负责安全审计与操作日志核查',
+    memberDeptId: 'admin',
+  },
+  {
+    id: 'file-manager',
+    name: '文件管理员',
+    type: 'custom',
+    desc: '负责企业文件资产的维护与授权',
+    memberDeptId: 'fin',
+  },
 ];
 
 const permissionTreeSeed: PermissionTreeGroupDto[] = [
@@ -85,7 +109,7 @@ const permissionTreeSeed: PermissionTreeGroupDto[] = [
     label: '安全审计',
     resources: [
       {
-        id: 'audit:op',
+        id: 'audit:oplog',
         label: '操作日志',
         code: 'audit:oplog',
         actions: [
@@ -130,7 +154,7 @@ const permissionTreeSeed: PermissionTreeGroupDto[] = [
       {
         id: 'notice:msg',
         label: '通知公告',
-        code: 'notice:notice',
+        code: 'notice:msg',
         actions: [
           { id: 'view', label: '查看' },
           { id: 'publish', label: '发布' },
@@ -162,6 +186,17 @@ const permissionTreeSeed: PermissionTreeGroupDto[] = [
           { id: 'edit', label: '编辑' },
         ],
       },
+      {
+        id: 'sys:dict',
+        label: '字典管理',
+        code: 'sys:dict',
+        actions: [
+          { id: 'view', label: '查看' },
+          { id: 'create', label: '新建' },
+          { id: 'update', label: '编辑' },
+          { id: 'delete', label: '删除' },
+        ],
+      },
     ],
   },
 ];
@@ -173,7 +208,7 @@ const permissionSeed: RolePermissionRow[] = [
       'iam:user': ['view', 'create', 'edit', 'del', 'resetpwd', 'assign'],
       'iam:dept': ['view', 'create', 'edit'],
       'iam:role': ['view'],
-      'audit:op': ['view'],
+      'audit:oplog': ['view'],
       'file:doc': ['view', 'upload', 'download'],
       'notice:msg': ['view'],
       'sys:org': ['view'],
@@ -183,7 +218,7 @@ const permissionSeed: RolePermissionRow[] = [
     roleId: 'fin',
     permissions: {
       'iam:user': ['view'],
-      'audit:op': ['view'],
+      'audit:oplog': ['view'],
       'file:doc': ['view', 'upload', 'download', 'rename', 'del', 'share'],
       'notice:msg': ['view'],
     },
@@ -194,19 +229,20 @@ const permissionSeed: RolePermissionRow[] = [
       'iam:user': ['view', 'create', 'edit', 'del', 'resetpwd', 'assign'],
       'iam:dept': ['view', 'create', 'edit', 'del'],
       'iam:role': ['view', 'create', 'edit', 'del', 'grant'],
-      'audit:op': ['view', 'export'],
+      'audit:oplog': ['view', 'export'],
       'audit:login': ['view', 'export'],
       'file:doc': ['view', 'upload', 'download', 'rename', 'del', 'share'],
       'notice:msg': ['view', 'publish', 'edit', 'del'],
       'sys:org': ['view', 'edit'],
       'sys:pref': ['view', 'edit'],
+      'sys:dict': ['view', 'create', 'update', 'delete'],
     },
   },
   {
     roleId: 'legal',
     permissions: {
       'iam:user': ['view'],
-      'audit:op': ['view', 'export'],
+      'audit:oplog': ['view', 'export'],
       'audit:login': ['view'],
       'file:doc': ['view', 'download'],
       'notice:msg': ['view'],
@@ -218,54 +254,98 @@ const permissionSeed: RolePermissionRow[] = [
       'iam:user': ['view'],
       'file:doc': ['view', 'upload', 'download', 'rename'],
       'notice:msg': ['view', 'publish', 'edit'],
-      'audit:op': ['view'],
+      'audit:oplog': ['view'],
     },
   },
 ];
 
-const adminRoleSeed: AdminRoleDto[] = [
-  { id: 'ar-super', name: '超级管理员', type: 'system', admin: '李长昕', scope: '全部权限' },
-  { id: 'ar-hr', name: '人事管理员', type: 'system', admin: '郑晓琳', scope: '人事管理模式、组织架构 +1' },
-  { id: 'ar-audit', name: '日志审计员', type: 'custom', admin: '吴俊豪', scope: '日志审计、数据报表' },
-  { id: 'ar-file', name: '文件管理员', type: 'custom', admin: '黄志强', scope: '文件管理' },
-];
-
-const roleLogSeed: Record<string, RoleLogDto[]> = {
-  hr: [
-    { id: 'hr-log-1', kind: 'grant', who: '李长昕', text: '授予 郑晓琳 此角色', time: '2 小时前' },
-    { id: 'hr-log-2', kind: 'add', who: '陈雨桐', text: '新增权限 成员与部门·分配角色', time: '昨天' },
-    { id: 'hr-log-3', kind: 'edit', who: '李长昕', text: '修改角色描述', time: '3 天前' },
-    { id: 'hr-log-4', kind: 'create', who: '系统', text: '角色创建', time: '2025-06-18' },
-  ],
-  fin: [
-    { id: 'fin-log-1', kind: 'add', who: '李长昕', text: '新增权限 文件管理·分享', time: '1 天前' },
-    { id: 'fin-log-2', kind: 'grant', who: '郑晓琳', text: '授予 吴俊豪 此角色', time: '2 天前' },
-    { id: 'fin-log-3', kind: 'create', who: '系统', text: '角色创建', time: '2025-06-18' },
-  ],
-  it: [
-    { id: 'it-log-1', kind: 'grant', who: '李长昕', text: '授予 黄志强 此角色', time: '5 小时前' },
-    { id: 'it-log-2', kind: 'add', who: '李长昕', text: '新增权限 系统设置·编辑', time: '昨天' },
-    { id: 'it-log-3', kind: 'remove', who: '陈雨桐', text: '移除权限 登录日志·导出', time: '4 天前' },
-    { id: 'it-log-4', kind: 'create', who: '系统', text: '角色创建', time: '2025-06-18' },
-  ],
-  legal: [
-    { id: 'legal-log-1', kind: 'add', who: '李长昕', text: '新增权限 操作日志·导出', time: '昨天' },
-    { id: 'legal-log-2', kind: 'create', who: '系统', text: '角色创建', time: '2025-06-18' },
-  ],
-  ops: [
-    { id: 'ops-log-1', kind: 'grant', who: '李长昕', text: '授予 王小明 此角色', time: '2 小时前' },
-    { id: 'ops-log-2', kind: 'add', who: '陈雨桐', text: '新增权限 通知公告·发布', time: '昨天' },
-    { id: 'ops-log-3', kind: 'remove', who: '李长昕', text: '移除权限 成员与部门·删除', time: '3 天前' },
-    { id: 'ops-log-4', kind: 'create', who: '系统', text: '角色创建', time: '2026-01-12' },
-  ],
+const defaultDataPermission: RoleDataPermission = {
+  defaultScope: 'dept',
+  defaultDepartmentIds: [],
+  resources: {
+    members: { scope: 'inherit', departmentIds: [] },
+    files: { scope: 'inherit', departmentIds: [] },
+    notices: { scope: 'inherit', departmentIds: [] },
+    auditLogs: { scope: 'self', departmentIds: [] },
+  },
 };
 
+const dataPermissionSeed: RoleDataPermissionRow[] = roleSeed.map((role) => ({
+  roleId: role.id,
+  permission:
+    role.id === 'superadmin'
+      ? {
+          defaultScope: 'all',
+          defaultDepartmentIds: [],
+          resources: {
+            members: { scope: 'inherit', departmentIds: [] },
+            files: { scope: 'inherit', departmentIds: [] },
+            notices: { scope: 'inherit', departmentIds: [] },
+            auditLogs: { scope: 'inherit', departmentIds: [] },
+          },
+        }
+      : defaultDataPermission,
+}));
+
+const roleAuditLogSeed: RoleAuditLogDto[] = [
+  {
+    id: 'audit-fin-share',
+    occurredAt: '2026-07-09 15:42',
+    operator: '李长昕',
+    roleId: 'fin',
+    roleName: '财务',
+    kind: 'grant',
+    change: '新增功能权限：文件管理 · 分享',
+  },
+  {
+    id: 'audit-hr-member',
+    occurredAt: '2026-07-09 10:18',
+    operator: '陈雨桐',
+    roleId: 'hr',
+    roleName: '人事',
+    kind: 'grant',
+    change: '授予郑晓琳人事角色',
+  },
+  {
+    id: 'audit-it-scope',
+    occurredAt: '2026-07-08 17:06',
+    operator: '李长昕',
+    roleId: 'it',
+    roleName: 'IT',
+    kind: 'dataScope',
+    change: '数据范围调整为本部门及下级部门',
+  },
+  {
+    id: 'audit-ops-permission',
+    occurredAt: '2026-07-08 11:30',
+    operator: '陈雨桐',
+    roleId: 'ops',
+    roleName: '运营',
+    kind: 'remove',
+    change: '移除功能权限：成员与部门 · 删除',
+  },
+];
+
 const memberSeed = [
-  { id: 'u1', name: '李长昕', deptId: 'rd', deptLabel: '产品研发中心', title: '超级管理员', status: 'active' },
+  {
+    id: 'u1',
+    name: '李长昕',
+    deptId: 'rd',
+    deptLabel: '产品研发中心',
+    title: '超级管理员',
+    status: 'active',
+  },
   { id: 'u2', name: '王思远', deptId: 'rd_fe', deptLabel: '前端组', title: '开发工程师', status: 'active' },
   { id: 'u3', name: '陈嘉怡', deptId: 'rd_be', deptLabel: '后端组', title: '开发工程师', status: 'active' },
   { id: 'u4', name: '赵敏杰', deptId: 'rd_be', deptLabel: '后端组', title: '开发工程师', status: 'active' },
-  { id: 'u5', name: '刘婉婷', deptId: 'rd_qa', deptLabel: '测试组', title: '测试工程师', status: 'unactivated' },
+  {
+    id: 'u5',
+    name: '刘婉婷',
+    deptId: 'rd_qa',
+    deptLabel: '测试组',
+    title: '测试工程师',
+    status: 'unactivated',
+  },
   { id: 'u6', name: '孙浩然', deptId: 'mkt', deptLabel: '市场营销部', title: '市场专员', status: 'active' },
   { id: 'u7', name: '周雅雯', deptId: 'mkt', deptLabel: '市场营销部', title: '市场经理', status: 'active' },
   { id: 'u8', name: '吴俊豪', deptId: 'hr', deptLabel: '人力资源部', title: 'HRBP', status: 'active' },
@@ -284,12 +364,21 @@ const deptCovers: Record<string, string[]> = {
   admin: ['admin'],
 };
 
-const roles = createCollection<RoleDto, 'id'>(roleSeed, 'id');
-const rolePermissions = createCollection<RolePermissionRow, 'roleId'>(permissionSeed, 'roleId');
-const adminRoles = createCollection<AdminRoleDto, 'id'>(adminRoleSeed, 'id');
+const { roles, rolePermissions, roleDataPermissions, roleAuditLogs } = createRoleMockDb({
+  roles: roleSeed,
+  permissions: permissionSeed,
+  dataPermissions: dataPermissionSeed,
+  auditLogs: roleAuditLogSeed,
+});
 
 function clonePermissions(permissions: RolePermissionMap): RolePermissionMap {
-  return Object.fromEntries(Object.entries(permissions).map(([resourceId, actions]) => [resourceId, [...actions]]));
+  return Object.fromEntries(
+    Object.entries(permissions).map(([resourceId, actions]) => [resourceId, [...actions]]),
+  );
+}
+
+function cloneDataPermission(permission: RoleDataPermission): RoleDataPermission {
+  return structuredClone(permission);
 }
 
 function membersForRole(role: RoleDto | undefined): RoleMemberDto[] {
@@ -300,8 +389,24 @@ function membersForRole(role: RoleDto | undefined): RoleMemberDto[] {
     .map(({ id, name, deptLabel, title }) => ({ id, name, deptLabel, title }));
 }
 
+function appendRoleAudit(role: RoleDto, kind: RoleAuditLogDto['kind'], change: string) {
+  roleAuditLogs.insert({
+    id: genId('role-audit'),
+    occurredAt: new Date().toISOString(),
+    operator: '李长昕',
+    roleId: role.id,
+    roleName: role.name,
+    kind,
+    change,
+  });
+}
+
 export const roleHandlers = [
   http.get('/api/roles', () => ok(roles.all())),
+
+  http.get('/api/role-audit-logs', () =>
+    ok([...roleAuditLogs.all()].sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))),
+  ),
 
   http.post('/api/roles', async ({ request }) => {
     const body = (await request.json()) as CreateRoleInput;
@@ -314,6 +419,8 @@ export const roleHandlers = [
       desc: body.desc?.trim() || '自定义业务角色',
     });
     rolePermissions.insert({ roleId: role.id, permissions: {} });
+    roleDataPermissions.insert({ roleId: role.id, permission: cloneDataPermission(defaultDataPermission) });
+    appendRoleAudit(role, 'create', '创建角色');
     return ok(role);
   }),
 
@@ -328,11 +435,30 @@ export const roleHandlers = [
 
   http.put('/api/roles/:id/permissions', async ({ params, request }) => {
     const id = String(params.id);
-    if (!roles.find(id)) return biz(4040, '角色不存在');
+    const role = roles.find(id);
+    if (!role) return biz(4040, '角色不存在');
     const permissions = clonePermissions((await request.json()) as RolePermissionMap);
     const updated = rolePermissions.update(id, { permissions });
     if (!updated) rolePermissions.insert({ roleId: id, permissions });
+    appendRoleAudit(role, 'grant', '更新角色功能权限');
     return ok(permissions);
+  }),
+
+  http.get('/api/roles/:id/data-permissions', ({ params }) => {
+    const id = String(params.id);
+    if (!roles.find(id)) return biz(4040, '角色不存在');
+    return ok(cloneDataPermission(roleDataPermissions.find(id)?.permission ?? defaultDataPermission));
+  }),
+
+  http.put('/api/roles/:id/data-permissions', async ({ params, request }) => {
+    const id = String(params.id);
+    const role = roles.find(id);
+    if (!role) return biz(4040, '角色不存在');
+    const permission = normalizeRoleDataPermission((await request.json()) as RoleDataPermission);
+    const updated = roleDataPermissions.update(id, { permission });
+    if (!updated) roleDataPermissions.insert({ roleId: id, permission });
+    appendRoleAudit(role, 'dataScope', '更新角色数据权限');
+    return ok(cloneDataPermission(permission));
   }),
 
   http.get('/api/roles/:id/members', ({ params }) => {
@@ -340,35 +466,15 @@ export const roleHandlers = [
     return role ? ok(membersForRole(role)) : biz(4040, '角色不存在');
   }),
 
-  http.get('/api/roles/:id/logs', ({ params }) => {
-    const id = String(params.id);
-    if (!roles.find(id)) return biz(4040, '角色不存在');
-    return ok(roleLogSeed[id] ?? [{ id: `${id}-log-create`, kind: 'create', who: '系统', text: '角色创建', time: '刚刚' }]);
-  }),
-
   http.delete('/api/roles/:id', ({ params }) => {
     const id = String(params.id);
     const role = roles.find(id);
     if (!role) return biz(4040, '角色不存在');
     if (role.type === 'system') return biz(4004, '系统角色不可删除');
+    appendRoleAudit(role, 'remove', '删除角色');
     roles.remove(id);
     rolePermissions.remove(id);
+    roleDataPermissions.remove(id);
     return ok(null);
-  }),
-
-  http.get('/api/admin-roles', () => ok(adminRoles.all())),
-
-  http.post('/api/admin-roles', async ({ request }) => {
-    const body = (await request.json()) as CreateAdminRoleInput;
-    const name = body.name.trim();
-    if (!name || !body.admin) return biz(4001, '角色名称和管理员不能为空');
-    const role = adminRoles.insert({
-      id: genId('admin-role'),
-      name,
-      type: 'custom',
-      admin: body.admin,
-      scope: body.scope?.trim() || '指定模块管理权限',
-    });
-    return ok(role);
   }),
 ];

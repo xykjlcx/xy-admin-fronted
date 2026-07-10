@@ -1,7 +1,7 @@
 import { Bell, Folder, List, Network, Shield, SlidersHorizontal } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import type { TriState } from './types';
+import type { TriState } from '../types';
 
 export function TriStateButton({
   state,

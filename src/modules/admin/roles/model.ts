@@ -1,12 +1,4 @@
-import type {
-  CreateAdminRoleInput,
-  CreateRoleInput,
-  PermissionResourceDto,
-  RoleLogKind,
-  RolePermissionMap,
-} from '@/modules/admin/api/role.api';
-
-export const adminGridTemplate = '1.2fr 1fr 1.8fr calc(140px * var(--app-scale))';
+import type { CreateRoleInput, PermissionResourceDto, RolePermissionMap } from '@/modules/admin/roles/api';
 
 export const avatarClasses = [
   'bg-(--accent-emphasis)',
@@ -17,19 +9,12 @@ export const avatarClasses = [
   'bg-(--accent-emphasis) text-white',
 ];
 
-export const logToneClass: Record<RoleLogKind, string> = {
-  grant: 'bg-success-soft text-success',
-  add: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)',
-  remove: 'bg-danger-soft text-danger',
-  edit: 'bg-warning-soft text-warning',
-  create: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)',
-};
-
 export const emptyRoleDraft: CreateRoleInput = { name: '', desc: '' };
-export const emptyAdminDraft: CreateAdminRoleInput = { name: '', admin: '' };
 
 export function clonePermissions(permissions: RolePermissionMap): RolePermissionMap {
-  return Object.fromEntries(Object.entries(permissions).map(([resourceId, actions]) => [resourceId, [...actions]]));
+  return Object.fromEntries(
+    Object.entries(permissions).map(([resourceId, actions]) => [resourceId, [...actions]]),
+  );
 }
 
 export function cleanPermissions(permissions: RolePermissionMap): RolePermissionMap {

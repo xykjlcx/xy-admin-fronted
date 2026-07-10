@@ -6,63 +6,69 @@ import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
 import { PageFrame, PageSurface, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
 import { matchPermission } from '@/lib/permission';
 import {
-  adminRolesQuery,
   permissionTreeQuery,
   roleApi,
-  roleLogsQuery,
+  roleAuditLogsQuery,
+  roleDataPermissionsQuery,
+  roleKeys,
   roleMembersQuery,
   rolePermissionsQuery,
   rolesQuery,
-  type CreateAdminRoleInput,
   type CreateRoleInput,
+  type RoleDataPermission,
   type RoleDto,
   type RolePermissionMap,
-} from '@/modules/admin/api/role.api';
-import { usersQuery } from '@/modules/admin/api/user.api';
-import { AdminRolesPanel } from './AdminRolesPanel';
-import { CreateAdminRoleDialog, CreateRoleDialog } from './RoleDialogs';
-import { RoleDetailsPanel } from './RoleDetailsPanel';
+} from '@/modules/admin/roles/api';
+import { deptsQuery } from '@/modules/admin/users/api';
+import { CreateRoleDialog } from '../form/RoleDialogs';
+import { RoleAuditLogsPanel } from './RoleAuditLogsPanel';
+import { RoleDetailsPanel } from '../detail/RoleDetailsPanel';
 import { RoleListPanel } from './RoleListPanel';
-import type { DetailTab, PageTab, RolesViewProps, SelectableMemberDto } from './types';
+import type { DetailTab, PageTab, RolesViewProps } from '../types';
 
-export type { RolesViewProps, SelectableMemberDto };
+export type { RolesViewProps };
 
 const emptyRolePermissions: RolePermissionMap = {};
+const emptyRoleDataPermission: RoleDataPermission = {
+  defaultScope: 'self',
+  defaultDepartmentIds: [],
+  resources: {},
+};
 
-interface RolesPageProps {
+export interface RolesPageProps {
   permissions: string[];
   roleId: string;
   onRoleIdChange: (roleId: string) => void;
 }
 
-export function RolesPage({ permissions, roleId, onRoleIdChange }: RolesPageProps) {
-  // Page 层把左侧角色列表、右侧详情 tabs、管理员角色等数据统一编排。
-  // 具体 tab 内容继续拆到 RoleDetailsPanel/RoleMembersPanel 等子组件，保持每块职责单一。
+export function RolesScene({ permissions, roleId, onRoleIdChange }: RolesPageProps) {
   const { t } = useTranslation('admin');
   const queryClient = useQueryClient();
   const { data: roles } = useSuspenseQuery(rolesQuery);
   const { data: permissionTree } = useSuspenseQuery(permissionTreeQuery);
-  const { data: adminRoles } = useSuspenseQuery(adminRolesQuery);
-  const activeRoleId = roles.some((role) => role.id === roleId) ? roleId : roles[0]?.id ?? '';
-
+  const { data: departments } = useSuspenseQuery(deptsQuery);
+  const activeRoleId = roles.some((role) => role.id === roleId) ? roleId : (roles[0]?.id ?? '');
   const rolePermissionsResult = useQuery({
     ...rolePermissionsQuery(activeRoleId),
+    enabled: !!activeRoleId,
+  });
+  const roleDataPermissionResult = useQuery({
+    ...roleDataPermissionsQuery(activeRoleId),
     enabled: !!activeRoleId,
   });
   const roleMembersResult = useQuery({
     ...roleMembersQuery(activeRoleId),
     enabled: !!activeRoleId,
   });
-  const roleLogsResult = useQuery({
-    ...roleLogsQuery(activeRoleId),
-    enabled: !!activeRoleId,
-  });
-  const usersResult = useQuery(usersQuery({ page: 1, pageSize: 50, status: 'all', keyword: '' }));
+  const roleAuditLogsResult = useQuery(roleAuditLogsQuery);
 
   const createRole = useMutation({
     mutationFn: roleApi.createRole,
     onSuccess: async (role) => {
-      await queryClient.invalidateQueries({ queryKey: ['iam', 'roles'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: roleKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
+      ]);
       onRoleIdChange(role.id);
       toast.success(t('roles.toast.created'));
     },
@@ -70,7 +76,10 @@ export function RolesPage({ permissions, roleId, onRoleIdChange }: RolesPageProp
   const deleteRole = useMutation({
     mutationFn: roleApi.deleteRole,
     onSuccess: async (_data, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['iam', 'roles'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: roleKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
+      ]);
       const nextRole = roles.find((role) => role.id !== id);
       onRoleIdChange(nextRole?.id ?? '');
       toast.success(t('roles.toast.deleted'));
@@ -80,23 +89,30 @@ export function RolesPage({ permissions, roleId, onRoleIdChange }: RolesPageProp
     mutationFn: ({ id, rolePermissions }: { id: string; rolePermissions: RolePermissionMap }) =>
       roleApi.saveRolePermissions(id, rolePermissions),
     onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['iam', 'rolePermissions', variables.id] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: roleKeys.permissions(variables.id) }),
+        queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
+      ]);
       toast.success(t('roles.toast.permissionsSaved'));
     },
   });
-  const createAdminRole = useMutation({
-    mutationFn: roleApi.createAdminRole,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['iam', 'adminRoles'] });
-      toast.success(t('roles.toast.adminCreated'));
+  const saveRoleDataPermissions = useMutation({
+    mutationFn: ({ id, permission }: { id: string; permission: RoleDataPermission }) =>
+      roleApi.saveRoleDataPermissions(id, permission),
+    onSuccess: async (_data, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: roleKeys.dataPermissions(variables.id) }),
+        queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
+      ]);
+      toast.success(t('roles.toast.dataPermissionsSaved'));
     },
   });
 
   const roleDetailLoading =
-    rolePermissionsResult.isPending || roleMembersResult.isPending || roleLogsResult.isPending;
+    rolePermissionsResult.isPending || roleDataPermissionResult.isPending || roleMembersResult.isPending;
   const roleDetailRefreshing =
     !roleDetailLoading &&
-    (rolePermissionsResult.isFetching || roleMembersResult.isFetching || roleLogsResult.isFetching);
+    (rolePermissionsResult.isFetching || roleDataPermissionResult.isFetching || roleMembersResult.isFetching);
 
   return (
     <RolesView
@@ -105,12 +121,13 @@ export function RolesPage({ permissions, roleId, onRoleIdChange }: RolesPageProp
       activeRoleId={activeRoleId}
       permissionTree={permissionTree}
       rolePermissions={rolePermissionsResult.data ?? emptyRolePermissions}
+      roleDataPermission={roleDataPermissionResult.data ?? emptyRoleDataPermission}
+      departments={departments.map(({ id, name }) => ({ id, name }))}
       roleMembers={roleMembersResult.data ?? []}
-      roleLogs={roleLogsResult.data ?? []}
-      adminRoles={adminRoles}
-      selectableMembers={(usersResult.data?.list ?? []).map((user) => ({ id: user.id, name: user.name }))}
+      roleAuditLogs={roleAuditLogsResult.data ?? []}
       roleDetailLoading={roleDetailLoading}
       roleDetailRefreshing={roleDetailRefreshing}
+      roleAuditLogsLoading={roleAuditLogsResult.isPending}
       onActiveRoleChange={onRoleIdChange}
       onCreateRole={async (dto: CreateRoleInput) => {
         await createRole.mutateAsync(dto);
@@ -121,8 +138,8 @@ export function RolesPage({ permissions, roleId, onRoleIdChange }: RolesPageProp
       onSaveRolePermissions={async (id: string, rolePermissions: RolePermissionMap) => {
         await saveRolePermissions.mutateAsync({ id, rolePermissions });
       }}
-      onCreateAdminRole={async (dto: CreateAdminRoleInput) => {
-        await createAdminRole.mutateAsync(dto);
+      onSaveRoleDataPermissions={async (id: string, permission: RoleDataPermission) => {
+        await saveRoleDataPermissions.mutateAsync({ id, permission });
       }}
     />
   );
@@ -134,17 +151,18 @@ export function RolesView({
   activeRoleId,
   permissionTree,
   rolePermissions,
+  roleDataPermission,
+  departments,
   roleMembers,
-  roleLogs,
-  adminRoles,
-  selectableMembers,
+  roleAuditLogs,
   roleDetailLoading = false,
   roleDetailRefreshing = false,
+  roleAuditLogsLoading = false,
   onActiveRoleChange,
   onCreateRole,
   onDeleteRole,
   onSaveRolePermissions,
-  onCreateAdminRole,
+  onSaveRoleDataPermissions,
 }: RolesViewProps) {
   const { t } = useTranslation('admin');
   const activeRole = roles.find((role) => role.id === activeRoleId) ?? roles[0];
@@ -152,15 +170,13 @@ export function RolesView({
   const [pageTab, setPageTab] = useState<PageTab>('roles');
   const [detailTab, setDetailTab] = useState<DetailTab>('permissions');
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
-  const [adminDialogOpen, setAdminDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<RoleDto | null>(null);
   const canCreateRole = matchPermission(permissions, 'iam:role:create');
   const canDeleteRole = matchPermission(permissions, 'iam:role:del');
   const canGrant = matchPermission(permissions, 'iam:role:grant');
-  const canCreateAdmin = matchPermission(permissions, 'iam:admin:create');
   const pageTabItems: PageTabItem<PageTab>[] = [
     { value: 'roles', label: t('roles.tabs.roles') },
-    { value: 'admins', label: t('roles.tabs.admins') },
+    { value: 'auditLogs', label: t('roles.tabs.auditLogs') },
   ];
 
   const confirmDeleteRole = async () => {
@@ -168,7 +184,6 @@ export function RolesView({
     try {
       await onDeleteRole(deleteTarget.id);
     } catch {
-      // 失败时保留弹窗，错误 toast 由全局 MutationCache 兜底。
       return;
     }
     setDeleteTarget(null);
@@ -194,16 +209,17 @@ export function RolesView({
             />
             <main
               data-role-detail-shell
-              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-l border-(--page-section-divider) px-7 py-[calc(22px*var(--app-scale))]"
+              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain border-l border-(--page-section-divider) px-(--page-scene-px) py-(--page-scene-py)"
             >
               <RoleDetailsPanel
                 activeRole={activeRole}
                 currentRoleId={currentRoleId}
                 detailTab={detailTab}
                 roleMembers={roleMembers}
-                roleLogs={roleLogs}
                 permissionTree={permissionTree}
                 rolePermissions={rolePermissions}
+                roleDataPermission={roleDataPermission}
+                departments={departments}
                 roleDetailLoading={roleDetailLoading}
                 roleDetailRefreshing={roleDetailRefreshing}
                 canDeleteRole={canDeleteRole}
@@ -211,25 +227,16 @@ export function RolesView({
                 onDetailTabChange={setDetailTab}
                 onDeleteRole={setDeleteTarget}
                 onSaveRolePermissions={onSaveRolePermissions}
+                onSaveRoleDataPermissions={onSaveRoleDataPermissions}
               />
             </main>
           </div>
         ) : (
-          <AdminRolesPanel
-            adminRoles={adminRoles}
-            canCreateAdmin={canCreateAdmin}
-            onCreateAdmin={() => setAdminDialogOpen(true)}
-          />
+          <RoleAuditLogsPanel logs={roleAuditLogs} roles={roles} loading={roleAuditLogsLoading} />
         )}
       </PageSurface>
 
       <CreateRoleDialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen} onCreateRole={onCreateRole} />
-      <CreateAdminRoleDialog
-        open={adminDialogOpen}
-        selectableMembers={selectableMembers}
-        onOpenChange={setAdminDialogOpen}
-        onCreateAdminRole={onCreateAdminRole}
-      />
       <ConfirmDialog
         open={!!deleteTarget}
         title={t('roles.dialog.deleteRoleTitle')}

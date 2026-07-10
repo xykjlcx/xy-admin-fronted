@@ -1,15 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 import {
-  adminRolesQuery,
   permissionTreeQuery,
-  roleLogsQuery,
+  roleAuditLogsQuery,
+  roleDataPermissionsQuery,
   roleMembersQuery,
   rolePermissionsQuery,
   rolesQuery,
-} from '@/modules/admin/api/role.api';
-import { usersQuery } from '@/modules/admin/api/user.api';
-import { RolesPage } from '@/modules/admin/pages/roles';
+} from '@/modules/admin/roles/api';
+import { deptsQuery } from '@/modules/admin/users/api';
+import { RolesPage } from '@/modules/admin/roles';
 
 // roleId 放在 URL search 中，让“选中某个角色”可刷新、可复制链接，也不会触发 Shell 重建。
 const searchSchema = z.object({
@@ -25,23 +25,19 @@ export const Route = createFileRoute('/_auth/admin/roles')({
     const [roles] = await Promise.all([
       context.queryClient.ensureQueryData(rolesQuery),
       context.queryClient.ensureQueryData(permissionTreeQuery),
-      context.queryClient.ensureQueryData(adminRolesQuery),
+      context.queryClient.ensureQueryData(deptsQuery),
+      context.queryClient.ensureQueryData(roleAuditLogsQuery),
     ]);
-    const activeRoleId = roles.some((role) => role.id === deps.roleId)
-      ? deps.roleId
-      : roles[0]?.id ?? '';
+    const activeRoleId = roles.some((role) => role.id === deps.roleId) ? deps.roleId : (roles[0]?.id ?? '');
 
     await Promise.all([
       activeRoleId
         ? context.queryClient.ensureQueryData(rolePermissionsQuery(activeRoleId))
         : Promise.resolve(),
+      activeRoleId ? context.queryClient.ensureQueryData(roleMembersQuery(activeRoleId)) : Promise.resolve(),
       activeRoleId
-        ? context.queryClient.ensureQueryData(roleMembersQuery(activeRoleId))
+        ? context.queryClient.ensureQueryData(roleDataPermissionsQuery(activeRoleId))
         : Promise.resolve(),
-      activeRoleId ? context.queryClient.ensureQueryData(roleLogsQuery(activeRoleId)) : Promise.resolve(),
-      context.queryClient.ensureQueryData(
-        usersQuery({ page: 1, pageSize: 50, status: 'all', keyword: '' }),
-      ),
     ]);
   },
   staticData: {
@@ -52,7 +48,6 @@ export const Route = createFileRoute('/_auth/admin/roles')({
       { code: 'iam:role:create', labelKey: 'roles.actions.addRole' },
       { code: 'iam:role:del', labelKey: 'roles.actions.deleteRole' },
       { code: 'iam:role:grant', labelKey: 'roles.actions.savePermissions' },
-      { code: 'iam:admin:create', labelKey: 'roles.actions.createAdmin' },
     ],
   },
   component: RolesRoute,

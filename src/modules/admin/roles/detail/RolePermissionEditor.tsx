@@ -10,10 +10,16 @@ import type {
   PermissionResourceDto,
   PermissionTreeGroupDto,
   RolePermissionMap,
-} from '@/modules/admin/api/role.api';
-import { PermissionGroupIcon, TriStateButton } from './PermissionControls';
-import { actionList, cleanPermissions, clonePermissions } from './model';
-import type { PermissionDraftState, PermissionDraftUpdater, TriState } from './types';
+} from '@/modules/admin/roles/api';
+import { PermissionGroupIcon, TriStateButton } from '../components/PermissionControls';
+import { actionList, cleanPermissions, clonePermissions } from '../model';
+import type { PermissionDraftState, PermissionDraftUpdater, TriState } from '../types';
+
+interface PermissionCollapseState {
+  roleId: string;
+  source: PermissionTreeGroupDto[];
+  collapsedIds: string[];
+}
 
 export function RolePermissionEditor({
   roleId,
@@ -30,7 +36,15 @@ export function RolePermissionEditor({
 }) {
   const { t } = useTranslation('admin');
   const [permissionKeyword, setPermissionKeyword] = useState('');
-  const [collapsedGroupIds, setCollapsedGroupIds] = useState<string[]>([]);
+  const defaultCollapsedGroupIds = useMemo(
+    () => permissionTree.slice(1).map((group) => group.id),
+    [permissionTree],
+  );
+  const [permissionCollapseState, setPermissionCollapseState] = useState<PermissionCollapseState>(() => ({
+    roleId,
+    source: permissionTree,
+    collapsedIds: permissionTree.slice(1).map((group) => group.id),
+  }));
   const [permissionDraftState, setPermissionDraftState] = useState<PermissionDraftState>(() => ({
     roleId,
     source: rolePermissions,
@@ -42,7 +56,10 @@ export function RolePermissionEditor({
       ? permissionDraftState.draft
       : clonePermissions(rolePermissions);
   const permissionActionSets = useMemo(
-    () => new Map(Object.entries(draftPermissions).map(([resourceId, actions]) => [resourceId, new Set(actions)])),
+    () =>
+      new Map(
+        Object.entries(draftPermissions).map(([resourceId, actions]) => [resourceId, new Set(actions)]),
+      ),
     [draftPermissions],
   );
   const permissionStats = useMemo(() => {
@@ -59,9 +76,14 @@ export function RolePermissionEditor({
     return { total, granted, pct: total ? Math.round((granted / total) * 100) : 0 };
   }, [draftPermissions, permissionTree]);
   const allGroupIds = useMemo(() => permissionTree.map((group) => group.id), [permissionTree]);
+  const collapsedGroupIds =
+    permissionCollapseState.roleId === roleId && permissionCollapseState.source === permissionTree
+      ? permissionCollapseState.collapsedIds
+      : defaultCollapsedGroupIds;
   const allGroupsCollapsed =
     allGroupIds.length > 0 && allGroupIds.every((groupId) => collapsedGroupIds.includes(groupId));
-  const allPermissionsGranted = permissionStats.total > 0 && permissionStats.granted === permissionStats.total;
+  const allPermissionsGranted =
+    permissionStats.total > 0 && permissionStats.granted === permissionStats.total;
   const filteredPermissionTree = useMemo(() => {
     const keyword = permissionKeyword.trim().toLowerCase();
     if (!keyword) return permissionTree;
@@ -137,28 +159,47 @@ export function RolePermissionEditor({
     }
     updateDraftPermissions(
       Object.fromEntries(
-        permissionTree.flatMap((group) => group.resources.map((resource) => [resource.id, actionList(resource)])),
+        permissionTree.flatMap((group) =>
+          group.resources.map((resource) => [resource.id, actionList(resource)]),
+        ),
       ) as RolePermissionMap,
     );
   };
   const toggleGroupCollapsed = (groupId: string) => {
-    setCollapsedGroupIds((current) =>
-      current.includes(groupId) ? current.filter((id) => id !== groupId) : [...current, groupId],
-    );
+    setPermissionCollapseState((current) => {
+      const collapsedIds =
+        current.roleId === roleId && current.source === permissionTree
+          ? current.collapsedIds
+          : defaultCollapsedGroupIds;
+      return {
+        roleId,
+        source: permissionTree,
+        collapsedIds: collapsedIds.includes(groupId)
+          ? collapsedIds.filter((id) => id !== groupId)
+          : [...collapsedIds, groupId],
+      };
+    });
   };
   const toggleAllGroupsCollapsed = () => {
-    setCollapsedGroupIds(allGroupsCollapsed ? [] : allGroupIds);
+    setPermissionCollapseState({
+      roleId,
+      source: permissionTree,
+      collapsedIds: allGroupsCollapsed ? [] : allGroupIds,
+    });
   };
   const toggleAllPermissions = () => {
     setAllPermissions(!allPermissionsGranted);
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div data-role-permission-action-bar className="mb-4 flex flex-wrap items-center justify-between gap-3.5">
+    <div className="flex flex-col">
+      <div
+        data-role-permission-action-bar
+        className="mb-3 flex flex-wrap items-center justify-between gap-2.5"
+      >
         <div
           data-role-permission-progress
-          className="flex min-w-[calc(260px*var(--app-scale))] flex-1 items-center gap-3.5"
+          className="flex min-w-[calc(260px*var(--app-scale))] flex-1 items-center gap-3"
         >
           <div className="flex shrink-0 items-center gap-2">
             <KeyRound className="size-4 text-(--accent-emphasis)" />
@@ -188,12 +229,7 @@ export function RolePermissionEditor({
             placeholder={t('roles.permissionSearchPlaceholder')}
             onChange={(event) => setPermissionKeyword(event.target.value)}
           />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={toggleAllGroupsCollapsed}
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={toggleAllGroupsCollapsed}>
             {allGroupsCollapsed ? (
               <ChevronsDown data-icon="inline-start" />
             ) : (
@@ -215,7 +251,7 @@ export function RolePermissionEditor({
                 onClick={toggleAllPermissions}
               >
                 {!allPermissionsGranted && <Check data-icon="inline-start" />}
-                {t(allPermissionsGranted ? 'roles.actions.clear' : 'roles.actions.grantAll')}
+                {t(allPermissionsGranted ? 'roles.actions.cancelAll' : 'roles.actions.grantAll')}
               </Button>
               <span
                 data-role-permission-action-separator
@@ -225,14 +261,10 @@ export function RolePermissionEditor({
               <div data-role-permission-save-actions className="flex items-center gap-1.5">
                 <Button
                   type="button"
-                  variant="outline"
                   size="sm"
-                  onClick={() => updateDraftPermissions(clonePermissions(rolePermissions))}
+                  onClick={() => onSave(roleId, cleanPermissions(draftPermissions))}
                 >
-                  {t('roles.actions.reset')}
-                </Button>
-                <Button type="button" size="sm" onClick={() => onSave(roleId, cleanPermissions(draftPermissions))}>
-                  {t('roles.actions.savePermissions')}
+                  {t('roles.actions.save')}
                 </Button>
               </div>
             </>
@@ -240,30 +272,36 @@ export function RolePermissionEditor({
         </div>
       </div>
 
-      <div
-        data-role-tab-content-scroll
-        data-role-permission-panel-scroll
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6 pr-1"
-      >
-        <div className="flex flex-col gap-3">
-          {filteredPermissionTree.length > 0 ? (
-            filteredPermissionTree.map((group) => {
+      <div data-role-tab-content-scroll data-role-permission-panel-scroll className="pb-6 pr-1">
+        {filteredPermissionTree.length > 0 ? (
+          <div data-role-permission-groups className="overflow-hidden rounded-12 bg-(--table-bg)">
+            {filteredPermissionTree.map((group) => {
               const collapsed = collapsedGroupIds.includes(group.id);
               const groupGranted = group.resources.reduce(
                 (count, resource) =>
                   count + resource.actions.filter((action) => hasAction(resource.id, action.id)).length,
                 0,
               );
-              const groupTotal = group.resources.reduce((count, resource) => count + resource.actions.length, 0);
+              const groupTotal = group.resources.reduce(
+                (count, resource) => count + resource.actions.length,
+                0,
+              );
 
               return (
-                <div key={group.id} className="overflow-hidden rounded-12 border border-border">
-                  <div className="flex h-[calc(52px*var(--app-scale))] items-center gap-3 bg-(--table-header-bg) px-4">
+                <section
+                  key={group.id}
+                  data-role-permission-group
+                  className="border-t border-(--table-row-border) first:border-t-0"
+                >
+                  <div className="flex h-(--table-row-h) items-center gap-3 bg-(--table-header-bg) px-4">
                     <Button
                       type="button"
-                      aria-label={t(collapsed ? 'roles.permission.expandGroup' : 'roles.permission.collapseGroup', {
-                        group: group.label,
-                      })}
+                      aria-label={t(
+                        collapsed ? 'roles.permission.expandGroup' : 'roles.permission.collapseGroup',
+                        {
+                          group: group.label,
+                        },
+                      )}
                       aria-expanded={!collapsed}
                       variant="ghost"
                       size="icon-xs"
@@ -303,20 +341,19 @@ export function RolePermissionEditor({
                       {group.resources.map((resource) => (
                         <div
                           key={resource.id}
-                          className="flex items-start gap-3.5 border-t border-border px-[calc(18px*var(--app-scale))] py-3.5"
+                          className="flex items-center gap-3 border-t border-(--table-row-border) px-4 py-1.5"
                         >
                           <TriStateButton
                             state={resourceState(resource)}
                             ariaLabel={t('roles.permission.toggleResource', { resource: resource.label })}
                             disabled={!canGrant}
-                            className="mt-0.5"
                             onClick={() => toggleResource(resource)}
                           />
-                          <div className="w-[calc(150px*var(--app-scale))] shrink-0">
+                          <div className="w-[calc(140px*var(--app-scale))] shrink-0">
                             <div className="text-sm font-medium text-text">{resource.label}</div>
                             <div className="mt-0.5 text-xs tabular-nums text-text-3">{resource.code}</div>
                           </div>
-                          <div className="flex flex-1 flex-wrap gap-2">
+                          <div className="flex flex-1 flex-wrap gap-1.5">
                             {resource.actions.map((action) => {
                               const on = hasAction(resource.id, action.id);
                               return (
@@ -329,7 +366,7 @@ export function RolePermissionEditor({
                                   })}
                                   disabled={!canGrant}
                                   variant={on ? 'text' : 'outline'}
-                                  size="sm"
+                                  size="xs"
                                   className={cn(
                                     on
                                       ? 'border border-(--accent-emphasis) bg-(--accent-emphasis-soft) text-(--accent-emphasis) hover:bg-(--accent-emphasis-soft)'
@@ -347,13 +384,13 @@ export function RolePermissionEditor({
                       ))}
                     </div>
                   </div>
-                </div>
+                </section>
               );
-            })
-          ) : (
-            <Empty title={t('roles.noPermissionResult')} className="rounded-12 border border-border py-12" />
-          )}
-        </div>
+            })}
+          </div>
+        ) : (
+          <Empty title={t('roles.noPermissionResult')} className="rounded-12 border border-border py-12" />
+        )}
       </div>
     </div>
   );
