@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: metabuilder
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://127.0.0.1:54329/metabuilder}
+    username: ${DB_USERNAME:metabuilder}
+    password: ${DB_PASSWORD:}
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:63799}
+  flyway:
+    enabled: false
+
+metabuilder:
+  auth:
+    token-secret: ${METABUILDER_AUTH_TOKEN_SECRET:}
+  cors:
+    allowed-origins: ${METABUILDER_CORS_ALLOWED_ORIGINS:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-components: always
+      show-details: never
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db,redis
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+server:
+  shutdown: graceful
