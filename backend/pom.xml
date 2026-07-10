@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.metabuilder</groupId>
+  <groupId>com.metabuild</groupId>
   <artifactId>metabuilder-parent</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
@@ -49,47 +49,47 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.metabuilder</groupId>
+        <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-app</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.metabuilder</groupId>
+        <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-shared-kernel</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.metabuilder</groupId>
+        <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-admin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.metabuilder</groupId>
+        <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-schema-platform</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.metabuilder</groupId>
+        <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-schema-lastmile</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.metabuilder</groupId>
+        <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-infrastructure</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.metabuilder</groupId>
+        <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-api-contract</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.metabuilder</groupId>
+        <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-admin</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.metabuilder</groupId>
+        <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-lastmile</artifactId>
         <version>${project.version}</version>
       </dependency>

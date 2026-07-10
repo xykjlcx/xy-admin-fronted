@@ -7,6 +7,8 @@ REPO_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 VERIFIER="${SCRIPT_DIR}/verify-reactor.sh"
 TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/metabuilder-reactor-contract.XXXXXX")"
 failures=0
+legacy_namespace="com.meta""builder"
+legacy_namespace_path="com/meta""builder"
 
 cleanup() {
   rm -r "${TEMP_DIR}"
@@ -86,11 +88,52 @@ expect_verifier_failure \
   "backend/.env.example must be committable" \
   "missing .env.example exception is rejected"
 
+legacy_pom_fixture="$(make_fixture legacy-namespace-pom)"
+awk -v legacy_namespace="${legacy_namespace}" '
+  !injected && /^[[:space:]]*<artifactId>metabuilder-parent<\/artifactId>[[:space:]]*$/ {
+    print
+    print "  <description>" legacy_namespace " namespace mutation</description>"
+    injected = 1
+    next
+  }
+  { print }
+' "${legacy_pom_fixture}/backend/pom.xml" \
+  >"${legacy_pom_fixture}/backend/pom.xml.tmp"
+mv \
+  "${legacy_pom_fixture}/backend/pom.xml.tmp" \
+  "${legacy_pom_fixture}/backend/pom.xml"
+expect_verifier_failure \
+  "${legacy_pom_fixture}" \
+  "canonical namespace must be com.metabuild" \
+  "legacy namespace in POM content is rejected"
+
+legacy_package_fixture="$(make_fixture legacy-namespace-package)"
+legacy_package_file="${legacy_package_fixture}/backend/app/src/main/java/com/metabuild/app/LegacyNamespaceProbe.java"
+mkdir -p "$(dirname "${legacy_package_file}")"
+printf '%s\n' \
+  "package ${legacy_namespace}.app;" \
+  '' \
+  'final class LegacyNamespaceProbe {}' \
+  >"${legacy_package_file}"
+expect_verifier_failure \
+  "${legacy_package_fixture}" \
+  "canonical namespace must be com.metabuild" \
+  "legacy Java package declaration is rejected"
+
+legacy_path_fixture="$(make_fixture legacy-namespace-path)"
+legacy_path_file="${legacy_path_fixture}/backend/app/src/main/java/${legacy_namespace_path}/path/LegacyPathProbe.txt"
+mkdir -p "$(dirname "${legacy_path_file}")"
+printf '%s\n' 'legacy path mutation' >"${legacy_path_file}"
+expect_verifier_failure \
+  "${legacy_path_fixture}" \
+  "canonical namespace must be com.metabuild" \
+  "legacy namespace source path is rejected"
+
 dependency_fixture="$(make_fixture extra-lastmile-dependency)"
 awk '
   !injected && /^[[:space:]]*<\/dependencies>[[:space:]]*$/ {
     print "    <dependency>"
-    print "      <groupId>com.metabuilder</groupId>"
+    print "      <groupId>com.metabuild</groupId>"
     print "      <artifactId>metabuilder-infrastructure</artifactId>"
     print "    </dependency>"
     injected = 1

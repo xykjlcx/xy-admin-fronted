@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.metabuilder</groupId>
+    <groupId>com.metabuild</groupId>
     <artifactId>metabuilder-parent</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
@@ -15,19 +15,19 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.metabuilder</groupId>
+      <groupId>com.metabuild</groupId>
       <artifactId>metabuilder-admin</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.metabuilder</groupId>
+      <groupId>com.metabuild</groupId>
       <artifactId>metabuilder-lastmile</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.metabuilder</groupId>
+      <groupId>com.metabuild</groupId>
       <artifactId>metabuilder-infrastructure</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.metabuilder</groupId>
+      <groupId>com.metabuild</groupId>
       <artifactId>metabuilder-api-contract</artifactId>
     </dependency>
   </dependencies>

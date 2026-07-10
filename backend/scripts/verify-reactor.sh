@@ -36,6 +36,27 @@ pass "Java 21"
 root_pom="${BACKEND_DIR}/pom.xml"
 require_file "${root_pom}"
 
+legacy_namespace="com.meta""builder"
+legacy_namespace_path="com/meta""builder"
+
+if grep -R -F -q \
+  --exclude-dir=target \
+  --exclude='.flattened-pom.xml' \
+  -e "${legacy_namespace}" \
+  -e "${legacy_namespace_path}" \
+  "${BACKEND_DIR}"; then
+  fail "canonical namespace must be com.metabuild"
+fi
+
+if find "${BACKEND_DIR}" \
+  -path '*/target' -prune -o \
+  -name '.flattened-pom.xml' -prune -o \
+  -path "*${legacy_namespace_path}*" -print -quit \
+  | grep -q .; then
+  fail "canonical namespace must be com.metabuild"
+fi
+pass "canonical namespace com.metabuild"
+
 modules=(
   "app"
   "shared-kernel"
@@ -49,15 +70,15 @@ modules=(
 )
 
 package_dirs=(
-  "com/metabuilder/app"
-  "com/metabuilder/shared/kernel"
-  "com/metabuilder/admin/api"
-  "com/metabuilder/schema/platform"
-  "com/metabuilder/schema/lastmile"
-  "com/metabuilder/infrastructure"
-  "com/metabuilder/api/contract"
-  "com/metabuilder/modules/admin"
-  "com/metabuilder/modules/lastmile"
+  "com/metabuild/app"
+  "com/metabuild/shared/kernel"
+  "com/metabuild/admin/api"
+  "com/metabuild/schema/platform"
+  "com/metabuild/schema/lastmile"
+  "com/metabuild/infrastructure"
+  "com/metabuild/api/contract"
+  "com/metabuild/modules/admin"
+  "com/metabuild/modules/lastmile"
 )
 
 marker_classes=(
