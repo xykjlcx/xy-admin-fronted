@@ -32,19 +32,118 @@ const appearanceState = {
 
 const prototypeScenarios = [
   { key: 'login', file: 'prototype-login.png' },
+  { key: 'register', file: 'prototype-register.png' },
+  { key: 'forgot', file: 'prototype-forgot.png' },
   { key: 'dashboard', file: 'prototype-dashboard.png' },
   { key: 'users', file: 'prototype-users.png' },
   { key: 'roles', file: 'prototype-roles.png' },
   { key: 'menus', file: 'prototype-menus.png' },
+  { key: 'messages', file: 'prototype-messages.png' },
+  { key: 'logs', file: 'prototype-logs.png' },
+  { key: 'files', file: 'prototype-files.png' },
+  { key: 'company', file: 'prototype-company.png' },
+  { key: 'dictionaries', file: 'prototype-dictionaries.png' },
+  { key: 'profile', file: 'prototype-profile.png' },
+  { key: 'lastmile-overview', file: 'prototype-lastmile-overview.png' },
+  { key: 'lastmile-shipments', file: 'prototype-lastmile-shipments.png' },
+  { key: 'lastmile-customers', file: 'prototype-lastmile-customers.png' },
+  { key: 'lastmile-channels', file: 'prototype-lastmile-channels.png' },
+  { key: 'lastmile-carriers', file: 'prototype-lastmile-carriers.png' },
+  { key: 'lastmile-suppliers', file: 'prototype-lastmile-suppliers.png' },
+  { key: 'lastmile-billing', file: 'prototype-lastmile-billing.png' },
 ];
 
 const appScenarios = [
   { key: 'login', file: 'app-login.png', url: '/login', requiresAuth: false },
+  { key: 'register', file: 'app-register.png', url: '/register', requiresAuth: false },
+  { key: 'forgot', file: 'app-forgot.png', url: '/forgot-password', requiresAuth: false },
   { key: 'dashboard', file: 'app-dashboard.png', url: '/admin/dashboard', requiresAuth: true },
-  { key: 'users', file: 'app-users.png', url: '/admin/users?page=1&pageSize=10&status=all&keyword=', requiresAuth: true },
+  {
+    key: 'users',
+    file: 'app-users.png',
+    url: '/admin/users?page=1&pageSize=10&status=all&keyword=',
+    requiresAuth: true,
+  },
   { key: 'roles', file: 'app-roles.png', url: '/admin/roles', requiresAuth: true },
   { key: 'menus', file: 'app-menus.png', url: '/admin/menus', requiresAuth: true },
+  { key: 'messages', file: 'app-messages.png', url: '/admin/messages', requiresAuth: true },
+  { key: 'logs', file: 'app-logs.png', url: '/admin/logs', requiresAuth: true },
+  { key: 'files', file: 'app-files.png', url: '/admin/files', requiresAuth: true },
+  { key: 'company', file: 'app-company.png', url: '/admin/company', requiresAuth: true },
+  { key: 'dictionaries', file: 'app-dictionaries.png', url: '/admin/dictionaries', requiresAuth: true },
+  { key: 'profile', file: 'app-profile.png', url: '/admin/profile', requiresAuth: true },
+  {
+    key: 'lastmile-overview',
+    file: 'app-lastmile-overview.png',
+    url: '/lastmile/overview',
+    requiresAuth: true,
+  },
+  {
+    key: 'lastmile-shipments',
+    file: 'app-lastmile-shipments.png',
+    url: '/lastmile/shipments',
+    requiresAuth: true,
+  },
+  {
+    key: 'lastmile-customers',
+    file: 'app-lastmile-customers.png',
+    url: '/lastmile/customers',
+    requiresAuth: true,
+  },
+  {
+    key: 'lastmile-channels',
+    file: 'app-lastmile-channels.png',
+    url: '/lastmile/channels',
+    requiresAuth: true,
+  },
+  {
+    key: 'lastmile-carriers',
+    file: 'app-lastmile-carriers.png',
+    url: '/lastmile/carriers',
+    requiresAuth: true,
+  },
+  {
+    key: 'lastmile-suppliers',
+    file: 'app-lastmile-suppliers.png',
+    url: '/lastmile/suppliers',
+    requiresAuth: true,
+  },
+  { key: 'lastmile-billing', file: 'app-lastmile-billing.png', url: '/lastmile/billing', requiresAuth: true },
 ];
+
+const prototypePageByScenario = {
+  dashboard: 'dashboard',
+  users: 'users',
+  roles: 'roles',
+  menus: 'menus',
+  messages: 'messages',
+  logs: 'logs',
+  files: 'files',
+  company: 'settings',
+  dictionaries: 'dict',
+  profile: 'profile',
+};
+
+const completedAdminScaleScenarios = appScenarios.filter(
+  (scenario) =>
+    scenario.requiresAuth &&
+    scenario.url.startsWith('/admin/') &&
+    !['dashboard', 'users', 'roles', 'menus'].includes(scenario.key),
+);
+
+const completedLastmileScaleScenarios = appScenarios.filter((scenario) =>
+  scenario.url.startsWith('/lastmile/'),
+);
+
+const prototypeLastmileNavigation = {
+  'lastmile-overview': '运营概览',
+  'lastmile-shipments': '运单列表',
+  'lastmile-customers': '客户账户',
+  'lastmile-channels': '物流渠道',
+  'lastmile-carriers': '承运商管理',
+  'lastmile-suppliers': '供应商管理',
+  'lastmile-billing': '客户账单',
+};
 
 function agent(session, args, options = {}) {
   const globalArgs = ['--session', session];
@@ -120,7 +219,9 @@ async function ensureDevServer() {
     return { reused: true, stop: async () => undefined };
   }
   if (await isUrlReady(loginUrl)) {
-    throw new Error(`${baseOrigin} is responding but is not this M0 app. Stop that server or set M0_VISUAL_BASE_URL to a free local port.`);
+    throw new Error(
+      `${baseOrigin} is responding but is not this M0 app. Stop that server or set M0_VISUAL_BASE_URL to a free local port.`,
+    );
   }
 
   const viteBin = path.join(root, 'node_modules', '.bin', 'vite');
@@ -154,6 +255,10 @@ function setViewport(session) {
   agent(session, ['set', 'viewport', String(viewport.width), String(viewport.height)]);
 }
 
+function setStableMedia(session) {
+  agent(session, ['set', 'media', 'light', 'reduced-motion']);
+}
+
 function clickPrototypeText(session, text) {
   evalIn(
     session,
@@ -177,10 +282,25 @@ function clickPrototypeText(session, text) {
 function assertPrototypeScreen(session, key) {
   const expectedText = {
     login: '欢迎回来',
+    register: '创建账号',
+    forgot: '找回密码',
     dashboard: '小倪科技',
     users: '成员与部门',
     roles: '角色与权限',
-    menus: '子系统管理',
+    menus: '菜单管理',
+    messages: '消息中心',
+    logs: '日志审计',
+    files: '文件管理',
+    company: '企业信息',
+    dictionaries: '字典管理',
+    profile: '个人中心',
+    'lastmile-overview': '最近运单',
+    'lastmile-shipments': '运单列表',
+    'lastmile-customers': '客户账户',
+    'lastmile-channels': '物流渠道',
+    'lastmile-carriers': '承运商管理',
+    'lastmile-suppliers': '供应商管理',
+    'lastmile-billing': '客户账单',
   }[key];
   evalIn(
     session,
@@ -203,6 +323,7 @@ async function capturePrototypeBaselines() {
   for (const scenario of prototypeScenarios) {
     agent(prototypeSession, ['open', prototypeUrl], { allowFileAccess: true });
     setViewport(prototypeSession);
+    setStableMedia(prototypeSession);
     evalIn(
       prototypeSession,
       `
@@ -213,7 +334,7 @@ async function capturePrototypeBaselines() {
       window.__dcSetProps(rootName, ${JSON.stringify({
         defaultFlavor: 'feishu',
         defaultLayout: 'sidebar',
-        defaultPage: 'dashboard',
+        defaultPage: prototypePageByScenario[scenario.key] ?? 'dashboard',
         flavor: 'feishu',
         dark: false,
         density: 'md',
@@ -223,19 +344,30 @@ async function capturePrototypeBaselines() {
       rootName;
       `,
     );
-    if (scenario.key === 'users') {
-      clickPrototypeText(prototypeSession, '成员与部门');
-    }
-    if (scenario.key === 'roles') {
-      clickPrototypeText(prototypeSession, '角色与权限');
-    }
-    if (scenario.key === 'menus') {
-      clickPrototypeText(prototypeSession, '菜单管理');
-    }
-    if (scenario.key === 'login') {
+    if (['login', 'register', 'forgot'].includes(scenario.key)) {
       clickPrototypeText(prototypeSession, '李长昕');
       agent(prototypeSession, ['wait', '250']);
       clickPrototypeText(prototypeSession, '退出登录');
+      agent(prototypeSession, ['wait', '250']);
+    }
+    if (scenario.key === 'register') {
+      clickPrototypeText(prototypeSession, '注册');
+    }
+    if (scenario.key === 'forgot') {
+      clickPrototypeText(prototypeSession, '忘记密码?');
+    }
+    if (scenario.key === 'profile') {
+      clickPrototypeText(prototypeSession, '李长昕');
+      agent(prototypeSession, ['wait', '250']);
+      clickPrototypeText(prototypeSession, '个人中心');
+    }
+    const lastmileTarget = prototypeLastmileNavigation[scenario.key];
+    if (lastmileTarget) {
+      clickPrototypeText(prototypeSession, '后台管理');
+      agent(prototypeSession, ['wait', '250']);
+      clickPrototypeText(prototypeSession, '尾程快递');
+      agent(prototypeSession, ['wait', '350']);
+      if (scenario.key !== 'lastmile-overview') clickPrototypeText(prototypeSession, lastmileTarget);
     }
     agent(prototypeSession, ['wait', '700']);
     assertPrototypeScreen(prototypeSession, scenario.key);
@@ -329,10 +461,25 @@ function loginAsAdmin(session) {
 function assertAppScreen(session, key) {
   const expectedText = {
     login: '登录',
+    register: '创建账号',
+    forgot: '找回密码',
     dashboard: '小倪科技',
     users: '成员与部门',
     roles: '角色与权限',
-    menus: '子系统管理',
+    menus: '菜单管理',
+    messages: '消息中心',
+    logs: '日志审计',
+    files: '文件管理',
+    company: '企业信息',
+    dictionaries: '字典管理',
+    profile: '个人中心',
+    'lastmile-overview': '运营概览',
+    'lastmile-shipments': '运单列表',
+    'lastmile-customers': '客户账户',
+    'lastmile-channels': '物流渠道',
+    'lastmile-carriers': '承运商管理',
+    'lastmile-suppliers': '供应商管理',
+    'lastmile-billing': '客户账单',
   }[key];
   evalIn(
     session,
@@ -357,6 +504,7 @@ async function captureAppScreens() {
 
   try {
     setViewport(appSession);
+    setStableMedia(appSession);
     agent(appSession, ['open', new URL('/login', baseOrigin).href]);
     agent(appSession, ['wait', '700']);
     resetAppState(appSession);
@@ -370,6 +518,7 @@ async function captureAppScreens() {
       agent(appSession, ['open', new URL(scenario.url, baseOrigin).href]);
       agent(appSession, ['wait', '1200']);
       assertAppScreen(appSession, scenario.key);
+      assertNoHorizontalOverflow(appSession);
 
       const output = path.join(reportDir, scenario.file);
       agent(appSession, ['screenshot', output]);
@@ -383,7 +532,8 @@ async function captureAppScreens() {
         { allowFailure: true },
       );
       const diffOutputText = [diff.stdout, diff.stderr].filter(Boolean).join('\n');
-      const visualMatch = diff.ok && !diffOutputText.includes('pixels differ') && !diffOutputText.includes('✗');
+      const visualMatch =
+        diff.ok && !diffOutputText.includes('pixels differ') && !diffOutputText.includes('✗');
       diffs.push({
         key: scenario.key,
         ok: visualMatch,
@@ -517,8 +667,10 @@ function assertDetailSheet(session) {
   evalIn(
     session,
     `
-    const detailButton = [...document.querySelectorAll('button')].find((item) => item.textContent?.trim() === '详情');
-    if (!detailButton) throw new Error('detail button not found');
+    const detailButton = [...document.querySelectorAll('tbody button')].find(
+      (item) => item.textContent?.trim() === '李长昕',
+    );
+    if (!detailButton) throw new Error('member detail trigger not found');
     detailButton.click();
     true;
     `,
@@ -538,13 +690,13 @@ function assertDetailSheet(session) {
   );
 }
 
-function assertRoleDialog(session) {
+function assertRoleDataPermissions(session) {
   evalIn(
     session,
     `
-    const adminTab = [...document.querySelectorAll('button')].find((item) => item.textContent?.trim() === '管理员权限');
-    if (!adminTab) throw new Error('admin permissions tab not found');
-    adminTab.click();
+    const dataTab = [...document.querySelectorAll('[role="tab"]')].find((item) => item.textContent?.trim() === '数据权限');
+    if (!dataTab) throw new Error('data permissions tab not found');
+    dataTab.click();
     true;
     `,
   );
@@ -552,23 +704,18 @@ function assertRoleDialog(session) {
   evalIn(
     session,
     `
-    const createButton = [...document.querySelectorAll('button')].find((item) => item.textContent?.includes('创建管理员角色'));
-    if (!createButton) throw new Error('create admin role button not found');
-    createButton.click();
-    true;
-    `,
-  );
-  agent(session, ['wait', '400']);
-  evalIn(
-    session,
-    `
-    const dialog = document.querySelector('[role="dialog"]');
-    if (!dialog || !dialog.textContent?.includes('创建管理员角色')) throw new Error('admin role dialog not found');
-    const rect = dialog.getBoundingClientRect();
-    if (rect.left < -1 || rect.top < -1 || rect.right > window.innerWidth + 1 || rect.bottom > window.innerHeight + 1) {
-      throw new Error('role dialog out of viewport: ' + JSON.stringify(rect.toJSON()));
+    const editor = document.querySelector('[data-role-data-permission-editor]');
+    const table = editor?.querySelector('table');
+    const tableContainer = table?.parentElement;
+    const defaultScope = editor?.querySelector('[aria-label="角色默认数据范围"]');
+    const saveButton = [...(editor?.querySelectorAll('button') ?? [])].find((item) => item.textContent?.trim() === '保存数据权限');
+    if (!editor || !table || !tableContainer || !defaultScope || !saveButton) {
+      throw new Error('data permissions editor incomplete');
     }
-    rect.toJSON();
+    if (tableContainer.scrollWidth > tableContainer.clientWidth + 1) {
+      throw new Error('data permissions table overflow: ' + tableContainer.scrollWidth + ' > ' + tableContainer.clientWidth);
+    }
+    ({ tableWidth: table.scrollWidth, containerWidth: tableContainer.clientWidth });
     `,
   );
 }
@@ -577,21 +724,41 @@ function assertMenuDialog(session) {
   evalIn(
     session,
     `
-    const editButton = [...document.querySelectorAll('button')].find((item) => item.getAttribute('aria-label') === '编辑企业概览');
+    const overviewTreeItem = document.querySelector('[role="treeitem"][aria-label="企业概览 m-dashboard"]');
+    if (!overviewTreeItem) throw new Error('overview menu tree item not found');
+    overviewTreeItem.click();
+    true;
+    `,
+  );
+  agent(session, ['wait', '150']);
+  evalIn(
+    session,
+    `
+    const editButton = [...document.querySelectorAll('button')].find(
+      (item) => item.getAttribute('aria-label') === '编辑企业概览',
+    );
     if (!editButton) throw new Error('edit overview menu button not found');
     editButton.click();
     true;
     `,
   );
-  agent(session, ['wait', '400']);
+  agent(session, ['wait', '300']);
   evalIn(
     session,
     `
-    const dialog = document.querySelector('[role="dialog"]');
-    if (!dialog || !dialog.textContent?.includes('编辑菜单')) throw new Error('menu dialog not found');
+    const workspace = document.querySelector('[aria-label="菜单配置工作区"]');
+    const dialog = [...document.querySelectorAll('[role="dialog"]')].find((item) =>
+      item.textContent?.includes('编辑菜单'),
+    );
+    if (!workspace || !dialog) throw new Error('menu edit dialog not found');
     const rect = dialog.getBoundingClientRect();
-    if (rect.left < -1 || rect.top < -1 || rect.right > window.innerWidth + 1 || rect.bottom > window.innerHeight + 1) {
-      throw new Error('menu dialog out of viewport: ' + JSON.stringify(rect.toJSON()));
+    if (
+      rect.left < -1 ||
+      rect.top < -1 ||
+      rect.right > window.innerWidth + 1 ||
+      rect.bottom > window.innerHeight + 1
+    ) {
+      throw new Error('menu edit dialog out of viewport: ' + JSON.stringify(rect.toJSON()));
     }
     const normalize = (value) => value?.replace(/\\s+/g, '').trim() || '';
     const measureButton = (name) => {
@@ -627,8 +794,8 @@ function assertMenuDialog(session) {
       }
       return comparable[0];
     };
-    const toolbar = [measureButton('展开'), measureButton('折叠'), measureButton('新增菜单')];
-    const dialogFooter = [measureButton('取消'), measureButton('保存菜单')];
+    const toolbar = [measureButton('折叠'), measureButton('新增菜单')];
+    const dialogActions = [measureButton('取消'), measureButton('保存')];
     const formControls = [
       ...[...dialog.querySelectorAll('[data-slot="select-trigger"]')].map((item, index) => measureControl(item, 'select-' + index)),
       ...[...dialog.querySelectorAll('[data-slot="input"]')].map((item, index) => measureControl(item, 'input-' + index)),
@@ -642,11 +809,19 @@ function assertMenuDialog(session) {
       paddingRight,
       fontSize,
     }));
-    const formMetrics = assertSameMetrics('menu form controls and actions', [...formControls, ...dialogFooter], ({ height, fontSize }) => ({
+    const dialogActionMetrics = assertSameMetrics('menu dialog action buttons', dialogActions, ({ dataSize, height, paddingLeft, paddingRight, fontSize }) => ({
+      dataSize,
+      height,
+      paddingLeft,
+      paddingRight,
+      fontSize,
+    }));
+    const formMetrics = assertSameMetrics('menu form controls', formControls, ({ height, fontSize }) => ({
       height,
       fontSize,
     }));
     const expectedToolbarHeight = 30 * appScale;
+    const expectedDialogActionHeight = 32 * appScale;
     const expectedFormHeight = 36 * appScale;
     if (Math.abs(toolbarMetrics.height - expectedToolbarHeight) > 0.2) {
       throw new Error(
@@ -654,13 +829,19 @@ function assertMenuDialog(session) {
           JSON.stringify({ appScale, expectedToolbarHeight, toolbar }),
       );
     }
+    if (Math.abs(dialogActionMetrics.height - expectedDialogActionHeight) > 0.2) {
+      throw new Error(
+        'menu dialog action height does not follow app scale: ' +
+          JSON.stringify({ appScale, expectedDialogActionHeight, dialogActions }),
+      );
+    }
     if (Math.abs(formMetrics.height - expectedFormHeight) > 0.2) {
       throw new Error(
         'menu form control/action height does not follow app scale: ' +
-          JSON.stringify({ appScale, expectedFormHeight, formControls, dialogFooter }),
+          JSON.stringify({ appScale, expectedFormHeight, formControls }),
       );
     }
-    ({ rect: rect.toJSON(), toolbar, formControls, dialogFooter });
+    ({ rect: rect.toJSON(), toolbar, formControls, dialogActions });
     `,
   );
 }
@@ -672,10 +853,14 @@ async function runScaleChecks() {
 
   try {
     setViewport(appSession);
+    setStableMedia(appSession);
     loginAsAdmin(appSession);
 
     for (const zoom of ['sm', 'md', 'lg']) {
-      agent(appSession, ['open', new URL('/admin/users?page=1&pageSize=10&status=all&keyword=', baseOrigin).href]);
+      agent(appSession, [
+        'open',
+        new URL('/admin/users?page=1&pageSize=10&status=all&keyword=', baseOrigin).href,
+      ]);
       agent(appSession, ['wait', '1000']);
       setZoom(appSession, zoom);
       agent(appSession, ['wait', '300']);
@@ -693,10 +878,9 @@ async function runScaleChecks() {
       setZoom(appSession, zoom);
       agent(appSession, ['wait', '300']);
       assertNoHorizontalOverflow(appSession);
-      assertRoleDialog(appSession);
-      const rolesShot = path.join(reportDir, `app-roles-${zoom}-dialog.png`);
+      assertRoleDataPermissions(appSession);
+      const rolesShot = path.join(reportDir, `app-roles-${zoom}-data-permissions.png`);
       agent(appSession, ['screenshot', rolesShot]);
-      agent(appSession, ['press', 'Escape'], { allowFailure: true });
 
       agent(appSession, ['open', new URL('/admin/menus', baseOrigin).href]);
       agent(appSession, ['wait', '1000']);
@@ -708,18 +892,48 @@ async function runScaleChecks() {
       agent(appSession, ['screenshot', menusShot]);
       agent(appSession, ['press', 'Escape'], { allowFailure: true });
 
+      const adminPages = [];
+      for (const scenario of completedAdminScaleScenarios) {
+        agent(appSession, ['open', new URL(scenario.url, baseOrigin).href]);
+        agent(appSession, ['wait', '1000']);
+        setZoom(appSession, zoom);
+        agent(appSession, ['wait', '300']);
+        assertAppScreen(appSession, scenario.key);
+        assertNoHorizontalOverflow(appSession);
+        const pageShot = path.join(reportDir, `app-${scenario.key}-${zoom}.png`);
+        agent(appSession, ['screenshot', pageShot]);
+        adminPages.push({ key: scenario.key, file: path.relative(root, pageShot) });
+      }
+
+      const lastmilePages = [];
+      for (const scenario of completedLastmileScaleScenarios) {
+        agent(appSession, ['open', new URL(scenario.url, baseOrigin).href]);
+        agent(appSession, ['wait', '1000']);
+        setZoom(appSession, zoom);
+        agent(appSession, ['wait', '300']);
+        assertAppScreen(appSession, scenario.key);
+        assertNoHorizontalOverflow(appSession);
+        const pageShot = path.join(reportDir, `app-${scenario.key}-${zoom}.png`);
+        agent(appSession, ['screenshot', pageShot]);
+        lastmilePages.push({ key: scenario.key, file: path.relative(root, pageShot) });
+      }
+
       results.push({
         zoom,
         popover: path.relative(root, popoverShot),
         sheet: path.relative(root, sheetShot),
-        rolesDialog: path.relative(root, rolesShot),
+        roleDataPermissions: path.relative(root, rolesShot),
         menusDialog: path.relative(root, menusShot),
+        adminPages,
+        lastmilePages,
         assertions: [
           'no horizontal overflow',
           'status popover in viewport',
           'detail sheet in viewport',
-          'roles dialog in viewport',
-          'menus dialog in viewport',
+          'role data permissions fit viewport',
+          'menus edit dialog follows scale and fits viewport',
+          'completed Admin pages ready and without horizontal overflow',
+          'completed Lastmile pages ready and without horizontal overflow',
         ],
       });
     }
@@ -814,6 +1028,7 @@ async function runThemeMatrix() {
   const assertionLabel = 'page-ready / state-applied / no-horizontal-overflow / sera-computed-contracts';
   try {
     setViewport(appSession);
+    setStableMedia(appSession);
     loginAsAdmin(appSession);
     agent(appSession, ['open', new URL('/dev/theme-states', baseOrigin).href]);
     agent(appSession, ['wait', '1000']);
@@ -836,9 +1051,10 @@ async function runThemeMatrix() {
             mode,
             scale,
             file: path.relative(root, file),
-            assertions: flavor === 'sera'
-              ? ['state applied', 'no horizontal overflow', 'sera computed contracts']
-              : ['state applied', 'no horizontal overflow'],
+            assertions:
+              flavor === 'sera'
+                ? ['state applied', 'no horizontal overflow', 'sera computed contracts']
+                : ['state applied', 'no horizontal overflow'],
           });
         }
       }
@@ -888,13 +1104,23 @@ async function writeReport(data) {
   if (data.scale?.results?.length) {
     lines.push('## 显示比例三档', '');
     for (const item of data.scale.results) {
-      lines.push(`- ${item.zoom}: ${item.assertions.join(' / ')}；popover: ${item.popover}；sheet: ${item.sheet}；rolesDialog: ${item.rolesDialog}；menusDialog: ${item.menusDialog}`);
+      lines.push(
+        `- ${item.zoom}: ${item.assertions.join(' / ')}；popover: ${item.popover}；sheet: ${item.sheet}；roleDataPermissions: ${item.roleDataPermissions}；menusDialog: ${item.menusDialog}`,
+      );
+      for (const page of item.adminPages ?? []) {
+        lines.push(`  - ${page.key}: ${page.file}`);
+      }
+      for (const page of item.lastmilePages ?? []) {
+        lines.push(`  - ${page.key}: ${page.file}`);
+      }
     }
     lines.push('');
   }
   if (data.matrix?.cells?.length) {
     lines.push('## 主题矩阵（flavor × mode × scale）', '');
-    lines.push(`- 矩阵截图总数: ${data.matrix.actualCells ?? data.matrix.cells.length}/${data.matrix.expectedCells ?? data.matrix.cells.length}`);
+    lines.push(
+      `- 矩阵截图总数: ${data.matrix.actualCells ?? data.matrix.cells.length}/${data.matrix.expectedCells ?? data.matrix.cells.length}`,
+    );
     lines.push(`- 断言: ${data.matrix.assertionLabel ?? 'state-applied / no-horizontal-overflow'}`);
     lines.push(`- 水平溢出检查: ${data.matrix.noHorizontalOverflowPassed ? '全部通过' : '未全部通过'}`);
     for (const cell of data.matrix.cells) {

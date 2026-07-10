@@ -10,6 +10,24 @@
       }
     },
     {
+      "key": "register",
+      "file": "e2e/baseline/prototype-register.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "forgot",
+      "file": "e2e/baseline/prototype-forgot.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
       "key": "dashboard",
       "file": "e2e/baseline/prototype-dashboard.png",
       "source": "后台管理脚手架.dc.html",
@@ -39,6 +57,123 @@
     {
       "key": "menus",
       "file": "e2e/baseline/prototype-menus.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "messages",
+      "file": "e2e/baseline/prototype-messages.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "logs",
+      "file": "e2e/baseline/prototype-logs.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "files",
+      "file": "e2e/baseline/prototype-files.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "company",
+      "file": "e2e/baseline/prototype-company.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "dictionaries",
+      "file": "e2e/baseline/prototype-dictionaries.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "profile",
+      "file": "e2e/baseline/prototype-profile.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "lastmile-overview",
+      "file": "e2e/baseline/prototype-lastmile-overview.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "lastmile-shipments",
+      "file": "e2e/baseline/prototype-lastmile-shipments.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "lastmile-customers",
+      "file": "e2e/baseline/prototype-lastmile-customers.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "lastmile-channels",
+      "file": "e2e/baseline/prototype-lastmile-channels.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "lastmile-carriers",
+      "file": "e2e/baseline/prototype-lastmile-carriers.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "lastmile-suppliers",
+      "file": "e2e/baseline/prototype-lastmile-suppliers.png",
+      "source": "后台管理脚手架.dc.html",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "key": "lastmile-billing",
+      "file": "e2e/baseline/prototype-lastmile-billing.png",
       "source": "后台管理脚手架.dc.html",
       "viewport": {
         "width": 1440,
