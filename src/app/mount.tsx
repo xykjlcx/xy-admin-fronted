@@ -10,12 +10,15 @@ import { resetSession } from '@/lib/reset-auth';
 import { i18nInit } from '@/lib/i18n';
 import { assertMenuPathsValid } from '@/modules/registry';
 import { appConfig, featuresConfig } from '@/config';
+import { env } from '@/config/env';
+import { buildInternalRedirect, createHostHistory } from './host-routing';
 import '@/styles/global.css';
 
 // mount.tsx 是浏览器端应用装配层：路由、QueryClient、Provider、i18n 和全局事件都在这里接线。
 // 页面组件不应自己处理这些基础设施，否则会破坏 Shell 稳定性和请求缓存一致性。
 export const router = createRouter({
   routeTree,
+  history: createHostHistory(env.runtime),
   context: { queryClient },
   defaultPreload: 'intent',
   // 全局错误兜底：无此项时渲染期错误的 CatchBoundary 退化为 SafeFragment，错误冒泡到 React 根导致白屏（诊断 F2）。
@@ -40,7 +43,7 @@ const offAuthExpired = authEvents.on('expired', () => {
   // 不能再 navigate 或覆写 redirect（否则 redirect 会指向 /login 自身）。
   if (router.state.location.pathname === appConfig.routes.login) return;
   // 先捕获来源路径：导航后 window.location 会变成 /login，redirect 必须用导航前的值。
-  const redirect = location.pathname + location.search;
+  const redirect = buildInternalRedirect(router.state.location);
   void (async () => {
     await router.navigate({ to: appConfig.routes.login, search: { redirect } });
     await resetSession(null);

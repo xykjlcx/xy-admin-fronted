@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node", "electron", "vitest/globals"],
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "desktop.config.ts",
+    "electron.vite.config.ts",
+    "vite.renderer.config.ts",
+    "vitest.desktop.config.ts",
+    "electron/**/*.ts",
+    "scripts/**/*.test.ts",
+    "scripts/**/*.d.mts"
+  ],
+  "exclude": ["out", "release"]
+}

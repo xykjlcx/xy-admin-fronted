@@ -1,10 +1,4 @@
-import {
-  appConfig,
-  appearanceConfig,
-  createFeatureConfig,
-  createRequestConfig,
-  parseEnv,
-} from '@/config';
+import { appConfig, appearanceConfig, createFeatureConfig, createRequestConfig, parseEnv } from '@/config';
 // computeShouldStartMockWorker 未从 config barrel 导出（属入口门控内部实现），直接从 env 模块引入。
 import { computeShouldStartMockWorker } from '@/config/env';
 
@@ -13,6 +7,8 @@ test('parseEnv supplies stable defaults for local development', () => {
 
   expect(parsed).toMatchObject({
     mode: 'development',
+    runtime: 'web',
+    windowChrome: 'native',
     appEnv: 'development',
     appVersion: '0.1.0',
     apiBaseUrl: '',
@@ -24,19 +20,42 @@ test('parseEnv supplies stable defaults for local development', () => {
   });
 });
 
-test('feature config preserves mock gating rules', () => {
-  expect(createFeatureConfig(parseEnv({ MODE: 'development', DEV: true, PROD: false })).enableMock).toBe(true);
+test('parseEnv exposes a validated desktop host selection', () => {
   expect(
-    createFeatureConfig(
-      parseEnv({ MODE: 'development', DEV: true, PROD: false, VITE_ENABLE_MOCK: 'false' }),
-    ).enableMock,
+    parseEnv({
+      MODE: 'production',
+      DEV: false,
+      PROD: true,
+      VITE_DESKTOP_RUNTIME: 'true',
+      VITE_WINDOW_CHROME: 'integrated',
+    }),
+  ).toMatchObject({ runtime: 'desktop', windowChrome: 'integrated' });
+  expect(() =>
+    parseEnv({
+      MODE: 'production',
+      DEV: false,
+      PROD: true,
+      VITE_DESKTOP_RUNTIME: 'true',
+      VITE_WINDOW_CHROME: 'frameless',
+    }),
+  ).toThrow('VITE_WINDOW_CHROME');
+});
+
+test('feature config preserves mock gating rules', () => {
+  expect(createFeatureConfig(parseEnv({ MODE: 'development', DEV: true, PROD: false })).enableMock).toBe(
+    true,
+  );
+  expect(
+    createFeatureConfig(parseEnv({ MODE: 'development', DEV: true, PROD: false, VITE_ENABLE_MOCK: 'false' }))
+      .enableMock,
   ).toBe(false);
-  expect(createFeatureConfig(parseEnv({ MODE: 'production', DEV: false, PROD: true })).enableMock).toBe(false);
+  expect(createFeatureConfig(parseEnv({ MODE: 'production', DEV: false, PROD: true })).enableMock).toBe(
+    false,
+  );
   // 生产 + 显式开 mock 也必须是 false：worker 已被构建剥离，与 shouldStartMockWorker 保持同一真相
   expect(
-    createFeatureConfig(
-      parseEnv({ MODE: 'production', DEV: false, PROD: true, VITE_ENABLE_MOCK: 'true' }),
-    ).enableMock,
+    createFeatureConfig(parseEnv({ MODE: 'production', DEV: false, PROD: true, VITE_ENABLE_MOCK: 'true' }))
+      .enableMock,
   ).toBe(false);
   expect(createFeatureConfig(parseEnv({ MODE: 'demo', DEV: false, PROD: true })).enableMock).toBe(true);
 });

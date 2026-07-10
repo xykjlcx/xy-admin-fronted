@@ -4,14 +4,19 @@ import { z } from 'zod';
 // 其他层只消费解析后的配置对象，避免环境变量散落后失去校验和生产剥离能力。
 const appEnvSchema = z.enum(['local', 'development', 'test', 'staging', 'production', 'demo']);
 const localeSchema = z.enum(['zh-CN', 'en-US']);
+const windowChromeSchema = z.enum(['native', 'integrated']);
 
 export type AppEnvName = z.infer<typeof appEnvSchema>;
 export type LocaleCode = z.infer<typeof localeSchema>;
+export type HostRuntime = 'web' | 'desktop';
+export type WindowChromeMode = z.infer<typeof windowChromeSchema>;
 
 export interface ParsedEnv {
   mode: string;
   dev: boolean;
   prod: boolean;
+  runtime: HostRuntime;
+  windowChrome: WindowChromeMode;
   appEnv: AppEnvName;
   appVersion: string;
   apiBaseUrl: string;
@@ -60,13 +65,24 @@ function parseLocale(value: unknown): LocaleCode {
   return result.data;
 }
 
+function parseWindowChrome(runtime: HostRuntime, value: unknown): WindowChromeMode {
+  if (runtime === 'web') return 'native';
+  const result = windowChromeSchema.safeParse(value || 'native');
+  if (!result.success) throw new Error('VITE_WINDOW_CHROME must be native or integrated');
+  return result.data;
+}
+
 export function parseEnv(input: RawEnv): ParsedEnv {
   const mode = String(input.MODE || 'development');
+  const runtime: HostRuntime =
+    input.VITE_DESKTOP_RUNTIME === true || input.VITE_DESKTOP_RUNTIME === 'true' ? 'desktop' : 'web';
 
   return {
     mode,
     dev: parseBoolean(input.DEV, mode !== 'production'),
     prod: parseBoolean(input.PROD, mode === 'production'),
+    runtime,
+    windowChrome: parseWindowChrome(runtime, input.VITE_WINDOW_CHROME),
     appEnv: parseAppEnv(mode, input.VITE_APP_ENV),
     appVersion: String(input.VITE_APP_VERSION || '0.1.0'),
     apiBaseUrl: String(input.VITE_API_BASE_URL || ''),
@@ -74,7 +90,10 @@ export function parseEnv(input: RawEnv): ParsedEnv {
     requestTimeoutMs: parsePositiveInteger('VITE_REQUEST_TIMEOUT_MS', input.VITE_REQUEST_TIMEOUT_MS, 15000),
     enableMockOverride: parseBooleanOverride('VITE_ENABLE_MOCK', input.VITE_ENABLE_MOCK),
     enableDevtoolsOverride: parseBooleanOverride('VITE_ENABLE_DEVTOOLS', input.VITE_ENABLE_DEVTOOLS),
-    enableVisualDebugOverride: parseBooleanOverride('VITE_ENABLE_VISUAL_DEBUG', input.VITE_ENABLE_VISUAL_DEBUG),
+    enableVisualDebugOverride: parseBooleanOverride(
+      'VITE_ENABLE_VISUAL_DEBUG',
+      input.VITE_ENABLE_VISUAL_DEBUG,
+    ),
   };
 }
 
@@ -97,8 +116,7 @@ export function computeShouldStartMockWorker(source: {
 // 生产模式下即便 VITE_ENABLE_MOCK=true 也恒为 false —— 生产构建不允许 mock 接管网络，
 // 避免 MSW/faker 被打进生产包（配合 vite.config.ts 的构建期防呆双重兜底）。
 export const shouldStartMockWorker =
-  import.meta.env.MODE === 'demo' ||
-  (import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK !== 'false');
+  import.meta.env.MODE === 'demo' || (import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK !== 'false');
 
 export async function startMockWorkerIfEnabled(): Promise<boolean> {
   if (!shouldStartMockWorker) return false;

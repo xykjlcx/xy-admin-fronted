@@ -987,8 +987,12 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(css).toContain('--table-row-focus-ring: var(--soft);');
   expect(globalCss).toContain('.ui-table-row.ui-table-row:focus-visible');
   expect(globalCss).toContain('outline: var(--focus-ring) solid var(--table-row-focus-ring);');
-  expect(dataTableSource).toContain("surface === 'header' ? 'bg-(--table-header-bg)' : 'ui-table-pinned-cell'");
-  expect(dataTableSource).not.toContain("surface === 'header' ? 'bg-(--table-header-bg)' : 'bg-(--_table-row-bg)'");
+  expect(dataTableSource).toContain(
+    "surface === 'header' ? 'bg-(--table-header-bg)' : 'ui-table-pinned-cell'",
+  );
+  expect(dataTableSource).not.toContain(
+    "surface === 'header' ? 'bg-(--table-header-bg)' : 'bg-(--_table-row-bg)'",
+  );
   expect(globalCss).not.toContain(':has([aria-expanded');
 
   expect(pageScaffoldSource).toContain('bg-(--page-frame-bg)');
@@ -1060,9 +1064,13 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(globalCss).toContain('--page-pane-divider: transparent;');
   expect(globalCss).toContain('--page-section-divider: color-mix(in srgb, var(--border) 45%, transparent);');
   expect(globalCss).toContain('--page-inset-section-divider: var(--page-section-divider);');
-  expect(globalCss).toContain('--page-breadcrumb-divider: color-mix(in srgb, var(--border) 70%, transparent);');
+  expect(globalCss).toContain(
+    '--page-breadcrumb-divider: color-mix(in srgb, var(--border) 70%, transparent);',
+  );
   expect(globalCss).toContain('--table-shell-border: transparent;');
-  expect(globalCss).toContain('--table-row-border: color-mix(in srgb, var(--table-border) 54%, transparent);');
+  expect(globalCss).toContain(
+    '--table-row-border: color-mix(in srgb, var(--table-border) 54%, transparent);',
+  );
   expect(globalCss).toContain('--tabs-line-border: transparent;');
   expect(dataTableSource).not.toContain('border-(--table-shell-border)');
   expect(dataTableSource).toContain('border-(--table-row-border)');
@@ -1098,7 +1106,9 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(insetLayoutSource).not.toContain('<HeaderActions />');
   expect(navMenuInsetSource).toContain('{footer && !collapsed && (');
   expect(userMenuSource).toContain("const suppressSidebarFocusRestore = variant === 'sidebar';");
-  expect(userMenuSource).toContain('if (!suppressSidebarFocusRestore || !pointerTriggeredRef.current) return;');
+  expect(userMenuSource).toContain(
+    'if (!suppressSidebarFocusRestore || !pointerTriggeredRef.current) return;',
+  );
   expect(sideListSource).toContain('bg-(--side-list-bg)');
   expect(sideListSource).toContain('border-(--page-pane-divider)');
   expect(sideListSource).toContain('hover:bg-(--side-list-item-bg-hover)');
@@ -1248,15 +1258,17 @@ test('主题状态页暴露 DataTable 选择列三态对齐矩阵', () => {
 });
 
 test('DataTable 行操作守卫：两项平铺，三项以上进入菜单，并在主题状态页暴露', () => {
-  expect(dataTableRowActionsSource).toContain("actions.length <= 2");
+  expect(dataTableRowActionsSource).toContain('actions.length <= 2');
   expect(dataTableRowActionsSource).toContain('actions.slice(0, 1)');
   expect(dataTableRowActionsSource).toContain('actions.slice(1)');
   expect(dataTableRowActionsSource).toContain('<DropdownMenuGroup>');
-  expect(dataTableRowActionsSource).toContain("variant={action.tone === 'danger' ? 'destructive' : 'default'}");
+  expect(dataTableRowActionsSource).toContain(
+    "variant={action.tone === 'danger' ? 'destructive' : 'default'}",
+  );
   expect(dataTableRowActionsSource).not.toContain('@/modules/');
   expect(dataTableRowActionsSource).not.toContain('useTranslation');
 
-  expect(themeStatesSource).toContain("import { DataTableRowActions");
+  expect(themeStatesSource).toContain('import { DataTableRowActions');
   expect(themeStatesSource).toContain('const dataTableRowActions: DataTableRowAction[]');
   expect(themeStatesSource).toContain('actions={dataTableRowActions}');
   expect(themeStatesSource).toContain("overflowLabel={t('dev.themeStates.tableActionMore')}");
@@ -1311,15 +1323,17 @@ test('弹层阴影 token 与原型精确值一致', () => {
 // 以及 Task 14 的首帧防闪蓝——脚本必须读派生值注入 --pri（否则自选主题色首帧闪回蓝）。
 test('index.html FOUC 脚本契约不被静默删除（含 --pri 注入）', () => {
   const html = readFileSync('index.html', 'utf8');
-  expect(html).toContain('appearance');
-  expect(html).toContain('dataset.flavor');
-  expect(html).toContain('dataset.mode');
-  expect(html).toContain('--pri');
-  expect(html).toContain('--pri-active');
-  expect(html).toContain('--on-pri');
-  expect(html).toContain('_priResolved');
-  expect(html).toContain('_priActiveResolved');
-  expect(html).toContain('_onPriResolved');
+  const bootstrap = readFileSync('public/theme-bootstrap.js', 'utf8');
+  expect(html).toContain('src="%BASE_URL%theme-bootstrap.js"');
+  expect(bootstrap).toContain('appearance');
+  expect(bootstrap).toContain('dataset.flavor');
+  expect(bootstrap).toContain('dataset.mode');
+  expect(bootstrap).toContain('--pri');
+  expect(bootstrap).toContain('--pri-active');
+  expect(bootstrap).toContain('--on-pri');
+  expect(bootstrap).toContain('_priResolved');
+  expect(bootstrap).toContain('_priActiveResolved');
+  expect(bootstrap).toContain('_onPriResolved');
 });
 
 test('Tailwind source 限定在 src，避免 docs 里的示例 class 污染生产 CSS', () => {

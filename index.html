@@ -3,27 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="m0-app-id" content="admin-scaffold-frontend" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>通用后台管理</title>
     <!-- 契约：localStorage key 'appearance'（zustand persist {state} 结构）+ 默认值 feishu/light，与 src/stores/appearance.ts 同步。
          _priResolved/_priActiveResolved/_priSoftResolved/_onPriResolved 由 store 在主题色变更时写入，此处直接注入 --pri/--pri-active/--pri-soft/--on-pri，防自选主题色首帧闪回默认值。 -->
-    <script>
-      (function () {
-        try {
-          var s = JSON.parse(localStorage.getItem('appearance') || '{}').state || {};
-          var el = document.documentElement;
-          el.dataset.flavor = s.flavor || 'feishu';
-          el.dataset.mode = s.mode || 'light';
-          if (s.radius && s.radius !== 'default') el.dataset.radius = s.radius;
-          if (s.zoom && s.zoom !== 'md') el.dataset.zoom = s.zoom;
-          if (s._priResolved) el.style.setProperty('--pri', s._priResolved);
-          if (s._priActiveResolved) el.style.setProperty('--pri-active', s._priActiveResolved);
-          if (s._priSoftResolved) el.style.setProperty('--pri-soft', s._priSoftResolved);
-          if (s._onPriResolved) el.style.setProperty('--on-pri', s._onPriResolved);
-        } catch (e) {}
-      })();
-    </script>
+    <script vite-ignore src="%BASE_URL%theme-bootstrap.js"></script>
   </head>
   <body>
     <div id="root"></div>
