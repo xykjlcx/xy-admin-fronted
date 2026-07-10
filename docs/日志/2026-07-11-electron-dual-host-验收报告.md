@@ -9,8 +9,8 @@
 | #   | 完成条件                                           | 当前状态 | 证据指针                                                         |
 | --- | -------------------------------------------------- | -------- | ---------------------------------------------------------------- |
 | 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`       |
-| 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 实施中   | `vite.renderer.config.ts`；后续边界守卫与双构建总门禁            |
-| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 663 项、`theme:guard` 196 项、`build:web` 与产物扫描    |
+| 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts`；`pnpm guard:desktop`；双构建产物守卫  |
+| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 664 项、`theme:guard` 196 项、`build:web` 与产物扫描    |
 | 4   | 两种窗口模式与三套 Shell 安全区                    | pending  | Phase 4                                                          |
 | 5   | Electron 凭证安全存储与统一会话服务                | pending  | Phase 3                                                          |
 | 6   | 原生文件下载闭环                                   | pending  | Phase 5                                                          |
@@ -47,6 +47,21 @@
   - `pnpm build:web`：通过；`dist` 1,620 KiB，最大 JS chunk 264,517 bytes，入口 chunk 127,570 bytes。
   - `rg` 产物扫描：Web 包无 `faker`、`mockServiceWorker`、`setupWorker`、Electron API、Node `fs`；通过。
 
+### Phase 1 — 宿主骨架
+
+- 提交：`01a072c`。
+- `pnpm dev:desktop -- --window-chrome=native`：
+  - Main 6 modules、Preload 83 modules 编译通过。
+  - Renderer dev server 在 `http://localhost:5173/` 监听；本地 Electron 主进程与启用 `--enable-sandbox` 的 Renderer 进程实际启动。
+  - 验证后通过 Ctrl-C 主动结束开发进程；无遗留 Electron、electron-vite 或 Spike server 进程。
+- `pnpm guard:desktop`：通过。守卫自动拒绝 `src/**` 的 Electron/Node import、裸 `window.desktop`，以及 `electron/**` 的业务/React import、散落 `process.env` 和非 Preload `ipcRenderer`。
+- `pnpm build:web`：通过；自动产物守卫回读 `totalBytes=1,411,208`、`largestJavaScriptBytes=264,517`、`fileCount=91`。
+- `pnpm build:desktop -- --window-chrome=native`：通过；自动产物守卫回读 `totalBytes=1,410,898`、`largestJavaScriptBytes=264,783`、`fileCount=91`。
+- `pnpm test:desktop`：
+  - Desktop Vitest 增至 10 个文件、50 项通过。
+  - packaged macOS arm64 `.app` E2E 再次通过，耗时 2.9 秒。
+- 阶段总门禁：TypeScript Web/Desktop、ESLint、Vitest 112 文件 664 项、theme guard 196 项、design lint、Web build、Desktop packaged E2E 均通过。
+
 ## 平台证据矩阵
 
 | 平台        | build                | install | backend                  | update  | uninstall | 签名            |
@@ -62,6 +77,6 @@
 
 ## Pending 与后续人工动作
 
-- 当前报告只完成 Phase 0 证据；Phase 1–8 继续实施。
+- 当前报告已完成 Phase 0–1 证据；Phase 2–8 继续实施。
 - macOS x64、Windows x64 的真实安装、远程后端、更新、卸载和签名保持 pending，不能由当前 arm64 结果替代。
 - 当前机器没有 Developer ID identity，macOS 真实旧版到新版签名更新闭环保持 pending，不声明通过。
