@@ -2,7 +2,7 @@
 
 > 日期：2026-07-11  
 > 分支：`codex/electron-dual-host`  
-> 状态：实施中；本报告只登记已执行证据，未完成项保持 `pending`。
+> 状态：Phase 0–8 工程实现已收口；缺少外部签名条件的验收项保持 `pending`，本报告不把它们写成通过。
 
 ## §20.1 对照表
 
@@ -10,15 +10,15 @@
 | --- | -------------------------------------------------- | -------- | ----------------------------------------------------------------- |
 | 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`        |
 | 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts`；`pnpm guard:desktop`；双构建产物守卫   |
-| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 682 项、`theme:guard` 196 项、`build:web` 与产物扫描     |
+| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 通过     | `vitest` 682 项、`theme:guard` 196 项、`build:web` 与产物扫描     |
 | 4   | 两种窗口模式与三套 Shell 安全区                    | 通过     | 双 packaged E2E；3 布局 × 3 比例截图与几何断言                    |
 | 5   | Electron 凭证安全存储与统一会话服务                | 通过     | Phase 3 单元测试、架构守卫与 packaged `safeStorage` E2E           |
 | 6   | 原生文件下载闭环                                   | 通过     | Phase 5 单元/页面测试；packaged Main stub 保存框 + 实际流式落盘   |
 | 7   | 更新状态机、feed、metadata 与真实更新              | 部分通过 | generic feed/HTTP/metadata/公网回读工具通过；真实签名更新 pending |
 | 8   | CSP、sandbox、隔离、fuses、导航、sender、schema    | 通过     | 安全窗口/IPC 门禁；四套 macOS 产物 fuse wire 实读                 |
-| 9   | 全部门禁、visual、Electron E2E、平台 smoke         | 阶段通过 | Web 682 项、Desktop 169 项、双 E2E、macOS arm64 DMG smoke         |
-| 10  | 四份文档与代码一致                                 | pending  | Phase 8                                                           |
-| 11  | 既有改动未覆盖、提交可独立回滚                     | 通过     | 独立 worktree；Phase 0–7 独立提交，最新 `b85cfa7`                 |
+| 9   | 全部门禁、visual、Electron E2E、平台 smoke         | 通过     | Web visual 24/24；Web 682、Desktop 169、双 E2E、arm64 DMG smoke   |
+| 10  | 四份文档与代码一致                                 | 通过     | `architecture/AGENTS/README/desktop`；提交 `e662927`              |
+| 11  | 既有改动未覆盖、提交可独立回滚                     | 通过     | 独立 worktree；Phase 0–8 中文原子提交；主工作区未触碰             |
 
 ## 分期证据
 
@@ -162,6 +162,24 @@
 - 对抗修正：实包启动首轮暴露 `safeStorage.isAsyncEncryptionAvailable()` 在无凭据时仍卡住 Keychain；调整为先读密文后再访问安全存储后启动通过。首轮 fuse 开启 browser-specific V8 snapshot 后实包因缺少 snapshot 启动失败；按实际产物能力显式关闭后四套产物均可启动/验证。
 - 阶段门禁：Desktop Vitest 31 个文件/169 项；Web Vitest 117 个文件/682 项；theme guard 196 项；Web/Desktop TypeScript、ESLint 0 error、design lint、Web build、双 packaged E2E、双 `make` 全部通过。
 
+### Phase 8 — 文档与最终收口
+
+- 提交：`e662927`。
+- 文档当前态：
+  - `docs/architecture.md` 登记同一 `src/routeTree.gen.ts` 的 Web/Electron 双宿主图、Main/Preload/Platform 依赖方向、会话和配置真值。
+  - `AGENTS.md` 增加 Electron 禁止项、typed IPC/Zod/sender、安全窗口/fuse、证据分级与双宿主门禁。
+  - `README.md` 提供 Web/Desktop 快速开始、两种窗口模式与构建命令；`docs/desktop.md` 完整记录派生身份、产物矩阵、更新源、签名/公证/publisher、发布顺序、排障与证据级别。
+  - `docs/NEW-PROJECT.md` 追加 Desktop 身份和最终窗口模式实例化清单；设计文档记录 Vite 回退、TS builder 与 V8 snapshot fuse 的等价实施。
+- Web visual（Agent Browser CLI 0.25.4）：
+  - 采集 20 个原型基线、20 个实现侧页面和 20 张 diff；差异比例为 1.96%–8.59%，作为已知产品演进证据，不伪写为像素完全一致。
+  - 90%/100%/108% 三档通过无水平溢出、status popover/detail sheet/role permissions/menu dialog 视口与缩放契约，并遍历 6 个 Admin 和 7 个 Lastmile 已完成页。
+  - flavor × light/dark × scale 矩阵 24/24，`page-ready/state-applied/no-horizontal-overflow/sera-computed-contracts` 全部通过。证据位于 gitignore 的 `test-results/m0-visual/`。
+- 最终门禁：
+  - `tsc -b --noEmit`、`eslint src`（0 error，保留 1 条既有 TanStack Table compiler warning）、Web Vitest 117/682、theme guard 4/196、design lint 0 error/40 条已登记 warning、Desktop typecheck 全部通过。
+  - `pnpm test:desktop`：Desktop Vitest 31/169；native packaged E2E 4.4 秒；integrated packaged E2E 10.2 秒。
+  - `build:web`：`1,426,739` bytes/90 files；Desktop native `1,425,052` bytes/93 files；Desktop integrated `1,425,056` bytes/93 files；最大 JS 分别为 `264,519/264,785/264,785` bytes。Web 无 Electron/Node/Preload，Desktop Renderer 无 Mock 运行时。
+  - Phase 7 同一运行时代码已执行 native/integrated 双 `make`、四套 macOS 产物校验与 arm64 DMG smoke；Phase 8 仅修改文档，未使产物证据失效。
+
 ## 平台证据矩阵
 
 | 平台        | build                              | install               | backend                      | update  | uninstall        | 签名                     |
@@ -178,7 +196,9 @@
 
 ## Pending 与后续人工动作
 
-- 当前报告已完成 Phase 0–7 证据；Phase 8 继续实施。
+- Phase 0–8 工程实现、文档与当前平台可执行证据已收口；本目标累计执行 4 小时以上。
 - 原生保存框自动化是 Main stub；真实 macOS/Windows 保存框点击 smoke 保持 pending。
 - macOS x64、Windows x64 的真实安装、远程后端、更新、卸载和签名保持 pending，不能由当前 arm64 结果替代。
 - 当前机器没有 Developer ID identity，macOS 真实旧版到新版签名更新闭环保持 pending，不声明通过。
+- 本仓库没有真实公网 update base/CDN，因此 `verify:update-feed` 工具与本地 HTTP 契约已通过，真实公网回读保持 pending。
+- 由于 §20.1 第 7 条明确要求至少一个平台完成满足签名前提的真实旧版→新版更新，当前不将「§20.1 全部 11 条」整体标记为通过；该 pending 只能在注入有效签名身份并真实执行升级后消除。
