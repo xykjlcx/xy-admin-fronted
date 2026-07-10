@@ -1,0 +1,2 @@
+com.metabuild.infrastructure.i18n.I18nAutoConfiguration
+com.metabuild.infrastructure.web.InfrastructureWebAutoConfiguration

@@ -42,12 +42,27 @@
     <flyway.version>11.7.2</flyway.version>
     <postgresql.version>42.7.7</postgresql.version>
     <testcontainers.version>1.21.4</testcontainers.version>
+    <spring-boot.version>3.5.3</spring-boot.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
     <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-app</artifactId>
