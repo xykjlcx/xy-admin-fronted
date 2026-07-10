@@ -1,7 +1,7 @@
 # 角色管理、数据权限与操作日志重构设计
 
 - 日期：2026-07-10
-- 状态：已批准，待实现
+- 状态：已实现并完成首轮验收
 - 影响页面：`/admin/roles`
 - 上游约束：当前 `roles` 仍是 `modules/admin/pages/roles` 横切遗留，本次只在现有边界内完成产品重构，不顺带迁移整个业务包
 
@@ -273,3 +273,18 @@ pnpm build
 - 中英文资源同步更新，不新增组件内硬编码中文。
 - 旧管理员角色文案、类型、接口、query、组件、测试和权限声明全部清理，避免保留不可达分支。
 - 更新历史角色设计文档的状态说明时只标注“已被本规格替代”，不改写历史验收记录。
+
+## 12. 首轮验收记录
+
+2026-07-10 已完成：
+
+- API、mock、页面、路由预取与架构守卫定向测试：29 个通过。
+- 全量 Vitest：63 个文件、504 个测试通过。
+- `tsc -b --noEmit --force`：通过。
+- ESLint：0 error；现有 `DataTable` 的 TanStack Table React Compiler 兼容提示为 1 条 warning。
+- `theme:guard`：4 个文件、182 个测试通过。
+- `design:lint`：0 error；40 条均为既有白名单 warning。
+- `pnpm build`：通过；`dist` 未检出 `faker`、`msw`、`mockServiceWorker`。
+- Agent Browser：角色管理、数据权限保存、操作日志搜索、浅色/深色均通过，控制台无新错误。
+- `pnpm visual:scale`：90% / 100% / 108% 三档通过；角色数据权限表在 108% 下无内部或整页横向溢出。
+- 三档报告：`test-results/m0-visual/report.md`。

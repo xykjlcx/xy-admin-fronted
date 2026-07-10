@@ -207,7 +207,7 @@ UI 状态住在「所有消费它的组件的最近公共父」，不多不少�
 - Input 优先 `Input`；带前后缀用 `InputGroup*` 组合，错误态用 `status="error"` 或 `aria-invalid`。业务表单下拉统一 `SelectControl` / Radix Select，吃项目 token；`NativeSelect` 仅极少数需原生选择器场景。复杂表单优先 `Form` + `Field`/`FormField`，不在页面临时拼 label/错误/控件关联。
 - `StatusBadge`/`SearchField`/`TableShell`/`DataTable`/`Tree` 这类后台通用组合必须复用 Badge/Skeleton/Empty/Checkbox 等原子件。`components/pro` 只沉淀业务无关后台模式组件，可组合 UI 组件，但不引入模块 DTO/接口/权限逻辑、不 `useTranslation`（文案由 props 注入）。
 - 业务页面**通用表格/树/分页/选择/详情字段/表单弹窗**用 `pro`（DataTable/Tree/Pagination/DescriptionList/FormDialog…），只组装、填数据、传回调；**禁止**手写分页状态，行选择只能经 `DataTable` 的 selection API。
-- **表格选型（唯一答案）**：业务表格一律用 `DataTable`（TanStack Table，受控行选择/分页）。`TableShell`（手写 CSS grid）是 roles/menus 迁移到纵切前的遗留，**新页面禁止使用**、迁移完成后退役——不要因为它在 roles/menus 里出现就当作可选范式。
+- **表格选型（唯一答案）**：标准业务表格一律用 `DataTable`，状态能力优先采用 TanStack Table 原生模型：列宽用 `size/minSize/maxSize`，显隐用 `columnVisibility`，固定列用 `columnPinning`，受控行选择/分页沿用对应 TanStack 状态；禁止再用百分比字符串拼列宽或另造选择、固定列状态机。`DataTable` 只保留一个横向滚动容器，表头与单元格对齐分别由 `headerAlign/cellAlign` 声明；固定列必须使用不透明复合表面，不能直接复用半透明行状态色。带按钮等交互控件的列声明 `stopRowClick`，可点击行必须同时支持 Enter/Space 与 `aria-selected/aria-busy`。`TableShell`（手写 CSS grid）是 roles/menus 迁移到纵切前的遗留，**新页面禁止使用**、迁移完成后退役——不要因为它在 roles/menus 里出现就当作可选范式。
 - 页面层不直接写原生 `<button>`/`<input>`/`<select>`/`<textarea>`（除非作为新 UI/Pro 组件封装的实现细节）。组件样式只消费语义 token、Tailwind 语义类和 `--app-scale` 尺寸；页面不新增硬编码色值、任意圆角或脱离 token 的尺寸。
 - 动画属组件契约：tabs 指示条、展开收起、加载骨架、按钮 pending 等沉到 UI/Pro 并提供 `motion-reduce` 降级；页面不写临时动画。
 

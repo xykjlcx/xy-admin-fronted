@@ -240,3 +240,45 @@ git diff --check
 3. 按运营概览 → 运单主链 → 客户 → 渠道/承运商/供应商 → 计费推进。
 
 完整 Goal 在 Lastmile 全量验收前保持 active。
+
+## 2026-07-10 完成回证
+
+- Roles、Menus 已迁移到与 Users 一致的纵切包；旧横切 API、Mock 与页面目录已删除，Dashboard 是唯一保留的 `modules/admin/pages` 遗留。
+- Dictionaries、Messages、Logs、Files、Company、Profile、Register、Forgot Password 已完成 Mock CRUD/状态回读，Shell 消息和个人中心入口已接入真实页面。
+- 文件、日志与尾程导出统一通过 `fetch -> Blob -> object URL` 下载，避免开发态 Mock API 被 Vite HTML 回退页替代；CSV 与 PDF 已由 Agent Browser 下载并检查文件类型/内容。
+- 全仓最终门禁：TypeScript 通过；ESLint 0 error（仅 TanStack Table 已知 React Compiler warning）；Vitest 103 files / 609 tests；theme guard 4 files / 194 tests；design lint 0 error；生产构建通过且 `dist` 无 faker/MSW/worker 标记；`git diff --check` 通过。
+- Agent Browser 完成 Admin 页面关键交互回证，并将 20 个 Admin/Lastmile 主场景纳入同一视觉报告；90%/100%/108% 三档比例无整页水平溢出，24/24 flavor × mode × scale 主题矩阵通过。
+- 原型/实现像素差异范围为 1.96%–8.59%。差异主要来自脚手架真实 Shell、权限动作、工程化筛选/表格和原型静态演示结构，不通过删除真实功能或恢复假按钮压低差异。
+
+## 2026-07-10 全面复审与加固回证
+
+### 审查发现与处置
+
+- P1：新增页面的部分 Query 消费方在加载或失败时直接返回空白；已新增通用 `QueryState`，并为页面级 Query 与 `DataTable` 统一接入加载、失败、重试状态，同时纳入 `/dev/theme-states` 与主题守卫。
+- P1：文件下载、日志导出、账单导出和面单下载存在未捕获 Promise，失败会形成未处理拒绝；已统一改为 Mutation 状态机，提供 loading、失败反馈和回归测试。
+- P1：文件分享复制了不存在的 `/files/:id` 地址，且无 Clipboard 时仍可能显示成功；已改为受控 `fileId` URL 状态 `/admin/files?fileId=...`，支持刷新直达、失败反馈和深链回归测试。
+- P1：登录页短信验证码与扫码登录只有静态外观，没有 API、Mock 会话与登录闭环；已补齐 zod contract、API、MSW handler、token/session 回读和浏览器实测。短信 Mock 验证码为 `123456`，扫码页提供明确的 Mock 确认入口。
+- P1：768px 宽度仍保留 232px Sidebar，Header 被挤压且消息详情出现逐字换行；Shell 已在紧凑视口强制折叠为 64px，压缩 Header 控件，消息中心改为上下分区，并保留宽屏用户布局偏好。
+- P2：渠道草稿按钮只提示成功而不保存；已持久化到 localStorage，重新进入新增页可恢复，正式创建后清理草稿。
+- P2：渠道 KPI 受列表筛选影响，指标语义不稳定；Mock 列表响应已增加独立全局 `stats`，筛选只影响 `list/total`。
+- P2：Menus 存在内联 Query key；已补 key factory 并增加纵切业务包禁止内联 `queryKey` 的架构守卫。
+- P2：认证业务层仍有裸 `<button>`；已迁移到公共 `Button`，并用守卫禁止回归。
+
+### 复审门禁
+
+- TypeScript strict 通过；ESLint 0 error，仅保留 TanStack Table 与 React Compiler 的上游兼容性 warning。
+- Vitest：104 files / 624 tests 全部通过；theme guard：4 files / 196 tests 全部通过；design lint：0 error。
+- 生产构建通过；`dist` 二次扫描不含 `faker`、`msw/browser`、`msw/node` 或 `mockServiceWorker`。
+- Agent Browser 实测短信登录、扫码登录、文件深链和 768px 紧凑布局；浏览器错误日志为空。
+- 视觉报告于 2026-07-10 20:09 刷新：20/20 主场景、三档比例、24/24 主题矩阵通过；像素差异范围保持 1.96%–8.59%，最高差异页经实现图与 diff 图人工复核，不存在错页、白屏、浮层越界或整页水平溢出。
+
+### 边界说明
+
+- 本轮所有新 Admin 业务以及 Roles、Menus 均已使用 Users 纵切模板。`modules/admin/pages/dashboard` 与 `modules/admin/api/dashboard.api.ts` 是仓库既存、计划中明确保留的唯一横切遗留，不属于本轮新实现或 Roles/Menus 迁移的降级例外；后续若迁移 Dashboard，必须一次性按同一纵切骨架完成，不能做半迁移。
+
+## 2026-07-10 菜单三栏重构补充回证
+
+- 菜单工作区调整为“子系统管理 / 菜单管理 / 菜单详情”三栏，桌面端比例为 2:3:5；窄屏由 Sheet 承载子系统与详情。
+- 子系统恢复为纵向卡片；三栏骨架、Pane Header/Footer 和卡片状态沉到 Pro 层，业务页面只保留数据与语义回调。
+- 最终全量 Vitest 为 110 files / 649 tests；theme guard 为 4 files / 196 tests；TypeScript、ESLint、生产构建与 Mock 剥离扫描通过。
+- Agent Browser 重新采集菜单页，并复核 90% / 100% / 108% 三档无整页水平溢出、菜单编辑弹窗保持在视口内。
