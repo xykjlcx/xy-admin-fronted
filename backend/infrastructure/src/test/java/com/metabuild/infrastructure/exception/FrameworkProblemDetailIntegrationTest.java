@@ -129,20 +129,20 @@ class FrameworkProblemDetailIntegrationTest {
 
     @Test
     void mapsMethodNotAllowed() throws Exception {
-        expectProblem(
-                mockMvc.perform(post("/test/get-only")),
-                405,
-                "request.method.not-allowed");
+        ResultActions result = mockMvc.perform(post("/test/get-only"));
+
+        expectProblem(result, 405, "request.method.not-allowed");
+        result.andExpect(header().string(HttpHeaders.ALLOW, "GET"));
     }
 
     @Test
     void mapsUnsupportedMediaType() throws Exception {
-        expectProblem(
-                mockMvc.perform(post("/test/body")
-                        .contentType(MediaType.TEXT_PLAIN)
-                        .content("name")),
-                415,
-                "request.media-type.unsupported");
+        ResultActions result = mockMvc.perform(post("/test/body")
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("name"));
+
+        expectProblem(result, 415, "request.media-type.unsupported");
+        result.andExpect(header().string(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
     }
 
     @Test

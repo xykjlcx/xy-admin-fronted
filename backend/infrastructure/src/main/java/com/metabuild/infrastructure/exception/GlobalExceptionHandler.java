@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -158,7 +159,8 @@ public final class GlobalExceptionHandler {
                 HttpStatus.METHOD_NOT_ALLOWED,
                 "request.method.not-allowed",
                 "request.method.not-allowed",
-                request);
+                request,
+                exception.getHeaders());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -169,7 +171,8 @@ public final class GlobalExceptionHandler {
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE,
                 "request.media-type.unsupported",
                 "request.media-type.unsupported",
-                request);
+                request,
+                exception.getHeaders());
     }
 
     @ExceptionHandler(Exception.class)
@@ -223,6 +226,15 @@ public final class GlobalExceptionHandler {
             String code,
             String detail,
             HttpServletRequest request) {
+        return problem(status, code, detail, request, HttpHeaders.EMPTY);
+    }
+
+    private ResponseEntity<ProblemDetail> problem(
+            HttpStatus status,
+            String code,
+            String detail,
+            HttpServletRequest request,
+            HttpHeaders headers) {
         String localizedDetail = messageSource.getMessage(
                 code,
                 null,
@@ -237,6 +249,7 @@ public final class GlobalExceptionHandler {
                 "traceId",
                 Objects.toString(request.getAttribute(TraceIdFilter.REQUEST_ATTRIBUTE), ""));
         return ResponseEntity.status(status)
+                .headers(headers)
                 .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(problem);
     }
