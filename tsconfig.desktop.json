@@ -23,6 +23,8 @@
     "vite.renderer.config.ts",
     "vitest.desktop.config.ts",
     "electron/**/*.ts",
+    "e2e/electron/**/*.ts",
+    "playwright.electron.config.ts",
     "scripts/**/*.test.ts",
     "scripts/**/*.d.mts"
   ],

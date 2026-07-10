@@ -14,6 +14,7 @@ import { Dialog } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ProgressBar } from '@/components/ui/progress';
 import { downloadFile } from '@/lib/download';
+import { platform } from '@/lib/platform';
 import { matchPermission } from '@/lib/permission';
 import { fileApi, fileKeys, filesQuery, storageOverviewQuery, type FileEntryDto } from '../api';
 import { FilePreviewSheet } from '../detail';
@@ -106,10 +107,10 @@ export function FilesScene({
   });
   const share = useMutation({
     mutationFn: async () => {
-      if (!selectedId || !navigator.clipboard) throw new Error('Clipboard is unavailable');
+      if (!selectedId) throw new Error('File is unavailable');
       const url = new URL('/admin/files', window.location.origin);
       url.searchParams.set('fileId', selectedId);
-      await navigator.clipboard.writeText(url.toString());
+      await platform.clipboard.writeText(url.toString());
     },
     onSuccess: () => toast.success(t('files.toast.shared')),
     onError: () => toast.error(t('files.toast.shareFailed')),
@@ -255,7 +256,11 @@ export function FilesScene({
                       }
                       onClick={() => open(entry)}
                     >
-                      {entry.kind === 'folder' ? <Folder className="size-8" /> : <FileText className="size-8" />}
+                      {entry.kind === 'folder' ? (
+                        <Folder className="size-8" />
+                      ) : (
+                        <FileText className="size-8" />
+                      )}
                       <span className="max-w-full truncate">{entry.name}</span>
                       <span className="text-xs font-normal text-text-3">
                         {formatFileSize(entry, t('files.folderUnit'))}

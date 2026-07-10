@@ -12,4 +12,10 @@ export interface DesktopApi {
   window: {
     getSnapshot(): WindowSnapshot;
   };
+  clipboard: {
+    writeText(text: string): Promise<void>;
+  };
+  external: {
+    open(url: string): Promise<void>;
+  };
 }

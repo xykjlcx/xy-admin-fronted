@@ -54,6 +54,14 @@ export function findDesktopBoundaryViolations(files) {
       if (/\bipcRenderer\b/.test(source) && !normalizedFile.startsWith('electron/preload/')) {
         violations.push(`${normalizedFile}: ipcRenderer 只能由 Preload 白名单调用`);
       }
+      if (
+        normalizedFile.startsWith('electron/preload/') &&
+        /ipcRenderer\s*\.(?:send|sendSync|postMessage|on|once|addListener|invoke\s*\(\s*(?!ipcChannels\.))/.test(
+          source,
+        )
+      ) {
+        violations.push(`${normalizedFile}: Preload 只能通过 ipcChannels 调用 invoke，禁止暴露任意 IPC`);
+      }
     }
   }
   return violations;

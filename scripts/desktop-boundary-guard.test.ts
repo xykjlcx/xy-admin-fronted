@@ -38,6 +38,21 @@ describe('desktop architecture guard', () => {
     );
   });
 
+  test('rejects raw or event-style IPC even inside Preload', () => {
+    const violations = findDesktopBoundaryViolations(
+      new Map([
+        [
+          'electron/preload/leaky.ts',
+          "ipcRenderer.send('raw-channel');\nipcRenderer.on('raw-event', () => undefined);\nipcRenderer.invoke('raw-invoke');",
+        ],
+      ]),
+    );
+
+    expect(violations).toEqual([
+      'electron/preload/leaky.ts: Preload 只能通过 ipcChannels 调用 invoke，禁止暴露任意 IPC',
+    ]);
+  });
+
   test('allows the designated config, preload, and Renderer platform adapter boundaries', () => {
     expect(
       findDesktopBoundaryViolations(

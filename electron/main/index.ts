@@ -1,9 +1,10 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { app, BrowserWindow, dialog, net, protocol, session, shell } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, net, protocol, session, shell } from 'electron';
 import { getDesktopEnvironment, readRendererDevelopmentUrl } from '../config';
 import { createWindowOptions } from './create-window';
+import { registerDesktopIpcHandlers } from './ipc';
 import { decideNavigation } from './navigation-policy';
 import { buildRendererCsp, resolveRendererAssetPath } from './protocol';
 
@@ -108,6 +109,12 @@ async function startApplication(): Promise<void> {
   await app.whenReady();
   registerRendererProtocol();
   registerSecurityPolicies();
+  const disposeIpc = registerDesktopIpcHandlers({
+    writeClipboardText: (text) => clipboard.writeText(text),
+    openExternal: (url) => shell.openExternal(url),
+    allowedExternalHosts,
+  });
+  app.once('before-quit', disposeIpc);
   mainWindow = createMainWindow();
 
   app.on('activate', () => {

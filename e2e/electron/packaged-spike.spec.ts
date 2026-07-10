@@ -33,6 +33,7 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
     cwd: process.cwd(),
     env: { ...process.env, ELECTRON_ENABLE_LOGGING: '1' },
   });
+  let originalClipboard: string | undefined;
 
   try {
     const page = await desktop.firstWindow();
@@ -54,6 +55,53 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
       processType: 'undefined',
       requireType: 'undefined',
     });
+
+    originalClipboard = await desktop.evaluate(({ clipboard }) => clipboard.readText());
+    await page.evaluate(async () => {
+      const api = (
+        window as Window & {
+          desktop?: {
+            clipboard: { writeText(text: string): Promise<void> };
+            external: { open(url: string): Promise<void> };
+          };
+        }
+      ).desktop;
+      if (!api) throw new Error('Desktop API unavailable');
+      await api.clipboard.writeText('electron-packaged-spike');
+    });
+    expect(await desktop.evaluate(({ clipboard }) => clipboard.readText())).toBe('electron-packaged-spike');
+
+    await desktop.evaluate(({ shell }) => {
+      const state = globalThis as typeof globalThis & { __spikeExternalUrls?: string[] };
+      state.__spikeExternalUrls = [];
+      shell.openExternal = async (url) => {
+        state.__spikeExternalUrls?.push(url);
+      };
+    });
+    await page.evaluate(async () => {
+      const api = (window as Window & { desktop?: { external: { open(url: string): Promise<void> } } })
+        .desktop;
+      if (!api) throw new Error('Desktop API unavailable');
+      await api.external.open('https://app.example.com/guide');
+    });
+    expect(
+      await desktop.evaluate(
+        () => (globalThis as typeof globalThis & { __spikeExternalUrls?: string[] }).__spikeExternalUrls,
+      ),
+    ).toEqual(['https://app.example.com/guide']);
+    expect(
+      await page.evaluate(async () => {
+        const api = (window as Window & { desktop?: { external: { open(url: string): Promise<void> } } })
+          .desktop;
+        if (!api) throw new Error('Desktop API unavailable');
+        try {
+          await api.external.open('https://evil.example.com/guide');
+          return 'allowed';
+        } catch {
+          return 'blocked';
+        }
+      }),
+    ).toBe('blocked');
 
     const documentResponsePromise = page.waitForResponse((response) =>
       response.url().startsWith('app://renderer/index.html'),
@@ -150,6 +198,9 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
     expect(page.url()).toMatch(/^app:\/\/renderer\/index\.html#/);
     expect(desktop.windows()).toHaveLength(1);
   } finally {
+    if (originalClipboard !== undefined) {
+      await desktop.evaluate(({ clipboard }, text) => clipboard.writeText(text), originalClipboard);
+    }
     await desktop.close();
   }
 });
