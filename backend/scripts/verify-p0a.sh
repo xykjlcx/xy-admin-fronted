@@ -20,10 +20,16 @@ run_gate \
   "development shell contracts" \
   "${REPO_DIR}/scripts/dev-contract-test.sh"
 run_gate \
+  "effective production dependency matrix contracts" \
+  "${SCRIPT_DIR}/verify-module-dependencies-contract-test.sh"
+run_gate \
   "Maven verify and skip-test lifecycle contracts" \
   "${SCRIPT_DIR}/verify-maven-test-gate.sh"
 run_gate \
-  "lastmile effective dependency closure contracts" \
-  "${SCRIPT_DIR}/verify-lastmile-dependencies-contract-test.sh"
+  "dual-schema codegen reproducibility contracts" \
+  "${SCRIPT_DIR}/verify-codegen-reproducibility-contract-test.sh"
+run_gate \
+  "real development stack lifecycle" \
+  "${SCRIPT_DIR}/verify-dev-stack.sh"
 
 printf '[p0a] OK\n'

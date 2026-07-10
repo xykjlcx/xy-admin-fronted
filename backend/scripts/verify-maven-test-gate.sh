@@ -8,6 +8,14 @@ JAVA_HOME="${JAVA_HOME_21:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 MVNW="${BACKEND_DIR}/mvnw"
 POM="${BACKEND_DIR}/pom.xml"
 MUTATIONS_ONLY=0
+TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/metabuilder-maven-gate.XXXXXX")"
+
+cleanup() {
+  [[ ! -d "${TEMP_DIR}" ]] || rm -R "${TEMP_DIR}"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 if [[ "$#" -gt 0 ]]; then
   [[ "$#" -eq 1 && "$1" == "--mutations-only" ]] || {
@@ -39,25 +47,22 @@ expect_verify_skip_rejected() {
   local label="$2"
   local expected_property="$3"
   local output_file
-  output_file="$(mktemp "${TMPDIR:-/tmp}/metabuilder-maven-gate.XXXXXX")"
+  output_file="${TEMP_DIR}/${expected_property}.log"
 
   if run_maven verify "${property}" >"${output_file}" 2>&1; then
-    rm -f "${output_file}"
     fail "${label} unexpectedly succeeded"
   fi
   if ! grep -Fq "enforce-tests-during-verify" "${output_file}" ||
       ! grep -Fq "Property \"${expected_property}\" evaluates to \"true\"" "${output_file}"; then
     cat "${output_file}" >&2
-    rm -f "${output_file}"
     fail "${label} failed for a reason other than the verify test gate"
   fi
-  rm -f "${output_file}"
   pass "${label} is rejected"
 }
 
 if [[ "${MUTATIONS_ONLY}" -eq 0 ]]; then
-  run_maven verify
-  pass "normal verify executes the complete reactor"
+  run_maven clean verify
+  pass "normal clean verify executes the complete reactor without stale reports"
 fi
 
 expect_verify_skip_rejected "-DskipTests" "verify -DskipTests" "skipTests"

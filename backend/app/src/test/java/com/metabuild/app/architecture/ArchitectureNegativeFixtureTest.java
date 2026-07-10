@@ -1,17 +1,30 @@
 package com.metabuild.app.architecture;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.dev33.satoken.fixture.FakeSaTokenType;
 import com.metabuild.architecture.fixture.ModuleDirectionViolation;
+import com.metabuild.app.MetaBuilderApplicationMarker;
 import com.metabuild.infrastructure.InfrastructureMarker;
 import com.metabuild.infrastructure.cache.InfrastructureSliceViolation;
 import com.metabuild.infrastructure.web.InfrastructureDependencyViolation;
 import com.metabuild.modules.admin.AdminDirectRootViolation;
 import com.metabuild.modules.admin.AdminModuleMarker;
+import com.metabuild.modules.admin.application.ApplicationRootViolation;
+import com.metabuild.modules.admin.common.CommonRootViolation;
 import com.metabuild.modules.admin.controller.AdminVerticalSliceViolation;
+import com.metabuild.modules.admin.internal.InternalRootViolation;
+import com.metabuild.modules.admin.persistence.PersistenceRootViolation;
+import com.metabuild.modules.admin.roles.api.AllowedRoleApi;
+import com.metabuild.modules.admin.roles.internal.ForbiddenRoleInternal;
+import com.metabuild.modules.admin.shared.SharedRootViolation;
 import com.metabuild.modules.admin.users.AdminToLastmileViolation;
+import com.metabuild.modules.admin.users.AdminSchemaLastmileViolation;
+import com.metabuild.modules.admin.users.AllowedCrossDomainApiFixture;
+import com.metabuild.modules.admin.users.ForbiddenCrossDomainInternalFixture;
 import com.metabuild.modules.admin.users.SaTokenIsolationViolation;
+import com.metabuild.modules.admin.widgets.UnregisteredPluralDomainViolation;
 import com.metabuild.modules.lastmile.LastmileModuleMarker;
 import com.metabuild.modules.lastmile.shipments.LastmileIsolationViolation;
 import com.metabuild.schema.lastmile.LastmileSchemaMarker;
@@ -49,9 +62,16 @@ class ArchitectureNegativeFixtureTest {
         MetaBuilderArchitectureRules.CORE_DEPENDENCIES_POINT_INWARD,
         new ClassFileImporter().importClasses(
             CoreReverseDependencyViolation.class,
-            InfrastructureMarker.class),
+            MetaBuilderApplicationMarker.class,
+            InfrastructureMarker.class,
+            AdminModuleMarker.class,
+            LastmileModuleMarker.class),
         "core and contract modules do not depend outward",
-        CoreReverseDependencyViolation.class.getName());
+        CoreReverseDependencyViolation.class.getName(),
+        MetaBuilderApplicationMarker.class.getName(),
+        InfrastructureMarker.class.getName(),
+        AdminModuleMarker.class.getName(),
+        LastmileModuleMarker.class.getName());
   }
 
   @Test
@@ -82,9 +102,28 @@ class ArchitectureNegativeFixtureTest {
         MetaBuilderArchitectureRules.INFRASTRUCTURE_DEPENDENCIES_POINT_INWARD,
         new ClassFileImporter().importClasses(
             InfrastructureDependencyViolation.class,
-            PlatformSchemaMarker.class),
+            AdminModuleMarker.class,
+            LastmileModuleMarker.class,
+            PlatformSchemaMarker.class,
+            LastmileSchemaMarker.class),
         "infrastructure does not depend on business implementations or schemas",
-        InfrastructureDependencyViolation.class.getName());
+        InfrastructureDependencyViolation.class.getName(),
+        AdminModuleMarker.class.getName(),
+        LastmileModuleMarker.class.getName(),
+        PlatformSchemaMarker.class.getName(),
+        LastmileSchemaMarker.class.getName());
+  }
+
+  @Test
+  void adminToLastmileSchemaFixtureIsRejected() {
+    assertViolation(
+        MetaBuilderArchitectureRules.ADMIN_DOES_NOT_DEPEND_ON_LASTMILE_SCHEMA,
+        new ClassFileImporter().importClasses(
+            AdminSchemaLastmileViolation.class,
+            LastmileSchemaMarker.class),
+        "admin does not depend on lastmile schema",
+        AdminSchemaLastmileViolation.class.getName(),
+        LastmileSchemaMarker.class.getName());
   }
 
   @Test
@@ -93,10 +132,43 @@ class ArchitectureNegativeFixtureTest {
         MetaBuilderArchitectureRules.ADMIN_VERTICAL_SLICES,
         new ClassFileImporter().importClasses(
             AdminVerticalSliceViolation.class,
-            AdminDirectRootViolation.class),
+            AdminDirectRootViolation.class,
+            UnregisteredPluralDomainViolation.class,
+            ApplicationRootViolation.class,
+            PersistenceRootViolation.class,
+            CommonRootViolation.class,
+            SharedRootViolation.class,
+            InternalRootViolation.class),
         "admin implementation is package-vertical",
         AdminVerticalSliceViolation.class.getName(),
-        AdminDirectRootViolation.class.getName());
+        AdminDirectRootViolation.class.getName(),
+        UnregisteredPluralDomainViolation.class.getName(),
+        ApplicationRootViolation.class.getName(),
+        PersistenceRootViolation.class.getName(),
+        CommonRootViolation.class.getName(),
+        SharedRootViolation.class.getName(),
+        InternalRootViolation.class.getName());
+  }
+
+  @Test
+  void adminCrossDomainInternalFixtureIsRejected() {
+    assertViolation(
+        MetaBuilderArchitectureRules.ADMIN_CROSS_DOMAIN_API_ONLY,
+        new ClassFileImporter().importClasses(
+            ForbiddenCrossDomainInternalFixture.class,
+            ForbiddenRoleInternal.class),
+        "admin cross-domain dependencies use target api packages",
+        ForbiddenCrossDomainInternalFixture.class.getName(),
+        ForbiddenRoleInternal.class.getName());
+  }
+
+  @Test
+  void adminCrossDomainApiFixtureIsAllowed() {
+    var classes = new ClassFileImporter().importClasses(
+        AllowedCrossDomainApiFixture.class,
+        AllowedRoleApi.class);
+    var result = MetaBuilderArchitectureRules.ADMIN_CROSS_DOMAIN_API_ONLY.evaluate(classes);
+    assertFalse(result.hasViolation(), () -> result.getFailureReport().toString());
   }
 
   @Test
@@ -108,7 +180,9 @@ class ArchitectureNegativeFixtureTest {
             AdminModuleMarker.class,
             PlatformSchemaMarker.class),
         "lastmile does not depend on platform schema or admin implementation",
-        LastmileIsolationViolation.class.getName());
+        LastmileIsolationViolation.class.getName(),
+        AdminModuleMarker.class.getName(),
+        PlatformSchemaMarker.class.getName());
   }
 
   @Test

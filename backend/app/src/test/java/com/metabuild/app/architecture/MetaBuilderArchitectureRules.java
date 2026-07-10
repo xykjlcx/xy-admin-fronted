@@ -24,8 +24,22 @@ final class MetaBuilderArchitectureRules {
   private static final String LASTMILE = "com.metabuild.modules.lastmile..";
   private static final String ADMIN_ROOT = "com.metabuild.modules.admin";
   private static final String INFRASTRUCTURE_ROOT = "com.metabuild.infrastructure";
-  private static final Set<String> FORBIDDEN_ADMIN_ROOT_SLICES =
-      Set.of("controller", "service", "repository", "dto", "model", "config", "api");
+  private static final Set<String> ALLOWED_ADMIN_DOMAINS = Set.of(
+      "auth",
+      "menus",
+      "subsystems",
+      "users",
+      "departments",
+      "roles",
+      "files",
+      "messages",
+      "dictionaries",
+      "company",
+      "profile",
+      "audit",
+      "dashboard",
+      "mail",
+      "sms");
   private static final Set<String> ALLOWED_INFRASTRUCTURE_SLICES =
       Set.of("web", "exception", "i18n", "observability", "jooq", "security");
 
@@ -65,6 +79,11 @@ final class MetaBuilderArchitectureRules {
           ADMIN, LASTMILE, SCHEMA_PLATFORM, SCHEMA_LASTMILE)
       .as("infrastructure does not depend on business implementations or schemas");
 
+  static final ArchRule ADMIN_DOES_NOT_DEPEND_ON_LASTMILE_SCHEMA = noClasses()
+      .that().resideInAPackage(ADMIN)
+      .should().dependOnClassesThat().resideInAPackage(SCHEMA_LASTMILE)
+      .as("admin does not depend on lastmile schema");
+
   static final ArchRule MODULE_DIRECTION = CompositeArchRule.of(
           ONLY_APP_DEPENDS_ADMIN_IMPLEMENTATION)
       .and(ONLY_APP_DEPENDS_LASTMILE_IMPLEMENTATION)
@@ -72,11 +91,12 @@ final class MetaBuilderArchitectureRules {
       .and(PLATFORM_SCHEMA_OWNER_ISOLATION)
       .and(LASTMILE_SCHEMA_OWNER_ISOLATION)
       .and(INFRASTRUCTURE_DEPENDENCIES_POINT_INWARD)
+      .and(ADMIN_DOES_NOT_DEPEND_ON_LASTMILE_SCHEMA)
       .as("module dependencies follow the P0a direction");
 
   static final ArchRule ADMIN_VERTICAL_SLICES = classes()
       .that().resideInAPackage(ADMIN)
-      .should(new ArchCondition<>("put admin business classes below a business-domain slice") {
+      .should(new ArchCondition<>("belong to the approved admin business-domain registry") {
         @Override
         public void check(JavaClass javaClass, ConditionEvents events) {
           String packageName = javaClass.getPackageName();
@@ -84,18 +104,49 @@ final class MetaBuilderArchitectureRules {
               && javaClass.getSimpleName().equals("AdminModuleMarker");
           boolean packageDescriptor = packageName.equals(ADMIN_ROOT)
               && javaClass.getSimpleName().equals("package-info");
-          boolean directBusinessClass = packageName.equals(ADMIN_ROOT) && !marker && !packageDescriptor;
-          String directSlice = directChildPackage(packageName, ADMIN_ROOT);
-          boolean horizontalRoot = FORBIDDEN_ADMIN_ROOT_SLICES.contains(directSlice);
+          String directDomain = directChildPackage(packageName, ADMIN_ROOT);
+          boolean invalidRootClass = packageName.equals(ADMIN_ROOT) && !marker && !packageDescriptor;
+          boolean unregisteredDomain = !directDomain.isEmpty()
+              && !ALLOWED_ADMIN_DOMAINS.contains(directDomain);
 
-          if (directBusinessClass || horizontalRoot) {
+          if (invalidRootClass || unregisteredDomain) {
             events.add(SimpleConditionEvent.violated(
                 javaClass,
-                javaClass.getName() + " must start with an admin business-domain package"));
+                javaClass.getName() + " must use an approved admin business-domain package"));
           }
         }
       })
       .as("admin implementation is package-vertical");
+
+  static final ArchRule ADMIN_CROSS_DOMAIN_API_ONLY = classes()
+      .that().resideInAPackage(ADMIN)
+      .should(new ArchCondition<>("depend on other admin domains only through target api packages") {
+        @Override
+        public void check(JavaClass javaClass, ConditionEvents events) {
+          String sourceDomain = directChildPackage(javaClass.getPackageName(), ADMIN_ROOT);
+          if (sourceDomain.isEmpty()) {
+            return;
+          }
+
+          javaClass.getDirectDependenciesFromSelf().forEach(dependency -> {
+            String targetPackage = dependency.getTargetClass().getPackageName();
+            String targetDomain = directChildPackage(targetPackage, ADMIN_ROOT);
+            if (targetDomain.isEmpty() || sourceDomain.equals(targetDomain)) {
+              return;
+            }
+            String targetApiPackage = ADMIN_ROOT + "." + targetDomain + ".api";
+            boolean apiDependency = targetPackage.equals(targetApiPackage)
+                || targetPackage.startsWith(targetApiPackage + ".");
+            if (!apiDependency) {
+              events.add(SimpleConditionEvent.violated(
+                  dependency,
+                  dependency.getDescription()
+                      + " crosses admin domains without target api package"));
+            }
+          });
+        }
+      })
+      .as("admin cross-domain dependencies use target api packages");
 
   static final ArchRule LASTMILE_ISOLATION = noClasses()
       .that().resideInAPackage(LASTMILE)
