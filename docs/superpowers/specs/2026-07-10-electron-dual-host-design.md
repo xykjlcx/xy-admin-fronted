@@ -312,7 +312,7 @@ webSecurity: true
 - 文件路径由 Main 生成或由系统对话框返回，Renderer 不提交任意目标路径。
 - 外链只允许 `https:`；首期不允许 `file:`、`javascript:`、`data:` 和自定义外部协议。
 - 保持 Electron 当前稳定版本升级节奏；安全更新不能长期冻结。
-- 打包阶段使用 `@electron/fuses` 固定 release profile：`RunAsNode=false`、`EnableNodeOptionsEnvironmentVariable=false`、`EnableNodeCliInspectArguments=false`、`EnableEmbeddedAsarIntegrityValidation=true`、`OnlyLoadAppFromAsar=true`。开发态和 Playwright 使用未翻转 fuse 的开发 Electron，不复用 release 二进制做调试。
+- 打包阶段使用 `@electron/fuses` 固定 release profile：`RunAsNode=false`、`EnableCookieEncryption=true`、`EnableNodeOptionsEnvironmentVariable=false`、`EnableNodeCliInspectArguments=false`、`EnableEmbeddedAsarIntegrityValidation=true`、`OnlyLoadAppFromAsar=true`、`GrantFileProtocolExtraPrivileges=false`。项目使用自定义安全协议，不保留 `file://` 额外权限。开发态和 Playwright 使用未翻转 fuse 的开发 Electron，不复用 release 二进制做调试。
 - 打包后读取实际 fuse wire 并断言 release profile；不能只检查配置文件。若目标 Electron 版本不支持某个 fuse，构建直接失败并要求升级设计，不静默跳过。
 
 ## 10. 平台 API
