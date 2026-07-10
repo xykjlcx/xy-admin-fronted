@@ -193,9 +193,9 @@ GREEN：`biz({status,code,detail,extensions})`、`noContent()`；逐调用点分
 
 ## Task 11：IAM UUID schema 与 bootstrap seed
 
-新增 platform migrations：user/dept/role/user_role、permission/role_permission、menu/menu_customization、refresh token、authz outbox、登录/操作日志；所有 ID UUID。
+新增 platform migrations：user（含持久 `authz_revision`）/dept/role（含五型 `data_scope_type`）/role_custom_dept/user_role、permission/role_permission、menu/menu_customization、refresh token、authz outbox、登录/操作日志；所有 ID UUID。
 
-RED：FK/unique/check/soft-delete、部门防环数据库辅助约束、P1 bootstrap sourceKey/code 稳定、fresh/upgrade migration。
+RED：FK/unique/check/soft-delete、部门防环数据库辅助约束、scope enum/custom relation 清理、authz_revision 单调递增、P1 bootstrap sourceKey/code 稳定、SELF+CUSTOM 与 OWN_CHILD+CUSTOM 数据 fixture、fresh/upgrade migration。
 
 GREEN：最小 admin、角色、部门、Shell menu/permission seed；不实现管理写 API。
 
@@ -242,7 +242,7 @@ GREEN：TypeScript compiler API，不执行 route graph；只生成并校验 cla
 
 RED：逐 use case 写 controller/service/repository tests；角色禁用/删除、自定义部门清理、用户软删除、部门移动 preimage 均覆盖。
 
-GREEN：API 字段逐项匹配现有 zod；写 use case 必须依赖尚未装配的 `AuthorizationRefreshService` 端口，本任务不把写 controller 注册进 app，防止 Task 16 前出现可调用但不会安全刷新的运行态。
+GREEN：API 字段逐项匹配现有 zod；实现 `UserDirectoryApi/DepartmentDirectoryApi` adapter，单批 500、partial missing、固定次数批量 SQL；写 use case 必须依赖尚未装配的 `AuthorizationRefreshService` 端口，本任务不把写 controller 注册进 app，防止 Task 16 前出现可调用但不会安全刷新的运行态。
 
 验证：模块测试 + OpenAPI/zod contract fixtures。
 
@@ -361,8 +361,8 @@ GREEN：新 clone 按文档 30 分钟内启动；admin 核心与 lastmile 示例
 工程门禁：
 
 ```bash
-frontend/node_modules/.bin/tsc -b --noEmit
-frontend/node_modules/.bin/eslint frontend/src
+pnpm --dir frontend exec tsc -b --noEmit
+pnpm --dir frontend exec eslint src
 pnpm --dir frontend test
 pnpm --dir frontend theme:guard
 pnpm --dir frontend design:lint
