@@ -4,8 +4,10 @@ import zhCommon from './zh-CN/common.json';
 import zhAdmin from './zh-CN/admin.json';
 import enCommon from './en-US/common.json';
 import enAdmin from './en-US/admin.json';
+import zhLastmile from './zh-CN/lastmile.json';
+import enLastmile from './en-US/lastmile.json';
 
 export const resources = {
-  'zh-CN': { common: zhCommon, admin: zhAdmin },
-  'en-US': { common: enCommon, admin: enAdmin },
+  'zh-CN': { common: zhCommon, admin: zhAdmin, lastmile: zhLastmile },
+  'en-US': { common: enCommon, admin: enAdmin, lastmile: enLastmile },
 } as const;

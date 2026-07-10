@@ -1,0 +1,322 @@
+{
+  "common": {
+    "subsystem": "Last-mile Delivery",
+    "loading": "Loading…",
+    "loadFailed": "Failed to load data. Please retry.",
+    "retry": "Retry",
+    "downloadFailed": "Download failed. Please retry.",
+    "empty": "No data",
+    "back": "Back to list",
+    "actions": "Actions",
+    "detail": "Details",
+    "create": "Create",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "export": "Export",
+    "status": "Status",
+    "all": "All",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "search": "Search",
+    "normal": "Normal",
+    "configured": "Configured",
+    "notConfigured": "Not configured",
+    "trackingSupported": "Tracking supported",
+    "trackingUnsupported": "No tracking",
+    "total": "{{count}} total"
+  },
+  "overview": {
+    "title": "Operations Overview",
+    "recent": "Recent Shipments",
+    "realtime": "Live",
+    "channelUsage": "Top 5 Channels",
+    "stats": {
+      "pending": "Pending Labels",
+      "transit": "In Transit",
+      "todayFee": "Today's Fees",
+      "month": "Monthly Shipments"
+    }
+  },
+  "shipments": {
+    "title": "Shipments",
+    "description": "Manage last-mile shipments, labels and end-to-end tracking",
+    "search": "Search shipment, customer or tracking number",
+    "create": "Create Shipment",
+    "export": "Export",
+    "batchPrint": "Batch Print",
+    "print": "Print",
+    "track": "Track",
+    "detailTitle": "Shipment Details",
+    "newTitle": "Create Shipment",
+    "newDescription": "Enter shipper, recipient, parcel and last-mile channel details",
+    "printTitle": "Print Shipment",
+    "printDescription": "Preview the label and configure printing",
+    "trackTitle": "Shipment Tracking",
+    "saveOnly": "Save Only",
+    "saveAndPrint": "Save & Print",
+    "downloadPdf": "Download PDF",
+    "printLabel": "Print Label",
+    "sender": "Sender",
+    "receiver": "Recipient",
+    "parcel": "Parcel",
+    "channel": "Last-mile Channel",
+    "estimate": "Estimated Fees",
+    "stats": {
+      "pending": "Pending Labels",
+      "transit": "In Transit",
+      "delivered": "Delivered",
+      "issues": "Exceptions/Returns"
+    },
+    "addParcel": "Add Item",
+    "removeParcel": "Remove Item",
+    "insurance": "Insurance",
+    "baseFee": "Base Fee",
+    "fuelFee": "Fuel Surcharge",
+    "totalFee": "Total",
+    "from": "FROM / Sender",
+    "to": "TO / Recipient",
+    "printer": "Printer",
+    "paper": "Paper Size",
+    "copies": "Copies",
+    "packingList": "Print packing list too",
+    "thermalPrinter": "Zebra ZT411 (Thermal)",
+    "tabs": { "basic": "Basic", "parcel": "Parcel", "fee": "Fees", "track": "Tracking" },
+    "status": {
+      "all": "All",
+      "pending": "Pending",
+      "printed": "Printed",
+      "transit": "In Transit",
+      "delivered": "Delivered",
+      "exception": "Exception",
+      "returned": "Returned"
+    },
+    "columns": {
+      "no": "Shipment No.",
+      "customer": "Customer",
+      "country": "Destination",
+      "channel": "Channel",
+      "weight": "Weight",
+      "fee": "Fee",
+      "tracking": "Tracking No.",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "fields": {
+      "customer": "Customer",
+      "warehouse": "Warehouse",
+      "recipient": "Recipient",
+      "phone": "Phone",
+      "country": "Country/Region",
+      "postalCode": "Postal Code",
+      "address": "Address",
+      "channel": "Channel",
+      "service": "Value-added Services",
+      "parcelName": "Item Name",
+      "hsCode": "HS Code",
+      "quantity": "Quantity",
+      "weightKg": "Weight (kg)",
+      "declaredValue": "Declared Value",
+      "sizeCm": "Dimensions (cm)"
+    },
+    "toast": {
+      "created": "Shipment created",
+      "printed": "Sent to printer",
+      "batchPrinted": "Pending shipments were printed"
+    }
+  },
+  "customers": {
+    "title": "Customer Accounts",
+    "search": "Search customer name or code",
+    "create": "Create Customer",
+    "detailTitle": "Customer Details",
+    "tabs": {
+      "basic": "Basic",
+      "authorization": "Channel Access",
+      "pricing": "Pricing",
+      "flow": "Account Activity"
+    },
+    "status": { "active": "Active", "trial": "Trial", "overdue": "Overdue", "suspended": "Suspended" },
+    "columns": {
+      "customer": "Customer",
+      "code": "Code",
+      "type": "Type",
+      "channels": "Channels",
+      "pricing": "Pricing",
+      "balance": "Balance",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "fields": {
+      "name": "Customer Name",
+      "code": "Customer Code",
+      "type": "Customer Type",
+      "contact": "Contact",
+      "phone": "Phone",
+      "email": "Email",
+      "credit": "Credit Limit",
+      "balance": "Balance"
+    },
+    "summary": {
+      "balance": "Balance",
+      "credit": "Credit Limit",
+      "usage": "Credit Usage",
+      "pricing": "Pricing Plan"
+    },
+    "authorizationAria": "Authorize {{name}} channel",
+    "toast": { "created": "Customer created", "authorized": "Channel access updated" }
+  },
+  "channels": {
+    "title": "Logistics Channels",
+    "description": "Configure channels, supplier APIs, regions and pricing",
+    "search": "Search channel, code or supplier",
+    "create": "Create Channel",
+    "editTitle": "Edit Channel",
+    "newTitle": "Create Channel",
+    "detailTitle": "Channel Details",
+    "reset": "Reset",
+    "batchEnable": "Enable Selected",
+    "test": "Test Connection",
+    "saveDraft": "Save Draft",
+    "sections": { "basic": "Basic Information", "api": "API Integration" },
+    "account": {
+      "platform": "Platform Account",
+      "enterprise": "Enterprise Account",
+      "self": "Self-operated"
+    },
+    "settlement": { "monthly": "Monthly", "prepaid": "Prepaid" },
+    "selectPage": "Select page channels",
+    "selectRow": "Select {{name}}",
+    "summary": {
+      "sevenDays": "Labels in 7 Days",
+      "successRate": "API Success Rate",
+      "countries": "Countries Covered",
+      "lastSync": "Last Synced"
+    },
+    "metrics": {
+      "enabled": "Enabled Channels",
+      "countries": "Countries/Regions",
+      "today": "Labels Today",
+      "success": "API Success Rate",
+      "channelTotal": "{{count}} channels total",
+      "globalCoverage": "Global coverage",
+      "todayTrend": "+12.6% vs yesterday",
+      "successTrend": "-0.12% vs yesterday"
+    },
+    "api": {
+      "productCode": "API Product Code",
+      "tracking": "Tracking API",
+      "latency": "Latency"
+    },
+    "tabs": {
+      "basic": "Basic",
+      "api": "API",
+      "region": "Regions",
+      "quote": "Pricing",
+      "logs": "Labels & Logs"
+    },
+    "kind": {
+      "all": "All Types",
+      "express": "Express",
+      "line": "Linehaul",
+      "postal": "Postal",
+      "self": "Self-operated"
+    },
+    "status": { "all": "All Statuses", "enabled": "Enabled", "disabled": "Disabled" },
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "kind": "Type",
+      "supplier": "Supplier",
+      "carrier": "Carrier",
+      "service": "Service",
+      "countries": "Regions",
+      "account": "Account",
+      "cost": "Cost",
+      "sell": "Price",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "fields": {
+      "name": "Channel Name",
+      "code": "Channel Code",
+      "kind": "Channel Type",
+      "supplier": "Supplier",
+      "carrier": "Carrier",
+      "service": "Carrier Service",
+      "account": "Account Owner",
+      "settlement": "Settlement",
+      "countries": "Countries/Regions",
+      "priority": "Priority",
+      "baseUrl": "Base URL",
+      "apiKey": "API Key",
+      "labelFormat": "Label Format",
+      "timeout": "Timeout (s)"
+    },
+    "toast": {
+      "created": "Channel created",
+      "updated": "Channel updated",
+      "toggled": "Channel status updated",
+      "tested": "Connection succeeded in {{latency}} ms",
+      "drafted": "Draft saved",
+      "batchEnabled": "Selected channels enabled"
+    }
+  },
+  "carriers": {
+    "title": "Carriers",
+    "description": "Delivery brands that execute the final mile",
+    "search": "Search carrier",
+    "create": "Create Carrier",
+    "detailTitle": "Carrier Details",
+    "tabs": { "basic": "Basic", "services": "Services", "channels": "Channels" },
+    "columns": { "carrier": "Carrier", "region": "Region", "services": "Services", "channels": "Channels" },
+    "fields": {
+      "code": "Carrier Code",
+      "name": "Carrier Name",
+      "fullName": "Full Name",
+      "region": "Region",
+      "services": "Services",
+      "serviceCode": "Service Code"
+    },
+    "toast": { "created": "Carrier created" }
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "description": "Channel aggregators and official accounts used for labels and billing",
+    "search": "Search supplier",
+    "create": "Create Supplier",
+    "detailTitle": "Supplier Details",
+    "tabs": {
+      "basic": "Basic",
+      "credentials": "Credentials",
+      "mapping": "Carrier Mapping",
+      "channels": "Channels"
+    },
+    "fields": {
+      "name": "Supplier Name",
+      "code": "Supplier Code",
+      "type": "Supplier Type",
+      "carriers": "Carriers",
+      "account": "Credential / Account",
+      "settlement": "Settlement"
+    },
+    "columns": { "supplier": "Supplier", "channels": "Channels" },
+    "credentials": { "connection": "Connection", "latency": "Latency" },
+    "toast": { "created": "Supplier created" }
+  },
+  "billing": {
+    "title": "Customer Bills",
+    "search": "Search bill or customer",
+    "export": "Export Statement",
+    "status": { "all": "All", "pending": "Pending", "paid": "Paid", "overdue": "Overdue" },
+    "columns": {
+      "no": "Bill No.",
+      "customer": "Customer",
+      "period": "Period",
+      "shipments": "Shipments",
+      "amount": "Receivable",
+      "status": "Status"
+    },
+    "receivable": "Receivable: {{amount}}"
+  }
+}
