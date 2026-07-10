@@ -4,6 +4,7 @@ dist/
 dist-ssr/
 .env
 .env.*
+!**/.env.example
 *.local
 
 # Logs
@@ -32,3 +33,5 @@ test-results/
 coverage/
 .tanstack/
 .superpowers/
+**/target/
+.flattened-pom.xml
