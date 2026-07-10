@@ -1,7 +1,7 @@
 import { createRouter, createMemoryHistory } from '@tanstack/react-router';
 import { QueryClient } from '@tanstack/react-query';
 import { routeTree } from '@/routeTree.gen';
-import { meQuery } from '@/modules/admin/api/auth.api';
+import { meQuery } from '@/modules/admin/auth/api';
 import { useAuth } from '@/stores/auth';
 
 // 直接驱动路由 beforeLoad 守卫（无需浏览器）：预置 me 缓存绕过网络，断言重定向落点。

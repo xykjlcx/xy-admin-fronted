@@ -1,6 +1,6 @@
 import { setupServer } from 'msw/node';
-import { authHandlers } from '@/modules/admin/mocks/auth.handlers';
-import { authApi, meQuery } from '@/modules/admin/api/auth.api';
+import { authHandlers } from '@/modules/admin/auth/mocks';
+import { authApi, meQuery } from '@/modules/admin/auth/api';
 import { queryClient } from '@/app/query';
 import { resetSession } from '@/lib/reset-auth';
 import { useAuth } from '@/stores/auth';
@@ -26,7 +26,7 @@ test('预置 admin me 缓存 → viewer 登录 resetSession → beforeLoad 取�
 
   const me = await queryClient.ensureQueryData(meQuery); // 模拟 _auth beforeLoad
   expect(me.user.username).toBe('viewer');
-  expect(me.permissions).toEqual(['dashboard:view', 'iam:user:view', 'iam:dept:view']);
+  expect(me.permissions).toEqual(['dashboard:view', 'iam:user:view', 'iam:dept:view', 'notice:msg:view']);
 });
 
 // 防回归：resetSession 必须清空全部业务缓存（不止 ['auth']）。

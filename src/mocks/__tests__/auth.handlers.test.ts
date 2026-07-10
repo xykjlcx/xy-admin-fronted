@@ -1,5 +1,5 @@
 import { setupServer } from 'msw/node';
-import { authHandlers } from '@/modules/admin/mocks/auth.handlers';
+import { authHandlers } from '@/modules/admin/auth/mocks';
 
 const server = setupServer(...authHandlers);
 beforeAll(() => server.listen());
