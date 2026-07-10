@@ -12,7 +12,12 @@ BACKEND_PID_FILE="$RUNTIME_DIR/backend.pid"
 FRONTEND_PID_FILE="$RUNTIME_DIR/frontend.pid"
 BACKEND_LOG="$RUNTIME_DIR/backend.log"
 FRONTEND_LOG="$RUNTIME_DIR/frontend.log"
+BACKEND_PORT=8080
+FRONTEND_PORT=5173
 JAVA_BIN=""
+BACKEND_STARTED_THIS_RUN=0
+FRONTEND_STARTED_THIS_RUN=0
+COMPOSE_STARTED_THIS_RUN=0
 
 usage() {
   printf 'Usage: %s {start|stop|status}\n' "$0" >&2
@@ -54,6 +59,19 @@ process_command() {
   ps -p "$1" -o command= 2>/dev/null || true
 }
 
+listener_pids() {
+  local port="$1"
+  { lsof -t -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null || true; } | sort -u
+}
+
+pid_listens_on_port() {
+  local pid="$1"
+  local port="$2"
+  local listeners
+  listeners="$(listener_pids "$port")"
+  [[ "$listeners" == "$pid" ]]
+}
+
 process_belongs_to_repo() {
   local pid="$1"
   local role="$2"
@@ -82,19 +100,40 @@ process_belongs_to_repo() {
 process_status() {
   local pid_file="$1"
   local role="$2"
+  local port="$3"
   local pid=""
 
   if ! pid="$(read_pid "$pid_file")"; then
     printf 'stopped'
     return
   fi
-  if process_belongs_to_repo "$pid" "$role"; then
+  if process_belongs_to_repo "$pid" "$role" && pid_listens_on_port "$pid" "$port"; then
     printf 'running (pid %s)' "$pid"
+  elif process_belongs_to_repo "$pid" "$role"; then
+    printf 'not listening (pid %s)' "$pid"
   elif kill -0 "$pid" 2>/dev/null; then
     printf 'foreign process refused (pid %s)' "$pid"
   else
     printf 'stale pid (pid %s)' "$pid"
   fi
+}
+
+ensure_port_available_or_managed() {
+  local port="$1"
+  local pid_file="$2"
+  local role="$3"
+  local listeners pid=""
+  listeners="$(listener_pids "$port")"
+  [[ -z "$listeners" ]] && return
+
+  if pid="$(read_pid "$pid_file")" &&
+      process_belongs_to_repo "$pid" "$role" &&
+      [[ "$listeners" == "$pid" ]]; then
+    return
+  fi
+  printf 'Cannot start: port %s is occupied by a foreign process (listener pid: %s)\n' \
+    "$port" "$(printf '%s' "$listeners" | tr '\n' ',')" >&2
+  return 1
 }
 
 generate_local_env() {
@@ -142,8 +181,26 @@ load_local_env() {
   fi
 }
 
+repository_path_hash() {
+  if command -v shasum >/dev/null 2>&1; then
+    printf '%s' "$ROOT_DIR" | shasum -a 256 | awk '{print substr($1, 1, 12)}'
+  elif command -v sha256sum >/dev/null 2>&1; then
+    printf '%s' "$ROOT_DIR" | sha256sum | awk '{print substr($1, 1, 12)}'
+  else
+    printf '%s' "$ROOT_DIR" | openssl dgst -sha256 | awk '{print substr($NF, 1, 12)}'
+  fi
+}
+
+compose_project_name() {
+  printf 'metabuilder-dev-%s\n' "$(repository_path_hash)"
+}
+
 compose() {
-  docker compose --project-name metabuilder-dev --env-file "$ENV_FILE" -f "$COMPOSE_FILE" "$@"
+  docker compose \
+    --project-name "$(compose_project_name)" \
+    --env-file "$ENV_FILE" \
+    -f "$COMPOSE_FILE" \
+    "$@"
 }
 
 java_major_version() {
@@ -211,6 +268,7 @@ start_backend() {
     nohup "$JAVA_BIN" -jar "$jar" >"$BACKEND_LOG" 2>&1 </dev/null &
     printf '%s\n' "$!" >"$BACKEND_PID_FILE"
   )
+  BACKEND_STARTED_THIS_RUN=1
 }
 
 start_frontend() {
@@ -227,6 +285,7 @@ start_frontend() {
     nohup "$ROOT_DIR/node_modules/.bin/vite" --host 127.0.0.1 --port 5173 --strictPort >"$FRONTEND_LOG" 2>&1 </dev/null &
     printf '%s\n' "$!" >"$FRONTEND_PID_FILE"
   )
+  FRONTEND_STARTED_THIS_RUN=1
 }
 
 wait_for_url() {
@@ -234,14 +293,20 @@ wait_for_url() {
   local url="$2"
   local pid_file="$3"
   local role="$4"
+  local port="$5"
   local pid="" attempt=0
 
   while [[ "$attempt" -lt 120 ]]; do
-    if curl -fsS "$url" >/dev/null 2>&1; then
-      return
-    fi
     if ! pid="$(read_pid "$pid_file")" || ! process_belongs_to_repo "$pid" "$role"; then
       printf '%s stopped before becoming ready\n' "$label" >&2
+      return 1
+    fi
+    if curl -fsS "$url" >/dev/null 2>&1; then
+      if pid_listens_on_port "$pid" "$port"; then
+        return
+      fi
+      printf 'Cannot mark %s ready: port %s listener does not belong to managed %s pid %s\n' \
+        "$label" "$port" "$role" "$pid" >&2
       return 1
     fi
     sleep 1
@@ -250,6 +315,19 @@ wait_for_url() {
 
   printf 'Timed out waiting for %s at %s\n' "$label" "$url" >&2
   return 1
+}
+
+cleanup_start_failure() {
+  if [[ "$FRONTEND_STARTED_THIS_RUN" -eq 1 ]]; then
+    stop_process "$FRONTEND_PID_FILE" frontend
+  fi
+  if [[ "$BACKEND_STARTED_THIS_RUN" -eq 1 ]]; then
+    stop_process "$BACKEND_PID_FILE" backend
+  fi
+  if [[ "$COMPOSE_STARTED_THIS_RUN" -eq 1 && -f "$ENV_FILE" ]] &&
+      command -v docker >/dev/null 2>&1; then
+    compose down --remove-orphans >/dev/null 2>&1 || true
+  fi
 }
 
 stop_process() {
@@ -281,29 +359,56 @@ stop_process() {
 }
 
 start_all() {
-  require_command docker
-  require_command curl
-  generate_local_env
-  load_local_env
-  mkdir -p "$RUNTIME_DIR"
+  BACKEND_STARTED_THIS_RUN=0
+  FRONTEND_STARTED_THIS_RUN=0
+  COMPOSE_STARTED_THIS_RUN=0
 
-  compose up -d --wait --wait-timeout 90
-  if ! start_backend; then
-    stop_all
+  if ! require_command docker || ! require_command curl || ! require_command lsof; then
+    cleanup_start_failure
     return 1
   fi
-  if ! wait_for_url backend "http://127.0.0.1:8080/actuator/health/liveness" "$BACKEND_PID_FILE" backend; then
+  if ! generate_local_env || ! load_local_env; then
+    cleanup_start_failure
+    return 1
+  fi
+  mkdir -p "$RUNTIME_DIR"
+
+  if ! ensure_port_available_or_managed "$BACKEND_PORT" "$BACKEND_PID_FILE" backend ||
+      ! ensure_port_available_or_managed "$FRONTEND_PORT" "$FRONTEND_PID_FILE" frontend; then
+    cleanup_start_failure
+    return 1
+  fi
+  COMPOSE_STARTED_THIS_RUN=1
+  if ! compose up -d --wait --wait-timeout 90; then
+    cleanup_start_failure
+    return 1
+  fi
+  if ! start_backend; then
+    cleanup_start_failure
+    return 1
+  fi
+  if ! wait_for_url backend-liveness \
+      "http://127.0.0.1:${BACKEND_PORT}/actuator/health/liveness" \
+      "$BACKEND_PID_FILE" backend "$BACKEND_PORT"; then
     tail -n 80 "$BACKEND_LOG" >&2 || true
-    stop_all
+    cleanup_start_failure
+    return 1
+  fi
+  if ! wait_for_url backend-readiness \
+      "http://127.0.0.1:${BACKEND_PORT}/actuator/health/readiness" \
+      "$BACKEND_PID_FILE" backend "$BACKEND_PORT"; then
+    tail -n 80 "$BACKEND_LOG" >&2 || true
+    cleanup_start_failure
     return 1
   fi
   if ! start_frontend; then
-    stop_all
+    cleanup_start_failure
     return 1
   fi
-  if ! wait_for_url frontend "http://127.0.0.1:5173" "$FRONTEND_PID_FILE" frontend; then
+  if ! wait_for_url frontend "http://127.0.0.1:${FRONTEND_PORT}" \
+      "$FRONTEND_PID_FILE" frontend "$FRONTEND_PORT"; then
     tail -n 80 "$FRONTEND_LOG" >&2 || true
-    stop_all
+    cleanup_start_failure
     return 1
   fi
 
@@ -314,17 +419,47 @@ stop_all() {
   stop_process "$FRONTEND_PID_FILE" frontend
   stop_process "$BACKEND_PID_FILE" backend
   if [[ -f "$ENV_FILE" ]] && command -v docker >/dev/null 2>&1; then
-    compose down
+    compose down --remove-orphans
+  fi
+}
+
+compose_service_health() {
+  local service="$1"
+  local output normalized state health
+  output="$(compose ps --format json "$service" 2>/dev/null || true)"
+  normalized="$(printf '%s' "$output" | tr -d '[:space:]')"
+  if [[ "$normalized" != *"\"Service\":\"$service\""* ]]; then
+    printf 'stopped'
+    return
+  fi
+  state="$(printf '%s' "$normalized" | sed -n 's/.*"State":"\([^"]*\)".*/\1/p')"
+  health="$(printf '%s' "$normalized" | sed -n 's/.*"Health":"\([^"]*\)".*/\1/p')"
+  if [[ "$state" != "running" ]]; then
+    printf '%s' "${state:-stopped}"
+  elif [[ -n "$health" ]]; then
+    printf '%s' "$health"
+  else
+    printf 'unknown'
   fi
 }
 
 show_status() {
-  printf 'backend: %s\n' "$(process_status "$BACKEND_PID_FILE" backend)"
-  printf 'frontend: %s\n' "$(process_status "$FRONTEND_PID_FILE" frontend)"
-  if [[ -f "$ENV_FILE" ]] && command -v docker >/dev/null 2>&1 && compose ps --status running --quiet 2>/dev/null | grep -q .; then
-    printf 'dependencies: running\n'
-  else
+  local postgres_status="stopped"
+  local redis_status="stopped"
+  printf 'backend: %s\n' "$(process_status "$BACKEND_PID_FILE" backend "$BACKEND_PORT")"
+  printf 'frontend: %s\n' "$(process_status "$FRONTEND_PID_FILE" frontend "$FRONTEND_PORT")"
+  if [[ -f "$ENV_FILE" ]] && command -v docker >/dev/null 2>&1; then
+    postgres_status="$(compose_service_health postgres)"
+    redis_status="$(compose_service_health redis)"
+  fi
+  printf 'postgres: %s\n' "$postgres_status"
+  printf 'redis: %s\n' "$redis_status"
+  if [[ "$postgres_status" == "healthy" && "$redis_status" == "healthy" ]]; then
+    printf 'dependencies: healthy\n'
+  elif [[ "$postgres_status" == "stopped" && "$redis_status" == "stopped" ]]; then
     printf 'dependencies: stopped\n'
+  else
+    printf 'dependencies: degraded\n'
   fi
 }
 

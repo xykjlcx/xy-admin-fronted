@@ -280,7 +280,7 @@ Listener 对注册表内每张表按 `(deptIds 非空 ? owner_dept_id IN deptIds
 
 ### 7.1 唯一声明源与 AST 管线
 
-route `staticData.permission/actions` 是唯一权限声明源。权限码沿用当前 `<namespace>:<resource>:<action>` colon grammar（如 `iam:user:view`）；点分 grammar 只属于 ProblemDetail error code，二者不得互换。page permission 的稳定 sourceKey 为 `routeId#page`；每个 action 新增与 code 解耦的稳定 `key`，sourceKey 为 `routeId#action:<key>`，改 code/label/排序都不得改 key。
+route `staticData.permission/actions` 是唯一权限声明源。权限码统一为且必须恰好符合 `<namespace>:<resource>:<action>` 三段 colon grammar（如 `iam:user:view`）；点分 grammar 只属于 ProblemDetail error code，二者不得互换。现存两段 legacy `dashboard:view` 在 P0a 迁移为 canonical `dashboard:overview:view`；Task 14 的 extractor/generator guard 必须拒绝任何两段 legacy code。page permission 的稳定 sourceKey 为 `routeId#page`；每个 action 新增与 code 解耦的稳定 `key`，sourceKey 为 `routeId#action:<key>`，改 code/label/排序都不得改 key。
 
 实现 `frontend/scripts/permissions/extract.ts`，用 TypeScript compiler API 读取 `.tsx` AST；只接受对象/数组/string literal 与受控常量引用，动态表达式、缺 action key 或重复 sourceKey 直接 CI 失败。禁止 regex、构建时执行 route、`eval`。
 

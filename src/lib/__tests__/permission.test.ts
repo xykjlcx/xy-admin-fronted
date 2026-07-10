@@ -13,7 +13,7 @@ test.each([
   [['*:*:*'], 'dept:role:whatever', true],
   [['iam:user'], 'iam:user:view', false], // pattern 比 required 短且末段非 * → 不匹配
   [['iam:user:view:extra'], 'iam:user:view', false], // pattern 比 required 长且末段非 * → 不匹配
-  [['*:*:*'], 'dashboard:view', true], // 权限串段数不固定：3 段超管 pattern 末段 * 需覆盖 2 段的 dashboard:view
+  [['*:*:*'], 'dashboard:overview:view', true],
 ])('%j 匹配 %s → %s', (owned, need, expected) => {
   expect(matchPermission(owned as string[], need as string)).toBe(expected);
 });

@@ -3,6 +3,8 @@ package com.metabuild.app;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.metabuild.modules.admin.AdminModuleMarker;
+import com.metabuild.modules.lastmile.LastmileModuleMarker;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,13 @@ class MetaBuilderApplicationContractTest {
     Class<?> applicationClass = applicationClassReference.get();
 
     assertThat(applicationClass).hasAnnotation(SpringBootApplication.class);
+    SpringBootApplication annotation = applicationClass.getAnnotation(SpringBootApplication.class);
+    assertThat(annotation.scanBasePackages()).isEmpty();
+    assertThat(annotation.scanBasePackageClasses())
+        .containsExactlyInAnyOrder(
+            MetaBuilderApplication.class,
+            AdminModuleMarker.class,
+            LastmileModuleMarker.class);
     Method main = applicationClass.getDeclaredMethod("main", String[].class);
     assertThat(main.getReturnType()).isEqualTo(void.class);
   }

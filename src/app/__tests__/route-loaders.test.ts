@@ -59,7 +59,7 @@ function buildRouter(initial: string, permissions: string[]) {
 }
 
 test('dashboard 已配置首屏预取，冷缓存进入时概览数据进 cache', async () => {
-  const { router, queryClient } = buildRouter('/admin/dashboard', ['dashboard:view']);
+  const { router, queryClient } = buildRouter('/admin/dashboard', ['dashboard:overview:view']);
 
   await router.load();
 

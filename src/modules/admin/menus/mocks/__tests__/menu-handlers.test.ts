@@ -134,7 +134,7 @@ test('PUT /api/menus/:id 编辑菜单字段后可读回', async () => {
     label: { 'zh-CN': '经营总览' },
     icon: 'chart',
     path: '/admin/dashboard',
-    permission: 'dashboard:view',
+    permission: 'dashboard:overview:view',
     visible: false,
     sort: 6,
   };

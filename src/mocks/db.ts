@@ -116,7 +116,12 @@ export const db = {
       password: 'viewer123',
       name: faker.person.fullName(),
       roles: ['viewer'],
-      permissions: ['dashboard:view', 'iam:user:view', 'iam:dept:view', 'notice:msg:view'],
+      permissions: [
+        'dashboard:overview:view',
+        'iam:user:view',
+        'iam:dept:view',
+        'notice:msg:view',
+      ],
     },
   ] as MockUser[],
   sessions: createSessionStore(), // token -> userId

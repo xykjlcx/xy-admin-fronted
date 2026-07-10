@@ -34,7 +34,7 @@ export const adminManifest: SubsystemManifest = {
       type: 'menu',
       label: { 'zh-CN': '企业概览', 'en-US': 'Overview' },
       path: '/admin/dashboard',
-      permission: 'dashboard:view',
+      permission: 'dashboard:overview:view',
       visible: true,
       sort: 1,
     },

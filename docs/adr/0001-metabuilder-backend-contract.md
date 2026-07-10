@@ -30,6 +30,7 @@
 - 每段只允许小写字母、数字与连字符，且必须以小写字母开头；整体匹配 `^[a-z][a-z0-9-]*(:[a-z][a-z0-9-]*){2}$`。
 - 权限声明支持机器可读的 `AND/OR` 逻辑；多权限不得压成失去逻辑的字符串列表。
 - 前端 route `staticData` 是权限码唯一声明源，后端只能消费声明过的权限码。
+- P0a 将两段 legacy `dashboard:view` 统一迁移到 `dashboard:overview:view`；Task 14 的 catalog extractor/generator guard 负责拒绝后续两段权限码回流。
 
 ### 持久化 ID
 

@@ -1,6 +1,6 @@
-// 权限符匹配（RuoYi 风格 `域:资源:动作`，但本项目权限串段数不固定，如 dashboard:view 只有 2 段）：
+// 权限符匹配（RuoYi 风格 `域:资源:动作`；声明权限固定三段）：
 // `*` 只通配恰好一段；仅当 `*` 是 pattern 的最后一段时才通配其后剩余所有段（含 0 段——
-// 如 `*:*:*` 覆盖 2 段的 `dashboard:view`、`iam:*` 覆盖 `iam:user:view`）。
+// 如 `*:*:*` 覆盖 `dashboard:overview:view`、`iam:*` 覆盖 `iam:user:view`）。
 // 中段 `*`（如 `iam:*:view`）仅对齐当前这一段，不放行其后动作（`iam:*:view` 不覆盖 `iam:user:delete`）。
 export function matchPermission(owned: string[], need: string): boolean {
   const needSeg = need.split(':');

@@ -87,10 +87,36 @@ class ApplicationDatabaseMigrationIntegrationTest {
         .hasStackTraceContaining("platformDatabaseMigration");
   }
 
+  @Test
+  void realApplicationRefusesToStartWithoutAnAuthenticationSecret() {
+    Throwable failure = startAndCaptureFailure(null);
+
+    assertThat(failure)
+        .isNotNull()
+        .hasRootCauseMessage("METABUILDER_AUTH_TOKEN_SECRET must be configured");
+  }
+
+  @Test
+  void realApplicationRefusesToStartWithTheExampleAuthenticationSecret() {
+    Throwable failure = startAndCaptureFailure("__GENERATED__");
+
+    assertThat(failure)
+        .isNotNull()
+        .hasRootCauseMessage("METABUILDER_AUTH_TOKEN_SECRET must not use the example placeholder");
+  }
+
   private org.springframework.context.ConfigurableApplicationContext start(
       Map<String, Object> databaseProperties) {
+    return start(databaseProperties, VALID_SECRET);
+  }
+
+  private org.springframework.context.ConfigurableApplicationContext start(
+      Map<String, Object> databaseProperties,
+      String authenticationSecret) {
     var arguments = new ArrayList<String>();
-    arguments.add("--metabuilder.auth.token-secret=" + VALID_SECRET);
+    if (authenticationSecret != null) {
+      arguments.add("--metabuilder.auth.token-secret=" + authenticationSecret);
+    }
     arguments.add("--spring.main.banner-mode=off");
     arguments.add("--logging.level.root=OFF");
     databaseProperties.forEach((key, value) -> arguments.add("--" + key + "=" + value));
@@ -98,5 +124,16 @@ class ApplicationDatabaseMigrationIntegrationTest {
     return new SpringApplicationBuilder(MetaBuilderApplication.class)
         .web(WebApplicationType.NONE)
         .run(arguments.toArray(String[]::new));
+  }
+
+  private Throwable startAndCaptureFailure(String authenticationSecret) {
+    try (var ignored = start(Map.of(
+        "spring.datasource.url", POSTGRES.getJdbcUrl(),
+        "spring.datasource.username", POSTGRES.getUsername(),
+        "spring.datasource.password", POSTGRES.getPassword()), authenticationSecret)) {
+      return null;
+    } catch (Throwable failure) {
+      return failure;
+    }
   }
 }

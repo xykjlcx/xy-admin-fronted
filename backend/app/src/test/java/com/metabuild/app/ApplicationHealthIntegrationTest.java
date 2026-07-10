@@ -13,7 +13,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.context.WebServerApplicationContext;
@@ -21,6 +26,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
+@TestMethodOrder(OrderAnnotation.class)
 class ApplicationHealthIntegrationTest {
 
   private static final String VALID_SECRET = "0123456789abcdef0123456789abcdef";
@@ -50,6 +56,7 @@ class ApplicationHealthIntegrationTest {
   }
 
   @Test
+  @Order(2)
   void keepsLivenessUpWhenRuntimeDependenciesGoDown() throws Exception {
     verifyConfiguredCorsOrigin();
 
@@ -80,6 +87,32 @@ class ApplicationHealthIntegrationTest {
     }
   }
 
+  @ParameterizedTest
+  @Order(1)
+  @ValueSource(strings = {
+      "*",
+      "https://*.example.com",
+      "ftp://example.com",
+      "https://user@example.com",
+      "https://example.com/path",
+      "https://example.com?debug=true",
+      "https://example.com#fragment",
+      "https:///missing-host"
+  })
+  void realApplicationRejectsUnsafeCorsOrigins(String origin) {
+    Throwable failure = null;
+    try (var ignored = start(Map.of("metabuilder.cors.allowed-origins", origin))) {
+      // 启动成功即为契约失败，由后续断言统一报告。
+    } catch (Throwable caught) {
+      failure = caught;
+    }
+
+    assertThat(failure)
+        .isNotNull()
+        .hasRootCauseMessage(
+            "METABUILDER_CORS_ALLOWED_ORIGINS must contain only explicit HTTP(S) origins");
+  }
+
   private void verifyConfiguredCorsOrigin() throws Exception {
     try (var context = start(Map.of(
         "metabuilder.cors.allowed-origins", ALLOWED_ORIGIN))) {
@@ -89,6 +122,11 @@ class ApplicationHealthIntegrationTest {
       assertThat(response.statusCode()).isEqualTo(200);
       assertThat(response.headers().firstValue("Access-Control-Allow-Origin"))
           .contains(ALLOWED_ORIGIN);
+
+      HttpResponse<String> actuatorResponse =
+          get(port, "/actuator/health/liveness", ALLOWED_ORIGIN);
+      assertThat(actuatorResponse.headers().firstValue("Access-Control-Allow-Origin"))
+          .isEmpty();
     }
   }
 

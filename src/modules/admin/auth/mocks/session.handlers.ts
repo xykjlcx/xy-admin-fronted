@@ -58,7 +58,7 @@ export const sessionHandlers = [
     return ok({
       user: { id: registered.id, name: registered.name, username: registered.email },
       roles: ['viewer'],
-      permissions: ['dashboard:view', 'notice:msg:view'],
+      permissions: ['dashboard:overview:view', 'notice:msg:view'],
     });
   }),
   http.post('/api/auth/logout', ({ request }) => {

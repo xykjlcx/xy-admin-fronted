@@ -38,7 +38,7 @@ test('已登录但缺页面权限 → 重定向 /403', async () => {
 });
 
 test('已登录且有页面权限 → 停留目标路由', async () => {
-  const router = buildRouter({ token: 't', permissions: ['dashboard:view'] }, '/admin/dashboard');
+  const router = buildRouter({ token: 't', permissions: ['dashboard:overview:view'] }, '/admin/dashboard');
   await router.load();
   expect(router.state.location.pathname).toBe('/admin/dashboard');
 });
