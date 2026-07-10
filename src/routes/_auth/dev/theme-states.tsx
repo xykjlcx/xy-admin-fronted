@@ -220,6 +220,7 @@ function ThemeStatesRoute() {
   const treeNodes: TreeNode[] = treeThemeNodes.map((node) => ({
     id: node.id,
     label: t(node.labelKey),
+    description: node.id,
     depth: node.depth,
     meta: node.meta,
     expandable: node.id === 'all',
@@ -923,6 +924,7 @@ function ThemeStatesRoute() {
           <div>
             <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.treeStateMatrix')}</p>
             <Tree
+              variant="management"
               nodes={treeNodes}
               selectedId="rd"
               onSelect={() => undefined}

@@ -134,6 +134,30 @@ test('PagePaneHeader stacks metadata below its title so pane actions cannot sque
   expect(screen.getByText('5 个节点')).toHaveAttribute('data-slot', 'page-pane-meta');
 });
 
+test('PageScaffold exposes canvas pane bodies and card or plain section surfaces', () => {
+  const { container } = render(
+    <PagePaneBody tone="canvas">
+      <PageSection variant="card" leading={<span>图标</span>} title="对象摘要">
+        摘要内容
+      </PageSection>
+      <PageSection variant="plain" title="操作列表">
+        操作内容
+      </PageSection>
+    </PagePaneBody>,
+  );
+
+  expect(container.querySelector('[data-slot="page-pane-body"]')).toHaveAttribute('data-tone', 'canvas');
+  expect(screen.getByText('对象摘要').closest('[data-slot="page-section"]')).toHaveAttribute(
+    'data-variant',
+    'card',
+  );
+  expect(screen.getByText('图标').closest('[data-slot="page-section-leading"]')).toBeInTheDocument();
+  expect(screen.getByText('操作列表').closest('[data-slot="page-section"]')).toHaveAttribute(
+    'data-variant',
+    'plain',
+  );
+});
+
 test('PageScaffold owns responsive 2:3:5 three-pane workspace presentation', () => {
   render(
     <PageThreePane>

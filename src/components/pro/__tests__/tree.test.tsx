@@ -78,3 +78,33 @@ test('Tree owns expand, hidden-row, leading and trailing presentation', async ()
     'true',
   );
 });
+
+test('Tree supports a management list variant with supporting descriptions', () => {
+  render(
+    <Tree
+      variant="management"
+      nodes={[
+        {
+          id: 'menu-files',
+          label: '文件管理',
+          description: 'm-files',
+          depth: 0,
+          leading: <span>图标</span>,
+          trailing: <span>菜单</span>,
+        },
+      ]}
+      selectedId="menu-files"
+      onSelect={() => undefined}
+      ariaLabel="菜单导航树"
+    />,
+  );
+
+  const tree = screen.getByRole('tree', { name: '菜单导航树' });
+  expect(tree).toHaveAttribute('data-variant', 'management');
+  expect(tree).toHaveClass('bg-(--table-bg)', 'border-(--table-border)');
+  expect(screen.getByText('m-files')).toHaveAttribute('data-slot', 'tree-description');
+  expect(screen.getByRole('treeitem', { name: '文件管理 m-files' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+});

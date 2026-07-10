@@ -206,11 +206,20 @@ export function PagePaneToolbar({ className, ...props }: ComponentProps<'div'>) 
   );
 }
 
-export function PagePaneBody({ className, ...props }: ComponentProps<'div'>) {
+export function PagePaneBody({
+  tone = 'default',
+  className,
+  ...props
+}: ComponentProps<'div'> & { tone?: 'default' | 'canvas' }) {
   return (
     <div
       data-slot="page-pane-body"
-      className={cn('min-h-0 flex-1 overflow-y-auto p-3', className)}
+      data-tone={tone}
+      className={cn(
+        'min-h-0 flex-1 overflow-y-auto p-3',
+        tone === 'canvas' && 'bg-(--pro-page-bg)',
+        className,
+      )}
       {...props}
     />
   );
@@ -229,25 +238,47 @@ export function PagePaneFooter({ className, ...props }: ComponentProps<'div'>) {
 export function PageSection({
   title,
   description,
+  leading,
   actions,
+  variant = 'subtle',
   children,
   className,
   ...props
 }: Omit<ComponentProps<'section'>, 'title'> & {
   title: ReactNode;
   description?: ReactNode;
+  leading?: ReactNode;
   actions?: ReactNode;
+  variant?: 'subtle' | 'card' | 'plain';
 }) {
   return (
     <section
       data-slot="page-section"
-      className={cn('rounded-10 bg-(--pro-page-bg) p-3', className)}
+      data-variant={variant}
+      className={cn(
+        'rounded-10 p-3',
+        variant === 'subtle' && 'bg-(--pro-page-bg)',
+        variant === 'card' &&
+          'border border-(--page-section-divider) bg-(--pro-panel-bg) shadow-card-sm',
+        variant === 'plain' && 'rounded-none bg-transparent p-0',
+        className,
+      )}
       {...props}
     >
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="text-sm font-semibold text-text">{title}</h3>
-          {description ? <p className="mt-1 text-xs text-text-3">{description}</p> : null}
+        <div className="flex min-w-0 items-center gap-2.5">
+          {leading ? (
+            <span
+              data-slot="page-section-leading"
+              className="flex size-9 shrink-0 items-center justify-center rounded-10 bg-(--accent-emphasis-soft) text-(--accent-emphasis)"
+            >
+              {leading}
+            </span>
+          ) : null}
+          <div className="min-w-0">
+            <h3 className="truncate text-sm font-semibold text-text">{title}</h3>
+            {description ? <p className="mt-1 truncate text-xs text-text-3">{description}</p> : null}
+          </div>
         </div>
         {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
       </div>

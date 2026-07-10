@@ -384,6 +384,8 @@ test('theme states route exposes the Tree state matrix', () => {
   expect(source).toContain('treeAriaLabel');
   expect(source).toContain('expanded: treeExpanded');
   expect(source).toContain('hidden: !treeExpanded');
+  expect(source).toContain('variant="management"');
+  expect(source).toContain('description: node.id');
   expect(source).toContain('leading:');
   expect(source).toContain('trailing:');
   expect(source).toContain('onToggle={() => setTreeExpanded');

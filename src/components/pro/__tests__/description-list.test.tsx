@@ -16,3 +16,28 @@ test('DescriptionList owns compact multi-column and empty presentation', () => {
   rerender(<DescriptionList columns={2} density="compact" items={[]} empty="暂无配置" />);
   expect(screen.getByText('暂无配置')).toHaveAttribute('data-slot', 'description-list-empty');
 });
+
+test('DescriptionList supports card records with a dedicated trailing action slot', () => {
+  const { container } = render(
+    <DescriptionList
+      presentation="cards"
+      density="compact"
+      items={[
+        {
+          label: '上传文件',
+          value: 'file:doc:upload',
+          actions: <button type="button">编辑上传文件</button>,
+        },
+      ]}
+    />,
+  );
+
+  const list = container.querySelector('[data-slot="description-list"]');
+  const item = screen.getByText('上传文件').closest('[data-slot="description-list-item"]');
+
+  expect(list).toHaveAttribute('data-presentation', 'cards');
+  expect(item).toHaveClass('bg-(--pro-panel-bg)', 'border-(--page-section-divider)');
+  expect(
+    screen.getByRole('button', { name: '编辑上传文件' }).closest('[data-slot="description-list-actions"]'),
+  ).toBeInTheDocument();
+});

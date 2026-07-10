@@ -68,7 +68,13 @@ test('节点详情按基本信息和页面操作组织', async () => {
   const inspector = screen.getByRole('complementary', { name: '节点详情' });
   expect(within(inspector).getByRole('region', { name: '基本信息' })).toBeInTheDocument();
   await userEvent.click(getTreeNodeButton('成员与部门'));
-  expect(within(inspector).getByRole('region', { name: '页面操作' })).toHaveTextContent('导出成员');
+  const actionRegion = within(inspector).getByRole('region', { name: '页面操作' });
+  expect(actionRegion).toHaveTextContent('导出成员');
+  expect(actionRegion.querySelector('[data-slot="description-list"]')).toHaveAttribute(
+    'data-presentation',
+    'cards',
+  );
+  expect(actionRegion.closest('[data-slot="page-pane-body"]')).toHaveAttribute('data-tone', 'canvas');
 });
 
 test('菜单树工具栏使用单行结构摘要', () => {
@@ -105,6 +111,14 @@ test('菜单树暴露标准展开和选中状态', async () => {
 
   await userEvent.click(inactiveTreeItem);
   expect(inactiveTreeItem).toHaveAttribute('aria-selected', 'true');
+});
+
+test('菜单树使用管理型连续列表并把节点标识作为次级信息展示', () => {
+  renderMenusView({ permissions: ['*:*:*'] });
+
+  const tree = screen.getByRole('tree', { name: '菜单导航树' });
+  expect(tree).toHaveAttribute('data-variant', 'management');
+  expect(within(tree).getByText('m-home')).toHaveAttribute('data-slot', 'tree-description');
 });
 
 test('动作节点不进入菜单树，只在所属页面详情中管理', async () => {

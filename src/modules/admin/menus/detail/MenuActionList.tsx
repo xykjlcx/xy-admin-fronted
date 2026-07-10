@@ -38,7 +38,7 @@ export function MenuActionList({
     return {
       label: name,
       value: action.permission || t('menus.inspector.emptyValue'),
-      description: (
+      actions: (
         <div className="flex items-center gap-2">
           {capabilities.toggle && (
             <Switch
@@ -79,6 +79,7 @@ export function MenuActionList({
     <PageSection
       aria-label={t('menus.actionSection.label')}
       data-testid="menu-actions-card"
+      variant="plain"
       title={t('menus.actionSection.title')}
       description={t('menus.actionSection.desc', { count: actions.length })}
       actions={
@@ -94,6 +95,7 @@ export function MenuActionList({
         <DescriptionList
           items={items}
           density="compact"
+          presentation="cards"
           empty={t('menus.actionSection.empty')}
         />
       </div>

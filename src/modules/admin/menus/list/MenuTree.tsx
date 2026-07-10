@@ -43,8 +43,8 @@ export function MenuTree({
     return {
       id: menu.id,
       label: name,
+      description: menu.id,
       depth,
-      meta: menu.id,
       leading: <Icon name={menu.icon} />,
       expandable: hasChildren,
       expanded: !collapsed.has(menu.id),
@@ -73,6 +73,7 @@ export function MenuTree({
 
   return (
     <Tree
+      variant="management"
       nodes={nodes}
       selectedId={selectedMenuId ?? undefined}
       ariaLabel={t('menus.treeLabel')}

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 export interface TreeNode {
   id: string;
   label: ReactNode;
+  description?: ReactNode;
   depth: number;
   meta?: ReactNode;
   leading?: ReactNode;
@@ -17,6 +18,7 @@ export interface TreeNode {
 }
 export interface TreeProps {
   nodes: TreeNode[];
+  variant?: 'default' | 'management';
   selectedId?: string;
   onSelect: (id: string) => void;
   onToggle?: (id: string) => void;
@@ -40,18 +42,37 @@ function textFromNode(node: ReactNode): string | undefined {
 function treeItemAriaLabel(node: TreeNode): string | undefined {
   const label = textFromNode(node.label);
   if (!label) return undefined;
+  const description = textFromNode(node.description);
   const meta = textFromNode(node.meta);
-  return meta ? `${label} ${meta}` : label;
+  return [label, description, meta].filter(Boolean).join(' ');
 }
 
-export function Tree({ nodes, selectedId, onSelect, onToggle, ariaLabel, empty }: TreeProps): JSX.Element {
+export function Tree({
+  nodes,
+  variant = 'default',
+  selectedId,
+  onSelect,
+  onToggle,
+  ariaLabel,
+  empty,
+}: TreeProps): JSX.Element {
   if (nodes.length === 0) {
     return <div data-slot="tree-empty" className="flex min-h-64 items-center justify-center text-sm text-text-3">{empty}</div>;
   }
 
   return (
-    <div role="tree" aria-label={ariaLabel} className="grid gap-1">
-      {nodes.map((node) => {
+    <div
+      role="tree"
+      aria-label={ariaLabel}
+      data-variant={variant}
+      className={cn(
+        'grid',
+        variant === 'default' && 'gap-1',
+        variant === 'management' &&
+          'overflow-hidden rounded-10 border border-(--table-border) bg-(--table-bg)',
+      )}
+    >
+      {nodes.map((node, index) => {
         const selected = node.id === selectedId;
         const itemAriaLabel = treeItemAriaLabel(node);
 
@@ -67,10 +88,16 @@ export function Tree({ nodes, selectedId, onSelect, onToggle, ariaLabel, empty }
           >
             <div className="min-h-0 overflow-hidden">
               <div
+                data-slot="tree-row-surface"
                 aria-hidden={node.hidden || undefined}
                 inert={node.hidden || undefined}
                 className={cn(
-                  'group/tree-row flex min-h-[calc(44px*var(--app-scale))] items-center rounded-8 px-1',
+                  'group/tree-row flex items-center px-1',
+                  variant === 'default' && 'min-h-[calc(44px*var(--app-scale))] rounded-8',
+                  variant === 'management' &&
+                    'min-h-[calc(54px*var(--app-scale))]',
+                  variant === 'management' && index < nodes.length - 1 &&
+                    'border-b border-(--table-row-border)',
                   selected
                     ? 'bg-(--side-list-item-bg-active)'
                     : 'hover:bg-(--side-list-item-bg-hover)',
@@ -105,7 +132,9 @@ export function Tree({ nodes, selectedId, onSelect, onToggle, ariaLabel, empty }
                   aria-label={itemAriaLabel}
                   aria-selected={selected}
                   className={cn(
-                    'flex min-h-[calc(36px*var(--app-scale))] min-w-0 flex-1 items-center gap-2 rounded-8 pr-2 text-left text-sm outline-none',
+                    'flex min-w-0 flex-1 items-center gap-2 rounded-8 pr-2 text-left text-sm outline-none',
+                    variant === 'default' && 'min-h-[calc(36px*var(--app-scale))]',
+                    variant === 'management' && 'min-h-[calc(46px*var(--app-scale))]',
                     selected
                       ? 'font-semibold text-(--side-list-item-fg-active)'
                       : 'text-text-2',
@@ -124,7 +153,20 @@ export function Tree({ nodes, selectedId, onSelect, onToggle, ariaLabel, empty }
                       {node.leading}
                     </span>
                   )}
-                  <span className="min-w-0 flex-1 truncate">{node.label}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate">{node.label}</span>
+                    {node.description ? (
+                      <span
+                        data-slot="tree-description"
+                        className={cn(
+                          'mt-0.5 block truncate text-xs font-normal text-text-3',
+                          selected && 'text-(--side-list-item-meta-fg-active)',
+                        )}
+                      >
+                        {node.description}
+                      </span>
+                    ) : null}
+                  </span>
                   {node.meta && (
                     <span
                       className={cn(

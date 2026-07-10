@@ -158,7 +158,7 @@ export function MenuWorkspace(props: MenuWorkspaceProps) {
           className="hidden xl:flex"
         >
           <PagePaneHeader title={props.t('menus.inspector.title')} />
-          <PagePaneBody>{inspector}</PagePaneBody>
+          <PagePaneBody tone="canvas">{inspector}</PagePaneBody>
         </PagePane>
       </PageThreePane>
 
@@ -166,7 +166,7 @@ export function MenuWorkspace(props: MenuWorkspaceProps) {
         <SheetContent side="right" className="gap-0 overflow-y-auto">
           <SheetTitle className="sr-only">{props.t('menus.inspector.title')}</SheetTitle>
           <PagePaneHeader title={props.t('menus.inspector.title')} />
-          <PagePaneBody>
+          <PagePaneBody tone="canvas">
             <MenuInspector
               menu={props.selectedMenu}
               parent={props.selectedParent}

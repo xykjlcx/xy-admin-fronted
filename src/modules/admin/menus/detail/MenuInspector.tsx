@@ -5,6 +5,7 @@ import { PageSection } from '@/components/pro/PageScaffold';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Icon } from '@/lib/icon-registry';
 import { lv } from '@/lib/localized';
 import { MenuActionList } from './MenuActionList';
 import type { MenuCapabilities } from '../types';
@@ -54,6 +55,8 @@ export function MenuInspector(props: MenuInspectorProps) {
     <div className="grid gap-3">
       <PageSection
         data-testid="menu-detail-header"
+        variant="card"
+        leading={<Icon name={menu.icon} />}
         title={name}
         description={menu.id}
         actions={
@@ -90,6 +93,7 @@ export function MenuInspector(props: MenuInspectorProps) {
       <PageSection
         aria-label={t('menus.inspector.basicInfo')}
         data-testid="menu-basic-card"
+        variant="card"
         title={t('menus.inspector.basicInfo')}
       >
         <DescriptionList
