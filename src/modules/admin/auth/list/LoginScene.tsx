@@ -24,7 +24,7 @@ import {
   InputGroupSuffix,
 } from '@/components/ui/input';
 import { authApi } from '../api';
-import { resetSession } from '@/lib/reset-auth';
+import { sessionCredentialService } from '@/lib/session-credential-service';
 import { HttpError } from '@/lib/http/errors';
 import { cn } from '@/lib/utils';
 import { appConfig } from '@/config';
@@ -77,7 +77,7 @@ export function LoginScene({
   });
 
   const completeAuthentication = async (token: string) => {
-    await resetSession(token); // 存新 token + 清空上个账号全部缓存，防权限/数据串号
+    await sessionCredentialService.replace(token); // 先安全持久化，再更新内存并清空上个账号缓存
     await onAuthenticated(token, safeInternalPath(redirect));
   };
   const showAuthenticationError = (error: unknown) => {
@@ -107,8 +107,7 @@ export function LoginScene({
 
   const onSubmit = handleSubmit(async (dto) => {
     try {
-      const { token } =
-        tab === 'sms' ? await authApi.smsLogin(sms) : await authApi.login(dto);
+      const { token } = tab === 'sms' ? await authApi.smsLogin(sms) : await authApi.login(dto);
       await completeAuthentication(token);
     } catch (e) {
       showAuthenticationError(e);
@@ -125,12 +124,14 @@ export function LoginScene({
             <Globe2 data-icon="inline-start" />
             {i18n.language.startsWith('zh') ? 'English' : '简体中文'}
           </Button>
-          <Button type="button" variant="text" size="xs" onClick={toggleTheme} className="gap-1.5 text-text-2">
-            {mode === 'dark' ? (
-              <Sun data-icon="inline-start" />
-            ) : (
-              <Moon data-icon="inline-start" />
-            )}
+          <Button
+            type="button"
+            variant="text"
+            size="xs"
+            onClick={toggleTheme}
+            className="gap-1.5 text-text-2"
+          >
+            {mode === 'dark' ? <Sun data-icon="inline-start" /> : <Moon data-icon="inline-start" />}
             {t('auth.switchTheme')}
           </Button>
         </div>
@@ -152,9 +153,7 @@ export function LoginScene({
                   size="sm"
                   className={cn(
                     'h-[calc(36px*var(--app-scale))] gap-1.5 rounded-8 text-[calc(13px*var(--app-scale))]',
-                    tab === item.key
-                      ? 'font-semibold'
-                      : 'text-text-2',
+                    tab === item.key ? 'font-semibold' : 'text-text-2',
                   )}
                   onClick={() => {
                     clearErrors('root');

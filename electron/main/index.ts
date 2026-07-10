@@ -1,12 +1,14 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { app, BrowserWindow, clipboard, dialog, net, protocol, session, shell } from 'electron';
-import { getDesktopEnvironment, readRendererDevelopmentUrl } from '../config';
+import { app, BrowserWindow, clipboard, dialog, net, protocol, safeStorage, session, shell } from 'electron';
+import { getDesktopEnvironment, readRendererDevelopmentUrl, readSpikeUserDataPathValue } from '../config';
 import { createWindowOptions } from './create-window';
+import { createAtomicCredentialFileStore, createCredentialVault } from './credential-vault';
 import { registerDesktopIpcHandlers } from './ipc';
 import { decideNavigation } from './navigation-policy';
 import { buildRendererCsp, resolveRendererAssetPath } from './protocol';
+import { parseSpikeUserDataPath } from './spike-user-data';
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -21,6 +23,8 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 const environment = getDesktopEnvironment();
+const spikeUserDataPath = parseSpikeUserDataPath(readSpikeUserDataPathValue(), environment.spikeMode);
+if (spikeUserDataPath) app.setPath('userData', spikeUserDataPath);
 const rendererRoot = path.join(app.getAppPath(), 'out/renderer');
 const allowedExternalHosts = new Set([new URL(environment.webPublicBaseUrl).hostname]);
 let mainWindow: BrowserWindow | null = null;
@@ -109,10 +113,27 @@ async function startApplication(): Promise<void> {
   await app.whenReady();
   registerRendererProtocol();
   registerSecurityPolicies();
+  const credentialVault = createCredentialVault({
+    crypto: {
+      isAvailable: () => safeStorage.isAsyncEncryptionAvailable(),
+      encrypt: (plainText) => safeStorage.encryptStringAsync(plainText),
+      decrypt: (ciphertext) => safeStorage.decryptStringAsync(ciphertext),
+    },
+    storage: createAtomicCredentialFileStore(
+      path.join(app.getPath('userData'), 'credentials', 'session.bin'),
+    ),
+  });
+  try {
+    await credentialVault.restore();
+  } catch {
+    // 安全存储不可用或密文损坏时按无会话启动，禁止回退明文。
+    console.error('Credential vault restore failed; starting without a session');
+  }
   const disposeIpc = registerDesktopIpcHandlers({
     writeClipboardText: (text) => clipboard.writeText(text),
     openExternal: (url) => shell.openExternal(url),
     allowedExternalHosts,
+    credentials: credentialVault,
   });
   app.once('before-quit', disposeIpc);
   mainWindow = createMainWindow();

@@ -1,4 +1,5 @@
 export type HostRuntime = 'web' | 'desktop';
+export type SessionClearReason = 'logout' | 'expired' | 'switch-account';
 
 export type PlatformWindowSnapshot =
   | { runtime: 'web'; platform: 'browser'; chrome: 'native' }
@@ -14,6 +15,11 @@ export interface AppPlatform {
   };
   readonly external: {
     open(url: string): Promise<void>;
+  };
+  readonly credentials: {
+    restore(): Promise<string | null>;
+    persist(token: string): Promise<void>;
+    clear(reason: SessionClearReason): Promise<void>;
   };
 }
 

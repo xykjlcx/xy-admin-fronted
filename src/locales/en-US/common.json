@@ -312,7 +312,8 @@
       "notification": "Message center is planned for M1",
       "search": "Global search is planned for M1",
       "stub": "This feature is planned for M1",
-      "logoutFailed": "Failed to log out"
+      "logoutFailed": "Failed to log out",
+      "sessionClearFailed": "Failed to clear the local credential. Close the app and try again"
     },
     "appearanceDrawer": {
       "title": "Appearance",

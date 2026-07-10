@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { CredentialClearInput } from './schemas';
 
 export const WindowSnapshotSchema = z.object({
   runtime: z.literal('desktop'),
@@ -17,5 +18,10 @@ export interface DesktopApi {
   };
   external: {
     open(url: string): Promise<void>;
+  };
+  credentials: {
+    restore(): Promise<string | null>;
+    persist(token: string): Promise<void>;
+    clear(reason: CredentialClearInput['reason']): Promise<void>;
   };
 }

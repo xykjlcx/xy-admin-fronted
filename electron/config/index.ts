@@ -96,6 +96,10 @@ export function readDesktopRendererEnvironment(): { enableMock: string | undefin
   return { enableMock: process.env.VITE_ENABLE_MOCK };
 }
 
+export function readSpikeUserDataPathValue(): string | undefined {
+  return process.env.SPIKE_USER_DATA_PATH;
+}
+
 declare const __DESKTOP_BUILD_ENV__: DesktopEnvironment | undefined;
 
 export function getDesktopEnvironment(): DesktopEnvironment {

@@ -53,6 +53,33 @@ describe('desktop architecture guard', () => {
     ]);
   });
 
+  test('allows setToken only inside the auth store and SessionCredentialService', () => {
+    const violations = findDesktopBoundaryViolations(
+      new Map([
+        ['src/lib/reset-auth.ts', 'useAuth.getState().setToken(token);'],
+        ['src/lib/session-credential-service.ts', 'dependencies.auth.setToken(token);'],
+        ['src/stores/auth.ts', 'setToken: (token) => set({ token })'],
+      ]),
+    );
+
+    expect(violations).toEqual(['src/lib/reset-auth.ts: setToken 只能由 SessionCredentialService 修改']);
+  });
+
+  test('allows credential adapter access only inside SessionCredentialService and platform adapters', () => {
+    const violations = findDesktopBoundaryViolations(
+      new Map([
+        ['src/modules/admin/auth/list/LoginScene.tsx', 'await platform.credentials.persist(token);'],
+        ['src/lib/session-credential-service.ts', 'credentials: platform.credentials'],
+        ['src/lib/platform/desktop.ts', 'credentials: { restore: () => api.credentials.restore() }'],
+        ['src/lib/platform/web.ts', 'credentials: { restore: async () => null }'],
+      ]),
+    );
+
+    expect(violations).toEqual([
+      'src/modules/admin/auth/list/LoginScene.tsx: credential adapter 只能由 SessionCredentialService 调用',
+    ]);
+  });
+
   test('allows the designated config, preload, and Renderer platform adapter boundaries', () => {
     expect(
       findDesktopBoundaryViolations(

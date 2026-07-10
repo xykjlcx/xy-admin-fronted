@@ -15,7 +15,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { meQuery, authApi } from '@/modules/admin/auth/api';
-import { resetSession } from '@/lib/reset-auth';
+import { sessionCredentialService } from '@/lib/session-credential-service';
 import { appConfig } from '@/config';
 
 export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar' | 'icon' } = {}) {
@@ -45,7 +45,11 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
     }
     // 先离开受保护树，再清缓存：否则 Shell 里挂载中的 useSuspenseQuery 会用空 token 重拉。
     await nav({ to: appConfig.routes.login });
-    await resetSession(null);
+    try {
+      await sessionCredentialService.clear('logout');
+    } catch {
+      toast.error(t('shell.toast.sessionClearFailed'));
+    }
   };
 
   return (
@@ -85,7 +89,12 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
           </Avatar>
           {!compact && (
             <>
-              <div className={cn('min-w-0 flex-1 text-left leading-tight', variant === 'header' && 'max-lg:hidden')}>
+              <div
+                className={cn(
+                  'min-w-0 flex-1 text-left leading-tight',
+                  variant === 'header' && 'max-lg:hidden',
+                )}
+              >
                 <div className="truncate text-[calc(13px*var(--app-scale))] font-semibold text-text">
                   {me.user.name}
                 </div>

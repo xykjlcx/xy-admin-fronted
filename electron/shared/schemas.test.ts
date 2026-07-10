@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'vitest';
-import { ClipboardWriteInputSchema, ExternalOpenInputSchema, IpcSuccessSchema } from './schemas';
+import {
+  ClipboardWriteInputSchema,
+  CredentialClearInputSchema,
+  CredentialPersistInputSchema,
+  CredentialRestoreResultSchema,
+  ExternalOpenInputSchema,
+  IpcSuccessSchema,
+} from './schemas';
 
 describe('desktop IPC schemas', () => {
   test('accepts bounded clipboard text and a strict success result', () => {
@@ -23,5 +30,14 @@ describe('desktop IPC schemas', () => {
     expect(ExternalOpenInputSchema.parse({ url: 'https://docs.example.com/guide?q=desktop' })).toEqual({
       url: 'https://docs.example.com/guide?q=desktop',
     });
+  });
+
+  test('bounds credential IPC and restricts clear reasons', () => {
+    expect(CredentialPersistInputSchema.parse({ token: 'token' })).toEqual({ token: 'token' });
+    expect(CredentialRestoreResultSchema.parse({ token: null })).toEqual({ token: null });
+    expect(CredentialClearInputSchema.parse({ reason: 'expired' })).toEqual({ reason: 'expired' });
+    expect(() => CredentialPersistInputSchema.parse({ token: '' })).toThrow();
+    expect(() => CredentialPersistInputSchema.parse({ token: 'x'.repeat(16_385) })).toThrow();
+    expect(() => CredentialClearInputSchema.parse({ reason: 'other' })).toThrow();
   });
 });

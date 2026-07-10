@@ -12,6 +12,7 @@ describe('desktop IPC handlers', () => {
       writeClipboardText,
       openExternal: vi.fn(),
       allowedExternalHosts: new Set(['docs.example.com']),
+      credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
     });
 
     await expect(handlers[ipcChannels.clipboardWrite](trustedEvent, { text: 'copied' })).resolves.toEqual({
@@ -31,6 +32,7 @@ describe('desktop IPC handlers', () => {
       writeClipboardText: vi.fn(),
       openExternal,
       allowedExternalHosts: new Set(['docs.example.com']),
+      credentials: { restore: vi.fn(), persist: vi.fn(), clear: vi.fn() },
     });
 
     await expect(
@@ -43,5 +45,36 @@ describe('desktop IPC handlers', () => {
       handlers[ipcChannels.externalOpen](trustedEvent, { url: 'file:///tmp/secret' }),
     ).rejects.toThrow();
     expect(openExternal).toHaveBeenCalledTimes(1);
+  });
+
+  test('keeps credential restore, persist, and clear behind the same sender and schema boundary', async () => {
+    const credentials = {
+      restore: vi.fn().mockResolvedValue('restored-token'),
+      persist: vi.fn().mockResolvedValue(undefined),
+      clear: vi.fn().mockResolvedValue(undefined),
+    };
+    const handlers = createDesktopIpcHandlers({
+      writeClipboardText: vi.fn(),
+      openExternal: vi.fn(),
+      allowedExternalHosts: new Set(),
+      credentials,
+    });
+
+    await expect(handlers[ipcChannels.credentialRestore](trustedEvent, undefined)).resolves.toEqual({
+      token: 'restored-token',
+    });
+    await expect(
+      handlers[ipcChannels.credentialPersist](trustedEvent, { token: 'next-token' }),
+    ).resolves.toEqual({
+      ok: true,
+    });
+    await expect(handlers[ipcChannels.credentialClear](trustedEvent, { reason: 'logout' })).resolves.toEqual({
+      ok: true,
+    });
+    await expect(
+      handlers[ipcChannels.credentialPersist](untrustedEvent, { token: 'blocked' }),
+    ).rejects.toThrow('拒绝非 Renderer IPC sender');
+    expect(credentials.persist).toHaveBeenCalledWith('next-token');
+    expect(credentials.clear).toHaveBeenCalledTimes(1);
   });
 });

@@ -8,6 +8,7 @@ beforeEach(() => {
 test('setToken 往返：写入后可读，写 null 清除', () => {
   useAuth.getState().setToken('tok-123');
   expect(useAuth.getState().token).toBe('tok-123');
+  expect(localStorage.getItem('auth')).toBeNull();
 
   useAuth.getState().setToken(null);
   expect(useAuth.getState().token).toBeNull();

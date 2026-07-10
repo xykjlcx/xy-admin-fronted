@@ -18,7 +18,15 @@ export const ExternalOpenInputSchema = z
   });
 
 export const IpcSuccessSchema = z.object({ ok: z.literal(true) }).strict();
+export const CredentialPersistInputSchema = z.object({ token: z.string().min(1).max(16_384) }).strict();
+export const CredentialRestoreInputSchema = z.undefined();
+export const CredentialClearInputSchema = z
+  .object({ reason: z.enum(['logout', 'expired', 'switch-account']) })
+  .strict();
+export const CredentialRestoreResultSchema = z.object({ token: z.string().max(16_384).nullable() }).strict();
 
 export type ClipboardWriteInput = z.infer<typeof ClipboardWriteInputSchema>;
 export type ExternalOpenInput = z.infer<typeof ExternalOpenInputSchema>;
 export type IpcSuccess = z.infer<typeof IpcSuccessSchema>;
+export type CredentialClearInput = z.infer<typeof CredentialClearInputSchema>;
+export type CredentialRestoreResult = z.infer<typeof CredentialRestoreResultSchema>;

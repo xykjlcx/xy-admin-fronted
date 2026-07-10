@@ -42,6 +42,19 @@ export function findDesktopBoundaryViolations(files) {
       if (usesWindowDesktop(source) && normalizedFile !== 'src/lib/platform/desktop.ts') {
         violations.push(`${normalizedFile}: window.desktop 只能出现在平台适配层`);
       }
+      if (
+        /\bsetToken\s*\(/.test(source) &&
+        normalizedFile !== 'src/lib/session-credential-service.ts' &&
+        normalizedFile !== 'src/stores/auth.ts'
+      ) {
+        violations.push(`${normalizedFile}: setToken 只能由 SessionCredentialService 修改`);
+      }
+      if (
+        /\bplatform\s*\.\s*credentials\b/.test(source) &&
+        normalizedFile !== 'src/lib/session-credential-service.ts'
+      ) {
+        violations.push(`${normalizedFile}: credential adapter 只能由 SessionCredentialService 调用`);
+      }
     }
 
     if (normalizedFile.startsWith('electron/') && !testFile) {

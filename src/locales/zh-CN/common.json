@@ -312,7 +312,8 @@
       "notification": "消息中心开发中（M1）",
       "search": "全局搜索开发中（M1）",
       "stub": "功能开发中（M1）",
-      "logoutFailed": "退出登录失败，请重试"
+      "logoutFailed": "退出登录失败，请重试",
+      "sessionClearFailed": "本地登录凭证清理失败，请关闭应用后重试"
     },
     "appearanceDrawer": {
       "title": "外观设置",

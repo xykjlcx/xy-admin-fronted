@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { _electron as electron, expect, test } from '@playwright/test';
 
 interface SpikeEvidence {
@@ -103,6 +104,42 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
       }),
     ).toBe('blocked');
 
+    const credentialPath = path.join(
+      await desktop.evaluate(({ app }) => app.getPath('userData')),
+      'credentials',
+      'session.bin',
+    );
+    await page.evaluate(async () => {
+      const api = (
+        window as Window & {
+          desktop?: {
+            credentials: {
+              persist(token: string): Promise<void>;
+              restore(): Promise<string | null>;
+            };
+          };
+        }
+      ).desktop;
+      if (!api) throw new Error('Desktop API unavailable');
+      await api.credentials.persist('packaged-vault-token');
+      if ((await api.credentials.restore()) !== 'packaged-vault-token') {
+        throw new Error('credential restore failed');
+      }
+    });
+    expect(existsSync(credentialPath)).toBe(true);
+    expect(readFileSync(credentialPath).includes(Buffer.from('packaged-vault-token'))).toBe(false);
+    expect(await page.evaluate(() => localStorage.getItem('auth'))).toBeNull();
+    await page.evaluate(async () => {
+      const api = (
+        window as Window & {
+          desktop?: { credentials: { clear(reason: 'switch-account'): Promise<void> } };
+        }
+      ).desktop;
+      if (!api) throw new Error('Desktop API unavailable');
+      await api.credentials.clear('switch-account');
+    });
+    expect(existsSync(credentialPath)).toBe(false);
+
     const documentResponsePromise = page.waitForResponse((response) =>
       response.url().startsWith('app://renderer/index.html'),
     );
@@ -189,6 +226,8 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
     expect(
       evidence.requests.some((item) => item.path === '/api/dashboard/overview' && item.hasAuthorization),
     ).toBe(true);
+    expect(await page.evaluate(() => localStorage.getItem('auth'))).toBeNull();
+    expect(existsSync(credentialPath)).toBe(false);
 
     await page.evaluate(() => {
       window.location.href = 'https://evil.example.com/escape';

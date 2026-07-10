@@ -7,6 +7,11 @@ export function createDesktopPlatform(api: DesktopApi): AppPlatform {
     window: { getSnapshot: () => api.window.getSnapshot() },
     clipboard: { writeText: (text) => api.clipboard.writeText(text) },
     external: { open: (url) => api.external.open(url) },
+    credentials: {
+      restore: () => api.credentials.restore(),
+      persist: (token) => api.credentials.persist(token),
+      clear: (reason) => api.credentials.clear(reason),
+    },
   };
 }
 

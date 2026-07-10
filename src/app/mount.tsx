@@ -1,12 +1,14 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
+import i18n from 'i18next';
+import { toast } from 'sonner';
 import { routeTree } from '@/routeTree.gen';
 import { Providers } from './providers';
 import { RouteError } from './RouteError';
 import { queryClient } from './query';
 import { authEvents } from '@/lib/http/events';
-import { resetSession } from '@/lib/reset-auth';
+import { sessionCredentialService } from '@/lib/session-credential-service';
 import { i18nInit } from '@/lib/i18n';
 import { assertMenuPathsValid } from '@/modules/registry';
 import { appConfig, featuresConfig } from '@/config';
@@ -36,7 +38,7 @@ if (featuresConfig.isDev) assertMenuPathsValid(Object.keys(router.routesByPath))
 
 // 401 统一处理：先导航回登录、再清缓存（事件解耦，spec §9；http 层不感知路由）。
 // 顺序很关键：clear 会让 _auth 里挂载中的 useSuspenseQuery 用空 token 立即重拉，
-// 所以必须等导航离开受保护树后再 resetSession(null)。
+// 所以必须等导航离开受保护树后再清理 SessionCredentialService。
 // 退订接 HMR dispose，防开发期 mount 模块反复求值导致订阅堆积。
 const offAuthExpired = authEvents.on('expired', () => {
   // 已在登录页时忽略：登出/过期后残留请求可能带空 token 再触发 401，
@@ -46,7 +48,11 @@ const offAuthExpired = authEvents.on('expired', () => {
   const redirect = buildInternalRedirect(router.state.location);
   void (async () => {
     await router.navigate({ to: appConfig.routes.login, search: { redirect } });
-    await resetSession(null);
+    try {
+      await sessionCredentialService.clear('expired');
+    } catch {
+      toast.error(i18n.t('shell.toast.sessionClearFailed'));
+    }
   })();
 });
 import.meta.hot?.dispose(offAuthExpired);
