@@ -10,15 +10,15 @@
 | --- | -------------------------------------------------- | -------- | ---------------------------------------------------------------- |
 | 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`       |
 | 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts`；`pnpm guard:desktop`；双构建产物守卫  |
-| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 674 项、`theme:guard` 196 项、`build:web` 与产物扫描    |
+| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 阶段通过 | `vitest` 677 项、`theme:guard` 196 项、`build:web` 与产物扫描    |
 | 4   | 两种窗口模式与三套 Shell 安全区                    | 通过     | 双 packaged E2E；3 布局 × 3 比例截图与几何断言                   |
 | 5   | Electron 凭证安全存储与统一会话服务                | 通过     | Phase 3 单元测试、架构守卫与 packaged `safeStorage` E2E          |
-| 6   | 原生文件下载闭环                                   | pending  | Phase 5                                                          |
+| 6   | 原生文件下载闭环                                   | 通过     | Phase 5 单元/页面测试；packaged Main stub 保存框 + 实际流式落盘  |
 | 7   | 更新状态机、feed、metadata 与真实更新              | pending  | Phase 6–7；真实签名更新需满足签名前提                            |
 | 8   | CSP、sandbox、隔离、fuses、导航、sender、schema    | 实施中   | Phase 0 已验证 CSP/窗口隔离/导航；IPC 与 release fuse 待后续阶段 |
 | 9   | 全部门禁、visual、Electron E2E、平台 smoke         | 实施中   | Phase 0 自动化与 macOS arm64 未签名 packaged smoke 已登记        |
 | 10  | 四份文档与代码一致                                 | pending  | Phase 8                                                          |
-| 11  | 既有改动未覆盖、提交可独立回滚                     | 通过     | 独立 worktree；提交 `a2bc250`                                    |
+| 11  | 既有改动未覆盖、提交可独立回滚                     | 通过     | 独立 worktree；Phase 0–5 独立提交，最新 `0e75378`                |
 
 ## 分期证据
 
@@ -112,13 +112,32 @@
 - 阶段门禁：Desktop Vitest 16 个文件、78 项；Web Vitest 115 个文件、674 项；theme guard 196 项；design lint 0 error；Web/Desktop TypeScript、ESLint、Web build、双 packaged E2E 全通过。
 - 产物回读：Web `totalBytes=1,416,658`、最大 JS `264,519` bytes；integrated Desktop `totalBytes=1,415,321`、最大 JS `264,785` bytes。
 
+### Phase 5 — 文件能力
+
+- 提交：`0e75378`。
+- Main 下载安全边界：
+  - Renderer 只提交 Zod 校验后的 `resourceId + suggestedName`，目标路径只来自系统保存框；Main 从 `VITE_API_BASE_URL` 构造 `/api/files/{id}/download`，不接受绝对下载 URL 或 Renderer 路径。
+  - 文件名清理路径分隔符、控制字符、Windows 保留名和尾随点/空格，并在保留合理扩展名的前提下限制为 180 字符。
+  - Electron `net.request` 使用 `credentials: omit`、无 session cookie、`Accept-Encoding: identity` 和手动逐跳重定向；同源保留 vault Authorization，一旦跨 origin 永久剥离，且目标必须命中显式 HTTPS origin allowlist。
+  - 重定向最多 5 次；HTTP 降级、未知协议、未批准 origin、循环、缺失/非法 Content-Length、长度不一致和磁盘空间不足均进入稳定错误码。
+  - 下载流写入目标目录内的随机 `.part` 文件，处理 partial write；成功后 rename 原子替换，失败/取消清理临时文件。进度按百分比去重，避免小 chunk 导致 IPC 洪泛。
+- Platform/UI：Web 保留 fetch + `<a download>`，Desktop 通过 typed Preload IPC；文件预览展示进度、支持按 task id 取消并阻止保存框等待期重复提交。分享链接由 Web public base 生成，业务不再读取 `window.location.origin`；远程 HTTP public base 被拒绝，本地 localhost 开发例外。
+- RED → GREEN：文件描述符/event schema、文件名、redirect/auth 剥离、缺失长度、磁盘不足、长度不符、取消清理、IPC sender、Web adapter、分享地址、UI 进度/取消/single-flight、Spike Main 下载均先见失败再实现；新增守卫拒绝文件业务回退到裸 `downloadFile` 或 `window.location.origin`。
+- packaged 自动化：
+  - `pnpm test:desktop`：Desktop Vitest 17 个文件、107 项通过；native packaged E2E 1 项 3.1 秒，integrated packaged E2E 1 项 8.8 秒。
+  - Playwright 使用设计文档 §17.2 允许的 **Main 保存框 stub**，目标限制在隔离 Spike `userData` 内；该证据不表述为真实 OS 对话框点击。
+  - 实际 Main `net` 请求经历 `/download → /content` 同源重定向，两跳均由 HTTPS Spike 服务回读 `hasAuthorization: true`；最终文件 bytes 为 `electron-download-evidence`，事件包含 0%/100%/completed，payload 不含目标路径或 Authorization。
+  - 首轮 packaged 验证暴露 Main `net` 不沿用 Renderer 自签名证书处理；修复为仅在 `DESKTOP_SPIKE_MODE=true` 时接受 localhost、拒绝其他 host 的 session verifier，正式构建不开启。
+- 阶段门禁：Web/Desktop TypeScript、ESLint 0 error、Web Vitest 115 个文件/677 项、theme guard 196 项、design lint 0 error、Web build、Desktop unit、双 packaged E2E 全通过。
+- 产物回读：Web `totalBytes=1,419,843`、最大 JS `264,519` bytes；integrated Desktop `totalBytes=1,417,499`、最大 JS `264,785` bytes。
+
 ## 平台证据矩阵
 
-| 平台        | build                                  | install | backend                  | update  | uninstall | 签名            |
-| ----------- | -------------------------------------- | ------- | ------------------------ | ------- | --------- | --------------- |
-| macOS arm64 | native/integrated packaged `.app` 通过 | pending | packaged HTTPS/CORS 通过 | pending | pending   | 未签名；pending |
-| macOS x64   | pending                                | pending | pending                  | pending | pending   | pending         |
-| Windows x64 | pending                                | pending | pending                  | pending | pending   | pending         |
+| 平台        | build                                  | install | backend                      | update  | uninstall | 签名            |
+| ----------- | -------------------------------------- | ------- | ---------------------------- | ------- | --------- | --------------- |
+| macOS arm64 | native/integrated packaged `.app` 通过 | pending | packaged HTTPS/CORS/下载通过 | pending | pending   | 未签名；pending |
+| macOS x64   | pending                                | pending | pending                      | pending | pending   | pending         |
+| Windows x64 | pending                                | pending | pending                      | pending | pending   | pending         |
 
 ## 偏差记录
 
@@ -127,6 +146,7 @@
 
 ## Pending 与后续人工动作
 
-- 当前报告已完成 Phase 0–4 证据；Phase 5–8 继续实施。
+- 当前报告已完成 Phase 0–5 证据；Phase 6–8 继续实施。
+- 原生保存框自动化是 Main stub；真实 macOS/Windows 保存框点击 smoke 保持 pending。
 - macOS x64、Windows x64 的真实安装、远程后端、更新、卸载和签名保持 pending，不能由当前 arm64 结果替代。
 - 当前机器没有 Developer ID identity，macOS 真实旧版到新版签名更新闭环保持 pending，不声明通过。
