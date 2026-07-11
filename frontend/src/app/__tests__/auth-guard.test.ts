@@ -12,6 +12,8 @@ function buildRouter(opts: { token: string | null; permissions?: string[] }, ini
       user: { id: 'u', name: 'n', username: 'u' },
       roles: [],
       permissions: opts.permissions,
+      systemAdmin: false,
+      dataScope: { unrestricted: false, self: false, deptIds: [] },
     });
   useAuth.setState({ token: opts.token });
   return createRouter({

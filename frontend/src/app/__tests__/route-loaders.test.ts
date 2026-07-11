@@ -46,6 +46,8 @@ function buildRouter(initial: string, permissions: string[]) {
     user: { id: 'u-test', name: '测试用户', username: 'test' },
     roles: [],
     permissions,
+    systemAdmin: false,
+    dataScope: { unrestricted: false, self: false, deptIds: [] },
   });
   useAuth.setState({ token: 'token' });
 

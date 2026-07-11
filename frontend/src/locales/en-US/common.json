@@ -22,6 +22,7 @@
     "switchTheme": "Switch theme",
     "stubEntry": "This enterprise login provider is not connected",
     "invalidCredentials": "Invalid username or password",
+    "traceId": "Trace ID",
     "account": "Account",
     "forgotPassword": "Forgot password?",
     "remember": "Remember me · 30 days",

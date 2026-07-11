@@ -6,11 +6,18 @@ import { appConfig } from '@/config';
 
 interface AuthStore {
   token: string | null;
+  refreshToken: string | null;
   setToken: (t: string | null) => void;
+  setSession: (token: string | null, refreshToken: string | null) => void;
 }
 
 export const useAuth = create<AuthStore>()(
-  persist((set) => ({ token: null, setToken: (token) => set({ token }) }), {
+  persist((set) => ({
+    token: null,
+    refreshToken: null,
+    setToken: (token) => set({ token }),
+    setSession: (token, refreshToken) => set({ token, refreshToken }),
+  }), {
     name: appConfig.storageKeys.auth,
   }),
 );

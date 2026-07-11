@@ -28,7 +28,9 @@ afterAll(() => server.close());
 test('预置 admin me 缓存 → viewer 登录 resetSession → beforeLoad 取到 viewer 权限', async () => {
   // Task 10 批量迁移 handler 前，本集成测试局部使用 Task 9 的 direct JSON 方言。
   server.use(
-    mswHttp.post('/api/auth/login', () => HttpResponse.json({ token: 'viewer-token' })),
+    mswHttp.post('/api/auth/login', () => HttpResponse.json({
+      token: 'viewer-token', refreshToken: 'viewer-refresh', expiresInSeconds: 1800,
+    })),
     mswHttp.get('/api/auth/me', () =>
       HttpResponse.json({
         user: { id: 'u2', name: '查看者', username: 'viewer' },
@@ -39,6 +41,8 @@ test('预置 admin me 缓存 → viewer 登录 resetSession → beforeLoad 取�
           'iam:dept:view',
           'notice:msg:view',
         ],
+        systemAdmin: false,
+        dataScope: { unrestricted: false, self: true, deptIds: [] },
       }),
     ),
   );
@@ -46,6 +50,8 @@ test('预置 admin me 缓存 → viewer 登录 resetSession → beforeLoad 取�
     user: { id: 'u1', name: '超级管理员', username: 'admin' },
     roles: ['superadmin'],
     permissions: ['*:*:*'],
+    systemAdmin: true,
+    dataScope: { unrestricted: true, self: false, deptIds: [] },
   });
 
   const { token } = await authApi.login({ username: 'viewer', password: 'viewer123' });
@@ -70,6 +76,8 @@ test('resetSession 清空所有业务缓存并写入新 token', async () => {
     user: { id: 'u1', name: '超级管理员', username: 'admin' },
     roles: ['superadmin'],
     permissions: ['*:*:*'],
+    systemAdmin: true,
+    dataScope: { unrestricted: true, self: false, deptIds: [] },
   });
 
   await resetSession('new-token');

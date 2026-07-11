@@ -1,4 +1,4 @@
-import { http, bindTokenGetter, type HttpRequestOptions } from '@/lib/http/client';
+import { http, bindAuthRefreshHandler, bindTokenGetter, type HttpRequestOptions } from '@/lib/http/client';
 import { queryOptions } from '@tanstack/react-query';
 import { useAuth } from '@/stores/auth';
 import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
@@ -6,6 +6,7 @@ import { authKeys } from './keys';
 import {
   LoginInputSchema,
   LoginResponseSchema,
+  RefreshResponseSchema,
   MeSchema,
   SendSmsCodeResultSchema,
   SendSmsCodeSchema,
@@ -24,6 +25,7 @@ const loginContract = defineApiContract({ response: LoginResponseSchema });
 const sendSmsCodeContract = defineApiContract({ response: SendSmsCodeResultSchema });
 const meContract = defineApiContract({ response: MeSchema });
 const logoutContract = defineVoidContract();
+const refreshContract = defineApiContract({ response: RefreshResponseSchema });
 
 export type { MeDto } from './schema';
 
@@ -38,7 +40,24 @@ export const authApi = {
   qrLogin: () => http.post('/api/auth/qr-login', undefined, loginContract, { on401: 'reject' }),
   me: (options?: HttpRequestOptions) => http.get('/api/auth/me', undefined, meContract, options),
   logout: () => http.post('/api/auth/logout', undefined, logoutContract),
+  refresh: (refreshToken: string, signal?: AbortSignal) =>
+    http.post('/api/auth/refresh', { refreshToken }, refreshContract, { signal, on401: 'reject' }),
 };
+
+let pendingRefreshToken: string | null = null;
+bindAuthRefreshHandler({
+  refresh: async (signal) => {
+    const refreshToken = useAuth.getState().refreshToken;
+    if (!refreshToken) throw new Error('refresh token is unavailable');
+    const rotated = await authApi.refresh(refreshToken, signal);
+    pendingRefreshToken = rotated.refreshToken;
+    return rotated.token;
+  },
+  commitToken: (token) => {
+    useAuth.getState().setSession(token, pendingRefreshToken ?? useAuth.getState().refreshToken);
+    pendingRefreshToken = null;
+  },
+});
 
 export const meQuery = queryOptions({
   queryKey: authKeys.me(),

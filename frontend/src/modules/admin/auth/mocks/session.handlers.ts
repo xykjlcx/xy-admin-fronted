@@ -15,6 +15,10 @@ function createSession(userId: string) {
   return token;
 }
 
+function createTokenResponse(userId: string) {
+  return { token: createSession(userId), refreshToken: `mock-refresh-${userId}`, expiresInSeconds: 1800 };
+}
+
 export const sessionHandlers = [
   http.post('/api/auth/login', async ({ request }) => {
     const parsed = LoginInputSchema.safeParse(await request.json());
@@ -30,7 +34,7 @@ export const sessionHandlers = [
       .find((item) => item.email === normalized.username && item.password === normalized.password);
     const userId = user?.id ?? registered?.id;
     if (!userId) return biz({ status: 401, code: 'auth.credentials.invalid', detail: '用户名或密码错误' });
-    return ok({ token: createSession(userId) });
+    return ok(createTokenResponse(userId));
   }),
   http.post('/api/auth/sms-code', async ({ request }) => {
     const parsed = SendSmsCodeSchema.safeParse(await request.json());
@@ -40,10 +44,10 @@ export const sessionHandlers = [
   http.post('/api/auth/sms-login', async ({ request }) => {
     const parsed = SmsLoginSchema.safeParse(await request.json());
     if (!parsed.success || parsed.data.code !== '123456') return biz({ status: 401, code: 'auth.sms-code.invalid', detail: '验证码错误或已失效' });
-    return ok({ token: createSession('u1') });
+    return ok(createTokenResponse('u1'));
   }),
   http.post('/api/auth/qr-login', () => {
-    return ok({ token: createSession('u1') });
+    return ok(createTokenResponse('u1'));
   }),
   http.get('/api/auth/me', ({ request }) => {
     const token = request.headers.get('Authorization')?.replace('Bearer ', '');
@@ -51,7 +55,9 @@ export const sessionHandlers = [
     const user = db.users.find((item) => item.id === userId);
     if (user) {
       const { password: _password, ...safe } = user;
-      return ok({ user: safe, roles: user.roles, permissions: user.permissions });
+      return ok({ user: safe, roles: user.roles, permissions: user.permissions,
+        systemAdmin: user.roles.includes('superadmin'),
+        dataScope: { unrestricted: user.roles.includes('superadmin'), self: false, deptIds: [] } });
     }
     const registered = registeredAccounts.find(userId ?? '');
     if (!registered) return new HttpResponse(null, { status: 401 });
@@ -59,6 +65,8 @@ export const sessionHandlers = [
       user: { id: registered.id, name: registered.name, username: registered.email },
       roles: ['viewer'],
       permissions: ['dashboard:overview:view', 'notice:msg:view'],
+      systemAdmin: false,
+      dataScope: { unrestricted: false, self: true, deptIds: [] },
     });
   }),
   http.post('/api/auth/logout', ({ request }) => {

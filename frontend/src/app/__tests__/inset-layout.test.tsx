@@ -73,6 +73,8 @@ function renderShellWithLayout({
     user: { id: 'u-test', name: '测试用户', username: 'test' },
     roles: ['superadmin'],
     permissions: ['*:*:*'],
+    systemAdmin: true,
+    dataScope: { unrestricted: true, self: false, deptIds: [] },
   });
 
   const rootRoute = createRootRoute({

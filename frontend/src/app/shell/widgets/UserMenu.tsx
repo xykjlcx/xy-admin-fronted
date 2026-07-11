@@ -15,7 +15,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { meQuery, authApi } from '@/modules/admin/auth/api';
-import { resetSession } from '@/lib/reset-auth';
+import { advanceSessionCredentials, clearSessionCache } from '@/lib/reset-auth';
 import { appConfig } from '@/config';
 
 export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar' | 'icon' } = {}) {
@@ -43,9 +43,11 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
     } catch {
       toast.error(t('shell.toast.logoutFailed'));
     }
-    // 先离开受保护树，再清缓存：否则 Shell 里挂载中的 useSuspenseQuery 会用空 token 重拉。
+    // 先使凭证失效但保留已挂载 Shell 的缓存，再离开受保护树；卸载后才清缓存。
+    // 若导航期间先 clear，Shell 会按 /login 误算 subsystem 并触发受保护请求。
+    advanceSessionCredentials(null);
     await nav({ to: appConfig.routes.login });
-    await resetSession(null);
+    await clearSessionCache();
   };
 
   return (

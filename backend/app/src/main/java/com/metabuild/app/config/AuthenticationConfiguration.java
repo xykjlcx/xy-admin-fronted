@@ -18,6 +18,13 @@ import com.metabuild.modules.admin.auth.persistence.JdbcAuthUserRepository;
 import com.metabuild.modules.admin.auth.persistence.JdbcBootstrapCredentialRepository;
 import com.metabuild.modules.admin.auth.persistence.JdbcRefreshTokenStore;
 import com.metabuild.modules.admin.auth.persistence.JdbcLogoutRecoveryRepository;
+import com.metabuild.modules.admin.auth.application.CurrentUserQuery;
+import com.metabuild.modules.admin.auth.application.CurrentUserRepository;
+import com.metabuild.modules.admin.auth.persistence.JdbcCurrentUserRepository;
+import com.metabuild.modules.admin.menus.application.MenuQuery;
+import com.metabuild.modules.admin.menus.application.MenuRepository;
+import com.metabuild.modules.admin.menus.persistence.JdbcMenuRepository;
+import com.metabuild.modules.admin.auth.api.CurrentAuthorizationProvider;
 import com.metabuild.modules.admin.auth.application.LogoutRecoveryPort;
 import com.metabuild.modules.admin.auth.application.LogoutRecoveryHandler;
 import com.metabuild.shared.kernel.UuidV7Generator;
@@ -75,6 +82,21 @@ public class AuthenticationConfiguration {
     @Bean RequestAuthorizationLoader requestAuthorizationLoader(AuthorizationSnapshotStore snapshots) {
         return new RequestAuthorizationLoader(snapshots);
     }
+    @Bean CurrentUserRepository currentUsers(JdbcTemplate jdbc) { return new JdbcCurrentUserRepository(jdbc); }
+    @Bean CurrentUserQuery currentUserQuery(CurrentAuthorizationProvider authorization,
+            CurrentUserRepository users) { return new CurrentUserQuery(authorization, users); }
+    @Bean MenuRepository menuRepository(JdbcTemplate jdbc) { return new JdbcMenuRepository(jdbc); }
+    @Bean CurrentAuthorizationProvider currentAuthorization(AccountSessionPort sessions, RequestAuthorizationContext context) {
+        return () -> {
+            var userId = sessions.currentUserId();
+            if (userId == null) throw new com.metabuild.shared.kernel.Unauthorized(
+                    () -> "auth.token.invalid", "Authentication required");
+            return context.load(userId);
+        };
+    }
+    @Bean MenuQuery menuQuery(MenuRepository menus, CurrentAuthorizationProvider authorization) {
+        return new MenuQuery(menus, authorization);
+    }
     @Bean @RequestScope RequestAuthorizationContext requestAuthorizationContext(RequestAuthorizationLoader loader) {
         return new RequestAuthorizationContext(loader);
     }
@@ -86,7 +108,7 @@ public class AuthenticationConfiguration {
         return new WebMvcConfigurer() {
             @Override public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(interceptor)
-                        .excludePathPatterns("/auth/login", "/auth/refresh", "/actuator/**", "/__task12/**");
+                        .excludePathPatterns("/api/auth/login", "/api/auth/refresh", "/actuator/**", "/__task12/**");
             }
         };
     }

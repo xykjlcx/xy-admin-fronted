@@ -32,6 +32,8 @@ test('Shell 层在菜单路由切换时保持同一组 Header、Sidebar 和内�
     user: { id: 'u-test', name: '测试用户', username: 'test' },
     roles: ['superadmin'],
     permissions: ['*:*:*'],
+    systemAdmin: true,
+    dataScope: { unrestricted: true, self: false, deptIds: [] },
   });
 
   const rootRoute = createRootRoute({

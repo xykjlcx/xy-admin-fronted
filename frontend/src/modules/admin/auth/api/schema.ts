@@ -13,7 +13,12 @@ export const ForgotPasswordResultSchema = z.object({
   expiresInMinutes: z.number().int().positive(),
 });
 export const LoginInputSchema = z.object({ username: z.string().trim().min(1), password: z.string().min(1) });
-export const LoginResponseSchema = z.object({ token: z.string() });
+export const LoginResponseSchema = z.object({
+  token: z.string().min(1),
+  refreshToken: z.string().min(1),
+  expiresInSeconds: z.number().int().positive(),
+});
+export const RefreshResponseSchema = LoginResponseSchema;
 export const PhoneSchema = z.string().trim().regex(/^1\d{10}$/);
 export const SendSmsCodeSchema = z.object({ phone: PhoneSchema });
 export const SendSmsCodeResultSchema = z.object({ expiresInSeconds: z.number().int().positive() });
@@ -22,6 +27,12 @@ export const MeSchema = z.object({
   user: z.object({ id: z.string(), name: z.string(), username: z.string() }),
   roles: z.array(z.string()),
   permissions: z.array(z.string()),
+  systemAdmin: z.boolean(),
+  dataScope: z.object({
+    unrestricted: z.boolean(),
+    self: z.boolean(),
+    deptIds: z.array(z.string()),
+  }),
 });
 export const NullSchema = z.null();
 

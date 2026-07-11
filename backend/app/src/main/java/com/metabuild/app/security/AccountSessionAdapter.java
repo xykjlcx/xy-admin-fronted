@@ -14,4 +14,8 @@ public final class AccountSessionAdapter implements AccountSessionPort {
     }
     @Override public void logoutToken(String token) { sessions.logoutToken(token); }
     @Override public void kickoutAll(UUID userId) { sessions.kickoutAll(userId.toString()); }
+    @Override public UUID currentUserId() {
+        String userId = sessions.currentUserId();
+        return userId == null ? null : UUID.fromString(userId);
+    }
 }

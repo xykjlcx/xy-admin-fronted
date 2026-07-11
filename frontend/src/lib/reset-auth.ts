@@ -10,10 +10,18 @@ import { bumpAuthSessionEpoch } from '@/lib/http/client';
 // - 登录成功：在 /login 调用（受保护树未挂载，clear 安全），随后 router.invalidate 重新拉新账号数据。
 // - 登出 / 401 过期：调用方必须先导航离开 _auth 受保护树、再 await resetSession(null)；
 //   否则 Shell 里挂载中的 useSuspenseQuery 会立刻用空 token 重新发请求（多余 401 + 错误闪烁）。
-export async function resetSession(nextToken: string | null) {
-  useAuth.getState().setToken(nextToken);
+export async function resetSession(nextToken: string | null, nextRefreshToken: string | null = null) {
+  advanceSessionCredentials(nextToken, nextRefreshToken);
+  await clearSessionCache();
+}
+
+export function advanceSessionCredentials(nextToken: string | null, nextRefreshToken: string | null = null) {
+  useAuth.getState().setSession(nextToken, nextRefreshToken);
   // token 值可能被复用，所以会话代际必须由唯一切换入口显式推进，不从字符串变化猜测。
   bumpAuthSessionEpoch();
+}
+
+export async function clearSessionCache() {
   // 先 cancel 再 clear：中断在途请求，避免它们 resolve 后把旧账号数据回填进刚清空的缓存。
   await queryClient.cancelQueries();
   queryClient.clear();

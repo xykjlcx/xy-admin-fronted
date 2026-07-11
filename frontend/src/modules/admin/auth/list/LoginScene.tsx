@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/input';
 import { authApi } from '../api';
 import { resetSession } from '@/lib/reset-auth';
-import { HttpError } from '@/lib/http/errors';
+import { BizError, HttpError } from '@/lib/http/errors';
 import { cn } from '@/lib/utils';
 import { appConfig } from '@/config';
 import { useAppearance } from '@/stores/appearance';
@@ -76,13 +76,14 @@ export function LoginScene({
     defaultValues: { username: '', password: '' },
   });
 
-  const completeAuthentication = async (token: string) => {
-    await resetSession(token); // 存新 token + 清空上个账号全部缓存，防权限/数据串号
+  const completeAuthentication = async (token: string, refreshToken: string) => {
+    await resetSession(token, refreshToken); // 存新会话 + 清空上个账号全部缓存，防权限/数据串号
     await onAuthenticated(token, safeInternalPath(redirect));
   };
   const showAuthenticationError = (error: unknown) => {
-    if (error instanceof HttpError && error.status === 401) {
-      setError('root', { message: t('auth.invalidCredentials') });
+    if ((error instanceof HttpError || error instanceof BizError) && error.status === 401) {
+      const trace = error instanceof BizError && error.traceId ? ` · ${t('auth.traceId')}: ${error.traceId}` : '';
+      setError('root', { message: `${t('auth.invalidCredentials')}${trace}` });
     } else {
       setError('root', { message: error instanceof Error ? error.message : t('auth.invalidCredentials') });
     }
@@ -98,7 +99,7 @@ export function LoginScene({
   });
   const confirmQrLogin = useMutation({
     mutationFn: authApi.qrLogin,
-    onSuccess: ({ token }) => completeAuthentication(token),
+    onSuccess: ({ token, refreshToken }) => completeAuthentication(token, refreshToken),
     onError: showAuthenticationError,
   });
 
@@ -107,9 +108,9 @@ export function LoginScene({
 
   const onSubmit = handleSubmit(async (dto) => {
     try {
-      const { token } =
+      const { token, refreshToken } =
         tab === 'sms' ? await authApi.smsLogin(sms) : await authApi.login(dto);
-      await completeAuthentication(token);
+      await completeAuthentication(token, refreshToken);
     } catch (e) {
       showAuthenticationError(e);
     }

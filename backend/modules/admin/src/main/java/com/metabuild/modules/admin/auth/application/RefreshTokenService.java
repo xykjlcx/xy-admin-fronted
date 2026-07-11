@@ -9,7 +9,7 @@ public final class RefreshTokenService {
         this.snapshots = snapshots;
     }
 
-    public String rotate(String token) {
+    public RefreshRotation rotate(String token) {
         var outcome = tokens.rotate(token);
         if (outcome.status() != RefreshRotationOutcome.Status.SUCCESS) throw new RefreshTokenRejected();
         var rotation = outcome.rotation();
@@ -22,6 +22,17 @@ public final class RefreshTokenService {
             tokens.revokeAll(rotation.userId());
             throw exception;
         }
-        return rotation.token();
+        return rotation;
+    }
+
+    public RefreshResult rotateForAccess(String token, java.util.function.Function<java.util.UUID, AccessSession> accessIssuer) {
+        var rotation = rotate(token);
+        try {
+            var access = accessIssuer.apply(rotation.userId());
+            return new RefreshResult(access.token(), rotation.token(), access.expiresInSeconds());
+        } catch (RuntimeException failure) {
+            tokens.revokeAll(rotation.userId());
+            throw failure;
+        }
     }
 }

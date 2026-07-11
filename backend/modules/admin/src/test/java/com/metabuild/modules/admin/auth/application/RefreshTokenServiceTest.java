@@ -20,32 +20,32 @@ class RefreshTokenServiceTest {
     @Test
     void rotatesOnceAndReplayRevokesWholeFamily() {
         var store = new AtomicRefreshTokenStore(CLOCK);
-        var service = new RefreshTokenService(store, readyStore());
+        var service = service(store, readyStore());
         var original = store.issue(USER);
 
         var rotated = service.rotate(original);
 
-        assertThat(rotated).isNotEqualTo(original);
+        assertThat(rotated.token()).isNotEqualTo(original);
         assertThatThrownBy(() -> service.rotate(original)).isInstanceOf(RefreshTokenRejected.class);
-        assertThatThrownBy(() -> service.rotate(rotated)).isInstanceOf(RefreshTokenRejected.class);
+        assertThatThrownBy(() -> service.rotate(rotated.token())).isInstanceOf(RefreshTokenRejected.class);
     }
 
     @Test
     void winnerRemainsUsableUntilOriginalIsReplayedAfterCompletion() {
         var store = new AtomicRefreshTokenStore(CLOCK);
-        var service = new RefreshTokenService(store, readyStore());
+        var service = service(store, readyStore());
         var original = store.issue(USER);
         var winner = service.rotate(original);
-        var next = service.rotate(winner);
-        assertThat(next).isNotBlank();
+        var next = service.rotate(winner.token());
+        assertThat(next.token()).isNotBlank();
         assertThatThrownBy(() -> service.rotate(original)).isInstanceOf(RefreshTokenRejected.class);
-        assertThatThrownBy(() -> service.rotate(next)).isInstanceOf(RefreshTokenRejected.class);
+        assertThatThrownBy(() -> service.rotate(next.token())).isInstanceOf(RefreshTokenRejected.class);
     }
 
     @Test
     void fencedUserCannotRotateAndFamilyStaysRevoked() {
         var store = new AtomicRefreshTokenStore(CLOCK);
-        var service = new RefreshTokenService(store, new AuthorizationSnapshotStore() {
+        var service = service(store, new AuthorizationSnapshotStore() {
             @Override public boolean initializeReady(AuthorizationSnapshot snapshot) { return false; }
             @Override public AuthorizationState load(UUID userId) { return new com.metabuild.shared.kernel.security.AuthorizationFence(USER, 1, UUID.fromString("01900000-0000-7000-8000-000000000099"), Instant.EPOCH); }
             @Override public boolean fence(com.metabuild.shared.kernel.security.AuthorizationFence fence) { return false; }
@@ -55,6 +55,10 @@ class RefreshTokenServiceTest {
         var token = store.issue(USER);
         assertThatThrownBy(() -> service.rotate(token)).isInstanceOf(RefreshTokenRejected.class);
         assertThatThrownBy(() -> service.rotate(token)).isInstanceOf(RefreshTokenRejected.class);
+    }
+
+    private static RefreshTokenService service(RefreshTokenStore store, AuthorizationSnapshotStore snapshots) {
+        return new RefreshTokenService(store, snapshots);
     }
 
     private static AuthorizationSnapshotStore readyStore() {

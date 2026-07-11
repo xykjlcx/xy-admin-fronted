@@ -3,7 +3,9 @@ package com.metabuild.app.security;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +16,7 @@ import com.metabuild.modules.admin.auth.application.AuthorizationSnapshotCompile
 import com.metabuild.modules.admin.auth.application.LoginResult;
 import com.metabuild.modules.admin.auth.application.RefreshTokenRejected;
 import com.metabuild.modules.admin.auth.application.RefreshTokenService;
+import com.metabuild.modules.admin.menus.application.MenuRepository;
 import java.util.UUID;
 import java.util.Set;
 import java.time.Instant;
@@ -64,6 +67,7 @@ class AuthenticationRuntimeIntegrationTest {
     @Autowired AuthorizationGraphRepository graphs;
     @Autowired AuthorizationSnapshotCompiler compiler;
     @Autowired DataSource dataSource;
+    @Autowired MenuRepository menus;
 
     @Test
     void realPostgresRedisAndSaTokenCompleteLoginRotationReplayAndLogout() throws Exception {
@@ -84,6 +88,23 @@ class AuthenticationRuntimeIntegrationTest {
         assertThat(session).isNotNull();
         assertThat(session.getDataMap()).doesNotContainKeys("roles", "permissions", "dataScope", "authorizationSnapshot");
 
+        mvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + login.accessToken()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.systemAdmin").value(true))
+                .andExpect(jsonPath("$.dataScope.unrestricted").value(true));
+        mvc.perform(get("/api/subsystems").header("Authorization", "Bearer " + login.accessToken()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].key").value("admin"));
+        mvc.perform(get("/api/menus").param("subsystem", "admin")
+                        .header("Authorization", "Bearer " + login.accessToken()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[?(@.path == '/admin/users')]").isEmpty());
+        mvc.perform(get("/api/dashboard/overview").header("Authorization", "Bearer " + login.accessToken()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.company.name").value("MetaBuilder"));
+
+        UUID dashboard = UUID.fromString("01900000-0000-7000-8000-000000000201");
+        jdbc.update("insert into mb_menu_customization(menu_id,parent_overridden,parent_id) values (?,true,null) on conflict (menu_id) do update set parent_overridden=true,parent_id=null", dashboard);
+        assertThat(menus.findActive("admin")).filteredOn(row -> row.id().equals(dashboard)).singleElement()
+                .extracting(com.metabuild.modules.admin.menus.application.MenuRow::parentId).isNull();
+        jdbc.update("delete from mb_menu_customization where menu_id=?", dashboard);
+
         String readyBeforeFailedLogin = redis.opsForValue().get("authz:" + ADMIN);
         redis.opsForValue().set("authz:" + ADMIN, "READY|99|not-json");
         mvc.perform(post("/__task12/login")
@@ -101,7 +122,7 @@ class AuthenticationRuntimeIntegrationTest {
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             for (int i = 0; i < 2; i++) executor.submit(() -> {
                 ready.countDown(); start.await();
-                try { winners.add(refreshTokens.rotate(login.refreshToken())); } catch (RefreshTokenRejected ignored) {}
+                try { winners.add(refreshTokens.rotate(login.refreshToken()).token()); } catch (RefreshTokenRejected ignored) {}
                 return null;
             });
             assertThat(ready.await(2, TimeUnit.SECONDS)).isTrue();
@@ -110,7 +131,7 @@ class AuthenticationRuntimeIntegrationTest {
         assertThat(winners).hasSize(1);
         String rotated = winners.element();
         assertThat(rotated).isNotEqualTo(login.refreshToken());
-        String next = refreshTokens.rotate(rotated);
+        String next = refreshTokens.rotate(rotated).token();
         assertThat(next).isNotBlank();
         assertThatThrownBy(() -> refreshTokens.rotate(login.refreshToken())).isInstanceOf(RefreshTokenRejected.class);
         assertThatThrownBy(() -> refreshTokens.rotate(next)).isInstanceOf(RefreshTokenRejected.class);
@@ -144,12 +165,14 @@ class AuthenticationRuntimeIntegrationTest {
         UUID systemRole = UUID.fromString("01900000-0000-7000-8000-000000000020");
         jdbc.update("delete from mb_user_role where user_id=?", ADMIN);
         redis.delete("authz:" + ADMIN);
-        authentication.login("admin", "task12-local-secret");
+        var noRoleLogin = authentication.login("admin", "task12-local-secret");
         AuthorizationSnapshot noRole = (AuthorizationSnapshot) snapshots.load(ADMIN);
         assertThat(noRole.roles()).isEmpty();
         assertThat(noRole.dataScope().all()).isFalse();
         assertThat(noRole.dataScope().includeSelf()).isFalse();
         assertThat(noRole.dataScope().deptIds()).isEmpty();
+        mvc.perform(get("/api/dashboard/overview").header("Authorization", "Bearer " + noRoleLogin.accessToken()))
+                .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("auth.permission.denied"));
         authentication.logoutAll(ADMIN);
         verifyRealScopeMatrix();
         jdbc.update("insert into mb_user_role(user_id,role_id) values (?,?) on conflict do nothing", ADMIN, systemRole);
