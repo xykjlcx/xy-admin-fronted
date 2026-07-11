@@ -222,6 +222,6 @@
 - Phase 0–8 工程实现、文档与当前平台可执行证据已收口；本目标累计执行 4 小时以上。
 - 原生保存框自动化是 Main stub；真实 macOS/Windows 保存框点击 smoke 保持 pending。
 - macOS x64、Windows x64 的真实安装、远程后端、更新、卸载和签名保持 pending，不能由当前 arm64 结果替代。
-- 当前机器没有 Developer ID identity，macOS 真实旧版到新版签名更新闭环保持 pending，不声明通过。
+- 当前机器执行 `security find-identity -v -p codesigning` 返回 `0 valid identities found`；因此没有满足设计文档签名前提的 Developer ID identity，macOS 真实旧版到新版签名更新闭环保持 pending，不声明通过，也不生成自签名身份替代该证据。
 - 本仓库没有真实公网 update base/CDN，因此 `verify:update-feed` 工具与本地 HTTP 契约已通过，真实公网回读保持 pending。
 - 由于 §20.1 第 7 条明确要求至少一个平台完成满足签名前提的真实旧版→新版更新，当前不将「§20.1 全部 11 条」整体标记为通过；该 pending 只能在注入有效签名身份并真实执行升级后消除。
