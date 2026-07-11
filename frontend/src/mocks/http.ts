@@ -1,5 +1,38 @@
-// 共享 envelope helper，供各域 handlers 复用（对齐 src/lib/http/client.ts 的 { code, data, message } 契约）
-import { HttpResponse } from 'msw';
+import { HttpResponse, type JsonBodyType } from 'msw';
 
-export const ok = <T>(data: T) => HttpResponse.json({ code: 0, data, message: '' });
-export const biz = (code: number, message: string) => HttpResponse.json({ code, data: null, message });
+const HTTP_TITLES: Readonly<Record<number, string>> = {
+  400: 'Bad Request',
+  401: 'Unauthorized',
+  403: 'Forbidden',
+  404: 'Not Found',
+  409: 'Conflict',
+  500: 'Internal Server Error',
+};
+
+interface BizInput {
+  status: number;
+  code: string;
+  detail: string;
+  extensions?: Readonly<Record<string, unknown>>;
+}
+
+export const ok = <T extends JsonBodyType>(data: T) => HttpResponse.json(data);
+
+export const noContent = () => new HttpResponse(null, { status: 204 });
+
+export const biz = ({ status, code, detail, extensions }: BizInput) =>
+  HttpResponse.json(
+    {
+      ...extensions,
+      type: 'about:blank',
+      title: HTTP_TITLES[status] ?? 'Error',
+      status,
+      detail,
+      code,
+      traceId: crypto.randomUUID(),
+    },
+    {
+      status,
+      headers: { 'Content-Type': 'application/problem+json' },
+    },
+  );

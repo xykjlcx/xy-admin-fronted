@@ -20,5 +20,10 @@ test('新增承运商后出现在列表', async () => {
     }),
   });
   const result = await (await fetch('/api/lastmile/carriers?keyword=测试')).json();
-  expect(result.data.total).toBe(1);
+  expect(result.total).toBe(1);
+});
+test('缺失承运商返回 ProblemDetail', async () => {
+  const response = await fetch('/api/lastmile/carriers/missing');
+  expect(response.status).toBe(404); expect(response.headers.get('content-type')).toContain('application/problem+json');
+  await expect(response.json()).resolves.toMatchObject({ status: 404, code: 'lastmile.carrier.not-found', detail: '承运商不存在' });
 });

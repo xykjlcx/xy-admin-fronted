@@ -1,11 +1,10 @@
 import { queryOptions } from '@tanstack/react-query';
 import { z } from 'zod';
 import { http } from '@/lib/http/client';
-import { defineApiContract } from '@/lib/http/contract';
+import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
 import { roleKeys } from './keys';
 import {
   CreateRoleSchema,
-  NullSchema,
   PermissionTreeGroupSchema,
   RoleAuditLogSchema,
   RoleDataPermissionSchema,
@@ -24,7 +23,7 @@ const roleMembersContract = defineApiContract({ response: z.array(RoleMemberSche
 const roleDataPermissionContract = defineApiContract({ response: RoleDataPermissionSchema });
 const roleAuditLogsContract = defineApiContract({ response: z.array(RoleAuditLogSchema) });
 const roleContract = defineApiContract({ response: RoleSchema });
-const nullContract = defineApiContract({ response: NullSchema });
+const nullContract = defineVoidContract();
 
 export function normalizeRoleDataPermission(value: RoleDataPermission): RoleDataPermission {
   return RoleDataPermissionSchema.parse({

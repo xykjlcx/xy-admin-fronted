@@ -33,9 +33,9 @@ export const deptHandlers = [
     const patch = UpdateDeptSchema.parse(await request.json());
     // 拒绝把部门挂到自身或其下级，避免造出环形父链
     if (patch.parentId != null && collectDeptIds(id).has(patch.parentId)) {
-      return biz(4001, '不能选择自身或下级部门作为上级');
+      return biz({ status: 409, code: 'iam.dept.parent-cycle', detail: '不能选择自身或下级部门作为上级' });
     }
     const updated = depts.update(id, patch);
-    return updated ? ok({ ...updated, memberCount: countDeptMembers(updated.id) }) : biz(4040, '部门不存在');
+    return updated ? ok({ ...updated, memberCount: countDeptMembers(updated.id) }) : biz({ status: 404, code: 'iam.dept.not-found', detail: '部门不存在' });
   }),
 ];

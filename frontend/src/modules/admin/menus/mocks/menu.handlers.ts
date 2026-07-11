@@ -1,6 +1,6 @@
 import { http } from 'msw';
 import type { ZodError } from 'zod';
-import { biz, ok } from '@/mocks/http';
+import { biz, ok, noContent } from '@/mocks/http';
 import {
   CreateMenuSchema,
   CreateSubsystemSchema,
@@ -29,21 +29,21 @@ export const menuHandlers = [
   http.get('/api/subsystems', () => ok(subsystems.all())),
   http.post('/api/subsystems', async ({ request }) => {
     const parsed = CreateSubsystemSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, inputErrorMessage(parsed.error));
+    if (!parsed.success) return biz({ status: 400, code: 'menu.validation.invalid', detail: inputErrorMessage(parsed.error) });
     const body = parsed.data;
     const error = validateCreateSubsystemInput(body);
-    if (error) return biz(4001, error);
+    if (error) return biz({ status: 400, code: 'menu.validation.invalid', detail: error });
     return ok(subsystems.insert(normalizeSubsystemCreate(body)));
   }),
   http.put('/api/subsystems/:key', async ({ params, request }) => {
     const key = String(params.key);
-    if (!subsystems.find(key)) return biz(4040, '子系统不存在');
+    if (!subsystems.find(key)) return biz({ status: 404, code: 'menu.subsystem.not-found', detail: '子系统不存在' });
 
     const parsed = UpdateSubsystemSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, inputErrorMessage(parsed.error));
+    if (!parsed.success) return biz({ status: 400, code: 'menu.validation.invalid', detail: inputErrorMessage(parsed.error) });
     const body = parsed.data;
     const error = validateSubsystemInput(body);
-    if (error) return biz(4001, error);
+    if (error) return biz({ status: 400, code: 'menu.validation.invalid', detail: error });
 
     const updated = subsystems.update(key, {
       label: body.label,
@@ -53,7 +53,7 @@ export const menuHandlers = [
       home: body.home,
       enabled: body.enabled,
     });
-    return updated ? ok(updated) : biz(4040, '子系统不存在');
+    return updated ? ok(updated) : biz({ status: 404, code: 'menu.subsystem.not-found', detail: '子系统不存在' });
   }),
   http.get('/api/menus', ({ request }) => {
     const sub = new URL(request.url).searchParams.get('subsystem');
@@ -62,45 +62,45 @@ export const menuHandlers = [
 
   http.post('/api/menus', async ({ request }) => {
     const parsed = CreateMenuSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, inputErrorMessage(parsed.error));
+    if (!parsed.success) return biz({ status: 400, code: 'menu.validation.invalid', detail: inputErrorMessage(parsed.error) });
     const body = parsed.data;
     const error = validateMenuInput(body, body.subsystemKey);
-    if (error) return biz(4001, error);
+    if (error) return biz({ status: 400, code: 'menu.validation.invalid', detail: error });
     return ok(menus.insert(normalizeMenuCreate(body)));
   }),
 
   http.put('/api/menus/:id', async ({ params, request }) => {
     const id = String(params.id);
     const current = menus.find(id);
-    if (!current) return biz(4040, '菜单不存在');
+    if (!current) return biz({ status: 404, code: 'menu.node.not-found', detail: '菜单不存在' });
 
     const parsed = UpdateMenuSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, inputErrorMessage(parsed.error));
+    if (!parsed.success) return biz({ status: 400, code: 'menu.validation.invalid', detail: inputErrorMessage(parsed.error) });
     const body = parsed.data;
-    if (hasMenuChildren(id) && current.type !== body.type) return biz(4004, '存在子菜单，不能修改节点类型');
+    if (hasMenuChildren(id) && current.type !== body.type) return biz({ status: 409, code: 'menu.node.has-children', detail: '存在子菜单，不能修改节点类型' });
     const error = validateMenuInput(body, current.subsystemKey, id);
-    if (error) return biz(4001, error);
+    if (error) return biz({ status: 400, code: 'menu.validation.invalid', detail: error });
 
     const updated = menus.update(id, normalizeMenuUpdate(current, body));
-    return updated ? ok(updated) : biz(4040, '菜单不存在');
+    return updated ? ok(updated) : biz({ status: 404, code: 'menu.node.not-found', detail: '菜单不存在' });
   }),
 
   http.patch('/api/menus/:id/visibility', async ({ params, request }) => {
     const id = String(params.id);
-    if (!menus.find(id)) return biz(4040, '菜单不存在');
+    if (!menus.find(id)) return biz({ status: 404, code: 'menu.node.not-found', detail: '菜单不存在' });
     const parsed = SetMenuVisibilitySchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '请求参数不合法');
+    if (!parsed.success) return biz({ status: 400, code: 'menu.validation.invalid', detail: '请求参数不合法' });
     const body = parsed.data;
     const updated = menus.update(id, { visible: body.visible });
-    return updated ? ok(updated) : biz(4040, '菜单不存在');
+    return updated ? ok(updated) : biz({ status: 404, code: 'menu.node.not-found', detail: '菜单不存在' });
   }),
 
   http.delete('/api/menus/:id', ({ params }) => {
     const id = String(params.id);
     const current = menus.find(id);
-    if (!current) return biz(4040, '菜单不存在');
-    if (hasMenuChildren(id)) return biz(4004, '存在子菜单，不能直接删除');
+    if (!current) return biz({ status: 404, code: 'menu.node.not-found', detail: '菜单不存在' });
+    if (hasMenuChildren(id)) return biz({ status: 409, code: 'menu.node.has-children', detail: '存在子菜单，不能直接删除' });
     menus.remove(id);
-    return ok(null);
+    return noContent();
   }),
 ];

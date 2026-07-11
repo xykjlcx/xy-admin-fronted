@@ -1,14 +1,13 @@
 import { queryOptions } from '@tanstack/react-query';
 import { z } from 'zod';
 import { http } from '@/lib/http/client';
-import { defineApiContract } from '@/lib/http/contract';
+import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
 import { dictionaryKeys } from './keys';
 import {
   CreateDictionaryItemSchema,
   CreateDictionarySchema,
   DictionaryItemSchema,
   DictionarySchema,
-  NullSchema,
   SetDictionaryItemEnabledSchema,
   UpdateDictionaryItemSchema,
   UpdateDictionarySchema,
@@ -23,7 +22,7 @@ const dictionariesContract = defineApiContract({ response: z.array(DictionarySch
 const dictionaryContract = defineApiContract({ response: DictionarySchema });
 const dictionaryItemsContract = defineApiContract({ response: z.array(DictionaryItemSchema) });
 const dictionaryItemContract = defineApiContract({ response: DictionaryItemSchema });
-const nullContract = defineApiContract({ response: NullSchema });
+const nullContract = defineVoidContract();
 
 export const dictionariesQuery = queryOptions({
   queryKey: dictionaryKeys.list(),

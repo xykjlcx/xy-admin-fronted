@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import { defineApiContract } from '@/lib/http/contract';
+import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
 import { http } from '@/lib/http/client';
 import { fileKeys } from './keys';
 import {
@@ -7,7 +7,6 @@ import {
   CreateFolderSchema,
   FileEntrySchema,
   FileListResultSchema,
-  NullSchema,
   RenameFileSchema,
   StorageOverviewSchema,
   type CreateFileInput,
@@ -18,7 +17,7 @@ import {
 const listContract = defineApiContract({ response: FileListResultSchema });
 const entryContract = defineApiContract({ response: FileEntrySchema });
 const storageContract = defineApiContract({ response: StorageOverviewSchema });
-const nullContract = defineApiContract({ response: NullSchema });
+const nullContract = defineVoidContract();
 
 export const filesQuery = (parentId: string | null, keyword: string) =>
   queryOptions({

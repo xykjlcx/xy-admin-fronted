@@ -62,7 +62,7 @@ export const shipmentHandlers = [
   ),
   http.get('/api/lastmile/shipments/export', ({ request }) => {
     const items = list(request);
-    if (!items) return biz(4001, '状态不合法');
+    if (!items) return biz({ status: 400, code: 'lastmile.shipment.status.invalid', detail: '状态不合法' });
     const rows = items.map((item) =>
       [
         item.no,
@@ -95,10 +95,10 @@ export const shipmentHandlers = [
   }),
   http.post('/api/lastmile/shipments', async ({ request }) => {
     const input = CreateShipmentSchema.safeParse(await request.json());
-    if (!input.success) return biz(4001, '运单信息不完整');
+    if (!input.success) return biz({ status: 400, code: 'lastmile.shipment.validation.invalid', detail: '运单信息不完整' });
     const customer = customers.find((item) => item.value === input.data.customerId);
     const channel = channels.find((item) => item.value === input.data.channelId);
-    if (!customer || !channel) return biz(4004, '客户或渠道不存在');
+    if (!customer || !channel) return biz({ status: 409, code: 'lastmile.shipment.party.not-found', detail: '客户或渠道不存在' });
     const id = crypto.randomUUID();
     const fee = Math.round(input.data.parcels.reduce((sum, parcel) => sum + parcel.weight * 24, 38));
     const createdAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
@@ -153,13 +153,13 @@ export const shipmentHandlers = [
   }),
   http.get('/api/lastmile/shipments', ({ request }) => {
     const items = list(request);
-    return items ? ok(result(items)) : biz(4001, '状态不合法');
+    return items ? ok(result(items)) : biz({ status: 400, code: 'lastmile.shipment.status.invalid', detail: '状态不合法' });
   }),
   http.post('/api/lastmile/shipments/:id/print', async ({ params, request }) => {
     const input = PrintShipmentInputSchema.safeParse(await request.json());
-    if (!input.success) return biz(4001, '打印参数不合法');
+    if (!input.success) return biz({ status: 400, code: 'lastmile.shipment.print.invalid', detail: '打印参数不合法' });
     const current = shipmentDb.find(String(params.id));
-    if (!current) return biz(4040, '运单不存在');
+    if (!current) return biz({ status: 404, code: 'lastmile.shipment.not-found', detail: '运单不存在' });
     const next = shipmentDb.update(current.id, (item) => ({
       ...item,
       status: 'printed',
@@ -175,11 +175,11 @@ export const shipmentHandlers = [
             'Content-Disposition': `attachment; filename="label-${String(params.id)}.pdf"`,
           },
         })
-      : biz(4040, '运单不存在'),
+      : biz({ status: 404, code: 'lastmile.shipment.not-found', detail: '运单不存在' }),
   ),
   http.get('/api/lastmile/shipments/:id', ({ params }) => {
     const item = shipmentDb.find(String(params.id));
-    return item ? ok(item) : biz(4040, '运单不存在');
+    return item ? ok(item) : biz({ status: 404, code: 'lastmile.shipment.not-found', detail: '运单不存在' });
   }),
 ];
 

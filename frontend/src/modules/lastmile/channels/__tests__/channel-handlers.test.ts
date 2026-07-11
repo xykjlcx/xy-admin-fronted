@@ -29,24 +29,24 @@ test('渠道可创建、测试连接和停用', async () => {
       }),
     })
   ).json();
-  expect(created.data.name).toBe('测试渠道');
+  expect(created.name).toBe('测试渠道');
   const tested = await (
-    await fetch(`/api/lastmile/channels/${created.data.id}/test`, { method: 'POST' })
+    await fetch(`/api/lastmile/channels/${created.id}/test`, { method: 'POST' })
   ).json();
-  expect(tested.data.ok).toBe(true);
+  expect(tested.ok).toBe(true);
   const toggled = await (
-    await fetch(`/api/lastmile/channels/${created.data.id}/status`, {
+    await fetch(`/api/lastmile/channels/${created.id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ enabled: false }),
     })
   ).json();
-  expect(toggled.data.enabled).toBe(false);
+  expect(toggled.enabled).toBe(false);
 });
 
 test('已有渠道的结算模式可被编辑表单回读', async () => {
   const detail = await (await fetch('/api/lastmile/channels/ch-001')).json();
 
-  expect(['月结', '预付']).toContain(detail.data.settlement);
+  expect(['月结', '预付']).toContain(detail.settlement);
 });
 
 test('渠道运营指标来自全量数据，不随列表筛选条件漂移', async () => {
@@ -55,7 +55,12 @@ test('渠道运营指标来自全量数据，不随列表筛选条件漂移', as
     await fetch('/api/lastmile/channels?keyword=&kind=all&status=disabled')
   ).json();
 
-  expect(all.data.stats.enabled).toBe(6);
-  expect(disabled.data.total).toBe(1);
-  expect(disabled.data.stats).toEqual(all.data.stats);
+  expect(all.stats.enabled).toBe(6);
+  expect(disabled.total).toBe(1);
+  expect(disabled.stats).toEqual(all.stats);
+});
+test('缺失渠道返回 ProblemDetail', async () => {
+  const response = await fetch('/api/lastmile/channels/missing');
+  expect(response.status).toBe(404); expect(response.headers.get('content-type')).toContain('application/problem+json');
+  await expect(response.json()).resolves.toMatchObject({ status: 404, code: 'lastmile.channel.not-found', detail: '渠道不存在' });
 });

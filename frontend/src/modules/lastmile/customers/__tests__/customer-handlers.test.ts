@@ -22,12 +22,17 @@ test('客户创建和渠道授权均可回读', async () => {
       }),
     })
   ).json();
-  expect(created.data.status).toBe('trial');
+  expect(created.status).toBe('trial');
   const updated = await (
-    await fetch(`/api/lastmile/customers/${created.data.id}/channels`, {
+    await fetch(`/api/lastmile/customers/${created.id}/channels`, {
       method: 'PATCH',
       body: JSON.stringify({ channelId: 'ch-001', authorized: true }),
     })
   ).json();
-  expect(updated.data.channels[0].authorized).toBe(true);
+  expect(updated.channels[0].authorized).toBe(true);
+});
+test('缺失客户返回 ProblemDetail', async () => {
+  const response = await fetch('/api/lastmile/customers/missing');
+  expect(response.status).toBe(404); expect(response.headers.get('content-type')).toContain('application/problem+json');
+  await expect(response.json()).resolves.toMatchObject({ status: 404, code: 'lastmile.customer.not-found', detail: '客户不存在' });
 });

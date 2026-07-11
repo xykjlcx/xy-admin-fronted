@@ -1,13 +1,12 @@
 import { http, bindTokenGetter, type HttpRequestOptions } from '@/lib/http/client';
 import { queryOptions } from '@tanstack/react-query';
 import { useAuth } from '@/stores/auth';
-import { defineApiContract } from '@/lib/http/contract';
+import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
 import { authKeys } from './keys';
 import {
   LoginInputSchema,
   LoginResponseSchema,
   MeSchema,
-  NullSchema,
   SendSmsCodeResultSchema,
   SendSmsCodeSchema,
   SmsLoginSchema,
@@ -24,7 +23,7 @@ bindTokenGetter(() => useAuth.getState().token);
 const loginContract = defineApiContract({ response: LoginResponseSchema });
 const sendSmsCodeContract = defineApiContract({ response: SendSmsCodeResultSchema });
 const meContract = defineApiContract({ response: MeSchema });
-const logoutContract = defineApiContract({ response: NullSchema });
+const logoutContract = defineVoidContract();
 
 export type { MeDto } from './schema';
 

@@ -1,12 +1,11 @@
 import { queryOptions } from '@tanstack/react-query';
 import { z } from 'zod';
-import { defineApiContract } from '@/lib/http/contract';
+import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
 import { http } from '@/lib/http/client';
 import { profileKeys } from './keys';
 import {
   ChangePasswordSchema,
   LoginDeviceSchema,
-  NullSchema,
   PreferenceSchema,
   ProfileSchema,
   SecuritySettingsSchema,
@@ -21,7 +20,7 @@ const profileContract = defineApiContract({ response: ProfileSchema });
 const securityContract = defineApiContract({ response: SecuritySettingsSchema });
 const preferenceContract = defineApiContract({ response: PreferenceSchema });
 const devicesContract = defineApiContract({ response: z.array(LoginDeviceSchema) });
-const nullContract = defineApiContract({ response: NullSchema });
+const nullContract = defineVoidContract();
 
 export const profileQuery = queryOptions({
   queryKey: profileKeys.detail(),

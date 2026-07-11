@@ -6,8 +6,8 @@ import { baseChannels, customerDb } from './db';
 export const customerHandlers = [
   http.post('/api/lastmile/customers', async ({ request }) => {
     const parsed = CreateCustomerSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '客户信息不完整');
-    if (customerDb.all().some((item) => item.code === parsed.data.code)) return biz(4090, '客户编码已存在');
+    if (!parsed.success) return biz({ status: 400, code: 'lastmile.customer.validation.invalid', detail: '客户信息不完整' });
+    if (customerDb.all().some((item) => item.code === parsed.data.code)) return biz({ status: 409, code: 'lastmile.customer.code.conflict', detail: '客户编码已存在' });
     const item: CustomerDto = {
       id: crypto.randomUUID(),
       ...parsed.data,
@@ -33,9 +33,9 @@ export const customerHandlers = [
   }),
   http.patch('/api/lastmile/customers/:id/channels', async ({ params, request }) => {
     const parsed = CustomerAuthorizationSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '授权参数不合法');
+    if (!parsed.success) return biz({ status: 400, code: 'lastmile.customer.authorization.invalid', detail: '授权参数不合法' });
     const customer = customerDb.find(String(params.id));
-    if (!customer) return biz(4040, '客户不存在');
+    if (!customer) return biz({ status: 404, code: 'lastmile.customer.not-found', detail: '客户不存在' });
     const next = customerDb.update(customer.id, (item) => ({
       ...item,
       channels: item.channels.map((channel) =>
@@ -46,7 +46,7 @@ export const customerHandlers = [
   }),
   http.get('/api/lastmile/customers/:id', ({ params }) => {
     const item = customerDb.find(String(params.id));
-    return item ? ok(item) : biz(4040, '客户不存在');
+    return item ? ok(item) : biz({ status: 404, code: 'lastmile.customer.not-found', detail: '客户不存在' });
   }),
 ];
 export { customerDb } from './db';

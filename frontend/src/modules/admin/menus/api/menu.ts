@@ -1,13 +1,12 @@
 import { queryOptions } from '@tanstack/react-query';
 import { z } from 'zod';
 import { http } from '@/lib/http/client';
-import { defineApiContract } from '@/lib/http/contract';
+import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
 import { menuKeys } from './keys';
 import {
   CreateMenuSchema,
   CreateSubsystemSchema,
   MenuRecordSchema,
-  NullSchema,
   SetMenuVisibilitySchema,
   SubsystemSchema,
   UpdateMenuSchema,
@@ -23,7 +22,7 @@ const subsystemsContract = defineApiContract({ response: z.array(SubsystemSchema
 const subsystemContract = defineApiContract({ response: SubsystemSchema });
 const menusContract = defineApiContract({ response: z.array(MenuRecordSchema) });
 const menuContract = defineApiContract({ response: MenuRecordSchema });
-const nullContract = defineApiContract({ response: NullSchema });
+const nullContract = defineVoidContract();
 
 export const subsystemsQuery = queryOptions({
   queryKey: menuKeys.subsystems(),

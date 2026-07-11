@@ -1,5 +1,5 @@
 import { HttpResponse, http } from 'msw';
-import { biz, ok } from '@/mocks/http';
+import { biz, ok, noContent } from '@/mocks/http';
 import { genId } from '@/mocks/db';
 import { CreateFileSchema, CreateFolderSchema, RenameFileSchema, type FileKind } from '../api';
 import { files } from './db';
@@ -41,7 +41,7 @@ export const fileHandlers = [
   ),
   http.get('/api/files/:id/download', ({ params }) => {
     const entry = files.find(String(params.id));
-    if (!entry || entry.kind === 'folder') return biz(4040, '文件不存在');
+    if (!entry || entry.kind === 'folder') return biz({ status: 404, code: 'file.not-found', detail: '文件不存在' });
     return new HttpResponse(`Mock file content: ${entry.name}`, {
       headers: {
         'Content-Type': 'application/octet-stream',
@@ -63,11 +63,11 @@ export const fileHandlers = [
   }),
   http.get('/api/files/:id', ({ params }) => {
     const entry = files.find(String(params.id));
-    return entry ? ok(entry) : biz(4040, '文件不存在');
+    return entry ? ok(entry) : biz({ status: 404, code: 'file.not-found', detail: '文件不存在' });
   }),
   http.post('/api/files/folders', async ({ request }) => {
     const parsed = CreateFolderSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '文件夹名称不能为空');
+    if (!parsed.success) return biz({ status: 400, code: 'file.folder-name.invalid', detail: '文件夹名称不能为空' });
     const entry = files.insert({
       id: genId('created-folder'),
       name: parsed.data.name,
@@ -84,7 +84,7 @@ export const fileHandlers = [
   }),
   http.post('/api/files', async ({ request }) => {
     const parsed = CreateFileSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '文件信息不完整');
+    if (!parsed.success) return biz({ status: 400, code: 'file.validation.invalid', detail: '文件信息不完整' });
     const entry = files.insert({
       id: genId('uploaded-file'),
       ...parsed.data,
@@ -98,17 +98,17 @@ export const fileHandlers = [
   }),
   http.patch('/api/files/:id', async ({ params, request }) => {
     const id = String(params.id);
-    if (!files.find(id)) return biz(4040, '文件不存在');
+    if (!files.find(id)) return biz({ status: 404, code: 'file.not-found', detail: '文件不存在' });
     const parsed = RenameFileSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '文件名不能为空');
+    if (!parsed.success) return biz({ status: 400, code: 'file.name.invalid', detail: '文件名不能为空' });
     return ok(files.update(id, parsed.data));
   }),
   http.delete('/api/files/:id', ({ params }) => {
     const id = String(params.id);
-    if (!files.find(id)) return biz(4040, '文件不存在');
+    if (!files.find(id)) return biz({ status: 404, code: 'file.not-found', detail: '文件不存在' });
     removeTree(id);
     recount();
-    return ok(null);
+    return noContent();
   }),
 ];
 

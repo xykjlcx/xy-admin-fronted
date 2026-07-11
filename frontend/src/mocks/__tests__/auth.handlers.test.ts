@@ -12,12 +12,12 @@ test('登录成功返回 token，me 返回权限集', async () => {
       body: JSON.stringify({ username: 'admin', password: 'admin123' }),
     })
   ).json();
-  expect(login.data.token).toMatch(/^mock-token-/);
+  expect(login.token).toMatch(/^mock-token-/);
   const me = await (
-    await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${login.data.token}` } })
+    await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${login.token}` } })
   ).json();
-  expect(me.data.permissions).toEqual(['*:*:*']);
-  expect(me.data.user.password).toBeUndefined();
+  expect(me.permissions).toEqual(['*:*:*']);
+  expect(me.user.password).toBeUndefined();
 });
 
 test('原型视觉账号映射到管理员权限', async () => {
@@ -28,9 +28,9 @@ test('原型视觉账号映射到管理员权限', async () => {
     })
   ).json();
   const me = await (
-    await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${login.data.token}` } })
+    await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${login.token}` } })
   ).json();
-  expect(me.data.roles).toEqual(['superadmin']);
+  expect(me.roles).toEqual(['superadmin']);
 });
 
 test('密码错误 → code 4010，data 为 null', async () => {
@@ -40,7 +40,11 @@ test('密码错误 → code 4010，data 为 null', async () => {
       body: JSON.stringify({ username: 'admin', password: 'wrong' }),
     })
   ).json();
-  expect(res).toMatchObject({ code: 4010, data: null, message: '用户名或密码错误' });
+  expect(res).toMatchObject({
+    status: 401,
+    code: 'auth.credentials.invalid',
+    detail: '用户名或密码错误',
+  });
 });
 
 test('无 token 访问 me → 401', async () => {
@@ -55,12 +59,12 @@ test('登出后旧 token 失效，再访问 me → 401', async () => {
       body: JSON.stringify({ username: 'admin', password: 'admin123' }),
     })
   ).json();
-  const token = login.data.token as string;
+  const token = login.token as string;
   const logoutRes = await fetch('/api/auth/logout', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
   });
-  expect(logoutRes.status).toBe(200);
+  expect(logoutRes.status).toBe(204);
   const me = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
   expect(me.status).toBe(401);
 });

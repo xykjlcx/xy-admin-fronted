@@ -88,14 +88,24 @@ test('下载失败时给出可见反馈且不产生未处理拒绝', async () =>
   const errorToast = vi.spyOn(toast, 'error').mockImplementation(() => 'download-error');
   server.use(
     http.get('/api/files/:id/download', () =>
-      HttpResponse.json({ code: 5000, message: 'download unavailable', data: null }, { status: 503 }),
+      HttpResponse.json(
+        {
+          type: 'about:blank',
+          title: 'Service Unavailable',
+          status: 503,
+          detail: '下载服务暂不可用',
+          code: 'file.download.unavailable',
+          traceId: 'trace-files-download',
+        },
+        { status: 503, headers: { 'Content-Type': 'application/problem+json' } },
+      ),
     ),
   );
   renderPage();
   await userEvent.click(await screen.findByRole('button', { name: '预览 组织架构图.png' }));
   await userEvent.click(await screen.findByRole('button', { name: '下载' }));
 
-  await waitFor(() => expect(errorToast).toHaveBeenCalled());
+  await waitFor(() => expect(errorToast).toHaveBeenCalledWith('文件下载失败，请重试'));
 });
 
 test('分享文件复制可回读深链，直接进入深链会自动打开文件预览', async () => {

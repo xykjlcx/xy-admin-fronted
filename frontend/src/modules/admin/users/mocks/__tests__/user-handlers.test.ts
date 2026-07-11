@@ -8,11 +8,6 @@ beforeAll(() => server.listen());
 afterEach(() => resetDb());
 afterAll(() => server.close());
 
-interface Env<T> {
-  code: number;
-  data: T;
-  message: string;
-}
 
 interface Page<T> {
   list: T[];
@@ -35,23 +30,20 @@ interface DeptRow {
 test('users module handlers expose list filters and detail shape', async () => {
   const list = (await (
     await fetch('/api/users?page=1&pageSize=5&deptId=rd&status=active&keyword=李')
-  ).json()) as Env<Page<UserRow>>;
+  ).json()) as Page<UserRow>;
+  expect(list.list.length).toBeGreaterThan(0);
+  expect(list.list.every((user) => user.deptId === 'rd')).toBe(true);
+  expect(list.list.every((user) => user.status === 'active')).toBe(true);
 
-  expect(list.code).toBe(0);
-  expect(list.data.list.length).toBeGreaterThan(0);
-  expect(list.data.list.every((user) => user.deptId === 'rd')).toBe(true);
-  expect(list.data.list.every((user) => user.status === 'active')).toBe(true);
-
-  const detail = (await (await fetch(`/api/users/${list.data.list[0]!.id}`)).json()) as Env<UserDetailDto>;
-  expect(detail.code).toBe(0);
-  expect(UserDetailSchema.safeParse(detail.data).success).toBe(true);
-  expect(detail.data.id).toBe(list.data.list[0]!.id);
+  const detail = (await (await fetch(`/api/users/${list.list[0]!.id}`)).json()) as UserDetailDto;
+  expect(UserDetailSchema.safeParse(detail).success).toBe(true);
+  expect(detail.id).toBe(list.list[0]!.id);
 });
 
 test('users module handlers keep department member counts in sync with writes', async () => {
-  const before = (await (await fetch('/api/depts')).json()) as Env<DeptRow[]>;
-  const rdBefore = before.data.find((dept) => dept.id === 'rd')?.memberCount;
-  const feBefore = before.data.find((dept) => dept.id === 'rd_fe')?.memberCount;
+  const before = (await (await fetch('/api/depts')).json()) as DeptRow[];
+  const rdBefore = before.find((dept) => dept.id === 'rd')?.memberCount;
+  const feBefore = before.find((dept) => dept.id === 'rd_fe')?.memberCount;
 
   await fetch('/api/users', {
     method: 'POST',
@@ -65,9 +57,9 @@ test('users module handlers keep department member counts in sync with writes', 
     }),
   });
 
-  const after = (await (await fetch('/api/depts')).json()) as Env<DeptRow[]>;
-  expect(after.data.find((dept) => dept.id === 'rd')?.memberCount).toBe((rdBefore ?? 0) + 1);
-  expect(after.data.find((dept) => dept.id === 'rd_fe')?.memberCount).toBe((feBefore ?? 0) + 1);
+  const after = (await (await fetch('/api/depts')).json()) as DeptRow[];
+  expect(after.find((dept) => dept.id === 'rd')?.memberCount).toBe((rdBefore ?? 0) + 1);
+  expect(after.find((dept) => dept.id === 'rd_fe')?.memberCount).toBe((feBefore ?? 0) + 1);
 });
 
 test('users module handlers apply advanced filters from query params', async () => {
@@ -78,11 +70,9 @@ test('users module handlers apply advanced filters from query params', async () 
 
   const list = (await (
     await fetch(`/api/users?page=1&pageSize=10&status=left&filters=${filters}`)
-  ).json()) as Env<Page<UserRow>>;
-
-  expect(list.code).toBe(0);
-  expect(list.data.total).toBe(1);
-  expect(list.data.list[0]?.name).toBe('唐一鸣');
+  ).json()) as Page<UserRow>;
+  expect(list.total).toBe(1);
+  expect(list.list[0]?.name).toBe('唐一鸣');
 });
 
 test('department handlers create and update departments', async () => {
@@ -92,22 +82,18 @@ test('department handlers create and update departments', async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: '客户成功部', parentId: null }),
     })
-  ).json()) as Env<DeptRow & { name: string }>;
-
-  expect(created.code).toBe(0);
-  expect(created.data.name).toBe('客户成功部');
+  ).json()) as DeptRow & { name: string };
+  expect(created.name).toBe('客户成功部');
 
   const updated = (await (
-    await fetch(`/api/depts/${created.data.id}`, {
+    await fetch(`/api/depts/${created.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: '客户增长部' }),
     })
-  ).json()) as Env<DeptRow & { name: string }>;
+  ).json()) as DeptRow & { name: string };
+  expect(updated.name).toBe('客户增长部');
 
-  expect(updated.code).toBe(0);
-  expect(updated.data.name).toBe('客户增长部');
-
-  const all = (await (await fetch('/api/depts')).json()) as Env<(DeptRow & { name: string })[]>;
-  expect(all.data.some((dept) => dept.name === '客户增长部')).toBe(true);
+  const all = (await (await fetch('/api/depts')).json()) as (DeptRow & { name: string })[];
+  expect(all.some((dept) => dept.name === '客户增长部')).toBe(true);
 });

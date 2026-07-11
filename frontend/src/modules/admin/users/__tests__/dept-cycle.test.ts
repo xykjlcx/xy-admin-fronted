@@ -74,19 +74,25 @@ describe('dept update handler cycle guard', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ parentId }),
     });
-    return (await res.json()) as { code: number; message: string };
+    return { status: res.status, body: (await res.json()) as { code?: string } };
   }
 
   test('rejects choosing itself as parent', async () => {
-    expect((await putDeptParent('rd', 'rd')).code).toBe(4001);
+    expect(await putDeptParent('rd', 'rd')).toMatchObject({
+      status: 409,
+      body: { code: 'iam.dept.parent-cycle' },
+    });
   });
 
   test('rejects choosing a descendant as parent', async () => {
     // rd_fe 是 rd 的下级，选它作上级会造出环
-    expect((await putDeptParent('rd', 'rd_fe')).code).toBe(4001);
+    expect(await putDeptParent('rd', 'rd_fe')).toMatchObject({
+      status: 409,
+      body: { code: 'iam.dept.parent-cycle' },
+    });
   });
 
   test('allows a non-cyclic reparent', async () => {
-    expect((await putDeptParent('rd_fe', 'mkt')).code).toBe(0);
+    expect((await putDeptParent('rd_fe', 'mkt')).status).toBe(200);
   });
 });

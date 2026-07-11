@@ -9,9 +9,9 @@ import { sessionHandlers } from './session.handlers';
 export const registrationHandlers = [
   http.post('/api/auth/register', async ({ request }) => {
     const parsed = RegisterSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '注册信息不完整');
+    if (!parsed.success) return biz({ status: 400, code: 'auth.registration.invalid', detail: '注册信息不完整' });
     if (registeredAccounts.all().some((account) => account.email === parsed.data.email))
-      return biz(4001, '邮箱已注册');
+      return biz({ status: 409, code: 'auth.email.conflict', detail: '邮箱已注册' });
     const account = registeredAccounts.insert({
       id: genId('registered-user'),
       name: parsed.data.name,
@@ -41,9 +41,9 @@ export const registrationHandlers = [
   }),
   http.post('/api/auth/forgot-password', async ({ request }) => {
     const parsed = ForgotPasswordSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '邮箱格式不正确');
+    if (!parsed.success) return biz({ status: 400, code: 'auth.email.invalid', detail: '邮箱格式不正确' });
     if (!registeredAccounts.all().some((account) => account.email === parsed.data.email))
-      return biz(4040, '邮箱未注册');
+      return biz({ status: 404, code: 'auth.email.not-found', detail: '邮箱未注册' });
     passwordResetRequests.insert({
       id: genId('password-reset'),
       email: parsed.data.email,

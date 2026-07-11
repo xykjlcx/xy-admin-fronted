@@ -1,5 +1,5 @@
 import { http } from 'msw';
-import { biz, ok } from '@/mocks/http';
+import { biz, ok, noContent } from '@/mocks/http';
 import { genId } from '@/mocks/db';
 import type {
   CreateRoleInput,
@@ -411,7 +411,7 @@ export const roleHandlers = [
   http.post('/api/roles', async ({ request }) => {
     const body = (await request.json()) as CreateRoleInput;
     const name = body.name.trim();
-    if (!name) return biz(4001, '角色名称不能为空');
+    if (!name) return biz({ status: 400, code: 'role.name.invalid', detail: '角色名称不能为空' });
     const role = roles.insert({
       id: genId('role'),
       name,
@@ -428,7 +428,7 @@ export const roleHandlers = [
 
   http.get('/api/roles/:id/permissions', ({ params }) => {
     const id = String(params.id);
-    if (!roles.find(id)) return biz(4040, '角色不存在');
+    if (!roles.find(id)) return biz({ status: 404, code: 'role.not-found', detail: '角色不存在' });
     const row = rolePermissions.find(id);
     return ok(clonePermissions(row?.permissions ?? {}));
   }),
@@ -436,7 +436,7 @@ export const roleHandlers = [
   http.put('/api/roles/:id/permissions', async ({ params, request }) => {
     const id = String(params.id);
     const role = roles.find(id);
-    if (!role) return biz(4040, '角色不存在');
+    if (!role) return biz({ status: 404, code: 'role.not-found', detail: '角色不存在' });
     const permissions = clonePermissions((await request.json()) as RolePermissionMap);
     const updated = rolePermissions.update(id, { permissions });
     if (!updated) rolePermissions.insert({ roleId: id, permissions });
@@ -446,14 +446,14 @@ export const roleHandlers = [
 
   http.get('/api/roles/:id/data-permissions', ({ params }) => {
     const id = String(params.id);
-    if (!roles.find(id)) return biz(4040, '角色不存在');
+    if (!roles.find(id)) return biz({ status: 404, code: 'role.not-found', detail: '角色不存在' });
     return ok(cloneDataPermission(roleDataPermissions.find(id)?.permission ?? defaultDataPermission));
   }),
 
   http.put('/api/roles/:id/data-permissions', async ({ params, request }) => {
     const id = String(params.id);
     const role = roles.find(id);
-    if (!role) return biz(4040, '角色不存在');
+    if (!role) return biz({ status: 404, code: 'role.not-found', detail: '角色不存在' });
     const permission = normalizeRoleDataPermission((await request.json()) as RoleDataPermission);
     const updated = roleDataPermissions.update(id, { permission });
     if (!updated) roleDataPermissions.insert({ roleId: id, permission });
@@ -463,18 +463,18 @@ export const roleHandlers = [
 
   http.get('/api/roles/:id/members', ({ params }) => {
     const role = roles.find(String(params.id));
-    return role ? ok(membersForRole(role)) : biz(4040, '角色不存在');
+    return role ? ok(membersForRole(role)) : biz({ status: 404, code: 'role.not-found', detail: '角色不存在' });
   }),
 
   http.delete('/api/roles/:id', ({ params }) => {
     const id = String(params.id);
     const role = roles.find(id);
-    if (!role) return biz(4040, '角色不存在');
-    if (role.type === 'system') return biz(4004, '系统角色不可删除');
+    if (!role) return biz({ status: 404, code: 'role.not-found', detail: '角色不存在' });
+    if (role.type === 'system') return biz({ status: 409, code: 'role.system.protected', detail: '系统角色不可删除' });
     appendRoleAudit(role, 'remove', '删除角色');
     roles.remove(id);
     rolePermissions.remove(id);
     roleDataPermissions.remove(id);
-    return ok(null);
+    return noContent();
   }),
 ];

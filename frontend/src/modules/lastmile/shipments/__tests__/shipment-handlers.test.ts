@@ -36,13 +36,18 @@ test('新建运单后可从详情接口回读并推进到已打单', async () =>
       }),
     })
   ).json();
-  expect(created.data.status).toBe('pending');
+  expect(created.status).toBe('pending');
   const printed = await (
-    await fetch(`/api/lastmile/shipments/${created.data.id}/print`, {
+    await fetch(`/api/lastmile/shipments/${created.id}/print`, {
       method: 'POST',
       body: JSON.stringify({ printer: 'Zebra', paper: '100 × 150 mm', copies: 1, packingList: true }),
     })
   ).json();
-  expect(printed.data.shipment.status).toBe('printed');
-  expect(printed.data.shipment.trackingNo).toMatch(/^MOCK/);
+  expect(printed.shipment.status).toBe('printed');
+  expect(printed.shipment.trackingNo).toMatch(/^MOCK/);
+});
+test('缺失运单返回 ProblemDetail', async () => {
+  const response = await fetch('/api/lastmile/shipments/missing');
+  expect(response.status).toBe(404); expect(response.headers.get('content-type')).toContain('application/problem+json');
+  await expect(response.json()).resolves.toMatchObject({ status: 404, code: 'lastmile.shipment.not-found', detail: '运单不存在' });
 });

@@ -16,7 +16,8 @@ afterAll(() => server.close());
 test('PUT /api/depts rejects moving a department under itself', async () => {
   await expect(deptApi.updateDept('rd', { parentId: 'rd' })).rejects.toMatchObject({
     name: 'BizError',
-    code: 4001,
+    status: 409,
+    code: 'iam.dept.parent-cycle',
   });
 });
 
@@ -24,7 +25,8 @@ test('PUT /api/depts rejects moving a department under one of its descendants', 
   // rd_fe 是 rd 的下级，把 rd 挂到 rd_fe 会造出环形父链
   await expect(deptApi.updateDept('rd', { parentId: 'rd_fe' })).rejects.toMatchObject({
     name: 'BizError',
-    code: 4001,
+    status: 409,
+    code: 'iam.dept.parent-cycle',
   });
 });
 

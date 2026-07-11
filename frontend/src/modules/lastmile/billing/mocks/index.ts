@@ -16,7 +16,7 @@ function filter(request: Request) {
 export const billingHandlers = [
   http.get('/api/lastmile/billing/export', ({ request }) => {
     const list = filter(request);
-    if (!list) return biz(4001, '状态不合法');
+    if (!list) return biz({ status: 400, code: 'lastmile.billing.status.invalid', detail: '状态不合法' });
     const rows = list.map((item) =>
       [item.no, item.customer, item.period, item.shipments, item.amount, item.status]
         .map((value) => `"${value}"`)
@@ -39,6 +39,6 @@ export const billingHandlers = [
             .filter((item) => item.status !== 'paid')
             .reduce((sum, item) => sum + item.amount, 0),
         })
-      : biz(4001, '状态不合法');
+      : biz({ status: 400, code: 'lastmile.billing.status.invalid', detail: '状态不合法' });
   }),
 ];

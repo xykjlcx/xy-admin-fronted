@@ -51,7 +51,7 @@ function csvCell(value: string) {
 export const logHandlers = [
   http.get('/api/audit/operation-logs/export', ({ request }) => {
     const list = filterOperations(request);
-    if (!list) return biz(4001, '操作类型不合法');
+    if (!list) return biz({ status: 400, code: 'log.operation.invalid', detail: '操作类型不合法' });
     const rows = list.map((item) =>
       [item.occurredAt, item.operator, item.module, item.type, item.target, item.ip].map(csvCell).join(','),
     );
@@ -65,7 +65,7 @@ export const logHandlers = [
   }),
   http.get('/api/audit/login-logs/export', ({ request }) => {
     const list = filterLogins(request);
-    if (!list) return biz(4001, '登录结果不合法');
+    if (!list) return biz({ status: 400, code: 'log.login-result.invalid', detail: '登录结果不合法' });
     const rows = list.map((item) =>
       [item.occurredAt, item.user, item.result, item.ip, item.location, item.device].map(csvCell).join(','),
     );
@@ -79,11 +79,11 @@ export const logHandlers = [
   }),
   http.get('/api/audit/operation-logs', ({ request }) => {
     const list = filterOperations(request);
-    return list ? ok({ list, total: list.length }) : biz(4001, '操作类型不合法');
+    return list ? ok({ list, total: list.length }) : biz({ status: 400, code: 'log.operation.invalid', detail: '操作类型不合法' });
   }),
   http.get('/api/audit/login-logs', ({ request }) => {
     const list = filterLogins(request);
-    return list ? ok({ list, total: list.length }) : biz(4001, '登录结果不合法');
+    return list ? ok({ list, total: list.length }) : biz({ status: 400, code: 'log.login-result.invalid', detail: '登录结果不合法' });
   }),
 ];
 

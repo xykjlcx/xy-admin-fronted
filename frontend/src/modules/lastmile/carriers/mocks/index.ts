@@ -5,7 +5,7 @@ import { carrierDb } from './db';
 export const carrierHandlers = [
   http.post('/api/lastmile/carriers', async ({ request }) => {
     const parsed = CarrierInputSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '承运商信息不完整');
+    if (!parsed.success) return biz({ status: 400, code: 'lastmile.carrier.validation.invalid', detail: '承运商信息不完整' });
     const id = crypto.randomUUID();
     const item = {
       id,
@@ -40,7 +40,7 @@ export const carrierHandlers = [
   }),
   http.get('/api/lastmile/carriers/:id', ({ params }) => {
     const item = carrierDb.find(String(params.id));
-    return item ? ok(item) : biz(4040, '承运商不存在');
+    return item ? ok(item) : biz({ status: 404, code: 'lastmile.carrier.not-found', detail: '承运商不存在' });
   }),
 ];
 export { carrierDb } from './db';

@@ -1,18 +1,17 @@
 import { queryOptions } from '@tanstack/react-query';
 import { http } from '@/lib/http/client';
-import { defineApiContract } from '@/lib/http/contract';
+import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
 import { messageKeys } from './keys';
 import {
   MessageResultSchema,
   MessageSchema,
-  NullSchema,
   type ApprovalActionInput,
   type MessageStatus,
 } from './schema';
 
 const resultContract = defineApiContract({ response: MessageResultSchema });
 const messageContract = defineApiContract({ response: MessageSchema });
-const nullContract = defineApiContract({ response: NullSchema });
+const nullContract = defineVoidContract();
 
 export const messagesQuery = (status: MessageStatus) =>
   queryOptions({

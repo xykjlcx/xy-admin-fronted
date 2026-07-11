@@ -21,5 +21,10 @@ test('新增供应商后出现在列表', async () => {
     }),
   });
   const result = await (await fetch('/api/lastmile/suppliers?keyword=测试')).json();
-  expect(result.data.total).toBe(1);
+  expect(result.total).toBe(1);
+});
+test('缺失供应商返回 ProblemDetail', async () => {
+  const response = await fetch('/api/lastmile/suppliers/missing');
+  expect(response.status).toBe(404); expect(response.headers.get('content-type')).toContain('application/problem+json');
+  await expect(response.json()).resolves.toMatchObject({ status: 404, code: 'lastmile.supplier.not-found', detail: '供应商不存在' });
 });

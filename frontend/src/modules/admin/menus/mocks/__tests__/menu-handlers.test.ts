@@ -9,24 +9,18 @@ beforeAll(() => server.listen());
 afterEach(() => resetDb());
 afterAll(() => server.close());
 
-interface Env<T> {
-  code: number;
-  data: T;
-  message: string;
-}
 
-async function readEnv<T>(response: Response) {
-  return (await response.json()) as Env<T>;
+async function readJson<T>(response: Response) {
+  return (await response.json()) as T;
 }
 
 test('GET /api/subsystems 返回子系统种子', async () => {
-  const res = await readEnv<{ key: string }[]>(await fetch('/api/subsystems'));
-  expect(res.code).toBe(0);
-  expect(res.data.map((s) => s.key)).toContain('admin');
+  const res = await readJson<{ key: string }[]>(await fetch('/api/subsystems'));
+  expect(res.map((s) => s.key)).toContain('admin');
 });
 
 test('PUT /api/subsystems/:key 编辑子系统显示信息后可读回', async () => {
-  const updated = await readEnv<{ key: string; label: Record<string, string>; desc: Record<string, string> }>(
+  const updated = await readJson<{ key: string; label: Record<string, string>; desc: Record<string, string> }>(
     await fetch('/api/subsystems/admin', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -40,14 +34,13 @@ test('PUT /api/subsystems/:key 编辑子系统显示信息后可读回', async (
       }),
     }),
   );
-  expect(updated.code).toBe(0);
-  expect(updated.data.label).toEqual({ 'zh-CN': '基础后台' });
-  expect(updated.data.desc).toEqual({ 'zh-CN': '组织权限与审计' });
+  expect(updated.label).toEqual({ 'zh-CN': '基础后台' });
+  expect(updated.desc).toEqual({ 'zh-CN': '组织权限与审计' });
 
-  const list = await readEnv<{ key: string; label: Record<string, string> }[]>(
+  const list = await readJson<{ key: string; label: Record<string, string> }[]>(
     await fetch('/api/subsystems'),
   );
-  expect(list.data.find((subsystem) => subsystem.key === 'admin')?.label).toEqual({ 'zh-CN': '基础后台' });
+  expect(list.find((subsystem) => subsystem.key === 'admin')?.label).toEqual({ 'zh-CN': '基础后台' });
 });
 
 test('POST /api/subsystems 新增子系统后可读回', async () => {
@@ -63,35 +56,33 @@ test('POST /api/subsystems 新增子系统后可读回', async () => {
     sort: 9,
   };
 
-  const created = await readEnv<{ key: string; label: Record<string, string>; sort: number }>(
+  const created = await readJson<{ key: string; label: Record<string, string>; sort: number }>(
     await fetch('/api/subsystems', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dto),
     }),
   );
-  expect(created.code).toBe(0);
-  expect(created.data).toMatchObject({
+  expect(created).toMatchObject({
     key: 'wms',
     label: { 'zh-CN': '仓储执行' },
     sort: 9,
   });
 
-  const list = await readEnv<{ key: string; label: Record<string, string> }[]>(
+  const list = await readJson<{ key: string; label: Record<string, string> }[]>(
     await fetch('/api/subsystems'),
   );
-  expect(list.data.find((subsystem) => subsystem.key === 'wms')?.label).toEqual({ 'zh-CN': '仓储执行' });
+  expect(list.find((subsystem) => subsystem.key === 'wms')?.label).toEqual({ 'zh-CN': '仓储执行' });
 });
 
 test('GET /api/menus?subsystem=admin 返回该子系统菜单', async () => {
-  const res = await readEnv<{ id: string }[]>(await fetch('/api/menus?subsystem=admin'));
-  expect(res.code).toBe(0);
-  expect(res.data.some((m) => m.id === 'm-dashboard')).toBe(true);
+  const res = await readJson<{ id: string }[]>(await fetch('/api/menus?subsystem=admin'));
+  expect(res.some((m) => m.id === 'm-dashboard')).toBe(true);
 });
 
 test('GET /api/menus?subsystem=nope 未知子系统返回空集', async () => {
-  const res = await readEnv<unknown[]>(await fetch('/api/menus?subsystem=nope'));
-  expect(res.data).toHaveLength(0);
+  const res = await readJson<unknown[]>(await fetch('/api/menus?subsystem=nope'));
+  expect(res).toHaveLength(0);
 });
 
 test('POST /api/menus 新增菜单节点后可读回', async () => {
@@ -107,15 +98,14 @@ test('POST /api/menus 新增菜单节点后可读回', async () => {
     sort: 9,
   };
 
-  const created = await readEnv<MenuRecord>(
+  const created = await readJson<MenuRecord>(
     await fetch('/api/menus', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dto),
     }),
   );
-  expect(created.code).toBe(0);
-  expect(created.data).toMatchObject({
+  expect(created).toMatchObject({
     subsystemKey: 'admin',
     parentId: 'm-org',
     type: 'menu',
@@ -123,8 +113,8 @@ test('POST /api/menus 新增菜单节点后可读回', async () => {
     permission: 'iam:menu:view',
   });
 
-  const list = await readEnv<MenuRecord[]>(await fetch('/api/menus?subsystem=admin'));
-  expect(list.data.some((menu) => menu.id === created.data.id)).toBe(true);
+  const list = await readJson<MenuRecord[]>(await fetch('/api/menus?subsystem=admin'));
+  expect(list.some((menu) => menu.id === created.id)).toBe(true);
 });
 
 test('PUT /api/menus/:id 编辑菜单字段后可读回', async () => {
@@ -139,15 +129,14 @@ test('PUT /api/menus/:id 编辑菜单字段后可读回', async () => {
     sort: 6,
   };
 
-  const updated = await readEnv<MenuRecord>(
+  const updated = await readJson<MenuRecord>(
     await fetch('/api/menus/m-dashboard', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dto),
     }),
   );
-  expect(updated.code).toBe(0);
-  expect(updated.data).toMatchObject({
+  expect(updated).toMatchObject({
     id: 'm-dashboard',
     label: { 'zh-CN': '经营总览' },
     icon: 'chart',
@@ -155,39 +144,37 @@ test('PUT /api/menus/:id 编辑菜单字段后可读回', async () => {
     sort: 6,
   });
 
-  const list = await readEnv<MenuRecord[]>(await fetch('/api/menus?subsystem=admin'));
-  expect(list.data.find((menu) => menu.id === 'm-dashboard')?.label).toEqual({ 'zh-CN': '经营总览' });
+  const list = await readJson<MenuRecord[]>(await fetch('/api/menus?subsystem=admin'));
+  expect(list.find((menu) => menu.id === 'm-dashboard')?.label).toEqual({ 'zh-CN': '经营总览' });
 });
 
 test('PATCH /api/menus/:id/visibility 切换显示状态', async () => {
-  const updated = await readEnv<MenuRecord>(
+  const updated = await readJson<MenuRecord>(
     await fetch('/api/menus/m-dashboard/visibility', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ visible: false }),
     }),
   );
-
-  expect(updated.code).toBe(0);
-  expect(updated.data.visible).toBe(false);
+  expect(updated.visible).toBe(false);
 });
 
 test('DELETE /api/menus/:id 允许删除叶子节点', async () => {
-  const removed = await readEnv<null>(await fetch('/api/menus/m-dashboard', { method: 'DELETE' }));
-  expect(removed.code).toBe(0);
+  const removed = await fetch('/api/menus/m-dashboard', { method: 'DELETE' });
+  expect(removed.status).toBe(204);
 
-  const list = await readEnv<MenuRecord[]>(await fetch('/api/menus?subsystem=admin'));
-  expect(list.data.some((menu) => menu.id === 'm-dashboard')).toBe(false);
+  const list = await readJson<MenuRecord[]>(await fetch('/api/menus?subsystem=admin'));
+  expect(list.some((menu) => menu.id === 'm-dashboard')).toBe(false);
 });
 
 test('DELETE /api/menus/:id 拒绝删除非叶子节点', async () => {
-  const removed = await readEnv<null>(await fetch('/api/menus/m-org', { method: 'DELETE' }));
+  const removed = await readJson<{ code: string; detail: string }>(await fetch('/api/menus/m-org', { method: 'DELETE' }));
   expect(removed.code).not.toBe(0);
-  expect(removed.message).toContain('子菜单');
+  expect(removed.detail).toContain('子菜单');
 });
 
 test('PUT /api/menus/:id 拒绝把非叶子节点改成其他类型', async () => {
-  const updated = await readEnv<null>(
+  const updated = await readJson<{ code: string; detail: string }>(
     await fetch('/api/menus/m-org', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -203,11 +190,11 @@ test('PUT /api/menus/:id 拒绝把非叶子节点改成其他类型', async () =
     }),
   );
   expect(updated.code).not.toBe(0);
-  expect(updated.message).toContain('子菜单');
+  expect(updated.detail).toContain('子菜单');
 });
 
 test('POST /api/menus 校验动作节点必须有权限且不能有路由', async () => {
-  const invalid = await readEnv<null>(
+  const invalid = await readJson<{ code: string; detail: string }>(
     await fetch('/api/menus', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -223,11 +210,11 @@ test('POST /api/menus 校验动作节点必须有权限且不能有路由', asyn
     }),
   );
   expect(invalid.code).not.toBe(0);
-  expect(invalid.message).toContain('权限');
+  expect(invalid.detail).toContain('权限');
 });
 
 test('POST /api/menus 在执行业务规则前拒绝不合法的路由契约', async () => {
-  const invalid = await readEnv<null>(
+  const invalid = await readJson<{ code: string; detail: string }>(
     await fetch('/api/menus', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -244,5 +231,5 @@ test('POST /api/menus 在执行业务规则前拒绝不合法的路由契约', a
   );
 
   expect(invalid.code).not.toBe(0);
-  expect(invalid.message).toContain('参数');
+  expect(invalid.detail).toContain('参数');
 });

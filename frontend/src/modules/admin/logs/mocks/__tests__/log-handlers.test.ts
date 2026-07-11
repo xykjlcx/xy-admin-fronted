@@ -7,33 +7,25 @@ beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-interface Env<T> {
-  code: number;
-  data: T;
-}
 
-async function readEnv<T>(response: Response) {
-  return (await response.json()) as Env<T>;
+async function readJson<T>(response: Response) {
+  return (await response.json()) as T;
 }
 
 test('操作日志支持按关键词与操作类型筛选', async () => {
   const response = await fetch('/api/audit/operation-logs?keyword=李长昕&type=perm');
-  const result = await readEnv<{ list: OperationLogDto[]; total: number }>(response);
-
-  expect(result.code).toBe(0);
-  expect(result.data.total).toBeGreaterThan(0);
-  expect(result.data.list.every((item) => item.operator.includes('李长昕') && item.type === 'perm')).toBe(
+  const result = await readJson<{ list: OperationLogDto[]; total: number }>(response);
+  expect(result.total).toBeGreaterThan(0);
+  expect(result.list.every((item) => item.operator.includes('李长昕') && item.type === 'perm')).toBe(
     true,
   );
 });
 
 test('登录日志支持按结果与地点筛选', async () => {
   const response = await fetch('/api/audit/login-logs?keyword=境外&result=fail');
-  const result = await readEnv<{ list: LoginLogDto[]; total: number }>(response);
-
-  expect(result.code).toBe(0);
-  expect(result.data.total).toBe(2);
-  expect(result.data.list.every((item) => item.result === 'fail' && item.location === '境外')).toBe(true);
+  const result = await readJson<{ list: LoginLogDto[]; total: number }>(response);
+  expect(result.total).toBe(2);
+  expect(result.list.every((item) => item.result === 'fail' && item.location === '境外')).toBe(true);
 });
 
 test('日志导出返回与当前筛选一致的 CSV 内容', async () => {
@@ -49,14 +41,19 @@ test('日志导出返回与当前筛选一致的 CSV 内容', async () => {
 
 test('列表与导出均按起止日期闭区间筛选', async () => {
   const response = await fetch('/api/audit/operation-logs?type=all&startDate=2026-06-30&endDate=2026-06-30');
-  const result = await readEnv<{ list: OperationLogDto[]; total: number }>(response);
+  const result = await readJson<{ list: OperationLogDto[]; total: number }>(response);
 
-  expect(result.data.total).toBe(3);
-  expect(result.data.list.every((item) => item.occurredAt.startsWith('2026-06-30'))).toBe(true);
+  expect(result.total).toBe(3);
+  expect(result.list.every((item) => item.occurredAt.startsWith('2026-06-30'))).toBe(true);
 
   const csv = await (
     await fetch('/api/audit/operation-logs/export?type=all&startDate=2026-06-30&endDate=2026-06-30')
   ).text();
   expect(csv).toContain('新增成员');
   expect(csv).not.toContain('修改企业名称');
+});
+test('非法操作类型返回 ProblemDetail', async () => {
+  const response = await fetch('/api/audit/operation-logs?type=bad');
+  expect(response.status).toBe(400); expect(response.headers.get('content-type')).toContain('application/problem+json');
+  await expect(response.json()).resolves.toMatchObject({ status: 400, code: 'log.operation.invalid', detail: '操作类型不合法' });
 });

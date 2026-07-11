@@ -1,6 +1,6 @@
 import { http } from 'msw';
 import { z } from 'zod';
-import { biz, ok } from '@/mocks/http';
+import { biz, ok, noContent } from '@/mocks/http';
 import { genId } from '@/mocks/db';
 import {
   CreateUserSchema,
@@ -56,7 +56,7 @@ export const userHandlers = [
 
   http.get('/api/users/:id', ({ params }) => {
     const user = users.find(String(params.id));
-    return user ? ok(toUserDetail(user)) : biz(4040, '成员不存在');
+    return user ? ok(toUserDetail(user)) : biz({ status: 404, code: 'iam.user.not-found', detail: '成员不存在' });
   }),
 
   http.post('/api/users', async ({ request }) => {
@@ -77,12 +77,12 @@ export const userHandlers = [
   http.put('/api/users/:id', async ({ params, request }) => {
     const patch = UpdateUserSchema.parse(await request.json());
     const updated = users.update(String(params.id), patch);
-    return updated ? ok(updated) : biz(4040, '成员不存在');
+    return updated ? ok(updated) : biz({ status: 404, code: 'iam.user.not-found', detail: '成员不存在' });
   }),
 
   http.delete('/api/users/:id', ({ params }) => {
     const removed = users.remove(String(params.id));
-    return removed ? ok(null) : biz(4040, '成员不存在');
+    return removed ? noContent() : biz({ status: 404, code: 'iam.user.not-found', detail: '成员不存在' });
   }),
 
   http.post('/api/users/batch-disable', async ({ request }) => {

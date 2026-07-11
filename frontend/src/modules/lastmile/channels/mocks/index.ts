@@ -127,48 +127,48 @@ export const channelHandlers = [
   ),
   http.get('/api/lastmile/channels', ({ request }) => {
     const items = list(request);
-    return items ? ok(result(items)) : biz(4001, '筛选条件不合法');
+    return items ? ok(result(items)) : biz({ status: 400, code: 'lastmile.channel.filter.invalid', detail: '筛选条件不合法' });
   }),
   http.post('/api/lastmile/channels', async ({ request }) => {
     const parsed = ChannelInputSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '渠道信息不完整');
-    if (channelDb.all().some((item) => item.code === parsed.data.code)) return biz(4090, '渠道编码已存在');
+    if (!parsed.success) return biz({ status: 400, code: 'lastmile.channel.validation.invalid', detail: '渠道信息不完整' });
+    if (channelDb.all().some((item) => item.code === parsed.data.code)) return biz({ status: 409, code: 'lastmile.channel.code.conflict', detail: '渠道编码已存在' });
     const item = fromInput(parsed.data);
-    if (!item) return biz(4004, '供应商或承运商不存在');
+    if (!item) return biz({ status: 409, code: 'lastmile.channel.party.not-found', detail: '供应商或承运商不存在' });
     channelDb.add(item);
     return ok(item);
   }),
   http.post('/api/lastmile/channels/batch-enable', async ({ request }) => {
     const parsed = ChannelBatchSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '请选择渠道');
+    if (!parsed.success) return biz({ status: 400, code: 'lastmile.channel.selection.invalid', detail: '请选择渠道' });
     for (const id of parsed.data.ids) channelDb.update(id, (item) => ({ ...item, enabled: true }));
     return ok(result());
   }),
   http.put('/api/lastmile/channels/:id', async ({ params, request }) => {
     const parsed = ChannelInputSchema.safeParse(await request.json());
     const current = channelDb.find(String(params.id));
-    if (!parsed.success) return biz(4001, '渠道信息不完整');
-    if (!current) return biz(4040, '渠道不存在');
+    if (!parsed.success) return biz({ status: 400, code: 'lastmile.channel.validation.invalid', detail: '渠道信息不完整' });
+    if (!current) return biz({ status: 404, code: 'lastmile.channel.not-found', detail: '渠道不存在' });
     const item = fromInput(parsed.data, current);
-    if (!item) return biz(4004, '供应商或承运商不存在');
+    if (!item) return biz({ status: 409, code: 'lastmile.channel.party.not-found', detail: '供应商或承运商不存在' });
     channelDb.update(current.id, () => item);
     return ok(item);
   }),
   http.patch('/api/lastmile/channels/:id/status', async ({ params, request }) => {
     const parsed = ChannelToggleSchema.safeParse(await request.json());
     const current = channelDb.find(String(params.id));
-    if (!parsed.success) return biz(4001, '状态不合法');
-    if (!current) return biz(4040, '渠道不存在');
+    if (!parsed.success) return biz({ status: 400, code: 'lastmile.channel.status.invalid', detail: '状态不合法' });
+    if (!current) return biz({ status: 404, code: 'lastmile.channel.not-found', detail: '渠道不存在' });
     return ok(channelDb.update(current.id, (item) => ({ ...item, enabled: parsed.data.enabled })));
   }),
   http.post('/api/lastmile/channels/:id/test', ({ params }) =>
     channelDb.find(String(params.id))
       ? ok({ ok: true, latency: 286, testedAt: new Date().toISOString() })
-      : biz(4040, '渠道不存在'),
+      : biz({ status: 404, code: 'lastmile.channel.not-found', detail: '渠道不存在' }),
   ),
   http.get('/api/lastmile/channels/:id', ({ params }) => {
     const item = channelDb.find(String(params.id));
-    return item ? ok(item) : biz(4040, '渠道不存在');
+    return item ? ok(item) : biz({ status: 404, code: 'lastmile.channel.not-found', detail: '渠道不存在' });
   }),
 ];
 export { channelDb } from './db';

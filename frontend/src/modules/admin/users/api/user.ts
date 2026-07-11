@@ -1,10 +1,9 @@
 import { keepPreviousData, queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import { http } from '@/lib/http/client';
-import { defineApiContract } from '@/lib/http/contract';
+import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
 import {
   BatchDisableResultSchema,
   CreateUserSchema,
-  NullSchema,
   UpdateUserSchema,
   UserDetailSchema,
   UserSchema,
@@ -19,7 +18,7 @@ const usersContract = defineApiContract({ response: UsersPageSchema });
 const userContract = defineApiContract({ response: UserSchema });
 const userDetailContract = defineApiContract({ response: UserDetailSchema });
 const batchDisableContract = defineApiContract({ response: BatchDisableResultSchema });
-const nullContract = defineApiContract({ response: NullSchema });
+const nullContract = defineVoidContract();
 
 export const usersQuery = (params: UsersQueryParams) =>
   queryOptions({

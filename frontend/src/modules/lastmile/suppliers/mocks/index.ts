@@ -5,7 +5,7 @@ import { supplierDb } from './db';
 export const supplierHandlers = [
   http.post('/api/lastmile/suppliers', async ({ request }) => {
     const parsed = SupplierInputSchema.safeParse(await request.json());
-    if (!parsed.success) return biz(4001, '供应商信息不完整');
+    if (!parsed.success) return biz({ status: 400, code: 'lastmile.supplier.validation.invalid', detail: '供应商信息不完整' });
     const id = crypto.randomUUID();
     const carriers = parsed.data.carriers
       .split(/[·,，]/)
@@ -41,7 +41,7 @@ export const supplierHandlers = [
   }),
   http.get('/api/lastmile/suppliers/:id', ({ params }) => {
     const item = supplierDb.find(String(params.id));
-    return item ? ok(item) : biz(4040, '供应商不存在');
+    return item ? ok(item) : biz({ status: 404, code: 'lastmile.supplier.not-found', detail: '供应商不存在' });
   }),
 ];
 export { supplierDb } from './db';
