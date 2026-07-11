@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { parseDesktopEnvironment } from './index';
+import { parseDesktopEnvironment, readRendererDevelopmentUrl } from './index';
 
 const productionEnv = {
   NODE_ENV: 'production',
@@ -79,5 +79,15 @@ describe('desktop environment', () => {
         DESKTOP_ALLOW_INSECURE_LOCALHOST: 'true',
       }),
     ).toThrow('localhost');
+  });
+
+  test('reads the Vite 8 desktop development URL supplied by vite-plugin-electron', () => {
+    expect(readRendererDevelopmentUrl({ VITE_DEV_SERVER_URL: 'http://localhost:5173/' })).toBe(
+      'http://localhost:5173/',
+    );
+    expect(readRendererDevelopmentUrl({})).toBeNull();
+    expect(() => readRendererDevelopmentUrl({ VITE_DEV_SERVER_URL: 'file:///tmp/index.html' })).toThrow(
+      'VITE_DEV_SERVER_URL',
+    );
   });
 });

@@ -148,12 +148,12 @@ export function getDesktopEnvironment(): DesktopEnvironment {
   return readDesktopEnvironment();
 }
 
-export function readRendererDevelopmentUrl(): string | null {
-  const value = process.env.ELECTRON_RENDERER_URL;
+export function readRendererDevelopmentUrl(environment: RawEnvironment = process.env): string | null {
+  const value = environment.VITE_DEV_SERVER_URL;
   if (!value) return null;
   const url = new URL(value);
   if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-    throw new Error('ELECTRON_RENDERER_URL 必须使用 HTTP 或 HTTPS');
+    throw new Error('VITE_DEV_SERVER_URL 必须使用 HTTP 或 HTTPS');
   }
   return url.toString();
 }

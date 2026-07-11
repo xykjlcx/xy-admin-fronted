@@ -52,12 +52,13 @@ export function parseDesktopCommand(argv, env = process.env) {
 }
 
 export function createDesktopCommandPlan(parsed, platform = process.platform) {
-  if (parsed.command === 'dev') return [{ executable: 'electron-vite', args: ['dev'] }];
+  if (parsed.command === 'dev')
+    return [{ executable: 'vite', args: ['--config', 'vite.desktop.config.ts'] }];
   const buildSteps = [
     { executable: 'tsc', args: ['-b', '--noEmit'] },
     { executable: 'tsc', args: ['-p', 'tsconfig.desktop.json', '--noEmit'] },
     { executable: 'node', args: ['scripts/desktop-boundary-guard.mjs'] },
-    { executable: 'electron-vite', args: ['build'] },
+    { executable: 'vite', args: ['build', '--config', 'vite.desktop.config.ts'] },
     { executable: 'node', args: ['scripts/verify-renderer-artifacts.mjs', 'desktop'] },
   ];
   if (parsed.command === 'build') return buildSteps;

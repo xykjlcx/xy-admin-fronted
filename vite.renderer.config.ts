@@ -62,13 +62,16 @@ function stripMockWorkerPlugin(mode: string, outDir: string): Plugin {
   };
 }
 
-function rendererChunkName(moduleId: string): string | undefined {
-  if (!moduleId.includes('/node_modules/')) return undefined;
-  if (/\/node_modules\/(?:react|react-dom|scheduler)\//.test(moduleId)) return 'vendor-react';
-  if (moduleId.includes('/node_modules/@tanstack/')) return 'vendor-tanstack';
-  if (/\/node_modules\/(?:radix-ui|@radix-ui|lucide-react)\//.test(moduleId)) return 'vendor-ui';
-  return 'vendor';
-}
+const rendererChunkGroups = [
+  { name: 'vendor-react', test: /node_modules[\\/](?:react|react-dom|scheduler)[\\/]/, priority: 40 },
+  { name: 'vendor-tanstack', test: /node_modules[\\/]@tanstack[\\/]/, priority: 30 },
+  {
+    name: 'vendor-ui',
+    test: /node_modules[\\/](?:radix-ui|@radix-ui|lucide-react)[\\/]/,
+    priority: 20,
+  },
+  { name: 'vendor', test: /node_modules[\\/]/, priority: 10 },
+];
 
 export function createRendererConfig(options: RendererConfigOptions): UserConfig {
   assertTargetBase(options.target, options.base);
@@ -88,9 +91,9 @@ export function createRendererConfig(options: RendererConfigOptions): UserConfig
     build: {
       outDir: options.outDir,
       emptyOutDir: true,
-      minify: 'esbuild',
+      minify: 'oxc',
       sourcemap: false,
-      rollupOptions: { output: { manualChunks: rendererChunkName } },
+      rolldownOptions: { output: { codeSplitting: { groups: rendererChunkGroups } } },
     },
   };
 }

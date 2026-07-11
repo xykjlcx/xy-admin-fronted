@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { createElectronViteConfig } from '../../electron.vite.config';
+import { resolveViteConfig, withExternalBuiltins } from 'vite-plugin-electron';
+import { createDesktopViteConfig, createElectronBuildTargets } from '../../vite.desktop.config';
 import type { DesktopEnvironment } from './index';
 
 const environment: DesktopEnvironment = {
@@ -15,9 +16,10 @@ const environment: DesktopEnvironment = {
   downloadAllowedOrigins: [],
 };
 
-describe('electron-vite build graph', () => {
+describe('Vite 8 desktop build graph', () => {
   test('builds Main, Preload, and the shared Renderer into isolated output roots', () => {
-    const config = createElectronViteConfig({
+    const targets = createElectronBuildTargets(environment);
+    const config = createDesktopViteConfig({
       environment,
       command: 'build',
       mode: 'production',
@@ -25,30 +27,38 @@ describe('electron-vite build graph', () => {
       legacyAppVersion: undefined,
     });
 
-    expect(config.main?.build?.outDir).toBe('out/main');
-    expect(config.main?.build?.externalizeDeps).toEqual({ exclude: ['electron-updater'] });
-    expect(config.main?.build?.rollupOptions?.input).toBe(
-      path.resolve(import.meta.dirname, '../main/index.ts'),
-    );
-    expect(config.main?.define?.__DESKTOP_BUILD_ENV__).toBe(JSON.stringify(environment));
-    expect(config.preload?.build).toMatchObject({
-      outDir: 'out/preload',
-      externalizeDeps: false,
-      isolatedEntries: false,
-      rollupOptions: {
-        output: { inlineDynamicImports: true, format: 'cjs', entryFileNames: 'index.cjs' },
-      },
+    const main = targets[0];
+    const preload = targets[1];
+    expect(main?.entry).toBe(path.resolve(import.meta.dirname, '../main/index.ts'));
+    expect(main?.vite?.define?.__DESKTOP_BUILD_ENV__).toBe(JSON.stringify(environment));
+    expect(main?.vite?.build).toMatchObject({
+      outDir: 'out/main',
+      lib: { formats: ['es'] },
+      rolldownOptions: { external: expect.any(Function) },
     });
-    expect(config.preload?.build?.rollupOptions?.input).toBe(
-      path.resolve(import.meta.dirname, '../preload/index.ts'),
-    );
-    expect(config.renderer).toMatchObject({ base: './', build: { outDir: 'out/renderer' } });
-    expect(config.renderer?.root).toBe(path.resolve(import.meta.dirname, '../..'));
-    expect(config.renderer?.build?.rollupOptions?.input).toEqual({
+    expect(main?.vite?.build?.rollupOptions).toBeUndefined();
+    if (!main) throw new Error('Main build target is missing');
+    const resolvedMain = withExternalBuiltins(resolveViteConfig(main));
+    const external = resolvedMain.build?.rolldownOptions?.external;
+    if (typeof external !== 'function') throw new Error('Main externalization policy is missing');
+    expect(external('electron', undefined, false)).toBe(true);
+    expect(external('node:fs', undefined, false)).toBe(true);
+    expect(external('electron-updater', undefined, false)).toBe(false);
+    expect(preload?.entry).toBe(path.resolve(import.meta.dirname, '../preload/index.ts'));
+    expect(preload?.vite?.build).toMatchObject({
+      outDir: 'out/preload',
+      lib: { formats: ['cjs'] },
+      rolldownOptions: { output: { codeSplitting: false, entryFileNames: 'index.cjs' } },
+    });
+    expect(preload?.vite?.build?.rollupOptions).toBeUndefined();
+    expect(config).toMatchObject({ base: './', build: { outDir: 'out/renderer' } });
+    expect(config.root).toBe(path.resolve(import.meta.dirname, '../..'));
+    expect(config.build?.rolldownOptions?.input).toEqual({
       index: path.resolve(import.meta.dirname, '../../index.html'),
       recovery: path.resolve(import.meta.dirname, '../renderer/recovery.html'),
     });
-    expect(config.renderer?.plugins).toBeDefined();
-    expect(config.renderer?.define?.__APP_VERSION__).toBe(JSON.stringify('0.1.0'));
+    expect(config.build?.rollupOptions).toBeUndefined();
+    expect(config.plugins).toBeDefined();
+    expect(config.define?.__APP_VERSION__).toBe(JSON.stringify('0.1.0'));
   });
 });

@@ -20,7 +20,7 @@
   "include": [
     "desktop.config.ts",
     "electron-builder.ts",
-    "electron.vite.config.ts",
+    "vite.desktop.config.ts",
     "vite.renderer.config.ts",
     "vitest.desktop.config.ts",
     "electron/**/*.ts",

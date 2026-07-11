@@ -46,7 +46,7 @@ describe('desktop command parser', () => {
       { executable: 'tsc', args: ['-b', '--noEmit'] },
       { executable: 'tsc', args: ['-p', 'tsconfig.desktop.json', '--noEmit'] },
       { executable: 'node', args: ['scripts/desktop-boundary-guard.mjs'] },
-      { executable: 'electron-vite', args: ['build'] },
+      { executable: 'vite', args: ['build', '--config', 'vite.desktop.config.ts'] },
       { executable: 'node', args: ['scripts/verify-renderer-artifacts.mjs', 'desktop'] },
       {
         executable: 'electron-builder',
@@ -81,7 +81,7 @@ describe('desktop command parser', () => {
       { executable: 'tsc', args: ['-b', '--noEmit'] },
       { executable: 'tsc', args: ['-p', 'tsconfig.desktop.json', '--noEmit'] },
       { executable: 'node', args: ['scripts/desktop-boundary-guard.mjs'] },
-      { executable: 'electron-vite', args: ['build'] },
+      { executable: 'vite', args: ['build', '--config', 'vite.desktop.config.ts'] },
       { executable: 'node', args: ['scripts/verify-renderer-artifacts.mjs', 'desktop'] },
       {
         executable: 'electron-builder',

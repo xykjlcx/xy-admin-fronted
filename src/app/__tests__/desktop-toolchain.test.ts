@@ -7,20 +7,23 @@ const packageJson = JSON.parse(readFileSync(path.join(root, 'package.json'), 'ut
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
   scripts: Record<string, string>;
+  engines: Record<string, string>;
 };
 const pnpmWorkspace = readFileSync(path.join(root, 'pnpm-workspace.yaml'), 'utf8');
 const gitignore = readFileSync(path.join(root, '.gitignore'), 'utf8');
 
 describe('desktop toolchain contract', () => {
   test('pins the stable Vite and Electron toolchain selected for dual-host builds', () => {
-    expect(packageJson.devDependencies.vite).toBe('7.3.6');
-    expect(packageJson.devDependencies['@vitejs/plugin-react']).toBe('5.2.0');
+    expect(packageJson.devDependencies.vite).toBe('8.1.1');
+    expect(packageJson.devDependencies['@vitejs/plugin-react']).toBe('6.0.3');
     expect(packageJson.devDependencies.electron).toBe('43.1.0');
-    expect(packageJson.devDependencies['electron-vite']).toBe('5.0.0');
+    expect(packageJson.devDependencies['vite-plugin-electron']).toBe('1.1.0');
+    expect(packageJson.devDependencies['electron-vite']).toBeUndefined();
     expect(packageJson.devDependencies['electron-builder']).toBe('26.15.3');
     expect(packageJson.dependencies['electron-updater']).toBe('6.8.9');
     expect(packageJson.devDependencies['@electron/fuses']).toBe('2.1.3');
     expect(packageJson.devDependencies['@playwright/test']).toBe('1.61.1');
+    expect(packageJson.engines.node).toBe('^20.19.0 || >=22.12.0');
   });
 
   test('keeps explicit Web and Desktop command families', () => {
@@ -34,7 +37,7 @@ describe('desktop toolchain contract', () => {
     expect(packageJson.scripts['test:desktop']).toContain('scripts/run-packaged-spike.mjs');
   });
 
-  test('explicitly approves the esbuild install script required by Vite 7', () => {
+  test('approves the esbuild transitive install required by the Vite 8 plugin ecosystem', () => {
     expect(pnpmWorkspace).toMatch(/allowBuilds:\s+[\s\S]*esbuild: true/);
     expect(pnpmWorkspace).toMatch(/onlyBuiltDependencies:\s+[\s\S]*- esbuild/);
   });
@@ -58,7 +61,7 @@ describe('desktop toolchain contract', () => {
   test('provides the packaged Spike build and runtime entrypoints', () => {
     const requiredFiles = [
       'desktop.config.ts',
-      'electron.vite.config.ts',
+      'vite.desktop.config.ts',
       'electron-builder.ts',
       'vitest.desktop.config.ts',
       'tsconfig.desktop.json',
@@ -72,6 +75,7 @@ describe('desktop toolchain contract', () => {
     ];
 
     for (const file of requiredFiles) expect(existsSync(path.join(root, file)), file).toBe(true);
+    expect(existsSync(path.join(root, 'electron.vite.config.ts'))).toBe(false);
     expect(existsSync(path.join(root, 'electron-builder.yml'))).toBe(false);
   });
 
