@@ -123,6 +123,11 @@ public class MbRole extends TableImpl<MbRoleRecord> {
      */
     public final TableField<MbRoleRecord, OffsetDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
 
+    /**
+     * The column <code>public.mb_role.description</code>.
+     */
+    public final TableField<MbRoleRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(512).nullable(false).defaultValue(DSL.field(DSL.raw("''::character varying"), SQLDataType.VARCHAR)), this, "");
+
     private MbRole(Name alias, Table<MbRoleRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }

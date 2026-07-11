@@ -313,7 +313,7 @@ public class MbUser extends TableImpl<MbUserRecord> {
     public List<Check<MbUserRecord>> getChecks() {
         return Arrays.asList(
             Internal.createCheck(this, DSL.name("mb_user_authz_revision_check"), "((authz_revision >= 0))", true),
-            Internal.createCheck(this, DSL.name("mb_user_status_check"), "(((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DISABLED'::character varying])::text[])))", true)
+            Internal.createCheck(this, DSL.name("mb_user_status_check"), "(((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DISABLED'::character varying, 'UNACTIVATED'::character varying, 'LEFT'::character varying])::text[])))", true)
         );
     }
 

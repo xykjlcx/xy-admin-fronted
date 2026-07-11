@@ -169,6 +169,20 @@ public class MbRoleRecord extends UpdatableRecordImpl<MbRoleRecord> {
         return (OffsetDateTime) get(9);
     }
 
+    /**
+     * Setter for <code>public.mb_role.description</code>.
+     */
+    public void setDescription(String value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_role.description</code>.
+     */
+    public String getDescription() {
+        return (String) get(10);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -192,7 +206,7 @@ public class MbRoleRecord extends UpdatableRecordImpl<MbRoleRecord> {
     /**
      * Create a detached, initialised MbRoleRecord
      */
-    public MbRoleRecord(UUID id, String code, String name, Boolean systemRole, Boolean grantsSystemAdmin, String dataScopeType, String status, OffsetDateTime deletedAt, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MbRoleRecord(UUID id, String code, String name, Boolean systemRole, Boolean grantsSystemAdmin, String dataScopeType, String status, OffsetDateTime deletedAt, OffsetDateTime createdAt, OffsetDateTime updatedAt, String description) {
         super(MbRole.MB_ROLE);
 
         setId(id);
@@ -205,6 +219,7 @@ public class MbRoleRecord extends UpdatableRecordImpl<MbRoleRecord> {
         setDeletedAt(deletedAt);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
+        setDescription(description);
         resetChangedOnNotNull();
     }
 }
