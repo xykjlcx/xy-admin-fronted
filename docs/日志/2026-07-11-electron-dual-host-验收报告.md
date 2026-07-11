@@ -6,19 +6,19 @@
 
 ## §20.1 对照表
 
-| #   | 完成条件                                           | 当前状态 | 证据指针                                                          |
-| --- | -------------------------------------------------- | -------- | ----------------------------------------------------------------- |
-| 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`        |
-| 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts` + `vite.desktop.config.ts`；边界/产物守卫 |
-| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 通过     | Web 117 个文件/683 项、`theme:guard` 196 项、Vite 8 `build:web`   |
-| 4   | 两种窗口模式与三套 Shell 安全区                    | 通过     | 双 packaged E2E；3 布局 × 3 比例截图与几何断言                    |
-| 5   | Electron 凭证安全存储与统一会话服务                | 通过     | Phase 3 单元测试、架构守卫与 packaged `safeStorage` E2E           |
-| 6   | 原生文件下载闭环                                   | 通过     | Phase 5 单元/页面测试；packaged Main stub 保存框 + 实际流式落盘   |
-| 7   | 更新状态机、feed、metadata 与真实更新              | 部分通过 | generic feed/HTTP/metadata/公网回读工具通过；真实签名更新 pending |
-| 8   | CSP、sandbox、隔离、fuses、导航、sender、schema    | 通过     | packaged CSP console + 安全窗口/IPC 门禁 + 四套 fuse wire 实读    |
+| #   | 完成条件                                           | 当前状态 | 证据指针                                                                 |
+| --- | -------------------------------------------------- | -------- | ------------------------------------------------------------------------ |
+| 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`               |
+| 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts` + `vite.desktop.config.ts`；边界/产物守卫      |
+| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 通过     | Web 117 个文件/683 项、`theme:guard` 196 项、Vite 8 `build:web`          |
+| 4   | 两种窗口模式与三套 Shell 安全区                    | 通过     | 双 packaged E2E；3 布局 × 3 比例截图与几何断言                           |
+| 5   | Electron 凭证安全存储与统一会话服务                | 通过     | Phase 3 单元测试、架构守卫与 packaged `safeStorage` E2E                  |
+| 6   | 原生文件下载闭环                                   | 通过     | Phase 5 单元/页面测试；packaged Main stub 保存框 + 实际流式落盘          |
+| 7   | 更新状态机、feed、metadata 与真实更新              | 部分通过 | generic feed/HTTP/metadata/公网回读工具通过；真实签名更新 pending        |
+| 8   | CSP、sandbox、隔离、fuses、导航、sender、schema    | 通过     | packaged CSP console + 安全窗口/IPC 门禁 + 四套 fuse wire 实读           |
 | 9   | 全部门禁、visual、Electron E2E、平台 smoke         | 通过     | Web visual 20/20 + 3 档 + 24/24；Web 683、Desktop 175、双 E2E、DMG smoke |
-| 10  | 四份文档与代码一致                                 | 通过     | `architecture/AGENTS/README/desktop` 与 Vite 8 当前实现同步       |
-| 11  | 既有改动未覆盖、提交可独立回滚                     | 通过     | 独立 worktree；Phase 0–8 中文原子提交；主工作区未触碰             |
+| 10  | 四份文档与代码一致                                 | 通过     | `architecture/AGENTS/README/desktop` 与 Vite 8 当前实现同步              |
+| 11  | 既有改动未覆盖、提交可独立回滚                     | 通过     | 独立 worktree；Phase 0–8 中文原子提交；主工作区未触碰                    |
 
 ## 2026-07-11 Vite 8 授权迁移与终局复验
 
@@ -224,6 +224,15 @@
 - RED → GREEN：新增精确 Vite development document、相邻端口/host/path 拒绝和 IPC 透传测试；实现只允许 `vite-plugin-electron` 提供的精确 loopback origin，且生产模式忽略该开发 URL。Desktop 单测现为 34 个文件/177 项。
 - 真实运行验证：`VITE_ENABLE_MOCK=true pnpm dev:desktop -- --window-chrome=integrated` 启动后，通过 Electron DevTools Protocol 输入 `admin / admin123`；Preload bridge 存在、Service Worker 已控制页面、凭证可从 Main 恢复，`/api/auth/me` 返回 HTTP 200/业务码 0 并进入 `/admin/users`。
 - 回归门禁：`pnpm typecheck:desktop`、扩展 Electron ESLint、`pnpm test:desktop` 全绿；packaged Spike 及 integrated 三布局 × 三比例 E2E 分别通过。
+
+## 2026-07-11 Shell 更新入口与窗口拖动交互收口
+
+- 更新入口：顶部 `HeaderActions` 不再渲染更新按钮；`UpdateStatus` 改为始终挂载的状态控制器，用户菜单中直接展示检查、可用版本、下载进度、已下载与错误状态，并复用原下载/取消/重试/安装对话框。
+- Rail 几何：集成标题栏下使用 `min(titlebar, traffic-light-inset) - 16px` 作为安全净空；真实 Electron 回读首个 Rail 按钮顶部为 `54px`，标题栏 token 为 `56px`，保留红黄绿按钮安全区同时消除多余留白。
+- 拖动范围：顶部 Shell Header 的左/中/右容器背景保持 `app-region: drag`；按钮、链接、搜索框、输入框和菜单项由全局交互元素规则回收为 `no-drag`，避免拖动吞掉点击。
+- 自动化证据：`pnpm test:desktop` 对 Rail/Inset/Sidebar × 90%/100%/108% 共 9 组布局回读 Rail 几何，并断言 Header 垂直中心空白点的 computed `app-region` 为 `drag`、祖先链无 `no-drag`；Desktop Vitest 34 个文件/177 项、native packaged Spike 与 integrated packaged E2E 全绿。Web Vitest 117 个文件/684 项、theme guard 4 个文件/196 项、design lint 0 error、Web production build 与 Mock 剥离回读同步通过。
+- 真实 macOS 原生 smoke：在 Electron 窗口内顶部栏中段空白点（窗口相对坐标 `436,28`）使用系统鼠标事件拖动 `+64,+36`；窗口坐标从 `{x:144,y:53}` 精确变为 `{x:208,y:89}`。Playwright/CDP 只作 CSS 契约回读，未将合成 pointer 事件冒充为系统拖动。
+- 界面证据：`test-results/electron-shell-user-update.png` 回读用户菜单含更新状态，同时 Header 中更新按钮数为 `0`。该图是 gitignore 的可复查运行产物。
 
 ## Pending 与后续人工动作
 
