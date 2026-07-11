@@ -24,6 +24,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
+import org.jooq.JSONB;
 import org.jooq.Name;
 import org.jooq.Path;
 import org.jooq.PlainSQL;
@@ -140,6 +141,16 @@ public class MbAuthzRefreshOutbox extends TableImpl<MbAuthzRefreshOutboxRecord> 
      */
     public final TableField<MbAuthzRefreshOutboxRecord, OffsetDateTime> PROCESSED_AT = createField(DSL.name("processed_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6), this, "");
 
+    /**
+     * The column <code>public.mb_authz_refresh_outbox.recovery_phase</code>.
+     */
+    public final TableField<MbAuthzRefreshOutboxRecord, String> RECOVERY_PHASE = createField(DSL.name("recovery_phase"), SQLDataType.VARCHAR(32), this, "");
+
+    /**
+     * The column <code>public.mb_authz_refresh_outbox.recovery_payload</code>.
+     */
+    public final TableField<MbAuthzRefreshOutboxRecord, JSONB> RECOVERY_PAYLOAD = createField(DSL.name("recovery_payload"), SQLDataType.JSONB.nullable(false).defaultValue(DSL.field(DSL.raw("'{}'::jsonb"), SQLDataType.JSONB)), this, "");
+
     private MbAuthzRefreshOutbox(Name alias, Table<MbAuthzRefreshOutboxRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }
@@ -252,7 +263,8 @@ public class MbAuthzRefreshOutbox extends TableImpl<MbAuthzRefreshOutboxRecord> 
         return Arrays.asList(
             Internal.createCheck(this, DSL.name("mb_authz_refresh_outbox_attempts_check"), "((attempts >= 0))", true),
             Internal.createCheck(this, DSL.name("mb_authz_refresh_outbox_claim_shape_check"), "(((((status)::text = 'PROCESSING'::text) AND (worker_id IS NOT NULL) AND (claimed_at IS NOT NULL) AND (lease_until IS NOT NULL) AND (lease_until > claimed_at)) OR (((status)::text <> 'PROCESSING'::text) AND (worker_id IS NULL) AND (claimed_at IS NULL) AND (lease_until IS NULL))))", true),
-            Internal.createCheck(this, DSL.name("mb_authz_refresh_outbox_event_type_check"), "(((event_type)::text = ANY ((ARRAY['REFRESH'::character varying, 'TERMINAL'::character varying])::text[])))", true),
+            Internal.createCheck(this, DSL.name("mb_authz_refresh_outbox_event_type_check"), "(((event_type)::text = ANY ((ARRAY['REFRESH'::character varying, 'TERMINAL'::character varying, 'LOGOUT_ALL'::character varying])::text[])))", true),
+            Internal.createCheck(this, DSL.name("mb_authz_refresh_outbox_recovery_shape_check"), "(((((event_type)::text = 'LOGOUT_ALL'::text) AND ((recovery_phase)::text = ANY ((ARRAY['FENCED'::character varying, 'TOKENS_REVOKED'::character varying, 'SESSIONS_KICKED'::character varying])::text[]))) OR (((event_type)::text <> 'LOGOUT_ALL'::text) AND (recovery_phase IS NULL))))", true),
             Internal.createCheck(this, DSL.name("mb_authz_refresh_outbox_status_check"), "(((status)::text = ANY ((ARRAY['PENDING'::character varying, 'PROCESSING'::character varying, 'DONE'::character varying, 'FAILED'::character varying])::text[])))", true),
             Internal.createCheck(this, DSL.name("mb_authz_refresh_outbox_target_revision_check"), "((target_revision >= 0))", true)
         );

@@ -15,6 +15,8 @@ spring:
 metabuilder:
   auth:
     token-secret: ${METABUILDER_AUTH_TOKEN_SECRET:}
+    bootstrap-admin-password: ${METABUILDER_BOOTSTRAP_ADMIN_PASSWORD:}
+    deployment-mode: ${METABUILDER_DEPLOYMENT_MODE:}
   cors:
     allowed-origins: ${METABUILDER_CORS_ALLOWED_ORIGINS:}
 
@@ -42,3 +44,10 @@ management:
 
 server:
   shutdown: graceful
+
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  timeout: 1800
+  is-concurrent: true
+  is-share: false

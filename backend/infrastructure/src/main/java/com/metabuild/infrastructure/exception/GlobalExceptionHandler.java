@@ -7,6 +7,7 @@ import com.metabuild.shared.kernel.DomainException;
 import com.metabuild.shared.kernel.Forbidden;
 import com.metabuild.shared.kernel.NotFound;
 import com.metabuild.shared.kernel.RateLimited;
+import com.metabuild.shared.kernel.ServiceUnavailable;
 import com.metabuild.shared.kernel.Unauthorized;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -87,6 +88,12 @@ public final class GlobalExceptionHandler {
             RateLimited exception,
             HttpServletRequest request) {
         return handleDomain(exception, HttpStatus.TOO_MANY_REQUESTS, request);
+    }
+
+    @ExceptionHandler(ServiceUnavailable.class)
+    public ResponseEntity<ProblemDetail> handleServiceUnavailable(
+            ServiceUnavailable exception, HttpServletRequest request) {
+        return handleDomain(exception, HttpStatus.SERVICE_UNAVAILABLE, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

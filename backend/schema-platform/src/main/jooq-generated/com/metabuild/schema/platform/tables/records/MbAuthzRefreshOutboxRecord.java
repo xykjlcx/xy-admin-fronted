@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.annotation.processing.Generated;
 
+import org.jooq.JSONB;
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 
@@ -225,6 +226,34 @@ public class MbAuthzRefreshOutboxRecord extends UpdatableRecordImpl<MbAuthzRefre
         return (OffsetDateTime) get(13);
     }
 
+    /**
+     * Setter for <code>public.mb_authz_refresh_outbox.recovery_phase</code>.
+     */
+    public void setRecoveryPhase(String value) {
+        set(14, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_authz_refresh_outbox.recovery_phase</code>.
+     */
+    public String getRecoveryPhase() {
+        return (String) get(14);
+    }
+
+    /**
+     * Setter for <code>public.mb_authz_refresh_outbox.recovery_payload</code>.
+     */
+    public void setRecoveryPayload(JSONB value) {
+        set(15, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_authz_refresh_outbox.recovery_payload</code>.
+     */
+    public JSONB getRecoveryPayload() {
+        return (JSONB) get(15);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -248,7 +277,7 @@ public class MbAuthzRefreshOutboxRecord extends UpdatableRecordImpl<MbAuthzRefre
     /**
      * Create a detached, initialised MbAuthzRefreshOutboxRecord
      */
-    public MbAuthzRefreshOutboxRecord(UUID id, UUID operationId, UUID userId, Long targetRevision, String eventType, String status, Integer attempts, String workerId, OffsetDateTime claimedAt, OffsetDateTime leaseUntil, OffsetDateTime nextAttemptAt, String lastError, OffsetDateTime createdAt, OffsetDateTime processedAt) {
+    public MbAuthzRefreshOutboxRecord(UUID id, UUID operationId, UUID userId, Long targetRevision, String eventType, String status, Integer attempts, String workerId, OffsetDateTime claimedAt, OffsetDateTime leaseUntil, OffsetDateTime nextAttemptAt, String lastError, OffsetDateTime createdAt, OffsetDateTime processedAt, String recoveryPhase, JSONB recoveryPayload) {
         super(MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX);
 
         setId(id);
@@ -265,6 +294,8 @@ public class MbAuthzRefreshOutboxRecord extends UpdatableRecordImpl<MbAuthzRefre
         setLastError(lastError);
         setCreatedAt(createdAt);
         setProcessedAt(processedAt);
+        setRecoveryPhase(recoveryPhase);
+        setRecoveryPayload(recoveryPayload);
         resetChangedOnNotNull();
     }
 }

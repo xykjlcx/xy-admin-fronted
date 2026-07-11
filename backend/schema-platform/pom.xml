@@ -97,12 +97,19 @@
                 </goals>
                 <configuration>
                   <source>
-                    db = new org.testcontainers.containers.PostgreSQLContainer("postgres:16-alpine")
-                        .withDatabaseName("metabuilder_platform_codegen")
-                        .withUsername("${codegen.db.username}")
-                        .withPassword("${codegen.db.password}")
-                    db.start()
-                    project.properties.setProperty('codegen.db.url', db.getJdbcUrl())
+                    externalUrl = System.getProperty('codegen.db.url')
+                    if (externalUrl) {
+                      project.properties.setProperty('codegen.db.url', externalUrl)
+                      project.properties.setProperty('codegen.db.username', System.getProperty('codegen.db.username', 'test'))
+                      project.properties.setProperty('codegen.db.password', System.getProperty('codegen.db.password', ''))
+                    } else {
+                      db = new org.testcontainers.containers.PostgreSQLContainer("postgres:16-alpine")
+                          .withDatabaseName("metabuilder_platform_codegen")
+                          .withUsername("${codegen.db.username}")
+                          .withPassword("${codegen.db.password}")
+                      db.start()
+                      project.properties.setProperty('codegen.db.url', db.getJdbcUrl())
+                    }
                   </source>
                 </configuration>
               </execution>

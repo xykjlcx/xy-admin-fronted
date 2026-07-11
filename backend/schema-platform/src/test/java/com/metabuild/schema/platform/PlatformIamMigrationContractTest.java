@@ -79,6 +79,17 @@ class PlatformIamMigrationContractTest {
     assertTrue(migration.contains("bootstrap-scope-own-below-custom"));
   }
 
+  @Test
+  void logoutRecoveryUsesASeparatedV3EventContract() throws IOException {
+    Path migration = Path.of("src/main/resources/db/migration/platform/V3__add_logout_recovery_event.sql");
+    assertTrue(Files.isRegularFile(migration));
+    String sql = Files.readString(migration);
+    assertTrue(sql.contains("'LOGOUT_ALL'"));
+    assertTrue(sql.contains("recovery_phase varchar(32)"));
+    assertTrue(sql.contains("recovery_payload jsonb"));
+    assertTrue(sql.contains("mb_authz_refresh_outbox_recovery_shape_check"));
+  }
+
   private static String iamMigration() throws IOException {
     Path migration =
         Path.of("src/main/resources/db/migration/platform/V2__create_iam_read_model.sql");

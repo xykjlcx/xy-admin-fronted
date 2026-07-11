@@ -73,6 +73,7 @@ class ApplicationDependencyHealthIntegrationTest {
     var arguments = new ArrayList<String>();
     arguments.add("--server.port=0");
     arguments.add("--metabuilder.auth.token-secret=" + VALID_SECRET);
+    arguments.add("--metabuilder.auth.deployment-mode=test");
     arguments.add("--spring.datasource.url=" + POSTGRES.getJdbcUrl());
     arguments.add("--spring.datasource.username=" + POSTGRES.getUsername());
     arguments.add("--spring.datasource.password=" + POSTGRES.getPassword());

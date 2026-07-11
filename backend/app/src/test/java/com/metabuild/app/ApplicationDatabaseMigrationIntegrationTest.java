@@ -116,6 +116,7 @@ class ApplicationDatabaseMigrationIntegrationTest {
     var arguments = new ArrayList<String>();
     if (authenticationSecret != null) {
       arguments.add("--metabuilder.auth.token-secret=" + authenticationSecret);
+      arguments.add("--metabuilder.auth.deployment-mode=test");
     }
     arguments.add("--spring.main.banner-mode=off");
     arguments.add("--logging.level.root=OFF");

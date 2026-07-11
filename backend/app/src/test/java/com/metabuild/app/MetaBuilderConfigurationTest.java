@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
+import com.metabuild.modules.admin.auth.application.BootstrapCredentialProvisioner;
 
 class MetaBuilderConfigurationTest {
 
@@ -38,7 +40,7 @@ class MetaBuilderConfigurationTest {
   @Test
   void bindsCorsOriginsAsAnEmptyListByDefault() throws Exception {
     contextRunner
-        .withPropertyValues("metabuilder.auth.token-secret=" + VALID_SECRET)
+        .withPropertyValues("metabuilder.auth.token-secret=" + VALID_SECRET, "metabuilder.auth.deployment-mode=test")
         .run(context -> assertThat(context.getBean(MetaBuilderCorsProperties.class).allowedOrigins())
             .isEqualTo(List.of()));
   }
@@ -48,13 +50,34 @@ class MetaBuilderConfigurationTest {
     contextRunner
         .withPropertyValues(
             "metabuilder.auth.token-secret=" + VALID_SECRET,
+            "metabuilder.auth.deployment-mode=test",
             "metabuilder.cors.allowed-origins=https://one.example,https://two.example")
         .run(context -> assertThat(context.getBean(MetaBuilderCorsProperties.class).allowedOrigins())
             .isEqualTo(List.of("https://one.example", "https://two.example")));
   }
 
+  @Test
+  void productionContextFailsWithoutBootstrapSecret() {
+    new ApplicationContextRunner().withUserConfiguration(ProductionBootstrapConfiguration.class)
+        .withPropertyValues(
+            "metabuilder.auth.token-secret=" + VALID_SECRET,
+            "metabuilder.auth.deployment-mode=production")
+        .run(context -> assertThat(context).hasFailed()
+            .getFailure().hasRootCauseMessage("METABUILDER_BOOTSTRAP_ADMIN_PASSWORD must be configured"));
+  }
+
   @Configuration(proxyBeanMethods = false)
   @EnableConfigurationProperties({MetaBuilderAuthProperties.class, MetaBuilderCorsProperties.class})
   static class PropertiesConfiguration {
+  }
+
+  @Configuration(proxyBeanMethods = false)
+  @EnableConfigurationProperties(MetaBuilderAuthProperties.class)
+  static class ProductionBootstrapConfiguration {
+    @Bean Object bootstrapGate(MetaBuilderAuthProperties properties) {
+      new BootstrapCredentialProvisioner((a,b) -> false, value -> "hash")
+          .provision(properties.bootstrapAdminPassword(), properties.production());
+      return new Object();
+    }
   }
 }
