@@ -47,6 +47,8 @@
 | demo | demo 恒走 mock；真后端只 seed 引导数据，不装丰富演示数据 |
 | 文档 | 顶层 `CLAUDE.md` 单一手写真源；`AGENTS.md` 生成或软链；约束优先固化为测试 |
 
+UUID 的 HTTP wire contract 在 JSON value、JSON map key、path、query 和 form 参数上统一为 lowercase canonical UUIDv7；非 canonical、非 v7（包括 UUIDv4）一律按客户端类型错误拒绝，不能只收紧 Jackson value 后让 map key 或 Spring MVC 参数转换继续接受旧 UUID。
+
 保留原裁定：不换 Spring Security（ADR-0005 与认证门面仍成立）；不由 OpenAPI 生成 TS+Zod（zod 继续承载页面和表单语义）。本轮没有新证据推翻这两项。
 
 ## 3. 总体形态与所有权
@@ -385,7 +387,7 @@ lastmile 前后端必须成对实现 shipments/customers/channels/carriers/suppl
 |---|---|---|
 | **P0a 加法式基线** | 在现目录旁新增 backend 多模块骨架、schema 物理拆分、契约 ADR、dev compose/proxy 设计、结构守卫；前端暂留根目录 | `mvn verify` 真实执行；模块负依赖测试红→绿；Testcontainers 分别验证 platform-only fresh DB、platform→lastmile fresh DB、重复 validate 与同 owner 重复 version 负例；移除 lastmile 的测试 profile 不影响 admin/platform；无触碰现有脏 UI 文件 |
 | **P0b monorepo 归位** | 用户前端改动落地后 `git mv` 到 frontend，重写 CI/脚本/文档路径、顶层一键启动 | 前端全门禁 + backend verify 全绿；`scripts/dev.sh` 一键起；git 只含可解释改动 |
-| **P0.5 UUID 基础（gated）** | 新 migration 从第一天 UUIDv7；只移植并改造 shared/security/DataScope 基础类，禁旧 Long domain 进入；编号另做小设计 | AST/ArchUnit 证明持久化 ID、API/path ID、`CurrentUser.userId` 与 jOOQ ID 字段不使用 Long，系统 principal 不使用 `0L`；不全仓禁合法 long 零值；UUID 顺序与序列化测试绿；对抗复审通过 |
+| **P0.5 UUID 基础（gated）** | 新 migration 从第一天 UUIDv7；只移植并改造 shared/security/DataScope 基础类，禁旧 Long domain 进入；编号另做小设计 | AST/ArchUnit 证明业务模块持久化 ID、全部 API/path ID、`CurrentUser.userId` 与 jOOQ ID 字段只使用 UUID，系统 principal 不使用数值零哨兵；不全仓禁合法 long 零值；UUID 顺序及 JSON value/map-key/MVC 参数测试绿；对抗复审通过 |
 | **P1 认证 + Shell** | 引入最小 IAM **读模型**（user/role/dept/permission/menu）、真实 Redis/Sa-Token、token rotation、`AuthorizationSnapshot`/store/compiler 的登录初始化与 request-scope 读取、`/me`、menus/subsystems；完成 requestCore 与全部 mock 方言迁移；最小稳定 bootstrap seed | 关闭 mock 后从真实 DB 登录、写原子授权快照、刷新、进入 Shell、渲染导航；void/blob/problem 路径测试绿；错误 toast 有 traceId；SaSession 无授权字段 |
 | **P2 IAM + 权限闭环** | users/depts/roles CRUD、独立 permission 表、AST catalog/seed、`x-permissions`、`AuthorizationRefreshService` + FENCED/CAS/outbox/reconciler、DataScopePolicy 与启动校验、前端角色级 scope UI | IAM 三页 Browser/API/DB/Redis 闭环；五型+并集+并发矩阵绿；权限变更后所有设备下一请求得到新快照或 fail-closed；seed fresh/upgrade/idempotent 绿 |
 | **P3 admin 长尾** | messages/files/dictionaries/audit/profile/company/dashboard/mail/sms；逐页关闭真实模式 mock | 现有 admin 页面和动作全部满足 §9.3；文件/CSV/审批状态机有反向用例 |

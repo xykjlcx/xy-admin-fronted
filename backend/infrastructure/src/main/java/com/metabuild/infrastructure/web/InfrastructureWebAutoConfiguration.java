@@ -13,7 +13,7 @@ import org.springframework.core.Ordered;
  * MetaBuilder Web 基线自动装配。
  */
 @AutoConfiguration
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, UuidV7WebBindingAdvice.class})
 public class InfrastructureWebAutoConfiguration {
 
     @Bean
@@ -32,5 +32,10 @@ public class InfrastructureWebAutoConfiguration {
         registration.setName("securityHeadersFilter");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
         return registration;
+    }
+
+    @Bean
+    UuidV7JacksonModule uuidV7JacksonModule() {
+        return new UuidV7JacksonModule();
     }
 }

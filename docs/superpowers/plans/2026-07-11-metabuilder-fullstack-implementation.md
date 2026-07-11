@@ -170,13 +170,13 @@ GREEN：只改路径，不改 UI 行为。
 新增：
 
 - shared-kernel `UuidV7` validator/parser + monotonic `UuidV7Generator`；Java/API 类型继续使用 `java.util.UUID`，不发明第二个 ID wrapper
-- infrastructure Jackson UUIDv7 module：wire 固定 canonical string，序列化/反序列化均拒绝非 v7
+- infrastructure Jackson UUIDv7 module + Spring MVC binder：JSON value/map key、path/query/form wire 固定 lowercase canonical string，序列化/反序列化与参数绑定均拒绝非 v7
 - `AuthorizationState/Snapshot/Fence` 与不可变、可归一化/并集的 `DataScopePolicy`
-- JDK compiler AST + ArchUnit ID 语义守卫
+- javac analyze + Trees 符号/常量语义守卫，以及覆盖业务模块任意包、API/controller DTO 引用和 jOOQ 的 ArchUnit ID 守卫
 
 UUIDv7 generator 固定 RFC 9562 version/variant 与 48-bit Unix millisecond 布局；同一毫秒内和时钟小幅回拨时仍保持单进程单调，序列空间耗尽不得静默重复。`AuthorizationSnapshot/Fence` 字段逐字遵守 v4 spec §5.2，roles/permissions/deptIds 防御性复制；revision 不得为负。`DataScopePolicy(all=true)` 归一化为不再携带 self/dept 条件；deny-all 是 `all=false/includeSelf=false/deptIds=empty`，并集遵守 ALL 短路、SELF/DEPT/CUSTOM OR 语义。
 
-RED：UUID version/variant/时间提取、同毫秒和回拨排序、序列溢出、JSON/string round-trip 与 v4 拒绝；持久化字段/API path/current-user ID 使用 Long 的独立负向 fixtures、只针对 principal/userId/loginId 语义的 `0L` AST fixture（不得全仓禁合法 long 零值）；SELF/DEPT/CUSTOM/ALL/deny-all 并集与集合不可变测试。
+RED：UUID version/variant/时间提取、同毫秒和回拨排序、序列溢出、JSON value/map-key（含真实 `BatchResult<UUID,...>`）/path/string round-trip 与 v4 拒绝；业务模块任意包的持久化字段、admin-domain/lastmile/api-contract/controller DTO、API path/current-user ID 使用 Long/String 等非 UUID 类型的独立负向 fixtures；零值守卫覆盖常量别名、unary/binary/conditional、`Long.valueOf(0L).equals(userId())`、constructor 与调用参数符号，同时证明 `login(userId, 0L retryCount)` 和 login 统计字段不误报；SELF/DEPT/CUSTOM/ALL/deny-all 并集与集合不可变测试。
 
 GREEN：只移植 UUID-native shared/security/jOOQ 基础；不导入旧 Long domain。
 
@@ -371,7 +371,7 @@ GREEN：新 clone 按文档 30 分钟内启动；admin 核心与 lastmile 示例
 
 验证：在临时 clone 执行 bootstrap/dev/seed/smoke，不使用当前工作树缓存冒充。
 
-## Task 27：P5 全栈生产级收口
+## Task 27：P5 全栈功能与生产门禁收口
 
 工程门禁：
 
@@ -391,5 +391,28 @@ git diff --check
 1. Browser 覆盖 Admin/Lastmile 全主链、401/403/冲突/空态/失败恢复；90%/100%/108% 与主题矩阵无回退。
 2. API/DB/Redis/OpenAPI/文件内容互相回证；安全/性能故障矩阵全绿。
 3. 生产前端 bundle 无 faker/MSW/worker；oasdiff 无未裁定 breaking change。
-4. 最终 whole-branch 对抗 review；Critical/Important 全修并复审。
-5. Goal 只有在以上全部完成后才能标记 complete。
+4. 功能缺口对抗 review；Critical/Important 全修并复审。
+
+## Task 28：最终工程质量与整洁度 review / 重构
+
+在全部功能和真实联调完成后，对 whole branch 做独立、issue-first 的工程审查：模块/包边界、依赖方向、事务与并发、错误处理、命名与可读性、重复与错误抽象、死代码、配置/secret、日志与可观测性、查询/N+1、缓存、测试真实性/脆弱性、前端 query/state/contract、构建与依赖卫生。不得为“看起来更整洁”做无证据的大重写。
+
+RED：每个发现必须给 file:line、可复现命令或失败测试，并区分 Critical/Important/Minor；没有证据的审美意见不进入重构。
+
+GREEN：Critical/Important 全修；会造成维护成本、假阳性或架构漂移的 Minor 一并修复。重构必须保持 Browser/API/DB/Redis/OpenAPI 行为不变，并由原测试 + 新回归测试证明。完成后由独立 reviewer 复审到无阻断。
+
+验证：whole-branch diff review、依赖/重复/复杂度/死代码扫描、前后端全门禁、生产构建、真实运行 smoke；记录保留与拒绝的重构建议及理由。
+
+## Task 29：最终端到端目标完成审计
+
+从原始 Goal、v4 spec、附件、Task 1-28 和验收矩阵反向建立 requirement → authoritative evidence 总账；不得从“已有代码/已有测试”正向推断完成。每项分别标记已证明/矛盾/证据不足/缺失，后 3 类必须继续修复和复验。
+
+至少在 fresh DB + fresh Redis + production-like frontend build 上执行：
+
+1. Browser 覆盖 Admin 与 Lastmile 全部现有页面/主动作、登录/refresh/logout、权限显隐与后端拒绝、数据范围、文件流、错误/空态/冲突/恢复、90%/100%/108% 与主题；
+2. 每条关键 Browser 动作以 API response、PostgreSQL row/state、Redis snapshot/fence、文件 metadata/blob 或审计记录回证；
+3. OpenAPI snapshot/oasdiff 与前端 zod/permission catalog 对账，真实模式无 mock/faker/MSW fallback，生产 bundle 扫描清零；
+4. fresh clone 按文档一键启动，执行全测试、迁移/codegen、seed、build、security/performance/failure matrix；
+5. 最终独立对抗 review 检查证据是否覆盖目标本身，而非只覆盖测试清单。
+
+只有所有显式目标都有直接、当前、可复现证据且没有 required work 残留，才能把 Goal 标记 complete。
