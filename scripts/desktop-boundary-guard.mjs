@@ -29,6 +29,10 @@ function usesWindowDesktop(source) {
   return /\bwindow\s*(?:\.\s*desktop|\[\s*['"]desktop['"]\s*\])/.test(source);
 }
 
+function usesDesktopRuntimeBranch(source) {
+  return /\b(?:platform\s*\.\s*runtime|runtime)\s*(?:={2,3}|!={1,2})\s*['"]desktop['"]/.test(source);
+}
+
 export function findDesktopBoundaryViolations(files) {
   const violations = [];
   for (const [file, source] of files) {
@@ -41,6 +45,13 @@ export function findDesktopBoundaryViolations(files) {
         violations.push(`${normalizedFile}: src/** 禁止 Node built-in import`);
       if (usesWindowDesktop(source) && normalizedFile !== 'src/lib/platform/desktop.ts') {
         violations.push(`${normalizedFile}: window.desktop 只能出现在平台适配层`);
+      }
+      if (
+        usesDesktopRuntimeBranch(source) &&
+        normalizedFile !== 'src/lib/platform/index.ts' &&
+        normalizedFile !== 'src/app/host-routing.ts'
+      ) {
+        violations.push(`${normalizedFile}: desktop runtime 分支只能出现在宿主装配层`);
       }
       if (
         /\bsetToken\s*\(/.test(source) &&

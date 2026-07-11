@@ -17,6 +17,7 @@ test('Web platform preserves browser clipboard and safe external-link semantics'
   });
 
   expect(platform.runtime).toBe('web');
+  expect(platform.updater.supported).toBe(false);
   expect(platform.window.getSnapshot()).toMatchObject({
     runtime: 'web',
     platform: 'browser',
@@ -150,6 +151,7 @@ test('Desktop platform delegates only to the typed Preload API', async () => {
   const platform = createDesktopPlatform(api, 'https://app.example.com/console/');
 
   expect(platform.runtime).toBe('desktop');
+  expect(platform.updater.supported).toBe(true);
   expect(platform.window.getSnapshot()).toEqual({
     runtime: 'desktop',
     platform: 'darwin',

@@ -40,6 +40,7 @@ import { createSpikeUpdaterHarness } from './spike-updater';
 import { createUpdateController } from './update-controller';
 import { createUpdateFeedUrl } from './update-source';
 import { createQuitCoordinator } from './quit-coordinator';
+import { claimSingleInstance } from './single-instance';
 import { createDesktopLogger } from './desktop-logger';
 import {
   isHealthyRendererUrl,
@@ -191,16 +192,14 @@ async function availableDiskBytes(directory: string): Promise<number> {
 }
 
 async function startApplication(): Promise<void> {
-  if (!app.requestSingleInstanceLock()) {
-    app.quit();
+  if (
+    !claimSingleInstance(app, () => {
+      if (!mainWindow) return;
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    })
+  )
     return;
-  }
-
-  app.on('second-instance', () => {
-    if (!mainWindow) return;
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.focus();
-  });
 
   await app.whenReady();
   const logger = createDesktopLogger({ directory: path.join(app.getPath('userData'), 'logs') });

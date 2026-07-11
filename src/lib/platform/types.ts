@@ -66,6 +66,7 @@ export interface AppPlatform {
     createShareUrl(resourceId: string): string;
   };
   readonly updater: {
+    readonly supported: boolean;
     getSnapshot(): Promise<UpdateSnapshot>;
     check(): Promise<UpdateCommandResult>;
     download(): Promise<UpdateCommandResult>;

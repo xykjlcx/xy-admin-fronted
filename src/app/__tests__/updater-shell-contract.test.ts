@@ -8,7 +8,8 @@ test('all Shell layouts expose one host updater status and the user menu keeps m
 
   expect(headerActions).toContain('<UpdateStatus />');
   expect(insetLayout).toContain('<UpdateStatus />');
-  expect(userMenu).toContain("platform.runtime === 'desktop'");
+  expect(userMenu).toContain('platform.updater.supported');
+  expect(userMenu).not.toContain("platform.runtime === 'desktop'");
   expect(userMenu).toContain("t('update.actions.check')");
   expect(userMenu).toContain('platform.updater.check()');
 });

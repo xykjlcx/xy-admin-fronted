@@ -1,11 +1,27 @@
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { _electron as electron, expect, test, type Page } from '@playwright/test';
+import { _electron as electron, expect, test, type ElectronApplication, type Page } from '@playwright/test';
 
 type ShellLayout = 'sidebar' | 'rail' | 'inset';
 type Zoom = 'sm' | 'md' | 'lg';
 
 const expectedScale: Record<Zoom, number> = { sm: 0.9, md: 1, lg: 1.08 };
+
+function processExists(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function quitAndExpectExit(desktop: ElectronApplication): Promise<void> {
+  const pid = desktop.process().pid;
+  if (!pid) throw new Error('packaged Electron process has no pid');
+  await desktop.evaluate(({ app }) => app.quit());
+  await expect.poll(() => processExists(pid), { timeout: 10_000 }).toBe(false);
+}
 
 function requiredEnvironment(name: string): string {
   const value = process.env[name];
@@ -33,6 +49,40 @@ async function selectAppearance(page: Page, layout: ShellLayout, zoom: Zoom): Pr
   await expect(page.locator(`[data-shell-layout="${layout}"]`)).toBeVisible();
   // PageTransition 的入场动画结束后再采集视觉证据，避免把合法的首帧淡入误记为最终画面。
   await page.waitForTimeout(350);
+}
+
+async function setFullScreenAndWait(desktop: ElectronApplication, fullScreen: boolean): Promise<void> {
+  await desktop.evaluate(async ({ BrowserWindow }, desiredState) => {
+    const window = BrowserWindow.getAllWindows()[0];
+    if (!window) throw new Error('main window is missing');
+    if (process.platform === 'darwin') {
+      if (window.isSimpleFullScreen() !== desiredState) window.setSimpleFullScreen(desiredState);
+      if (window.isSimpleFullScreen() !== desiredState) {
+        throw new Error('window did not enter the requested simple full-screen state');
+      }
+      return;
+    }
+    if (window.isFullScreen() === desiredState) return;
+    window.focus();
+    await new Promise<void>((resolve, reject) => {
+      const eventLabel = desiredState ? 'enter-full-screen' : 'leave-full-screen';
+      const removeListener = () => {
+        if (desiredState) window.off('enter-full-screen', onTransition);
+        else window.off('leave-full-screen', onTransition);
+      };
+      const timeout = setTimeout(() => {
+        removeListener();
+        reject(new Error(`window did not emit ${eventLabel}`));
+      }, 15_000);
+      const onTransition = () => {
+        clearTimeout(timeout);
+        resolve();
+      };
+      if (desiredState) window.once('enter-full-screen', onTransition);
+      else window.once('leave-full-screen', onTransition);
+      window.setFullScreen(desiredState);
+    });
+  }, fullScreen);
 }
 
 test('packaged integrated chrome consumes safe areas in three Shell layouts at three scales', async () => {
@@ -169,7 +219,7 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
     await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.unmaximize());
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.maximized)).toBe('false');
 
-    await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setFullScreen(true));
+    await setFullScreenAndWait(desktop, true);
     await expect
       .poll(() =>
         page.evaluate(() => {
@@ -181,7 +231,7 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
         }),
       )
       .toEqual(['0px', '0px']);
-    await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setFullScreen(false));
+    await setFullScreenAndWait(desktop, false);
     await expect
       .poll(() =>
         page.evaluate(() => {
@@ -194,7 +244,7 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
       )
       .toEqual([`${String(expectedInsets.left)}px`, `${String(expectedInsets.right)}px`]);
 
-    await desktop.close();
+    await quitAndExpectExit(desktop);
     desktop = await electron.launch({
       executablePath,
       args: [`--user-data-dir=${userDataPath}`],
@@ -205,7 +255,8 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
     await restartedPage.waitForLoadState('domcontentloaded');
     await expect.poll(() => existsSync(pendingMarkerPath)).toBe(false);
   } finally {
-    await desktop.close();
+    const pid = desktop.process().pid;
+    if (pid && processExists(pid)) await quitAndExpectExit(desktop);
   }
 });
 

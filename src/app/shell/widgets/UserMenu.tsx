@@ -191,7 +191,7 @@ export function UserMenu({ variant = 'header' }: { variant?: 'header' | 'sidebar
             <Languages />
             {t('shell.user.language')}
           </DropdownMenuItem>
-          {platform.runtime === 'desktop' && (
+          {platform.updater.supported && (
             <DropdownMenuItem
               onClick={() => void checkUpdate()}
               className="h-[calc(42px*var(--app-scale))] gap-3 px-3"

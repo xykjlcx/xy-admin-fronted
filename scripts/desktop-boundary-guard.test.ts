@@ -6,7 +6,10 @@ describe('desktop architecture guard', () => {
     const violations = findDesktopBoundaryViolations(
       new Map([
         ['src/modules/orders/index.ts', "import { ipcRenderer } from 'electron';\nimport fs from 'node:fs';"],
-        ['src/app/Shell.tsx', 'window.desktop.files.save();'],
+        [
+          'src/app/Shell.tsx',
+          "window.desktop.files.save();\nif (platform.runtime === 'desktop') enableUpdater();",
+        ],
       ]),
     );
 
@@ -15,6 +18,7 @@ describe('desktop architecture guard', () => {
         expect.stringContaining('src/modules/orders/index.ts: src/** 禁止 Electron import'),
         expect.stringContaining('src/modules/orders/index.ts: src/** 禁止 Node built-in import'),
         expect.stringContaining('src/app/Shell.tsx: window.desktop 只能出现在平台适配层'),
+        expect.stringContaining('src/app/Shell.tsx: desktop runtime 分支只能出现在宿主装配层'),
       ]),
     );
   });

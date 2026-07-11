@@ -146,6 +146,7 @@ export function createWebPlatform(dependencies: WebPlatformDependencies = browse
         createPublicFileUrl(dependencies.webPublicBaseUrl ?? env.webPublicBaseUrl, resourceId),
     },
     updater: {
+      supported: false,
       getSnapshot: async () => unsupportedUpdateSnapshot,
       check: () => unsupportedCommand('check'),
       download: () => unsupportedCommand('download'),

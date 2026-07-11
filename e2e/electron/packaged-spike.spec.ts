@@ -24,6 +24,22 @@ function readEvidence(path: string): SpikeEvidence {
   return JSON.parse(readFileSync(path, 'utf8')) as SpikeEvidence;
 }
 
+function processExists(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function quitAndExpectExit(desktop: Awaited<ReturnType<typeof electron.launch>>): Promise<void> {
+  const pid = desktop.process().pid;
+  if (!pid) throw new Error('packaged Electron process has no pid');
+  await desktop.evaluate(({ app }) => app.quit());
+  await expect.poll(() => processExists(pid), { timeout: 10_000 }).toBe(false);
+}
+
 test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, and 401 redirect', async () => {
   const executablePath = requiredEnvironment('SPIKE_APP_EXECUTABLE');
   const evidencePath = requiredEnvironment('SPIKE_EVIDENCE_PATH');
@@ -346,6 +362,6 @@ test('packaged app proves protocol, hash routing, HTTPS CORS, CSP, navigation, a
     if (originalClipboard !== undefined) {
       await desktop.evaluate(({ clipboard }, text) => clipboard.writeText(text), originalClipboard);
     }
-    await desktop.close();
+    await quitAndExpectExit(desktop);
   }
 });

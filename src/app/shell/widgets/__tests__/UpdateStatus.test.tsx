@@ -24,9 +24,10 @@ const baseSnapshot: UpdateSnapshot = {
   errorCode: null,
 };
 
-function createUpdater(initial: UpdateSnapshot) {
+function createUpdater(initial: UpdateSnapshot, supported = true) {
   let listener: ((snapshot: UpdateSnapshot) => void) | undefined;
   const updater: AppPlatform['updater'] = {
+    supported,
     getSnapshot: vi.fn().mockResolvedValue(initial),
     check: vi.fn().mockResolvedValue({ ok: true, snapshot: initial }),
     download: vi.fn().mockResolvedValue({ ok: true, snapshot: initial }),
@@ -42,8 +43,8 @@ function createUpdater(initial: UpdateSnapshot) {
 }
 
 test('Web host renders no updater entry and performs no update command', () => {
-  const { updater } = createUpdater(baseSnapshot);
-  const { container } = render(<UpdateStatus runtime="web" updater={updater} />);
+  const { updater } = createUpdater(baseSnapshot, false);
+  const { container } = render(<UpdateStatus updater={updater} />);
   expect(container).toBeEmptyDOMElement();
   expect(updater.check).not.toHaveBeenCalled();
 });
@@ -62,7 +63,7 @@ test('Desktop background check stays quiet until an update becomes available', a
   };
   const harness = createUpdater(baseSnapshot);
   harness.updater.check = vi.fn().mockResolvedValue({ ok: true, snapshot: baseSnapshot });
-  render(<UpdateStatus runtime="desktop" updater={harness.updater} />);
+  render(<UpdateStatus updater={harness.updater} />);
 
   await waitFor(() => expect(harness.updater.check).toHaveBeenCalledOnce());
   expect(screen.queryByRole('button', { name: /更新/ })).not.toBeInTheDocument();
@@ -113,7 +114,7 @@ test('Desktop error entry exposes only a retry action', async () => {
     errorCode: 'UPDATE_CHECK_FAILED',
   };
   const harness = createUpdater(errorSnapshot);
-  render(<UpdateStatus runtime="desktop" updater={harness.updater} autoCheck={false} />);
+  render(<UpdateStatus updater={harness.updater} autoCheck={false} />);
   await userEvent.click(await screen.findByRole('button', { name: '更新检查失败' }));
   expect(screen.getByRole('alert')).toHaveTextContent('无法检查更新，请稍后重试');
   expect(screen.queryByText('UPDATE_CHECK_FAILED')).not.toBeInTheDocument();

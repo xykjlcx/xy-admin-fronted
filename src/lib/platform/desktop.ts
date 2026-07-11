@@ -22,6 +22,7 @@ export function createDesktopPlatform(api: DesktopApi, webPublicBaseUrl: string)
       createShareUrl: (resourceId) => createPublicFileUrl(webPublicBaseUrl, resourceId),
     },
     updater: {
+      supported: true,
       getSnapshot: () => api.updater.getSnapshot(),
       check: () => api.updater.command('check'),
       download: () => api.updater.command('download'),

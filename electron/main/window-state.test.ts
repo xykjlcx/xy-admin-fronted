@@ -10,12 +10,14 @@ describe('window state publisher', () => {
     const screenEvents = new EventEmitter();
     let maximized = false;
     let fullScreen = false;
+    let simpleFullScreen = false;
     let scaleFactor = 1;
     const send = vi.fn();
     const window = Object.assign(windowEvents, {
       webContents: Object.assign(webContentsEvents, { send }),
       isMaximized: () => maximized,
       isFullScreen: () => fullScreen,
+      isSimpleFullScreen: () => simpleFullScreen,
       getBounds: () => ({ x: 0, y: 0, width: 1440, height: 900 }),
     });
     const displaySource = Object.assign(screenEvents, {
@@ -33,10 +35,15 @@ describe('window state publisher', () => {
     windowEvents.emit('maximize');
     fullScreen = true;
     windowEvents.emit('enter-full-screen');
+    fullScreen = false;
+    windowEvents.emit('leave-full-screen');
+    simpleFullScreen = true;
+    windowEvents.emit('resize');
+    windowEvents.emit('resize');
     scaleFactor = 2;
     screenEvents.emit('display-metrics-changed');
 
-    expect(send).toHaveBeenCalledTimes(4);
+    expect(send).toHaveBeenCalledTimes(6);
     expect(send).toHaveBeenNthCalledWith(
       1,
       ipcEvents.windowStateChanged,
@@ -48,7 +55,7 @@ describe('window state publisher', () => {
       expect.objectContaining({ controlsInsetLeft: 0, fullScreen: true }),
     );
     expect(send).toHaveBeenNthCalledWith(
-      4,
+      6,
       ipcEvents.windowStateChanged,
       expect.objectContaining({ scaleFactor: 2 }),
     );
@@ -56,6 +63,6 @@ describe('window state publisher', () => {
     dispose();
     windowEvents.emit('unmaximize');
     screenEvents.emit('display-metrics-changed');
-    expect(send).toHaveBeenCalledTimes(4);
+    expect(send).toHaveBeenCalledTimes(6);
   });
 });

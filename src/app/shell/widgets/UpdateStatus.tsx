@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ProgressBar } from '@/components/ui/progress';
-import { platform, type AppPlatform, type HostRuntime, type UpdateSnapshot } from '@/lib/platform';
+import { platform, type AppPlatform, type UpdateSnapshot } from '@/lib/platform';
 
 function formatBytes(value: number): string {
   if (value < 1024) return `${String(value)} B`;
@@ -32,11 +32,9 @@ function entryLabel(snapshot: UpdateSnapshot, t: ReturnType<typeof useTranslatio
 }
 
 export function UpdateStatus({
-  runtime = platform.runtime,
   updater = platform.updater,
   autoCheck = true,
 }: {
-  runtime?: HostRuntime;
   updater?: AppPlatform['updater'];
   autoCheck?: boolean;
 }) {
@@ -46,7 +44,7 @@ export function UpdateStatus({
   const [commandPending, setCommandPending] = useState(false);
 
   useEffect(() => {
-    if (runtime !== 'desktop') return;
+    if (!updater.supported) return;
     let active = true;
     const unsubscribe = updater.subscribe((next) => {
       if (active) setSnapshot(next);
@@ -68,9 +66,9 @@ export function UpdateStatus({
       unsubscribe();
       window.removeEventListener('online', check);
     };
-  }, [autoCheck, runtime, updater]);
+  }, [autoCheck, updater]);
 
-  if (runtime !== 'desktop') return null;
+  if (!updater.supported) return null;
 
   const runCommand = async (command: 'download' | 'cancelDownload' | 'install' | 'retry'): Promise<void> => {
     setCommandPending(true);
