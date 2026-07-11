@@ -9,16 +9,27 @@
 | #   | 完成条件                                           | 当前状态 | 证据指针                                                          |
 | --- | -------------------------------------------------- | -------- | ----------------------------------------------------------------- |
 | 1   | Packaged Spike                                     | 通过     | `pnpm test:desktop`；`e2e/electron/packaged-spike.spec.ts`        |
-| 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts`；`pnpm guard:desktop`；双构建产物守卫   |
-| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 通过     | `vitest` 682 项、`theme:guard` 196 项、`build:web` 与产物扫描     |
+| 2   | 同一 `src/` 双构建、业务无 Electron 依赖、共享配置 | 通过     | `vite.renderer.config.ts` + `vite.desktop.config.ts`；边界/产物守卫 |
+| 3   | Web 登录、路由、主题、Mock 与既有测试零退化        | 通过     | Web 117 个文件/683 项、`theme:guard` 196 项、Vite 8 `build:web`   |
 | 4   | 两种窗口模式与三套 Shell 安全区                    | 通过     | 双 packaged E2E；3 布局 × 3 比例截图与几何断言                    |
 | 5   | Electron 凭证安全存储与统一会话服务                | 通过     | Phase 3 单元测试、架构守卫与 packaged `safeStorage` E2E           |
 | 6   | 原生文件下载闭环                                   | 通过     | Phase 5 单元/页面测试；packaged Main stub 保存框 + 实际流式落盘   |
 | 7   | 更新状态机、feed、metadata 与真实更新              | 部分通过 | generic feed/HTTP/metadata/公网回读工具通过；真实签名更新 pending |
-| 8   | CSP、sandbox、隔离、fuses、导航、sender、schema    | 通过     | 安全窗口/IPC 门禁；四套 macOS 产物 fuse wire 实读                 |
-| 9   | 全部门禁、visual、Electron E2E、平台 smoke         | 通过     | Web visual 24/24；Web 682、Desktop 169、双 E2E、arm64 DMG smoke   |
-| 10  | 四份文档与代码一致                                 | 通过     | `architecture/AGENTS/README/desktop`；提交 `e662927`              |
+| 8   | CSP、sandbox、隔离、fuses、导航、sender、schema    | 通过     | packaged CSP console + 安全窗口/IPC 门禁 + 四套 fuse wire 实读    |
+| 9   | 全部门禁、visual、Electron E2E、平台 smoke         | 通过     | Web visual 20/20 + 3 档 + 24/24；Web 683、Desktop 175、双 E2E、DMG smoke |
+| 10  | 四份文档与代码一致                                 | 通过     | `architecture/AGENTS/README/desktop` 与 Vite 8 当前实现同步       |
 | 11  | 既有改动未覆盖、提交可独立回滚                     | 通过     | 独立 worktree；Phase 0–8 中文原子提交；主工作区未触碰             |
+
+## 2026-07-11 Vite 8 授权迁移与终局复验
+
+- 用户明确授权把构建适配层从 `electron-vite 5 + Vite 7.3.6` 改为 `vite-plugin-electron 1.1.0 + Vite 8.1.1 + @vitejs/plugin-react 6.0.3`；先修订设计文档，再按 RED → GREEN 迁移。`electron-vite` 已从依赖、配置、命令和锁文件移除，`pnpm why electron-vite` 无结果。
+- `vite.desktop.config.ts` 复用唯一 Renderer 工厂；Vite 8 `build.rolldownOptions` 固定 Main/Preload/Renderer 输出。实际产物为 `out/main/index.js`、单文件 CJS `out/preload/index.cjs` 与 `out/renderer/`；Electron/Node built-in external，`electron-updater` 进入 Main bundle。
+- 新工具链的 Phase 0 packaged 证据已全部重跑：协议/资源/hash history、HTTPS CORS、登录/鉴权、401、CSP、导航/权限拒绝和静态恢复页通过；没有沿用旧 Vite 7 证据。
+- Web 零退化：`tsc -b --noEmit`、扩展 ESLint、Web 117 个文件/683 项、theme 4/196、design lint 0 error、Vite 8 Web production build 与 Mock 剥离检查通过。
+- Desktop：34 个文件/175 项；native packaged E2E 3.3 秒，integrated packaged E2E 11.8 秒。更新弹窗打开后无 `style-src-elem` violation，900px 紧凑窗口无 Header 重叠/横向溢出，三布局 × 三比例截图无 GPU 黑块。
+- 最终构建：Web `1,444,446` bytes/130 files；Desktop native `1,442,644` bytes/132 files，integrated `1,442,648` bytes/132 files；三者最大 JS 均为 `205,757` bytes。
+- 双 `make`：native/integrated 均生成 macOS arm64/x64 DMG + ZIP + blockmap + `latest-mac.yml`。两模式 ASAR 均为 142 个条目，约 2.34 MB；feed 的 version/path/arch/size/SHA-512、fuse wire、ASAR integrity 和 ad-hoc 签名均回读通过。
+- integrated arm64 DMG 重新完成挂载、隔离复制、`codesign --verify --deep --strict`、Main/3 个 helper、`application ready`/`renderer healthy` 日志、标准 Quit、隔离副本删除和 DMG detach smoke。
 
 ## 分期证据
 
@@ -27,7 +38,7 @@
 - `pnpm test:desktop`
   - Desktop Vitest：8 个文件、40 项通过。
   - 自动生成 1 日有效 localhost 自签证书到 gitignore 的 `test-results/`；证书未提交。
-  - `electron-vite build`：Main、单文件 CJS Preload、相对 base Renderer 构建通过。
+  - 当前复验使用 `vite build --config vite.desktop.config.ts`：Vite 8/Rolldown Main、单文件 CJS Preload、相对 base Renderer 构建通过。
   - `electron-builder --mac --arm64 --dir`：生成未签名 packaged `.app`。
   - Playwright：1 项 packaged E2E 通过，耗时 2.9 秒。
 - Packaged E2E 实测：
@@ -53,7 +64,7 @@
 - `pnpm dev:desktop -- --window-chrome=native`：
   - Main 6 modules、Preload 83 modules 编译通过。
   - Renderer dev server 在 `http://localhost:5173/` 监听；本地 Electron 主进程与启用 `--enable-sandbox` 的 Renderer 进程实际启动。
-  - 验证后通过 Ctrl-C 主动结束开发进程；无遗留 Electron、electron-vite 或 Spike server 进程。
+  - 验证后通过 Ctrl-C 主动结束开发进程；无遗留 Electron、Vite 或 Spike server 进程。
 - `pnpm guard:desktop`：通过。守卫自动拒绝 `src/**` 的 Electron/Node import、裸 `window.desktop`，以及 `electron/**` 的业务/React import、散落 `process.env` 和非 Preload `ipcRenderer`。
 - `pnpm build:web`：通过；自动产物守卫回读 `totalBytes=1,411,208`、`largestJavaScriptBytes=264,517`、`fileCount=91`。
 - `pnpm build:desktop -- --window-chrome=native`：通过；自动产物守卫回读 `totalBytes=1,410,898`、`largestJavaScriptBytes=264,783`、`fileCount=91`。
@@ -169,15 +180,15 @@
   - `docs/architecture.md` 登记同一 `src/routeTree.gen.ts` 的 Web/Electron 双宿主图、Main/Preload/Platform 依赖方向、会话和配置真值。
   - `AGENTS.md` 增加 Electron 禁止项、typed IPC/Zod/sender、安全窗口/fuse、证据分级与双宿主门禁。
   - `README.md` 提供 Web/Desktop 快速开始、两种窗口模式与构建命令；`docs/desktop.md` 完整记录派生身份、产物矩阵、更新源、签名/公证/publisher、发布顺序、排障与证据级别。
-  - `docs/NEW-PROJECT.md` 追加 Desktop 身份和最终窗口模式实例化清单；设计文档记录 Vite 回退、TS builder 与 V8 snapshot fuse 的等价实施。
+  - `docs/NEW-PROJECT.md` 追加 Desktop 身份和最终窗口模式实例化清单；设计文档记录 Vite 8 构建适配层、TS builder 与 V8 snapshot fuse 的等价实施。
 - Web visual（Agent Browser CLI 0.25.4）：
   - 采集 20 个原型基线、20 个实现侧页面和 20 张 diff；差异比例为 1.96%–8.59%，作为已知产品演进证据，不伪写为像素完全一致。
   - 90%/100%/108% 三档通过无水平溢出、status popover/detail sheet/role permissions/menu dialog 视口与缩放契约，并遍历 6 个 Admin 和 7 个 Lastmile 已完成页。
   - flavor × light/dark × scale 矩阵 24/24，`page-ready/state-applied/no-horizontal-overflow/sera-computed-contracts` 全部通过。证据位于 gitignore 的 `test-results/m0-visual/`。
 - 最终门禁：
-  - `tsc -b --noEmit`、`eslint src`（0 error，保留 1 条既有 TanStack Table compiler warning）、Web Vitest 117/682、theme guard 4/196、design lint 0 error/40 条已登记 warning、Desktop typecheck 全部通过。
-  - `pnpm test:desktop`：Desktop Vitest 31/169；native packaged E2E 4.4 秒；integrated packaged E2E 10.2 秒。
-  - `build:web`：`1,426,739` bytes/90 files；Desktop native `1,425,052` bytes/93 files；Desktop integrated `1,425,056` bytes/93 files；最大 JS 分别为 `264,519/264,785/264,785` bytes。Web 无 Electron/Node/Preload，Desktop Renderer 无 Mock 运行时。
+  - `tsc -b --noEmit`、扩展 ESLint（0 error，保留 1 条既有 TanStack Table compiler warning）、Web Vitest 117/683、theme guard 4/196、design lint 0 error/40 条已登记 warning、Desktop typecheck 全部通过。
+  - `pnpm test:desktop`：Desktop Vitest 34/175；native packaged E2E 3.3 秒；integrated packaged E2E 11.8 秒。
+  - `build:web`：`1,444,446` bytes/130 files；Desktop native `1,442,644` bytes/132 files；Desktop integrated `1,442,648` bytes/132 files；最大 JS 均为 `205,757` bytes。Web 无 Electron/Node/Preload，Desktop Renderer 无 Mock 运行时。
   - Phase 7 同一运行时代码已执行 native/integrated 双 `make`、四套 macOS 产物校验与 arm64 DMG smoke；Phase 8 仅修改文档，未使产物证据失效。
 
 ## 平台证据矩阵
@@ -190,9 +201,21 @@
 
 ## 偏差记录
 
-1. 原要求意图：sandbox Preload 必须是无外部依赖的单文件。实际做法：未使用 `electron-vite 5` 实验性的 `isolatedEntries`，改用单入口、`externalizeDeps: false`、`inlineDynamicImports: true`、CJS 输出。理由：`isolatedEntries` 在非 TTY 构建中无条件调用 `process.stdout.moveCursor` 并崩溃；替代做法保持相同安全产物约束，且可在无人值守环境稳定构建。
-2. 工具链：因 `electron-vite 5.0.0` 的 peer 范围不支持 Vite 8，按用户确认将 Vite 固定为 `7.3.6`、React 插件固定为 `5.2.0`。共享 manual chunks 后 Web 最大业务入口从对比基线约 596 KiB 收敛为约 128 KiB。
+1. 原要求意图：sandbox Preload 必须是无外部依赖的单文件。实际做法：`vite-plugin-electron` Flat API 使用单入口、CJS format 与 Rolldown `codeSplitting:false`，实包只有 `out/preload/index.cjs`。理由：直接表达安全产物约束，并由 packaged sandbox 启动验证。
+2. 原要求：`electron-vite 5 + Vite 7.3.6`。实际实现：`vite-plugin-electron 1.1.0 + Vite 8.1.1 + @vitejs/plugin-react 6.0.3`。原因：避免稳定 Web 工具链降级，采用明确支持 Vite 8/Rolldown 的稳定 Electron 适配层。授权来源：用户本轮明确批准。
 3. 原文件名：设计文档以 `electron-builder.yml` 为配置载体。实际改为 `electron-builder.ts`，并由守卫禁止 YAML/TS 双配置并存。理由：发布身份、平台签名前置条件和 Spike fuse 例外需要可类型检查、可单测的动态配置；安全、范围与产物目标不变。
+4. 严格 CSP：Sonner 与 `react-style-singleton` 上游会在运行时创建 `<style>`。实际以静态 CSS + pnpm patch 禁用运行时注入，并增加源码契约与 packaged console 断言；没有放宽 `style-src-elem`。
+
+## 终局对抗审查与修复
+
+- P1：Sonner/Radix scroll-lock 在严格 CSP 下运行时注入样式；已静态化并用两项 patch contract + packaged 控制台验证。
+- P1：BrowserWindow 原 `minWidth=1024` 使 `max-width:1023px` 紧凑布局永远不可达；改为 900，并在真实窗口 900×700 断言布局、Header 几何和无溢出。
+- P1：原 Vite 7 降级会增加后续合并成本；按授权迁移 Vite 8，重跑全部 packaged/Builder/Web 证据。
+- P2：更新 UI 长说明可能把 footer 推出视口、关闭按钮缺少本地化、adapter 拒绝会产生未处理 Promise；已增加可滚动内容区、`closeLabel` i18n 与去重错误反馈。
+- P2：文件与更新实现堆在 `electron/main`；已归位到 `electron/files`、`electron/updater`，并新增守卫禁止回退。
+- P2：packaged E2E 曾残留进程且截图偶发 GPU tile 黑块；已显式等待 PID 退出、修复单实例 lock loser、采用稳定视口双帧采集。
+- P2：`pnpm visual all` 在阶段间重启同 origin server 导致 MSW/HMR 接管竞态；改为单 server 生命周期后完整 20 页面 + 3 档 + 24/24 矩阵通过。
+- 复审结论：当前未发现新的 P0/P1 工程或 UI 阻断；剩余项均是外部签名/真实平台证据，不用自动化或未签名包冒充通过。
 
 ## Pending 与后续人工动作
 
