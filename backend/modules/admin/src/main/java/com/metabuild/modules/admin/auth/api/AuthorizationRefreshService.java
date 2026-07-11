@@ -18,6 +18,8 @@ public interface AuthorizationRefreshService {
     }
 
     <T> T executeTerminal(TerminalChange<T> change);
+    /** 新账号在 mutation 前尚不存在，必须在同一事务创建后初始化 READY。 */
+    default <T> T executeInitialize(AuthorizationChange<T> change){return executeEnable(change);}
     default <T> T executeEnable(AuthorizationChange<T> change){return execute(Cause.USER_CHANGED,change);}
 
     interface AuthorizationChange<T> {

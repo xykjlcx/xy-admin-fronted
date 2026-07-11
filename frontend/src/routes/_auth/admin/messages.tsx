@@ -16,5 +16,5 @@ export const Route = createFileRoute('/_auth/admin/messages')({
 
 function MessagesRoute() {
   const { me } = Route.useRouteContext();
-  return <MessagesPage permissions={me.permissions} />;
+  return <MessagesPage permissions={me.permissions} systemAdmin={me.systemAdmin} />;
 }

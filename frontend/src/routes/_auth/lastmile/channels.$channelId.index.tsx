@@ -16,6 +16,7 @@ function ChannelDetailRoute() {
     <ChannelDetailPage
       id={channelId}
       permissions={me.permissions}
+      systemAdmin={me.systemAdmin}
       onBack={() =>
         void navigate({ to: '/lastmile/channels', search: { keyword: '', kind: 'all', status: 'all' } })
       }

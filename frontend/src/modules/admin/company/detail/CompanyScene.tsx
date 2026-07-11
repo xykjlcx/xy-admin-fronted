@@ -25,7 +25,7 @@ function InformationGrid({ items }: { items: { label: ReactNode; value: ReactNod
   );
 }
 
-export function CompanyScene({ permissions }: { permissions: string[] }) {
+export function CompanyScene({ permissions, systemAdmin = false }: { permissions: string[]; systemAdmin?: boolean }) {
   const { t } = useTranslation('admin');
   const { t: tCommon } = useTranslation();
   const queryClient = useQueryClient();
@@ -98,7 +98,7 @@ export function CompanyScene({ permissions }: { permissions: string[] }) {
         <Card>
           <CardHeader>
             <CardTitle>{t('company.sections.more')}</CardTitle>
-            {matchPermission(permissions, 'sys:org:edit') && (
+            {matchPermission({ permissions, systemAdmin }, 'sys:org:edit') && (
               <CardAction>
                 <Button
                   variant="outline"

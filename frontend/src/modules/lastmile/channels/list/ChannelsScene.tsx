@@ -21,6 +21,7 @@ import {
 import { channelColumns } from './columns';
 export function ChannelsScene({
   permissions,
+  systemAdmin = false,
   keyword,
   kind,
   status,
@@ -28,6 +29,7 @@ export function ChannelsScene({
   onNavigate,
 }: {
   permissions: string[];
+  systemAdmin?: boolean;
   keyword: string;
   kind: ChannelKindFilter;
   status: ChannelStatusFilter;
@@ -102,7 +104,7 @@ export function ChannelsScene({
           <p className="mt-1 text-sm text-text-3">{t('channels.description')}</p>
         </div>
         <div className="flex-1" />
-        {matchPermission(permissions, 'lastmile:channel:create') && (
+        {matchPermission({ permissions, systemAdmin }, 'lastmile:channel:create') && (
           <Button onClick={() => onNavigate('new')}>
             <Plus data-icon="inline-start" />
             {t('channels.create')}

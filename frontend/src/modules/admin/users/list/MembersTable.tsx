@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, type JSX, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTable } from '@/components/pro/DataTable';
 import { Button } from '@/components/ui/button';
+import { SelectControl } from '@/components/ui/select';
 import { matchPermission } from '@/lib/permission';
 import { deptsQuery, usersQuery, type UserDto, type UsersQueryParams } from '../api';
 import { userColumns } from './columns';
@@ -12,6 +13,7 @@ import type { MembersVariant, UsersSearch } from '../types';
 interface MembersTableProps {
   variant: MembersVariant;
   permissions: string[];
+  systemAdmin?: boolean;
   search: UsersSearch;
   onSearchChange: (patch: Partial<UsersQueryParams>) => void;
   rowSelection: RowSelectionState;
@@ -21,6 +23,8 @@ interface MembersTableProps {
   onEdit?: (user: UserDto) => void;
   onDelete?: (user: UserDto) => void;
   onBatchDisable?: (ids: string[]) => void | Promise<void>;
+  onBatchEnable?: (ids: string[]) => void | Promise<void>;
+  onBatchMove?: (ids: string[], deptId: string) => void | Promise<void>;
   toolbar?: ReactNode;
 }
 
@@ -29,6 +33,7 @@ const emptyUsersPage = { list: [], total: 0 };
 export function MembersTable({
   variant,
   permissions,
+  systemAdmin = false,
   search,
   onSearchChange,
   rowSelection,
@@ -38,6 +43,8 @@ export function MembersTable({
   onEdit,
   onDelete,
   onBatchDisable,
+  onBatchEnable,
+  onBatchMove,
   toolbar,
 }: MembersTableProps): JSX.Element {
   const { t } = useTranslation('admin');
@@ -59,8 +66,10 @@ export function MembersTable({
   let selectedDeptLabel = t('users.allMembers');
   if (variant === 'left') selectedDeptLabel = t('users.tabs.left');
   else if (search.deptId) selectedDeptLabel = deptById.get(search.deptId)?.name ?? selectedDeptLabel;
-  const canDisable = !!onBatchDisable && matchPermission(permissions, 'iam:user:resign');
-  const selectionEnabled = variant === 'members' && canDisable;
+  const canDisable = !!onBatchDisable && matchPermission({ permissions, systemAdmin }, 'iam:user:resign');
+  const canUpdate = matchPermission({ permissions, systemAdmin }, 'iam:user:update');
+  const selectionEnabled = variant === 'members' && (canDisable || canUpdate);
+  const [moveDeptId, setMoveDeptId] = useState('');
   const rowSelectAriaLabel = useCallback(
     (user: UserDto) => t('users.selectUser', { name: user.name }),
     [t],
@@ -69,6 +78,11 @@ export function MembersTable({
   const handleBatchDisable = async (ids: string[]) => {
     if (!onBatchDisable) return;
     await onBatchDisable(ids);
+    onClearSelection();
+  };
+
+  const finishBatch = async (operation: () => void | Promise<void>) => {
+    await operation();
     onClearSelection();
   };
 
@@ -83,7 +97,7 @@ export function MembersTable({
       {toolbar}
 
       <DataTable
-        columns={userColumns({ t, permissions, deptById, onView, onEdit, onDelete })}
+        columns={userColumns({ t, permissions, systemAdmin, deptById, onView, onEdit, onDelete })}
         data={usersPage.list}
         rowKey={(user) => user.id}
         loading={usersResult.isPending}
@@ -96,19 +110,45 @@ export function MembersTable({
           selectAllAriaLabel: t('users.selectPage'),
           rowSelectAriaLabel,
           renderBulkBar: (selectedVisibleIds) => (
-            <div className="mb-4 flex items-center justify-between rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
               <span className="text-[calc(13px*var(--app-scale))] text-text-2">
                 {t('users.selectedCount', { count: selectedVisibleIds.length })}
               </span>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  void handleBatchDisable(selectedVisibleIds);
-                }}
-              >
-                {t('users.actions.batchDisable')}
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                {canUpdate && onBatchMove ? (
+                  <SelectControl
+                    size="sm"
+                    value={moveDeptId}
+                    aria-label={t('users.actions.batchMoveDept')}
+                    placeholder={t('users.actions.batchMoveDept')}
+                    options={depts.map((dept) => ({ value: dept.id, label: dept.name }))}
+                    onValueChange={(deptId) => {
+                      setMoveDeptId(deptId);
+                      void finishBatch(() => onBatchMove(selectedVisibleIds, deptId));
+                    }}
+                  />
+                ) : null}
+                {canUpdate && onBatchEnable ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => void finishBatch(() => onBatchEnable(selectedVisibleIds))}
+                  >
+                    {t('users.actions.batchEnable')}
+                  </Button>
+                ) : null}
+                {canDisable ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      void handleBatchDisable(selectedVisibleIds);
+                    }}
+                  >
+                    {t('users.actions.batchDisable')}
+                  </Button>
+                ) : null}
+              </div>
             </div>
           ),
         }}

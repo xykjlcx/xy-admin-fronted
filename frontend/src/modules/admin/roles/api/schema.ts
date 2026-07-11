@@ -35,23 +35,11 @@ export const RoleMemberSchema = z.object({
   title: z.string(),
 });
 export const DataScopeSchema = z.enum(['all', 'deptAndChildren', 'dept', 'self', 'custom']);
-export const ResourceDataScopeSchema = z.enum([
-  'inherit',
-  'all',
-  'deptAndChildren',
-  'dept',
-  'self',
-  'custom',
-]);
-export const ResourceDataPermissionSchema = z.object({
-  scope: ResourceDataScopeSchema,
-  departmentIds: z.array(z.string()),
-});
 export const RoleDataPermissionSchema = z.object({
   defaultScope: DataScopeSchema,
   defaultDepartmentIds: z.array(z.string()),
-  resources: z.record(z.string(), ResourceDataPermissionSchema),
-});
+  resources: z.object({}).strict(),
+}).strict();
 export const RoleAuditLogKindSchema = z.enum(['create', 'edit', 'grant', 'remove', 'dataScope']);
 export const RoleAuditLogSchema = z.object({
   id: z.string(),
@@ -73,8 +61,6 @@ export type PermissionTreeGroupDto = z.infer<typeof PermissionTreeGroupSchema>;
 export type RolePermissionMap = z.infer<typeof RolePermissionMapSchema>;
 export type RoleMemberDto = z.infer<typeof RoleMemberSchema>;
 export type DataScope = z.infer<typeof DataScopeSchema>;
-export type ResourceDataScope = z.infer<typeof ResourceDataScopeSchema>;
-export type ResourceDataPermission = z.infer<typeof ResourceDataPermissionSchema>;
 export type RoleDataPermission = z.infer<typeof RoleDataPermissionSchema>;
 export type RoleAuditLogKind = z.infer<typeof RoleAuditLogKindSchema>;
 export type RoleAuditLogDto = z.infer<typeof RoleAuditLogSchema>;

@@ -105,6 +105,8 @@
       "create": "Add member",
       "edit": "Edit",
       "batchDisable": "Disable selected",
+      "batchEnable": "Enable selected",
+      "batchMoveDept": "Move to department",
       "detail": "Details",
       "delete": "Delete",
       "more": "More actions",
@@ -279,6 +281,8 @@
     "actions": {
       "addRole": "Add role",
       "deleteRole": "Delete role",
+      "editRole": "Save role",
+      "disableRole": "Disable role",
       "expand": "Expand",
       "collapse": "Collapse",
       "clear": "Clear",
@@ -290,11 +294,13 @@
       "saveDataPermissions": "Save data permissions",
       "cancel": "Cancel",
       "confirmCreate": "Create",
+      "confirmUpdate": "Save changes",
       "confirmDelete": "Confirm delete",
       "removeMember": "Remove"
     },
     "dialog": {
       "addRoleTitle": "Add role",
+      "editRoleTitle": "Edit role",
       "deleteRoleTitle": "Delete role",
       "deleteRoleDesc": "This role and its permissions will be removed."
     },
@@ -308,6 +314,8 @@
       "stub": "This flow will be connected in a later task",
       "created": "Role created. Configure permissions next.",
       "deleted": "Role deleted",
+      "updated": "Role updated",
+      "disabled": "Role disabled",
       "permissionsSaved": "Functional permissions saved",
       "dataPermissionsSaved": "Data permissions saved"
     }

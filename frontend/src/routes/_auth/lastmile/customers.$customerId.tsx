@@ -16,6 +16,7 @@ function CustomerDetailRoute() {
     <CustomerDetailPage
       id={customerId}
       permissions={me.permissions}
+      systemAdmin={me.systemAdmin}
       onBack={() => void navigate({ to: '/lastmile/customers', search: { keyword: '' } })}
     />
   );

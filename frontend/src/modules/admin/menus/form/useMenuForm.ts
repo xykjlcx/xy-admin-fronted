@@ -90,10 +90,9 @@ export function menuFormValuesToInput(
   locale: string,
 ): UpdateMenuInput {
   const shortLabel = mergeLocalized(initialMenu?.shortLabel, locale, values.shortLabel);
-
   return UpdateMenuSchema.parse({
     type: values.type,
-    parentId: values.type === 'dir' ? null : values.parentId || null,
+    parentId: values.parentId || null,
     label: mergeLocalized(initialMenu?.label, locale, values.name),
     icon: values.icon,
     shortLabel: values.type === 'action' || Object.keys(shortLabel).length === 0 ? undefined : shortLabel,

@@ -73,6 +73,7 @@ function UsersRoute() {
   return (
     <UsersPage
       permissions={me.permissions}
+      systemAdmin={me.systemAdmin}
       search={search}
       onSearchChange={handleSearchChange}
     />

@@ -61,6 +61,7 @@ function RolesRoute() {
   return (
     <RolesPage
       permissions={me.permissions}
+      systemAdmin={me.systemAdmin}
       roleId={search.roleId}
       onRoleIdChange={(roleId) => {
         void navigate({ search: { roleId } });

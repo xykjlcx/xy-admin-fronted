@@ -5,14 +5,14 @@ import { meQuery } from '@/modules/admin/auth/api';
 import { useAuth } from '@/stores/auth';
 
 // 直接驱动路由 beforeLoad 守卫（无需浏览器）：预置 me 缓存绕过网络，断言重定向落点。
-function buildRouter(opts: { token: string | null; permissions?: string[] }, initial: string) {
+function buildRouter(opts: { token: string | null; permissions?: string[]; systemAdmin?: boolean }, initial: string) {
   const queryClient = new QueryClient();
   if (opts.permissions)
     queryClient.setQueryData(meQuery.queryKey, {
       user: { id: 'u', name: 'n', username: 'u' },
       roles: [],
       permissions: opts.permissions,
-      systemAdmin: false,
+      systemAdmin: opts.systemAdmin ?? false,
       dataScope: { unrestricted: false, self: false, deptIds: [] },
     });
   useAuth.setState({ token: opts.token });
@@ -41,6 +41,12 @@ test('已登录但缺页面权限 → 重定向 /403', async () => {
 
 test('已登录且有页面权限 → 停留目标路由', async () => {
   const router = buildRouter({ token: 't', permissions: ['dashboard:overview:view'] }, '/admin/dashboard');
+  await router.load();
+  expect(router.state.location.pathname).toBe('/admin/dashboard');
+});
+
+test('systemAdmin 无 catalog grant 仍可访问后续新增受保护路由', async () => {
+  const router = buildRouter({ token: 't', permissions: [], systemAdmin: true }, '/admin/dashboard');
   await router.load();
   expect(router.state.location.pathname).toBe('/admin/dashboard');
 });

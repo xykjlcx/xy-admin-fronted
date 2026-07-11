@@ -1,4 +1,6 @@
 import {
+  MenuCustomizationSchema,
+  RuntimeMenuCreateSchema,
   CreateSubsystemSchema,
   RoutePathSchema,
   UpdateMenuSchema,
@@ -15,11 +17,11 @@ test('menu queryOptions use stable nav query keys', () => {
 
 test('menu api exposes write operations required by the menu management page', () => {
   expect(typeof menuApi.createMenu).toBe('function');
-  expect(typeof menuApi.createSubsystem).toBe('function');
   expect(typeof menuApi.updateMenu).toBe('function');
-  expect(typeof menuApi.updateSubsystem).toBe('function');
   expect(typeof menuApi.deleteMenu).toBe('function');
   expect(typeof menuApi.setMenuVisibility).toBe('function');
+  expect(menuApi).not.toHaveProperty('createSubsystem');
+  expect(menuApi).not.toHaveProperty('updateSubsystem');
 });
 
 test('menu write schema rejects node shapes that violate the type contract', () => {
@@ -30,6 +32,7 @@ test('menu write schema rejects node shapes that violate the type contract', () 
       label: { 'zh-CN': '目录' },
       visible: true,
       sort: 1,
+      path: '/catalog-owned',
     }).success,
   ).toBe(false);
 
@@ -40,8 +43,45 @@ test('menu write schema rejects node shapes that violate the type contract', () 
       label: { 'zh-CN': '导出' },
       visible: true,
       sort: 1,
+      permission: 'iam:user:export',
     }).success,
   ).toBe(false);
+});
+
+test('catalog menus keep code-owned fields read-only while runtime creation is directory-only', () => {
+  expect(
+    MenuCustomizationSchema.safeParse({
+      type: 'menu',
+      parentId: null,
+      label: { 'zh-CN': '用户管理' },
+      icon: 'users',
+      visible: true,
+      sort: 10,
+      path: '/changed-by-client',
+      permission: 'iam:changed',
+    }).success,
+  ).toBe(false);
+  expect(
+    RuntimeMenuCreateSchema.safeParse({
+      subsystemKey: 'admin',
+      type: 'menu',
+      parentId: null,
+      label: { 'zh-CN': '伪造页面' },
+      path: '/admin/users',
+      visible: true,
+      sort: 1,
+    }).success,
+  ).toBe(false);
+  expect(
+    RuntimeMenuCreateSchema.safeParse({
+      subsystemKey: 'admin',
+      type: 'dir',
+      parentId: null,
+      label: { 'zh-CN': '运行时目录' },
+      visible: true,
+      sort: 1,
+    }).success,
+  ).toBe(true);
 });
 
 test('route and subsystem schemas reject values that cannot be registered', () => {

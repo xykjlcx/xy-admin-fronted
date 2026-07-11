@@ -1,17 +1,16 @@
 import { http } from 'msw';
-import { z } from 'zod';
 import { biz, ok, noContent } from '@/mocks/http';
 import { genId } from '@/mocks/db';
 import {
   CreateUserSchema,
+  MoveUsersSchema,
   UpdateUserSchema,
+  UserIdsSchema,
   type PageResult,
   type UserDto,
 } from '@/modules/admin/users/api';
 import { parseUserFilters, userMatchesAdvancedFilters } from '../model';
 import { collectDeptIds, toUserDetail, users } from './db';
-
-const BatchDisableRequestSchema = z.object({ ids: z.array(z.string()) });
 
 function parsePositiveInt(value: string | null, fallback: number) {
   const parsed = Number(value);
@@ -86,12 +85,24 @@ export const userHandlers = [
   }),
 
   http.post('/api/users/batch-disable', async ({ request }) => {
-    const { ids } = BatchDisableRequestSchema.parse(await request.json());
+    const { ids } = UserIdsSchema.parse(await request.json());
     let updated = 0;
     for (const id of ids) {
       const user = users.update(id, { status: 'disabled' });
       if (user) updated += 1;
     }
+    return ok({ updated });
+  }),
+  http.post('/api/users/batch-enable', async ({ request }) => {
+    const { ids } = UserIdsSchema.parse(await request.json());
+    let updated = 0;
+    for (const id of ids) if (users.update(id, { status: 'active' })) updated += 1;
+    return ok({ updated });
+  }),
+  http.post('/api/users/batch-move', async ({ request }) => {
+    const { ids, deptId } = MoveUsersSchema.parse(await request.json());
+    let updated = 0;
+    for (const id of ids) if (users.update(id, { deptId })) updated += 1;
     return ok({ updated });
   }),
 ];

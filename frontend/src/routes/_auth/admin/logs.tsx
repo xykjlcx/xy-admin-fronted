@@ -16,5 +16,5 @@ export const Route = createFileRoute('/_auth/admin/logs')({
 
 function LogsRoute() {
   const { me } = Route.useRouteContext();
-  return <LogsPage permissions={me.permissions} />;
+  return <LogsPage permissions={me.permissions} systemAdmin={me.systemAdmin} />;
 }

@@ -14,6 +14,8 @@ export interface Subsystem {
   builtin: boolean;
   enabled: boolean;
   sort: number;
+  origin?: 'catalog';
+  runtimeManaged?: false;
 }
 
 export interface MenuRecord {
@@ -28,6 +30,8 @@ export interface MenuRecord {
   permission?: string;
   visible: boolean;
   sort: number;
+  origin: 'catalog' | 'runtime';
+  runtimeManaged: boolean;
 }
 
 export interface SubsystemManifest {

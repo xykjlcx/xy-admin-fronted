@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { matchPermission } from '@/lib/permission';
 import { toast } from 'sonner';
 import { DescriptionList } from '@/components/pro/DescriptionList';
 import { PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
@@ -14,11 +15,13 @@ import type { ChannelDetailTab } from '../types';
 export function ChannelDetailScene({
   id,
   permissions,
+  systemAdmin = false,
   onBack,
   onEdit,
 }: {
   id: string;
   permissions: string[];
+  systemAdmin?: boolean;
   onBack: () => void;
   onEdit: () => void;
 }) {
@@ -86,7 +89,7 @@ export function ChannelDetailScene({
           <Button
             variant="outline"
             onClick={onEdit}
-            disabled={!permissions.includes('*:*:*') && !permissions.includes('lastmile:channel:update')}
+            disabled={!matchPermission({ permissions, systemAdmin }, 'lastmile:channel:update')}
           >
             {t('common.edit')}
           </Button>

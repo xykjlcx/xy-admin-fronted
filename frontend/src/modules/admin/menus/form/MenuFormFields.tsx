@@ -26,6 +26,7 @@ interface MenuFormFieldsProps {
   locale: string;
   t: TFunction<'admin'>;
   typeLocked: boolean;
+  codeOwnedLocked: boolean;
   contextLocked: boolean;
   parentOptions: SelectOption[];
   onTypeChange: (value: string) => void;
@@ -37,6 +38,7 @@ export function MenuFormFields({
   locale,
   t,
   typeLocked,
+  codeOwnedLocked,
   contextLocked,
   parentOptions,
   onTypeChange,
@@ -123,7 +125,7 @@ export function MenuFormFields({
                 id="menu-path"
                 aria-label={t('menus.form.path')}
                 value={field.value}
-                disabled={type !== 'menu'}
+                disabled={codeOwnedLocked || type !== 'menu'}
                 aria-invalid={!!formState.errors.path}
                 options={[
                   { value: '', label: t('menus.form.pathPlaceholder') },
@@ -144,7 +146,7 @@ export function MenuFormFields({
           <Input
             id="menu-permission"
             aria-label={t('menus.form.permission')}
-            disabled={type === 'dir'}
+            disabled={codeOwnedLocked || type === 'dir'}
             placeholder={type === 'action' ? 'iam:user:export' : 'iam:menu:view'}
             aria-invalid={!!formState.errors.permission}
             {...register('permission')}
@@ -157,7 +159,7 @@ export function MenuFormFields({
           <Input
             id="menu-short-label"
             aria-label={t('menus.form.shortLabel')}
-            disabled={type === 'action'}
+          disabled={codeOwnedLocked || type === 'action'}
             placeholder={t('menus.form.shortLabelPlaceholder')}
             {...register('shortLabel')}
           />

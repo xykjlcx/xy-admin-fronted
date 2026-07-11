@@ -1,6 +1,10 @@
 import { setupServer } from 'msw/node';
 import { resetDb } from '@/mocks/db';
-import type { CreateMenuInput, CreateSubsystemInput, UpdateMenuInput } from '@/modules/admin/menus/api';
+import type {
+  CreateMenuInput,
+  CreateSubsystemInput,
+  MenuCustomizationInput,
+} from '@/modules/admin/menus/api';
 import { menuHandlers } from '@/modules/admin/menus/mocks';
 import type { MenuRecord } from '@/modules/types';
 
@@ -88,12 +92,10 @@ test('GET /api/menus?subsystem=nope 未知子系统返回空集', async () => {
 test('POST /api/menus 新增菜单节点后可读回', async () => {
   const dto: CreateMenuInput = {
     subsystemKey: 'admin',
-    parentId: 'm-org',
-    type: 'menu',
-    label: { 'zh-CN': '权限看板' },
+    parentId: null,
+    type: 'dir',
+    label: { 'zh-CN': '运行时目录' },
     icon: 'menu',
-    path: '/admin/roles',
-    permission: 'iam:menu:view',
     visible: true,
     sort: 9,
   };
@@ -107,10 +109,8 @@ test('POST /api/menus 新增菜单节点后可读回', async () => {
   );
   expect(created).toMatchObject({
     subsystemKey: 'admin',
-    parentId: 'm-org',
-    type: 'menu',
-    path: '/admin/roles',
-    permission: 'iam:menu:view',
+    parentId: null,
+    type: 'dir',
   });
 
   const list = await readJson<MenuRecord[]>(await fetch('/api/menus?subsystem=admin'));
@@ -118,13 +118,11 @@ test('POST /api/menus 新增菜单节点后可读回', async () => {
 });
 
 test('PUT /api/menus/:id 编辑菜单字段后可读回', async () => {
-  const dto: UpdateMenuInput = {
+  const dto: MenuCustomizationInput = {
     parentId: 'm-home',
     type: 'menu',
     label: { 'zh-CN': '经营总览' },
     icon: 'chart',
-    path: '/admin/dashboard',
-    permission: 'dashboard:overview:view',
     visible: false,
     sort: 6,
   };
@@ -159,21 +157,28 @@ test('PATCH /api/menus/:id/visibility 切换显示状态', async () => {
   expect(updated.visible).toBe(false);
 });
 
-test('DELETE /api/menus/:id 允许删除叶子节点', async () => {
+test('DELETE /api/menus/:id 拒绝 catalog 叶子节点', async () => {
   const removed = await fetch('/api/menus/m-dashboard', { method: 'DELETE' });
-  expect(removed.status).toBe(204);
-
-  const list = await readJson<MenuRecord[]>(await fetch('/api/menus?subsystem=admin'));
-  expect(list.some((menu) => menu.id === 'm-dashboard')).toBe(false);
+  expect(removed.status).toBe(400);
+  await expect(removed.json()).resolves.toMatchObject({ code: 'iam.menu.catalog-owned' });
 });
 
-test('DELETE /api/menus/:id 拒绝删除非叶子节点', async () => {
+test('DELETE /api/menus/:id 拒绝 catalog 非叶子节点', async () => {
   const removed = await readJson<{ code: string; detail: string }>(await fetch('/api/menus/m-org', { method: 'DELETE' }));
   expect(removed.code).not.toBe(0);
-  expect(removed.detail).toContain('子菜单');
+  expect(removed.detail).toContain('Catalog');
 });
 
-test('PUT /api/menus/:id 拒绝把非叶子节点改成其他类型', async () => {
+test('demo runtime create 后可 delete，wire 显式标记 runtime', async () => {
+  const created = await readJson<MenuRecord>(await fetch('/api/menus', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subsystemKey: 'admin', type: 'dir', parentId: null, label: { 'zh-CN': 'Runtime', 'en-US': 'Runtime' }, visible: true, sort: 99 }),
+  }));
+  expect(created).toMatchObject({ origin: 'runtime', runtimeManaged: true });
+  expect((await fetch(`/api/menus/${created.id}`, { method: 'DELETE' })).status).toBe(204);
+});
+
+test('PUT /api/menus/:id 拒绝客户端修改 catalog-owned 字段', async () => {
   const updated = await readJson<{ code: string; detail: string }>(
     await fetch('/api/menus/m-org', {
       method: 'PUT',
@@ -190,10 +195,10 @@ test('PUT /api/menus/:id 拒绝把非叶子节点改成其他类型', async () =
     }),
   );
   expect(updated.code).not.toBe(0);
-  expect(updated.detail).toContain('子菜单');
+  expect(updated.detail).toContain('请求参数');
 });
 
-test('POST /api/menus 校验动作节点必须有权限且不能有路由', async () => {
+test('POST /api/menus 拒绝 catalog 页面和动作节点', async () => {
   const invalid = await readJson<{ code: string; detail: string }>(
     await fetch('/api/menus', {
       method: 'POST',
@@ -210,7 +215,7 @@ test('POST /api/menus 校验动作节点必须有权限且不能有路由', asyn
     }),
   );
   expect(invalid.code).not.toBe(0);
-  expect(invalid.detail).toContain('权限');
+  expect(invalid.detail).toContain('请求参数');
 });
 
 test('POST /api/menus 在执行业务规则前拒绝不合法的路由契约', async () => {

@@ -16,7 +16,7 @@ import { loginColumns, operationColumns } from './columns';
 
 type LogTab = 'operation' | 'login';
 
-export function LogsScene({ permissions }: { permissions: string[] }) {
+export function LogsScene({ permissions, systemAdmin = false }: { permissions: string[]; systemAdmin?: boolean }) {
   const { t } = useTranslation('admin');
   const { t: tCommon } = useTranslation();
   const [tab, setTab] = useState<LogTab>('operation');
@@ -60,7 +60,7 @@ export function LogsScene({ permissions }: { permissions: string[] }) {
     { value: 'login', label: t('logs.tabs.login') },
   ];
   const canExport = matchPermission(
-    permissions,
+    { permissions, systemAdmin },
     tab === 'operation' ? 'audit:oplog:export' : 'audit:login:export',
   );
   const exportCurrent = () => {

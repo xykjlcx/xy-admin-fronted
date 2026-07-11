@@ -15,11 +15,13 @@ import { billsQuery, type BillDto, type BillFilter } from '../api';
 import { money } from '../model';
 export function BillingScene({
   permissions,
+  systemAdmin = false,
   keyword,
   status,
   onFiltersChange,
 }: {
   permissions: string[];
+  systemAdmin?: boolean;
   keyword: string;
   status: BillFilter;
   onFiltersChange: (next: { keyword: string; status: BillFilter }) => void;
@@ -83,7 +85,7 @@ export function BillingScene({
             onValueChange={(next) => onFiltersChange({ keyword, status: next })}
           />
           <div className="flex-1" />
-          {matchPermission(permissions, 'lastmile:billing:export') && (
+          {matchPermission({ permissions, systemAdmin }, 'lastmile:billing:export') && (
             <Button variant="outline" size="sm" loading={exportBills.isPending} onClick={() => exportBills.mutate()}>
               <Download data-icon="inline-start" />
               {t('billing.export')}

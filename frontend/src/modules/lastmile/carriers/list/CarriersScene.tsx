@@ -15,11 +15,13 @@ import { carrierApi, carrierKeys, carriersQuery, type CarrierDto, type CarrierIn
 import { CarrierFormDialog } from '../form';
 export function CarriersScene({
   permissions,
+  systemAdmin = false,
   keyword,
   onKeywordChange,
   onDetail,
 }: {
   permissions: string[];
+  systemAdmin?: boolean;
   keyword: string;
   onKeywordChange: (keyword: string) => void;
   onDetail: (id: string) => void;
@@ -91,7 +93,7 @@ export function CarriersScene({
             containerClassName="w-[calc(260px*var(--app-scale))]"
           />
           <div className="flex-1" />
-          {matchPermission(permissions, 'lastmile:carrier:create') && (
+          {matchPermission({ permissions, systemAdmin }, 'lastmile:carrier:create') && (
             <Button onClick={() => setCreating(true)}>
               <Plus data-icon="inline-start" />
               {t('carriers.create')}

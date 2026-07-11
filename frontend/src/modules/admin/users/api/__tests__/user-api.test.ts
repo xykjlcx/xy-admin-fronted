@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import {
   CreateUserSchema,
+  DeptSchema,
   UpdateUserSchema,
   UserDetailSchema,
   deptKeys,
@@ -9,6 +10,7 @@ import {
   userKeys,
   usersQuery,
   useUserMutations,
+  userApi,
   type UserDto,
   type UsersQueryParams,
 } from '@/modules/admin/users/api';
@@ -35,7 +37,7 @@ test('users api exposes schema-derived input contracts', () => {
     email: 'test@example.com',
   }).success).toBe(true);
   expect(CreateUserSchema.safeParse({ ...userRow, email: 'bad-email' }).success).toBe(false);
-  expect(UpdateUserSchema.safeParse({ status: 'disabled' }).success).toBe(true);
+  expect(UpdateUserSchema.safeParse({ name: '新名称' }).success).toBe(true);
   expect(UserDetailSchema.parse(userRow)).toEqual(userRow);
 });
 
@@ -68,4 +70,15 @@ test('users mutations are centralized and invalidate user/dept key factories', (
   expect(source).toContain('deptKeys.all');
   expect(source).not.toMatch(/\['iam',\s*'users'/);
   expect(source).not.toMatch(/\['iam',\s*'depts'/);
+});
+
+test('real IAM user contract exposes symmetric batch state and department moves', () => {
+  expect(typeof userApi.batchDisableUsers).toBe('function');
+  expect(typeof userApi.batchEnableUsers).toBe('function');
+  expect(typeof userApi.batchMoveUsers).toBe('function');
+  expect(UpdateUserSchema.safeParse({ status: 'disabled' }).success).toBe(false);
+});
+
+test('root department accepts backend omitted parentId as null', () => {
+  expect(DeptSchema.parse({ id: 'root', name: 'Root', sort: 0, memberCount: 1 }).parentId).toBeNull();
 });

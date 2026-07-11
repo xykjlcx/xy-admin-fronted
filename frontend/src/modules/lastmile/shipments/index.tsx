@@ -7,6 +7,7 @@ import { ShipmentsScene } from './list/ShipmentsScene';
 
 export function ShipmentsPage(props: {
   permissions: string[];
+  systemAdmin?: boolean;
   search: ShipmentListSearch;
   onSearchChange: (search: ShipmentListSearch) => void;
   onNavigate: (target: 'new' | 'detail' | 'print' | 'track', id?: string) => void;

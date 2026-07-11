@@ -27,6 +27,8 @@ const subsystems = [
     builtin: true,
     enabled: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
 ] satisfies Subsystem[];
 
@@ -40,6 +42,8 @@ const tree = [
     icon: 'layout-dashboard',
     visible: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     children: [
       {
         id: 'm-dashboard',
@@ -51,6 +55,8 @@ const tree = [
         permission: 'dashboard:overview:view',
         visible: true,
         sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
       },
       {
         id: 'm-roles',
@@ -62,6 +68,8 @@ const tree = [
         permission: 'iam:role:view',
         visible: true,
         sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
       },
     ],
   },

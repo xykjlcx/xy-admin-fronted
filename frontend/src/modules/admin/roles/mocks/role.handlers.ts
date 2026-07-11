@@ -262,12 +262,7 @@ const permissionSeed: RolePermissionRow[] = [
 const defaultDataPermission: RoleDataPermission = {
   defaultScope: 'dept',
   defaultDepartmentIds: [],
-  resources: {
-    members: { scope: 'inherit', departmentIds: [] },
-    files: { scope: 'inherit', departmentIds: [] },
-    notices: { scope: 'inherit', departmentIds: [] },
-    auditLogs: { scope: 'self', departmentIds: [] },
-  },
+  resources: {},
 };
 
 const dataPermissionSeed: RoleDataPermissionRow[] = roleSeed.map((role) => ({
@@ -277,12 +272,7 @@ const dataPermissionSeed: RoleDataPermissionRow[] = roleSeed.map((role) => ({
       ? {
           defaultScope: 'all',
           defaultDepartmentIds: [],
-          resources: {
-            members: { scope: 'inherit', departmentIds: [] },
-            files: { scope: 'inherit', departmentIds: [] },
-            notices: { scope: 'inherit', departmentIds: [] },
-            auditLogs: { scope: 'inherit', departmentIds: [] },
-          },
+          resources: {},
         }
       : defaultDataPermission,
 }));
@@ -422,6 +412,33 @@ export const roleHandlers = [
     roleDataPermissions.insert({ roleId: role.id, permission: cloneDataPermission(defaultDataPermission) });
     appendRoleAudit(role, 'create', '创建角色');
     return ok(role);
+  }),
+
+  http.get('/api/roles/:id', ({ params }) => {
+    const role = roles.find(String(params.id));
+    return role ? ok(role) : biz({ status: 404, code: 'role.not-found', detail: '角色不存在' });
+  }),
+
+  http.put('/api/roles/:id', async ({ params, request }) => {
+    const id = String(params.id);
+    const role = roles.find(id);
+    if (!role) return biz({ status: 404, code: 'role.not-found', detail: '角色不存在' });
+    if (role.type === 'system') return biz({ status: 409, code: 'role.system.protected', detail: '系统角色不可修改' });
+    const body = (await request.json()) as CreateRoleInput;
+    if (!body.name?.trim()) return biz({ status: 400, code: 'request.validation.failed', detail: '角色名称不能为空' });
+    const updated = roles.update(id, { name: body.name.trim(), desc: body.desc?.trim() ?? '' })!;
+    appendRoleAudit(updated, 'edit', '更新角色');
+    return ok(updated);
+  }),
+
+  http.post('/api/roles/:id/disable', ({ params }) => {
+    const id = String(params.id);
+    const role = roles.find(id);
+    if (!role) return biz({ status: 404, code: 'role.not-found', detail: '角色不存在' });
+    if (role.type === 'system') return biz({ status: 409, code: 'role.system.protected', detail: '系统角色不可停用' });
+    appendRoleAudit(role, 'remove', '停用角色');
+    roles.remove(id);
+    return noContent();
   }),
 
   http.get('/api/permissions/tree', () => ok(permissionTreeSeed)),

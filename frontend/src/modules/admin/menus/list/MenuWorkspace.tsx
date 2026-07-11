@@ -35,6 +35,7 @@ interface MenuWorkspaceProps {
   locale: string;
   t: TFunction<'admin'>;
   capabilities: MenuCapabilities;
+  canCreateRoot: boolean;
   onKeywordChange: (keyword: string) => void;
   onOpenNavigation: () => void;
   onInspectorOpenChange: (open: boolean) => void;
@@ -119,7 +120,7 @@ export function MenuWorkspace(props: MenuWorkspaceProps) {
                   )}
                   {props.t(props.allMenusCollapsed ? 'menus.actions.expand' : 'menus.actions.collapse')}
                 </Button>
-                {props.capabilities.create && (
+                {props.canCreateRoot && (
                   <Button type="button" size="sm" onClick={props.onCreateRoot}>
                     <Plus data-icon="inline-start" />
                     {props.t('menus.actions.create')}

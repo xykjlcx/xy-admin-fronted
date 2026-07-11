@@ -297,7 +297,7 @@ GREEN：synchronizer 按 `CATALOG_SEED → AUTHZ_GRAPH` 锁顺序运行；IAM �
 
 变更 users/roles/menus 的 API/scene/query invalidation；菜单 code-owned 字段只读、customization 可编辑；角色只编辑角色级数据范围。
 
-RED：Browser/API contract、401/403/409/422、失效刷新、自改权限、批量禁用、部门防环、菜单 default/override。
+RED：Browser/API contract、401/403/409/503、validation 400 `request.validation.failed`、失效刷新、自改权限、批量禁用、部门防环、菜单 default/override。
 
 GREEN：真实模式删除 IAM handler fallback，demo registry 保留同方言 mock。
 

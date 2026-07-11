@@ -28,6 +28,8 @@ const subsystemsFixture = [
     builtin: true,
     enabled: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   {
     key: 'warehouse',
@@ -39,6 +41,8 @@ const subsystemsFixture = [
     builtin: false,
     enabled: true,
     sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
 ] satisfies MenusViewProps['subsystems'];
 
@@ -53,6 +57,8 @@ const menusFixture = [
     icon: 'layout-dashboard',
     visible: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   {
     id: 'm-dashboard',
@@ -64,6 +70,8 @@ const menusFixture = [
     permission: 'dashboard:overview:view',
     visible: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   {
     id: 'm-org',
@@ -75,6 +83,8 @@ const menusFixture = [
     icon: 'users',
     visible: true,
     sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   {
     id: 'm-users',
@@ -86,6 +96,8 @@ const menusFixture = [
     permission: 'iam:user:view',
     visible: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   {
     id: 'm-roles',
@@ -97,6 +109,8 @@ const menusFixture = [
     permission: 'iam:role:view',
     visible: true,
     sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   {
     id: 'a-user-export',
@@ -107,6 +121,8 @@ const menusFixture = [
     permission: 'iam:user:export',
     visible: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
 ] satisfies MenusViewProps['menus'];
 

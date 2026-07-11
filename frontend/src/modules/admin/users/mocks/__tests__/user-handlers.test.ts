@@ -75,6 +75,18 @@ test('users module handlers apply advanced filters from query params', async () 
   expect(list.list[0]?.name).toBe('唐一鸣');
 });
 
+test('demo batch enable and move use the same wire dialect as real IAM', async () => {
+  const page = (await (await fetch('/api/users?page=1&pageSize=1&status=active')).json()) as Page<UserRow>;
+  const id = page.list[0]!.id;
+  await fetch('/api/users/batch-disable', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [id] }) });
+  const enabled = await fetch('/api/users/batch-enable', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [id] }) });
+  await expect(enabled.json()).resolves.toEqual({ updated: 1 });
+  const moved = await fetch('/api/users/batch-move', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [id], deptId: 'rd_fe' }) });
+  await expect(moved.json()).resolves.toEqual({ updated: 1 });
+  const detail = (await (await fetch(`/api/users/${id}`)).json()) as UserDetailDto;
+  expect(detail).toMatchObject({ status: 'active', deptId: 'rd_fe' });
+});
+
 test('department handlers create and update departments', async () => {
   const created = (await (
     await fetch('/api/depts', {

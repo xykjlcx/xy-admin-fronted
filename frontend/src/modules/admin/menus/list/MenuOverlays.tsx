@@ -26,6 +26,7 @@ interface MenuOverlaysProps {
       | { mode: 'edit'; key: string; dto: UpdateSubsystemInput },
   ) => void | Promise<void>;
   onConfirmDelete: () => void | Promise<void>;
+  codeOwnedLocked?: boolean;
 }
 
 export function MenuOverlays(props: MenuOverlaysProps) {
@@ -63,6 +64,7 @@ export function MenuOverlays(props: MenuOverlaysProps) {
           }
           onOpenChange={closeWhenClosed}
           onSubmit={props.onSubmitMenu}
+          codeOwnedLocked={props.codeOwnedLocked}
         />
       ) : null}
 

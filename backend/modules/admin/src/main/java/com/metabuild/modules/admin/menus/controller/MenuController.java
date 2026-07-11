@@ -21,12 +21,12 @@ public final class MenuController {
     private final NavigationQuery menus;
     private final MenuRepository repository;private final UuidV7Generator ids;
     public MenuController(NavigationQuery menus,MenuRepository repository,UuidV7Generator ids) { this.menus=menus;this.repository=repository;this.ids=ids; }
-    @GetMapping @RequiresPermissions(codes={"iam:menu:view"}) public List<MenuItem> list(@RequestParam String subsystem) { return menus.load(subsystem); }
+    @GetMapping @RequiresPermissions(codes={"iam:menu:view"}) public List<MenuItem> list(@RequestParam String subsystem) { return repository.findActive(subsystem).stream().map(row->item(row,null)).toList(); }
     @PostMapping @RequiresPermissions(codes={"iam:menu:create"}) public MenuItem create(@RequestBody Write body){body.validateRuntime();return item(repository.createRuntimeDirectory(ids.generate(),body.subsystemKey(),body.parentId(),body.label(),body.icon(),body.sort(),body.visible()),body.label());}
     @PutMapping("/{id}") @RequiresPermissions(codes={"iam:menu:update"}) public MenuItem update(@PathVariable UUID id,@RequestBody Write body){body.validateDisplayOnly();return item(repository.customize(id,body.parentId(),true,body.label(),body.icon(),body.sort(),body.visible()),body.label());}
     @PatchMapping("/{id}/visibility") @RequiresPermissions(codes={"iam:menu:toggle"}) public MenuItem visibility(@PathVariable UUID id,@RequestBody Visibility body){return item(repository.setVisibility(id,body.visible()),null);}
     @DeleteMapping("/{id}") @ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT) @RequiresPermissions(codes={"iam:menu:del"}) public void delete(@PathVariable UUID id){repository.deleteRuntime(id);}
-    private static MenuItem item(MenuRow row,Map<String,String> labels){Map<String,String> effective=labels==null||labels.isEmpty()?(row.localizedLabel()==null?Map.of("zh-CN",row.labelKey(),"en-US",row.labelKey()):row.localizedLabel()):Map.copyOf(labels);return new MenuItem(row.id(),row.parentId(),row.subsystemKey(),row.type(),effective,row.icon(),row.path(),row.permission(),row.visible(),row.sort());}
+    private static MenuItem item(MenuRow row,Map<String,String> labels){Map<String,String> effective=labels==null||labels.isEmpty()?(row.localizedLabel()==null?Map.of("zh-CN",row.labelKey(),"en-US",row.labelKey()):row.localizedLabel()):Map.copyOf(labels);return new MenuItem(row.id(),row.parentId(),row.subsystemKey(),row.type(),effective,row.icon(),row.path(),row.permission(),row.visible(),row.sort(),row.runtimeManaged()?"runtime":"catalog",row.runtimeManaged());}
     public record Visibility(boolean visible){}
     public record Write(String subsystemKey,String type,UUID parentId,Map<String,String> label,String icon,int sort,boolean visible,String path,String permission){
       void validateRuntime(){if(!"dir".equals(type)||parentId!=null||path!=null||permission!=null||subsystemKey==null||!validLabel())throw invalid();}

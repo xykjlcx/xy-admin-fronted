@@ -1,10 +1,15 @@
 import { keepPreviousData, queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from '@tanstack/react-router';
+import { meQuery } from '@/modules/admin/auth/api';
+import { menuKeys } from '@/modules/admin/menus/api';
 import { http } from '@/lib/http/client';
 import { defineApiContract, defineVoidContract } from '@/lib/http/contract';
 import {
   BatchDisableResultSchema,
   CreateUserSchema,
+  MoveUsersSchema,
   UpdateUserSchema,
+  UserIdsSchema,
   UserDetailSchema,
   UserSchema,
   UsersPageSchema,
@@ -39,16 +44,25 @@ export const userApi = {
     http.put(`/api/users/${id}`, UpdateUserSchema.parse(dto), userContract),
   deleteUser: (id: string) => http.del(`/api/users/${id}`, nullContract),
   batchDisableUsers: (ids: string[]) =>
-    http.post('/api/users/batch-disable', { ids }, batchDisableContract),
+    http.post('/api/users/batch-disable', UserIdsSchema.parse({ ids }), batchDisableContract),
+  batchEnableUsers: (ids: string[]) =>
+    http.post('/api/users/batch-enable', UserIdsSchema.parse({ ids }), batchDisableContract),
+  batchMoveUsers: (ids: string[], deptId: string) =>
+    http.post('/api/users/batch-move', MoveUsersSchema.parse({ ids, deptId }), batchDisableContract),
 };
 
 export function useUserMutations() {
   const qc = useQueryClient();
-  const invalidate = () =>
-    Promise.all([
+  const router = useRouter({ warn: false });
+  const invalidate = async () => {
+    await Promise.all([
       qc.invalidateQueries({ queryKey: userKeys.all }),
       qc.invalidateQueries({ queryKey: deptKeys.all }),
+      qc.invalidateQueries({ queryKey: meQuery.queryKey }),
+      qc.invalidateQueries({ queryKey: menuKeys.menuLists() }),
     ]);
+    await router?.invalidate();
+  };
   const createUser = useMutation({ mutationFn: userApi.createUser, onSuccess: invalidate });
   const updateUser = useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateUserInput }) => userApi.updateUser(id, dto),
@@ -56,5 +70,11 @@ export function useUserMutations() {
   });
   const deleteUser = useMutation({ mutationFn: userApi.deleteUser, onSuccess: invalidate });
   const batchDisable = useMutation({ mutationFn: userApi.batchDisableUsers, onSuccess: invalidate });
-  return { createUser, updateUser, deleteUser, batchDisable };
+  const batchEnable = useMutation({ mutationFn: userApi.batchEnableUsers, onSuccess: invalidate });
+  const batchMove = useMutation({
+    mutationFn: ({ ids, deptId }: { ids: string[]; deptId: string }) =>
+      userApi.batchMoveUsers(ids, deptId),
+    onSuccess: invalidate,
+  });
+  return { createUser, updateUser, deleteUser, batchDisable, batchEnable, batchMove };
 }

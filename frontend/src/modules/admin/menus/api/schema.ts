@@ -29,6 +29,8 @@ export const MenuRecordSchema = z.object({
   permission: z.string().optional(),
   visible: z.boolean(),
   sort: z.number(),
+  origin: z.enum(['catalog', 'runtime']),
+  runtimeManaged: z.boolean(),
 }) satisfies z.ZodType<MenuRecord>;
 
 const menuInputBaseShape = {
@@ -71,11 +73,26 @@ export const CreateMenuSchema = z.discriminatedUnion('type', [
   z.object({ ...actionInputShape, subsystemKey: z.string().min(1) }).strict(),
 ]);
 
+export const RuntimeMenuCreateSchema = z
+  .object({ ...directoryInputShape, subsystemKey: z.string().min(1) })
+  .strict();
+
 export const UpdateMenuSchema = z.discriminatedUnion('type', [
   z.object(directoryInputShape).strict(),
   z.object(pageInputShape).strict(),
   z.object(actionInputShape).strict(),
 ]);
+
+export const MenuCustomizationSchema = z
+  .object({
+    type: MenuTypeSchema,
+    parentId: z.string().nullable(),
+    label: LocalizedStringSchema,
+    icon: z.string().optional(),
+    visible: z.boolean(),
+    sort: z.number(),
+  })
+  .strict();
 export const SetMenuVisibilitySchema = z.object({ visible: z.boolean() });
 export const UpdateSubsystemSchema = SubsystemSchema.pick({
   label: true,
@@ -95,6 +112,7 @@ export const NullSchema = z.null();
 export type ManagedMenuType = z.infer<typeof MenuTypeSchema>;
 export type CreateMenuInput = z.infer<typeof CreateMenuSchema>;
 export type UpdateMenuInput = z.infer<typeof UpdateMenuSchema>;
+export type MenuCustomizationInput = z.infer<typeof MenuCustomizationSchema>;
 export type SetMenuVisibilityInput = z.infer<typeof SetMenuVisibilitySchema>;
 export type UpdateSubsystemInput = z.infer<typeof UpdateSubsystemSchema>;
 export type CreateSubsystemInput = z.infer<typeof CreateSubsystemSchema>;

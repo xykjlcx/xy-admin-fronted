@@ -16,8 +16,43 @@ export function CreateRoleDialog({
   onOpenChange: (open: boolean) => void;
   onCreateRole: (dto: CreateRoleInput) => void | Promise<void>;
 }) {
+  return <RoleDialog open={open} onOpenChange={onOpenChange} onSubmit={onCreateRole} />;
+}
+
+export function EditRoleDialog({
+  open,
+  role,
+  onOpenChange,
+  onUpdateRole,
+}: {
+  open: boolean;
+  role: { id: string; name: string; desc: string } | null;
+  onOpenChange: (open: boolean) => void;
+  onUpdateRole: (id: string, dto: CreateRoleInput) => void | Promise<void>;
+}) {
+  return (
+    <RoleDialog
+      key={role?.id ?? 'no-role'}
+      open={open}
+      initial={role ? { name: role.name, desc: role.desc } : undefined}
+      title="roles.dialog.editRoleTitle"
+      submitLabel="roles.actions.confirmUpdate"
+      onOpenChange={onOpenChange}
+      onSubmit={(dto) => (role ? onUpdateRole(role.id, dto) : undefined)}
+    />
+  );
+}
+
+function RoleDialog({ open, initial, title = 'roles.dialog.addRoleTitle', submitLabel = 'roles.actions.confirmCreate', onOpenChange, onSubmit }: {
+  open: boolean;
+  initial?: CreateRoleInput;
+  title?: string;
+  submitLabel?: string;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (dto: CreateRoleInput) => void | Promise<void>;
+}) {
   const { t } = useTranslation('admin');
-  const [roleDraft, setRoleDraft] = useState<CreateRoleInput>({ ...emptyRoleDraft });
+  const [roleDraft, setRoleDraft] = useState<CreateRoleInput>(initial ?? { ...emptyRoleDraft });
   const [submitting, setSubmitting] = useState(false);
   const close = () => {
     onOpenChange(false);
@@ -30,7 +65,7 @@ export function CreateRoleDialog({
     if (submitting) return;
     setSubmitting(true);
     try {
-      await onCreateRole(dto);
+      await onSubmit(dto);
     } catch {
       // 失败时保留弹窗，错误 toast 由全局 MutationCache 兜底。
       return;
@@ -50,7 +85,7 @@ export function CreateRoleDialog({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('roles.dialog.addRoleTitle')}</DialogTitle>
+          <DialogTitle>{t(title)}</DialogTitle>
         </DialogHeader>
         <FieldGroup>
           <Field>
@@ -75,7 +110,7 @@ export function CreateRoleDialog({
             {t('roles.actions.cancel')}
           </Button>
           <Button onClick={submitCreateRole} loading={submitting} disabled={!roleDraft.name.trim()}>
-            {t('roles.actions.confirmCreate')}
+            {t(submitLabel)}
           </Button>
         </DialogFooter>
       </DialogContent>

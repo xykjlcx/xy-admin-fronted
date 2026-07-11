@@ -18,6 +18,7 @@ function CarriersRoute() {
   return (
     <CarriersPage
       permissions={me.permissions}
+      systemAdmin={me.systemAdmin}
       keyword={keyword}
       onKeywordChange={(next) => void navigate({ search: { keyword: next } })}
       onDetail={(id) => void navigate({ to: '/lastmile/carriers/$carrierId', params: { carrierId: id } })}

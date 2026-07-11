@@ -21,6 +21,7 @@ export interface MenuFormDialogProps {
   initialType?: ManagedMenuType;
   onOpenChange: (open: boolean) => void;
   onSubmit: (dto: UpdateMenuInput) => void | Promise<void>;
+  codeOwnedLocked?: boolean;
 }
 function isDescendant(menuById: Map<string, MenuRecord>, candidateId: string, ancestorId: string) {
   const visited = new Set<string>();
@@ -129,6 +130,7 @@ function MenuFormDialogContent(props: MenuFormDialogProps) {
         locale={props.locale}
         t={props.t}
         typeLocked={typeLocked}
+        codeOwnedLocked={props.mode === 'edit' && !!props.codeOwnedLocked}
         contextLocked={contextLocked}
         parentOptions={parentOptions}
         onTypeChange={changeType}

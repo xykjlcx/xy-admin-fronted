@@ -23,7 +23,7 @@ public final class JdbcMenuRepository implements MenuRepository {
                        coalesce(c.label_key,m.default_label_key) label_key,coalesce(c.localized_label,m.runtime_label)::text localized_label,
                        coalesce(c.icon,m.default_icon) icon,
                        coalesce(c.sort,m.default_sort) sort_order,coalesce(c.visible,m.default_visible) visible,p.code permission,
-                       m.default_path,m.default_type
+                       m.default_path,m.default_type,m.origin
                 from mb_menu m left join mb_menu_customization c on c.menu_id=m.id
                 left join mb_permission p on p.id=m.permission_id and p.status='ACTIVE' and p.deleted_at is null
                 where m.subsystem_key=? and m.status='ACTIVE' and m.deleted_at is null
@@ -33,11 +33,11 @@ public final class JdbcMenuRepository implements MenuRepository {
                 rs.getString("default_parent_source_key"), rs.getString("subsystem_key"), rs.getString("route_key"),
                 rs.getBoolean("parent_overridden"), rs.getObject("customized_parent_id",UUID.class),
                 rs.getString("label_key"),localized(rs.getString("localized_label")), rs.getString("icon"), rs.getInt("sort_order"), rs.getBoolean("visible"),
-                rs.getString("permission"),rs.getString("default_path"),rs.getString("default_type")), subsystemKey);
+                rs.getString("permission"),rs.getString("default_path"),rs.getString("default_type"),rs.getString("origin")), subsystemKey);
         var ids = new HashMap<String,UUID>();
         rows.forEach(row -> { if (row.sourceKey != null) ids.put(row.sourceKey,row.id); });
         return rows.stream().map(row -> new MenuRow(row.id, row.parentOverridden ? row.customizedParentId : ids.get(row.parentSourceKey), row.subsystem,
-                row.type, row.label,row.localizedLabel, row.icon, row.sort, row.visible, row.path, row.permission)).toList();
+                row.type, row.label,row.localizedLabel, row.icon, row.sort, row.visible, row.path, row.permission,"RUNTIME".equals(row.origin))).toList();
     }
     @Override public MenuRow createRuntimeDirectory(UUID id,String subsystem,UUID parentId,Map<String,String> label,String icon,int sort,boolean visible){
         if(parentId!=null){Integer count=jdbc.queryForObject("select count(*) from mb_menu where id=? and subsystem_key=? and default_type='dir' and status='ACTIVE' and deleted_at is null",Integer.class,parentId,subsystem);if(count==null||count!=1)throw invalid("Runtime directory parent is invalid");}
@@ -60,5 +60,5 @@ public final class JdbcMenuRepository implements MenuRepository {
     private static NotFound missing(){return new NotFound(()->"iam.menu.not-found","Menu not found");}
     private record Raw(UUID id,String sourceKey,String parentSourceKey,String subsystem,String routeKey,
             boolean parentOverridden,UUID customizedParentId,String label,
-            Map<String,String> localizedLabel,String icon,int sort,boolean visible,String permission,String path,String type) {}
+            Map<String,String> localizedLabel,String icon,int sort,boolean visible,String permission,String path,String type,String origin) {}
 }

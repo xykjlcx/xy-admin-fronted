@@ -18,6 +18,7 @@ function SuppliersRoute() {
   return (
     <SuppliersPage
       permissions={me.permissions}
+      systemAdmin={me.systemAdmin}
       keyword={keyword}
       onKeywordChange={(next) => void navigate({ search: { keyword: next } })}
       onDetail={(id) => void navigate({ to: '/lastmile/suppliers/$supplierId', params: { supplierId: id } })}

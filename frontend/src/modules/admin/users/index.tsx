@@ -8,11 +8,12 @@ import type { UsersQueryParams } from './api';
 
 interface UsersPageProps {
   permissions: string[];
+  systemAdmin?: boolean;
   search: UsersSearch;
   onSearchChange: (patch: Partial<UsersQueryParams>) => void;
 }
 
-export function UsersPage({ permissions, search, onSearchChange }: UsersPageProps): JSX.Element {
+export function UsersPage({ permissions, systemAdmin = false, search, onSearchChange }: UsersPageProps): JSX.Element {
   const { t } = useTranslation('admin');
   const [tab, setTab] = useState<TabKey>(search.status === 'left' ? 'left' : 'members');
   const activeTab: TabKey = search.status === 'left' ? 'left' : tab;
@@ -47,12 +48,13 @@ export function UsersPage({ permissions, search, onSearchChange }: UsersPageProp
         <PageTabs value={activeTab} items={tabItems} onValueChange={switchTab} />
 
         {activeTab === 'depts' ? (
-          <DeptScene permissions={permissions} />
+          <DeptScene permissions={permissions} systemAdmin={systemAdmin} />
         ) : (
           <MembersScene
             key={activeTab}
             variant={activeTab}
             permissions={permissions}
+            systemAdmin={systemAdmin}
             search={search}
             onSearchChange={onSearchChange}
           />

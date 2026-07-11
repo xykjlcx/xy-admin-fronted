@@ -7,9 +7,8 @@ afterEach(() => {
 });
 
 test('通过统一 request core 获取文件，服务端 filename 优先并触发下载', async () => {
-  const blob = new Blob(['bill,data'], { type: 'text/csv' });
   const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-    new Response(blob, {
+    new Response('bill,data', {
       headers: {
         'Content-Type': 'text/csv',
         'Content-Disposition': 'attachment; filename="server.csv"',

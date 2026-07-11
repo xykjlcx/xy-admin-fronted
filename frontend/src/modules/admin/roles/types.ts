@@ -11,6 +11,7 @@ import type { DeptDto } from '@/modules/admin/users/api';
 
 export interface RolesViewProps {
   permissions: string[];
+  systemAdmin?: boolean;
   roles: RoleDto[];
   activeRoleId: string;
   permissionTree: PermissionTreeGroupDto[];
@@ -24,6 +25,8 @@ export interface RolesViewProps {
   roleAuditLogsLoading?: boolean;
   onActiveRoleChange: (id: string) => void;
   onCreateRole: (dto: CreateRoleInput) => void | Promise<void>;
+  onUpdateRole?: (id: string, dto: CreateRoleInput) => void | Promise<void>;
+  onDisableRole?: (id: string) => void | Promise<void>;
   onDeleteRole: (id: string) => void | Promise<void>;
   onSaveRolePermissions: (id: string, permissions: RolePermissionMap) => void | Promise<void>;
   onSaveRoleDataPermissions: (id: string, permission: RoleDataPermission) => void | Promise<void>;

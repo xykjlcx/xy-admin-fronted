@@ -1,5 +1,5 @@
 import { MessagesScene } from './list/MessagesScene';
 
-export function MessagesPage({ permissions }: { permissions: string[] }) {
-  return <MessagesScene permissions={permissions} />;
+export function MessagesPage({ permissions, systemAdmin }: { permissions: string[]; systemAdmin?: boolean }) {
+  return <MessagesScene permissions={permissions} systemAdmin={systemAdmin} />;
 }

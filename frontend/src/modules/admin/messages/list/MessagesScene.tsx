@@ -17,7 +17,7 @@ const categoryTone: Record<MessageCategory, 'warning' | 'danger' | 'primary'> = 
   system: 'primary',
 };
 
-export function MessagesScene({ permissions }: { permissions: string[] }) {
+export function MessagesScene({ permissions, systemAdmin = false }: { permissions: string[]; systemAdmin?: boolean }) {
   const { t } = useTranslation('admin');
   const { t: tCommon } = useTranslation();
   const queryClient = useQueryClient();
@@ -27,8 +27,8 @@ export function MessagesScene({ permissions }: { permissions: string[] }) {
   const messages = result.data?.list ?? [];
   const unreadCount = result.data?.unreadCount ?? 0;
   const selected = messages.find((message) => message.id === selectedId) ?? messages[0];
-  const canDelete = matchPermission(permissions, 'notice:msg:del');
-  const canHandleApproval = matchPermission(permissions, 'notice:msg:edit');
+  const canDelete = matchPermission({ permissions, systemAdmin }, 'notice:msg:del');
+  const canHandleApproval = matchPermission({ permissions, systemAdmin }, 'notice:msg:edit');
   const invalidate = () => queryClient.invalidateQueries({ queryKey: messageKeys.all });
   const markRead = useMutation({
     mutationFn: messageApi.markRead,

@@ -27,6 +27,7 @@ function ChannelsRoute() {
   return (
     <ChannelsPage
       permissions={me.permissions}
+      systemAdmin={me.systemAdmin}
       {...search}
       onFiltersChange={(next) => void navigate({ search: next })}
       onNavigate={(target, id) => {

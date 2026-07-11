@@ -59,6 +59,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.metabuild.app.security.RequestAuthorizationContext;
 import com.metabuild.app.security.AuthorizationSnapshotInterceptor;
+import com.metabuild.app.security.PermissionAuthorizationInterceptor;
 import com.metabuild.modules.admin.auth.application.RequestAuthorizationLoader;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -158,11 +159,18 @@ public class AuthenticationConfiguration {
             SaTokenSessionControl sessions, RequestAuthorizationContext context) {
         return new AuthorizationSnapshotInterceptor(sessions, context);
     }
-    @Bean WebMvcConfigurer authorizationWebMvcConfigurer(AuthorizationSnapshotInterceptor interceptor) {
+    @Bean PermissionAuthorizationInterceptor permissionAuthorizationInterceptor(
+            SaTokenSessionControl sessions, RequestAuthorizationContext context) {
+        return new PermissionAuthorizationInterceptor(sessions, context);
+    }
+    @Bean WebMvcConfigurer authorizationWebMvcConfigurer(AuthorizationSnapshotInterceptor interceptor,
+            PermissionAuthorizationInterceptor permissions) {
         return new WebMvcConfigurer() {
             @Override public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(interceptor)
-                        .excludePathPatterns("/api/auth/login", "/api/auth/refresh", "/actuator/**", "/__task12/**");
+                        .excludePathPatterns("/api/auth/login", "/api/auth/refresh", "/actuator/**", "/__task12/**")
+                        .order(0);
+                registry.addInterceptor(permissions).order(1);
             }
         };
     }

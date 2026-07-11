@@ -97,6 +97,21 @@ public final class AuthorizationCommandExecutor implements AuthorizationRefreshS
         try{Map<UUID,AuthorizationSnapshot> ready=database.compileSnapshots(committed.users());if(!snapshots.initializeAll(ready))throw new AuthorizationRefreshPending();database.markDone(operationId,committed.users());return committed.result();}
         catch(AuthorizationRefreshPending e){throw e;}catch(RuntimeException e){throw new AuthorizationRefreshPending();}
     }
+    @Override public <T>T executeInitialize(AuthorizationChange<T> change){
+        UUID operationId=operationIds.get();
+        TransactionResult<T> committed=database.inTransaction(()->{
+            database.lockAuthzGraph();Set<UUID> users=Set.copyOf(change.affectedUserIds());
+            T result=change.mutate();
+            Map<UUID,Long> old=database.revisions(users);
+            Map<UUID,Long> revisions=database.incrementRevisions(users);
+            Map<UUID,Long> expected=old.entrySet().stream().collect(java.util.stream.Collectors.toUnmodifiableMap(Map.Entry::getKey,e->e.getValue()+1));
+            if(!revisions.equals(expected))throw new IllegalStateException("Authorization revision mismatch");
+            database.appendRefreshOutbox(operationId,revisions,Cause.USER_CHANGED);
+            return new TransactionResult<>(result,users,revisions);
+        });
+        try{Map<UUID,AuthorizationSnapshot> ready=database.compileSnapshots(committed.users());if(!snapshots.initializeAll(ready))throw new AuthorizationRefreshPending();database.markDone(operationId,committed.users());return committed.result();}
+        catch(AuthorizationRefreshPending e){throw e;}catch(RuntimeException e){throw new AuthorizationRefreshPending();}
+    }
     private static final class Holder<T>{T value;}
     private record TransactionResult<T>(T result,Set<UUID> users,Map<UUID,Long> revisions){}
 }

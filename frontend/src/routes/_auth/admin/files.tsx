@@ -27,6 +27,7 @@ function FilesRoute() {
   return (
     <FilesPage
       permissions={me.permissions}
+      systemAdmin={me.systemAdmin}
       fileId={search.fileId}
       onFileChange={(fileId) => void navigate({ search: { fileId }, replace: true })}
     />

@@ -2,6 +2,7 @@ import { CarrierDetailScene } from './detail/CarrierDetailScene';
 import { CarriersScene } from './list/CarriersScene';
 export function CarriersPage(props: {
   permissions: string[];
+  systemAdmin?: boolean;
   keyword: string;
   onKeywordChange: (keyword: string) => void;
   onDetail: (id: string) => void;

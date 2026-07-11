@@ -17,6 +17,7 @@ import type { UsersQueryParams } from '../api';
 interface MembersSceneProps {
   variant: MembersVariant;
   permissions: string[];
+  systemAdmin?: boolean;
   search: UsersSearch;
   onSearchChange: (patch: Partial<UsersQueryParams>) => void;
 }
@@ -24,6 +25,7 @@ interface MembersSceneProps {
 export function MembersScene({
   variant,
   permissions,
+  systemAdmin = false,
   search,
   onSearchChange,
 }: MembersSceneProps): JSX.Element {
@@ -34,7 +36,7 @@ export function MembersScene({
   const [detailUserId, setDetailUserId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserDto | null>(null);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const canCreate = matchPermission(permissions, 'iam:user:create');
+  const canCreate = matchPermission({ permissions, systemAdmin }, 'iam:user:create');
   const writable = variant === 'members';
 
   const clearRowSelection = useCallback(() => setRowSelection({}), []);
@@ -83,6 +85,7 @@ export function MembersScene({
           <MembersTable
             variant={variant}
             permissions={permissions}
+            systemAdmin={systemAdmin}
             search={search}
             onSearchChange={handleSearchChange}
             rowSelection={rowSelection}
@@ -104,6 +107,20 @@ export function MembersScene({
               writable
                 ? async (ids) => {
                     await mutations.batchDisable.mutateAsync(ids);
+                  }
+                : undefined
+            }
+            onBatchEnable={
+              writable
+                ? async (ids) => {
+                    await mutations.batchEnable.mutateAsync(ids);
+                  }
+                : undefined
+            }
+            onBatchMove={
+              writable
+                ? async (ids, deptId) => {
+                    await mutations.batchMove.mutateAsync({ ids, deptId });
                   }
                 : undefined
             }

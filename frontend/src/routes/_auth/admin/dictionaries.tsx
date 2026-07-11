@@ -17,5 +17,5 @@ export const Route = createFileRoute('/_auth/admin/dictionaries')({
 
 function DictionariesRoute() {
   const { me } = Route.useRouteContext();
-  return <DictionariesPage permissions={me.permissions} />;
+  return <DictionariesPage permissions={me.permissions} systemAdmin={me.systemAdmin} />;
 }

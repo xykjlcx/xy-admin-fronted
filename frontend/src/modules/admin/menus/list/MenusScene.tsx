@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useRouter } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
@@ -8,22 +9,22 @@ import {
   menusQuery,
   subsystemsQuery,
   type CreateMenuInput,
-  type CreateSubsystemInput,
   type UpdateMenuInput,
-  type UpdateSubsystemInput,
 } from '../api';
 import { MenusView } from './MenusView';
 
 export interface MenusPageProps {
   permissions: string[];
+  systemAdmin?: boolean;
 }
 function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
-export function MenusScene({ permissions }: MenusPageProps) {
+export function MenusScene({ permissions, systemAdmin = false }: MenusPageProps) {
   const { t } = useTranslation('admin');
   const queryClient = useQueryClient();
+  const router = useRouter({ warn: false });
   const { data: subsystems } = useSuspenseQuery(subsystemsQuery);
   const [activeSubsystemKey, setActiveSubsystemKey] = useState(() => subsystems[0]?.key ?? 'admin');
   const fallbackSubsystemKey = subsystems[0]?.key ?? 'admin';
@@ -32,10 +33,10 @@ export function MenusScene({ permissions }: MenusPageProps) {
     : fallbackSubsystemKey;
   const { data: menus, isFetching } = useSuspenseQuery(menusQuery(effectiveSubsystemKey));
 
-  const invalidateMenus = () =>
-    queryClient.invalidateQueries({ queryKey: menuKeys.menuLists() });
-  const invalidateSubsystems = () =>
-    queryClient.invalidateQueries({ queryKey: menuKeys.subsystems() });
+  const invalidateMenus = async () => {
+    await queryClient.invalidateQueries({ queryKey: menuKeys.menuLists() });
+    await router?.invalidate();
+  };
   const mutationError = (error: unknown) =>
     toast.error(errorMessage(error, t('menus.toast.failed')));
 
@@ -72,44 +73,21 @@ export function MenusScene({ permissions }: MenusPageProps) {
     },
     onError: mutationError,
   });
-  const createSubsystem = useMutation({
-    mutationFn: menuApi.createSubsystem,
-    onSuccess: async (subsystem) => {
-      setActiveSubsystemKey(subsystem.key);
-      await Promise.all([invalidateSubsystems(), invalidateMenus()]);
-      toast.success(t('menus.toast.subsystemCreated'));
-    },
-    onError: mutationError,
-  });
-  const updateSubsystem = useMutation({
-    mutationFn: ({ key, dto }: { key: string; dto: UpdateSubsystemInput }) =>
-      menuApi.updateSubsystem(key, dto),
-    onSuccess: async () => {
-      await Promise.all([invalidateSubsystems(), invalidateMenus()]);
-      toast.success(t('menus.toast.subsystemUpdated'));
-    },
-    onError: mutationError,
-  });
-
   return (
     <MenusView
+      catalogManaged
       permissions={permissions}
+      systemAdmin={systemAdmin}
       subsystems={subsystems}
       activeSubsystemKey={effectiveSubsystemKey}
       menus={menus}
       refreshing={isFetching}
       onActiveSubsystemChange={setActiveSubsystemKey}
-      onCreateSubsystem={async (dto: CreateSubsystemInput) => {
-        await createSubsystem.mutateAsync(dto);
-      }}
       onCreateMenu={async (dto: CreateMenuInput) => {
         await createMenu.mutateAsync(dto);
       }}
       onUpdateMenu={async (id: string, dto: UpdateMenuInput) => {
         await updateMenu.mutateAsync({ id, dto });
-      }}
-      onUpdateSubsystem={async (key: string, dto: UpdateSubsystemInput) => {
-        await updateSubsystem.mutateAsync({ key, dto });
       }}
       onDeleteMenu={async (id: string) => {
         await deleteMenu.mutateAsync(id);

@@ -21,5 +21,5 @@ export const Route = createFileRoute('/_auth/admin/menus')({
 function MenusRoute() {
   const { me } = Route.useRouteContext();
 
-  return <MenusPage permissions={me.permissions} />;
+  return <MenusPage permissions={me.permissions} systemAdmin={me.systemAdmin} />;
 }

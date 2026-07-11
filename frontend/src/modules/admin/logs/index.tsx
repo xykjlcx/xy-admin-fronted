@@ -1,5 +1,5 @@
 import { LogsScene } from './list/LogsScene';
 
-export function LogsPage({ permissions }: { permissions: string[] }) {
-  return <LogsScene permissions={permissions} />;
+export function LogsPage({ permissions, systemAdmin }: { permissions: string[]; systemAdmin?: boolean }) {
+  return <LogsScene permissions={permissions} systemAdmin={systemAdmin} />;
 }

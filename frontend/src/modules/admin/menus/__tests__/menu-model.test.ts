@@ -10,6 +10,8 @@ const menus: MenuRecord[] = [
     label: { 'zh-CN': '系统管理' },
     visible: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   {
     id: 'page',
@@ -20,6 +22,8 @@ const menus: MenuRecord[] = [
     path: '/admin/menus',
     visible: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   {
     id: 'action',
@@ -30,6 +34,8 @@ const menus: MenuRecord[] = [
     permission: 'iam:menu:create',
     visible: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
 ];
 

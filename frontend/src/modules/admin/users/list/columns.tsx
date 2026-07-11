@@ -11,6 +11,7 @@ import type { DeptDto, UserDto } from '../api';
 interface UserColumnsContext {
   t: TFunction<'admin'>;
   permissions: string[];
+  systemAdmin?: boolean;
   deptById: Map<string, DeptDto>;
   onView?: (user: UserDto) => void;
   onEdit?: (user: UserDto) => void;
@@ -20,13 +21,14 @@ interface UserColumnsContext {
 export function userColumns({
   t,
   permissions,
+  systemAdmin = false,
   deptById,
   onView,
   onEdit,
   onDelete,
 }: UserColumnsContext): ColumnDef<UserDto>[] {
-  const canUpdate = !!onEdit && matchPermission(permissions, 'iam:user:update');
-  const canDelete = !!onDelete && matchPermission(permissions, 'iam:user:del');
+  const canUpdate = !!onEdit && matchPermission({ permissions, systemAdmin }, 'iam:user:update');
+  const canDelete = !!onDelete && matchPermission({ permissions, systemAdmin }, 'iam:user:del');
 
   return [
     {

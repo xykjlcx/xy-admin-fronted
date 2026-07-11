@@ -56,12 +56,7 @@ const defaultRolePermissions = {
 const defaultDataPermission = {
   defaultScope: 'dept' as const,
   defaultDepartmentIds: [],
-  resources: {
-    members: { scope: 'inherit' as const, departmentIds: [] },
-    files: { scope: 'all' as const, departmentIds: [] },
-    notices: { scope: 'inherit' as const, departmentIds: [] },
-    auditLogs: { scope: 'self' as const, departmentIds: [] },
-  },
+  resources: {},
 };
 
 const departmentsFixture = [
@@ -208,36 +203,11 @@ test('管理员可以调整角色默认数据范围并保存', async () => {
   });
 });
 
-test('数据资源可以覆盖默认范围并选择多个自定义部门', async () => {
-  const onSaveRoleDataPermissions = vi.fn();
-  renderRolesView({ permissions: ['*:*:*'], onSaveRoleDataPermissions });
-
-  await userEvent.click(screen.getByRole('tab', { name: '数据权限' }));
-  await userEvent.click(screen.getByRole('combobox', { name: '成员与部门数据范围' }));
-  await userEvent.click(await screen.findByRole('option', { name: '自定义部门' }));
-  await userEvent.click(screen.getByRole('button', { name: '选择成员与部门可见部门' }));
-  await userEvent.click(screen.getByRole('checkbox', { name: '人力资源部' }));
-  await userEvent.click(screen.getByRole('checkbox', { name: '财务部' }));
-  await userEvent.keyboard('{Escape}');
-  await userEvent.click(screen.getByRole('button', { name: '保存数据权限' }));
-
-  expect(onSaveRoleDataPermissions).toHaveBeenCalledWith(
-    'hr',
-    expect.objectContaining({
-      resources: expect.objectContaining({
-        members: { scope: 'custom', departmentIds: ['hr', 'fin'] },
-      }),
-    }),
-  );
-});
-
-test('数据权限三列表格使用紧凑宽度预算，108% 下无需横向滚动', async () => {
+test('数据权限只编辑角色级范围，不渲染虚假的资源级覆盖', async () => {
   renderRolesView({ permissions: ['*:*:*'] });
   await userEvent.click(screen.getByRole('tab', { name: '数据权限' }));
-
-  expect(screen.getByRole('table')).toHaveStyle({
-    minWidth: 'max(100%, calc(650px * var(--app-scale)))',
-  });
+  expect(screen.getByRole('combobox', { name: '角色默认数据范围' })).toBeInTheDocument();
+  expect(screen.queryByRole('combobox', { name: '成员与部门数据范围' })).not.toBeInTheDocument();
 });
 
 test('操作日志使用表格汇总角色变更并支持关键词筛选', async () => {

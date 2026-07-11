@@ -19,7 +19,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const { data: menus } = useSuspenseQuery(menusQuery(subsystemKey));
   const { data: me } = useSuspenseQuery(meQuery);
   // 菜单过滤只提升体验和防误触，真正的权限边界仍然必须在后端校验。
-  const menuTree = useMemo(() => buildMenuTree(menus, me.permissions), [menus, me.permissions]);
+  const menuTree = useMemo(() => buildMenuTree(menus, me), [menus, me]);
 
   const layout = useAppearance((s) => s.layout);
   const collapsed = useAppearance((s) => s.collapsed[layout] ?? false);

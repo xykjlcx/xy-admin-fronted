@@ -1,17 +1,17 @@
 import type { MenuRecord } from '@/modules/types';
-import { matchPermission } from '@/lib/permission';
+import { matchPermission, type AuthzContext } from '@/lib/permission';
 
 export interface MenuNode extends MenuRecord {
   children?: MenuNode[];
 }
 
 // 扁平菜单记录 → 两级树：过滤 action/不可见/无权限项，再按 parentId 组树，最后剪掉空目录
-export function buildMenuTree(records: MenuRecord[], permissions: string[]): MenuNode[] {
+export function buildMenuTree(records: MenuRecord[], authz: AuthzContext): MenuNode[] {
   const visible = records.filter(
     (r) =>
       r.type !== 'action' &&
       r.visible &&
-      (!r.permission || matchPermission(permissions, r.permission)),
+      (!r.permission || matchPermission(authz, r.permission)),
   );
   const byParent = new Map<string | null, MenuNode[]>();
   for (const r of [...visible].sort((a, b) => a.sort - b.sort)) {

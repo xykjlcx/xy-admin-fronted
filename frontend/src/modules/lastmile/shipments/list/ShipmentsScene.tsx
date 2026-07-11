@@ -17,11 +17,13 @@ import { shipmentColumns } from './columns';
 
 export function ShipmentsScene({
   permissions,
+  systemAdmin = false,
   search,
   onSearchChange,
   onNavigate,
 }: {
   permissions: string[];
+  systemAdmin?: boolean;
   search: ShipmentListSearch;
   onSearchChange: (search: ShipmentListSearch) => void;
   onNavigate: (target: 'new' | 'detail' | 'print' | 'track', id?: string) => void;
@@ -95,7 +97,7 @@ export function ShipmentsScene({
           <p className="mt-1 text-sm text-text-3">{t('shipments.description')}</p>
         </div>
         <div className="flex-1" />
-        {matchPermission(permissions, 'lastmile:shipment:create') && (
+        {matchPermission({ permissions, systemAdmin }, 'lastmile:shipment:create') && (
           <Button onClick={() => onNavigate('new')}>
             <Plus data-icon="inline-start" />
             {t('shipments.create')}
@@ -133,7 +135,7 @@ export function ShipmentsScene({
             onValueChange={(status) => onSearchChange({ ...search, status })}
           />
           <div className="flex-1" />
-          {matchPermission(permissions, 'lastmile:shipment:export') && (
+          {matchPermission({ permissions, systemAdmin }, 'lastmile:shipment:export') && (
             <Button
               variant="outline"
               size="sm"
@@ -144,7 +146,7 @@ export function ShipmentsScene({
               {t('shipments.export')}
             </Button>
           )}
-          {matchPermission(permissions, 'lastmile:shipment:print') && (
+          {matchPermission({ permissions, systemAdmin }, 'lastmile:shipment:print') && (
             <Button
               variant="outline"
               size="sm"

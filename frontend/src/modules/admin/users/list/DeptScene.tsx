@@ -19,16 +19,17 @@ import type { DeptFormState } from '../types';
 
 interface DeptSceneProps {
   permissions: string[];
+  systemAdmin?: boolean;
 }
 
-export function DeptScene({ permissions }: DeptSceneProps): JSX.Element {
+export function DeptScene({ permissions, systemAdmin = false }: DeptSceneProps): JSX.Element {
   const { t } = useTranslation('admin');
   const { data: depts = [], isPending } = useQuery(deptsQuery);
   const mutations = useDeptMutations();
   const depthMap = useMemo(() => buildDepthMap(depts), [depts]);
   const [formState, setFormState] = useState<DeptFormState>({ kind: 'closed' });
-  const canCreate = matchPermission(permissions, 'iam:dept:create');
-  const canUpdate = matchPermission(permissions, 'iam:dept:update');
+  const canCreate = matchPermission({ permissions, systemAdmin }, 'iam:dept:create');
+  const canUpdate = matchPermission({ permissions, systemAdmin }, 'iam:dept:update');
   const columns: ColumnDef<DeptDto>[] = [
     {
       id: 'dept',

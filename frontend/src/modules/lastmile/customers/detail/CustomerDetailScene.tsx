@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { matchPermission } from '@/lib/permission';
 import { toast } from 'sonner';
 import { DescriptionList } from '@/components/pro/DescriptionList';
 import { PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
@@ -16,10 +17,12 @@ import type { CustomerDetailTab } from '../types';
 export function CustomerDetailScene({
   id,
   permissions,
+  systemAdmin = false,
   onBack,
 }: {
   id: string;
   permissions: string[];
+  systemAdmin?: boolean;
   onBack: () => void;
 }) {
   const { t } = useTranslation('lastmile');
@@ -126,7 +129,7 @@ export function CustomerDetailScene({
                     aria-label={t('customers.authorizationAria', { name: channel.name })}
                     checked={channel.authorized}
                     disabled={
-                      !permissions.includes('*:*:*') && !permissions.includes('lastmile:customer:authorize')
+                      !matchPermission({ permissions, systemAdmin }, 'lastmile:customer:authorize')
                     }
                     onCheckedChange={(authorized) => authorize.mutate({ channelId: channel.id, authorized })}
                   />

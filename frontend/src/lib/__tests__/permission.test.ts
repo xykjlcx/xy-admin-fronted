@@ -15,5 +15,10 @@ test.each([
   [['iam:user:view:extra'], 'iam:user:view', false], // pattern 比 required 长且末段非 * → 不匹配
   [['*:*:*'], 'dashboard:overview:view', true],
 ])('%j 匹配 %s → %s', (owned, need, expected) => {
-  expect(matchPermission(owned as string[], need as string)).toBe(expected);
+  expect(matchPermission({ permissions: owned as string[], systemAdmin: false }, need as string)).toBe(expected);
+});
+
+test('system administrator bypasses presentation gates without forging catalog permission codes', () => {
+  expect(matchPermission({ permissions: ['iam:user:view'], systemAdmin: true }, 'iam:user:create')).toBe(true);
+  expect(matchPermission({ permissions: ['iam:user:view'], systemAdmin: false }, 'iam:user:create')).toBe(false);
 });

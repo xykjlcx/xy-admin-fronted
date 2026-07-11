@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react';
+import { Ban, Edit3, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,8 @@ export function RoleDetailsPanel({
   canGrant,
   onDetailTabChange,
   onDeleteRole,
+  onUpdateRole,
+  onDisableRole,
   onSaveRolePermissions,
   onSaveRoleDataPermissions,
 }: {
@@ -50,6 +52,8 @@ export function RoleDetailsPanel({
   canGrant: boolean;
   onDetailTabChange: (tab: DetailTab) => void;
   onDeleteRole: (role: RoleDto) => void;
+  onUpdateRole: (role: RoleDto) => void;
+  onDisableRole: (id: string) => void | Promise<void>;
   onSaveRolePermissions: (id: string, permissions: RolePermissionMap) => void | Promise<void>;
   onSaveRoleDataPermissions: (id: string, permission: RoleDataPermission) => void | Promise<void>;
 }) {
@@ -70,6 +74,18 @@ export function RoleDetailsPanel({
         <h1 className="text-base font-bold text-text">{activeRole.name}</h1>
         <RoleTypeChip type={activeRole.type} label={t(`roles.roleTypes.${activeRole.type}`)} />
         <div className="flex-1" />
+        {activeRole.type === 'custom' && canGrant ? (
+          <Button type="button" variant="outline" size="sm" onClick={() => onUpdateRole(activeRole)}>
+            <Edit3 data-icon="inline-start" />
+            {t('roles.actions.editRole')}
+          </Button>
+        ) : null}
+        {activeRole.type === 'custom' && canDeleteRole ? (
+          <Button type="button" variant="outline" size="sm" onClick={() => void onDisableRole(activeRole.id)}>
+            <Ban data-icon="inline-start" />
+            {t('roles.actions.disableRole')}
+          </Button>
+        ) : null}
         {activeRole.type === 'custom' && canDeleteRole ? (
           <Button
             type="button"

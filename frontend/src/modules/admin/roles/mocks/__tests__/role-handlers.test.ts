@@ -52,6 +52,18 @@ test('POST /api/roles 新增自定义角色后可读回', async () => {
   expect(list.some((role) => role.id === created.id)).toBe(true);
 });
 
+test('detail/update/disable 与真实 role API 对称且保护系统角色', async () => {
+  const detail = await readJson<RoleDto>(await fetch('/api/roles/ops'));
+  expect(detail.type).toBe('custom');
+  const updated = await readJson<RoleDto>(await fetch('/api/roles/ops', {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: '新运营', desc: '已更新' }),
+  }));
+  expect(updated).toMatchObject({ name: '新运营', desc: '已更新' });
+  expect((await fetch('/api/roles/hr/disable', { method: 'POST' })).status).toBe(409);
+  expect((await fetch('/api/roles/ops/disable', { method: 'POST' })).status).toBe(204);
+  expect((await fetch('/api/roles/ops')).status).toBe(404);
+});
+
 test('POST /api/roles 空角色名返回 400 ProblemDetail', async () => {
   const response = await fetch('/api/roles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: ' ', desc: '' }) });
   expect(response.status).toBe(400);
@@ -93,10 +105,7 @@ test('角色数据权限保存时清理无效部门并可读回', async () => {
   const permission: RoleDataPermission = {
     defaultScope: 'dept',
     defaultDepartmentIds: ['hr'],
-    resources: {
-      members: { scope: 'inherit', departmentIds: ['fin'] },
-      files: { scope: 'custom', departmentIds: ['rd', 'fin'] },
-    },
+    resources: {},
   };
 
   const saved = await readJson<RoleDataPermission>(
@@ -109,10 +118,7 @@ test('角色数据权限保存时清理无效部门并可读回', async () => {
   expect(saved).toEqual({
     defaultScope: 'dept',
     defaultDepartmentIds: [],
-    resources: {
-      members: { scope: 'inherit', departmentIds: [] },
-      files: { scope: 'custom', departmentIds: ['rd', 'fin'] },
-    },
+    resources: {},
   });
 
   const reread = await readJson<RoleDataPermission>(await fetch('/api/roles/hr/data-permissions'));

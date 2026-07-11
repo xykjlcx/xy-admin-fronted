@@ -26,6 +26,7 @@ function ShipmentListRoute() {
   return (
     <ShipmentsPage
       permissions={me.permissions}
+      systemAdmin={me.systemAdmin}
       search={search}
       onSearchChange={(next) => void navigate({ search: next })}
       onNavigate={(target, id) => {

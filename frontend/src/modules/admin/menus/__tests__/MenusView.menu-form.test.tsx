@@ -83,6 +83,8 @@ test('统一编辑表单保留双语菜单的 label/shortLabel', async () => {
       icon: 'layout-dashboard',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
   ] satisfies MenusViewProps['menus'];
   renderMenusView({ permissions: ['*:*:*'], menus: bilingualMenus, onUpdateMenu });

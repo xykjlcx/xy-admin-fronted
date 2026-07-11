@@ -29,7 +29,8 @@ public final class MenuTreePolicy {
         candidates.stream().filter(row -> retained.contains(row.id()))
                 .sorted(Comparator.comparingInt(MenuRow::sort).thenComparing(MenuRow::id))
                 .forEach(row -> result.add(new MenuItem(row.id(), row.parentId(), row.subsystemKey(), row.type(),
-                        labels(row), row.icon(), row.path(), row.permission(), true, row.sort())));
+                        labels(row), row.icon(), row.path(), row.permission(), true, row.sort(),
+                        row.runtimeManaged() ? "runtime" : "catalog", row.runtimeManaged())));
         return List.copyOf(result);
     }
     private static boolean hasCompleteAncestorChain(MenuRow row, java.util.Map<UUID,MenuRow> byId) {

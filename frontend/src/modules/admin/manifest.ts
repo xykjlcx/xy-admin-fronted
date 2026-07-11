@@ -14,6 +14,8 @@ export const adminManifest: SubsystemManifest = {
     builtin: true,
     enabled: true,
     sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   menuSeed: [
     {
@@ -26,6 +28,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'layout-dashboard',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-dashboard',
@@ -37,6 +41,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'dashboard:overview:view',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-org',
@@ -48,6 +54,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'users',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-users',
@@ -59,6 +67,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'iam:user:view',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-roles',
@@ -70,6 +80,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'iam:role:view',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-menus',
@@ -82,6 +94,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'menu',
       visible: true,
       sort: 3,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-menu-create',
@@ -92,6 +106,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'iam:menu:create',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-menu-update',
@@ -102,6 +118,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'iam:menu:update',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-menu-toggle',
@@ -112,6 +130,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'iam:menu:toggle',
       visible: true,
       sort: 3,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-menu-delete',
@@ -122,6 +142,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'iam:menu:del',
       visible: true,
       sort: 4,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-audit',
@@ -133,6 +155,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'list',
       visible: true,
       sort: 3,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-logs',
@@ -145,6 +169,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'list',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-operation-log-export',
@@ -155,6 +181,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'audit:oplog:export',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-login-log-export',
@@ -165,6 +193,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'audit:login:export',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-file-center',
@@ -176,6 +206,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'folder',
       visible: true,
       sort: 4,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-files',
@@ -188,6 +220,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'folder',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-file-upload',
@@ -198,22 +232,24 @@ export const adminManifest: SubsystemManifest = {
       permission: 'file:doc:upload',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-file-download', parentId: 'm-files', subsystemKey: 'admin', type: 'action',
-      label: { 'zh-CN': '下载文件', 'en-US': 'Download' }, permission: 'file:doc:download', visible: true, sort: 2,
+      label: { 'zh-CN': '下载文件', 'en-US': 'Download' }, permission: 'file:doc:download', visible: true, sort: 2, origin: 'catalog', runtimeManaged: false,
     },
     {
       id: 'a-file-rename', parentId: 'm-files', subsystemKey: 'admin', type: 'action',
-      label: { 'zh-CN': '重命名', 'en-US': 'Rename' }, permission: 'file:doc:rename', visible: true, sort: 3,
+      label: { 'zh-CN': '重命名', 'en-US': 'Rename' }, permission: 'file:doc:rename', visible: true, sort: 3, origin: 'catalog', runtimeManaged: false,
     },
     {
       id: 'a-file-share', parentId: 'm-files', subsystemKey: 'admin', type: 'action',
-      label: { 'zh-CN': '分享文件', 'en-US': 'Share' }, permission: 'file:doc:share', visible: true, sort: 4,
+      label: { 'zh-CN': '分享文件', 'en-US': 'Share' }, permission: 'file:doc:share', visible: true, sort: 4, origin: 'catalog', runtimeManaged: false,
     },
     {
       id: 'a-file-del', parentId: 'm-files', subsystemKey: 'admin', type: 'action',
-      label: { 'zh-CN': '删除文件', 'en-US': 'Delete' }, permission: 'file:doc:del', visible: true, sort: 5,
+      label: { 'zh-CN': '删除文件', 'en-US': 'Delete' }, permission: 'file:doc:del', visible: true, sort: 5, origin: 'catalog', runtimeManaged: false,
     },
     {
       id: 'm-system',
@@ -225,6 +261,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'settings',
       visible: true,
       sort: 5,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-company',
@@ -237,6 +275,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'settings',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-company-edit',
@@ -247,6 +287,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'sys:org:edit',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'm-dictionaries',
@@ -259,6 +301,8 @@ export const adminManifest: SubsystemManifest = {
       icon: 'list',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-dictionary-create',
@@ -269,6 +313,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'sys:dict:create',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-dictionary-update',
@@ -279,6 +325,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'sys:dict:update',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'a-dictionary-delete',
@@ -289,6 +337,8 @@ export const adminManifest: SubsystemManifest = {
       permission: 'sys:dict:delete',
       visible: true,
       sort: 3,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
   ],
 };

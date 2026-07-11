@@ -13,6 +13,28 @@ function readProjectFile(path: string) {
   return readFileSync(resolve(projectRoot, path), 'utf8');
 }
 
+function sourceFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const path = resolve(dir, entry.name);
+    if (entry.isDirectory()) return sourceFiles(path);
+    return /\.(ts|tsx)$/.test(entry.name) ? [path] : [];
+  });
+}
+
+test('permission presentation gates consume complete AuthzContext', () => {
+  const violations = sourceFiles(sourceRoot)
+    .filter((path) => !path.includes('/__tests__/'))
+    .flatMap((path) => {
+      const source = readFileSync(path, 'utf8');
+      const legacyCalls = [...source.matchAll(/matchPermission\(\s*permissions\b/g)];
+      // profile 无权限按钮，只消费账号自身数据，不需要 AuthzContext。
+      const profileWithoutGates = path.endsWith('/routes/_auth/admin/profile.tsx');
+      const incompleteMeProps = !profileWithoutGates && source.includes('permissions={me.permissions}') && !source.includes('systemAdmin={me.systemAdmin}');
+      return legacyCalls.length || incompleteMeProps ? [path.replace(`${projectRoot}/`, '')] : [];
+    });
+  expect(violations).toEqual([]);
+});
+
 function readTsConfig(path: string) {
   const parsed = parseConfigFileTextToJson(path, readProjectFile(path));
   if (parsed.error) throw new Error(parsed.error.messageText.toString());

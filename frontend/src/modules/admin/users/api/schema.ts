@@ -10,7 +10,7 @@ export const UserStatusSchema = z.enum(['active', 'disabled', 'unactivated', 'le
 
 export const DeptSchema = z.object({
   id: z.string(),
-  parentId: z.string().nullable(),
+  parentId: z.string().nullable().default(null),
   name: z.string(),
   sort: z.number(),
   memberCount: z.number(),
@@ -47,9 +47,10 @@ export const CreateUserSchema = z.object({
   email: z.string().email(),
 });
 
-export const UpdateUserSchema = CreateUserSchema.partial().extend({
-  status: UserStatusSchema.optional(),
-});
+export const UpdateUserSchema = CreateUserSchema.partial().strict();
+
+export const UserIdsSchema = z.object({ ids: z.array(z.string()).min(1).max(500) }).strict();
+export const MoveUsersSchema = UserIdsSchema.extend({ deptId: z.string().min(1) }).strict();
 
 export const BatchDisableResultSchema = z.object({ updated: z.number() });
 export const NullSchema = z.null();
@@ -63,6 +64,7 @@ export type UserDetailDto = z.infer<typeof UserDetailSchema>;
 export type UsersPageDto = z.infer<typeof UsersPageSchema>;
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 export type UpdateUserInput = z.infer<typeof UpdateUserSchema>;
+export type MoveUsersInput = z.infer<typeof MoveUsersSchema>;
 export type BatchDisableResult = z.infer<typeof BatchDisableResultSchema>;
 
 export interface UsersQueryParams {

@@ -3,6 +3,7 @@ import type {
   CreateMenuInput,
   CreateSubsystemInput,
   UpdateMenuInput,
+  MenuCustomizationInput,
   UpdateSubsystemInput,
 } from '@/modules/admin/menus/api';
 import type { MenuRecord, Subsystem } from '@/modules/types';
@@ -62,7 +63,7 @@ function isDescendant(candidateId: string, ancestorId: string): boolean {
 }
 
 export function validateMenuInput(
-  body: CreateMenuInput | UpdateMenuInput,
+  body: CreateMenuInput | UpdateMenuInput | MenuCustomizationInput,
   subsystemKey: string,
   editingId?: string,
 ): string | null {
@@ -88,23 +89,19 @@ export function normalizeMenuCreate(body: CreateMenuInput): MenuRecord {
     type: body.type,
     label: body.label,
     icon: body.icon?.trim() || undefined,
-    shortLabel: body.shortLabel,
-    path: body.path,
-    permission: body.permission?.trim() || undefined,
     visible: body.visible,
     sort: Number.isFinite(body.sort) ? body.sort : nextSort(body.subsystemKey, body.parentId),
+    origin: 'runtime',
+    runtimeManaged: true,
   };
 }
 
-export function normalizeMenuUpdate(current: MenuRecord, body: UpdateMenuInput): Partial<MenuRecord> {
+export function normalizeMenuUpdate(current: MenuRecord, body: MenuCustomizationInput): Partial<MenuRecord> {
   return {
     parentId: body.parentId,
     type: body.type,
     label: body.label,
     icon: body.icon?.trim() || undefined,
-    shortLabel: body.shortLabel,
-    path: body.path,
-    permission: body.permission?.trim() || undefined,
     visible: body.visible,
     sort: Number.isFinite(body.sort) ? body.sort : nextSort(current.subsystemKey, body.parentId),
   };

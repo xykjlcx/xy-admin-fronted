@@ -2,10 +2,10 @@ import { http } from 'msw';
 import type { ZodError } from 'zod';
 import { biz, ok, noContent } from '@/mocks/http';
 import {
-  CreateMenuSchema,
+  RuntimeMenuCreateSchema,
   CreateSubsystemSchema,
   SetMenuVisibilitySchema,
-  UpdateMenuSchema,
+  MenuCustomizationSchema,
   UpdateSubsystemSchema,
 } from '@/modules/admin/menus/api';
 import { menus, subsystems } from './db';
@@ -18,6 +18,13 @@ import {
   validateMenuInput,
   validateSubsystemInput,
 } from './menu-rules';
+import type { MenuRecord } from '@/modules/types';
+
+const catalogWire = (menu: MenuRecord): MenuRecord => ({
+  ...menu,
+  origin: menu.origin ?? 'catalog',
+  runtimeManaged: menu.runtimeManaged ?? false,
+});
 
 function inputErrorMessage(error: ZodError) {
   return error.issues.some((issue) => issue.path[0] === 'permission')
@@ -57,16 +64,16 @@ export const menuHandlers = [
   }),
   http.get('/api/menus', ({ request }) => {
     const sub = new URL(request.url).searchParams.get('subsystem');
-    return ok(menus.filter((m) => !sub || m.subsystemKey === sub));
+    return ok(menus.filter((m) => !sub || m.subsystemKey === sub).map(catalogWire));
   }),
 
   http.post('/api/menus', async ({ request }) => {
-    const parsed = CreateMenuSchema.safeParse(await request.json());
+    const parsed = RuntimeMenuCreateSchema.safeParse(await request.json());
     if (!parsed.success) return biz({ status: 400, code: 'menu.validation.invalid', detail: inputErrorMessage(parsed.error) });
     const body = parsed.data;
     const error = validateMenuInput(body, body.subsystemKey);
     if (error) return biz({ status: 400, code: 'menu.validation.invalid', detail: error });
-    return ok(menus.insert(normalizeMenuCreate(body)));
+    return ok(menus.insert({ ...normalizeMenuCreate(body), origin: 'runtime', runtimeManaged: true }));
   }),
 
   http.put('/api/menus/:id', async ({ params, request }) => {
@@ -74,7 +81,7 @@ export const menuHandlers = [
     const current = menus.find(id);
     if (!current) return biz({ status: 404, code: 'menu.node.not-found', detail: '菜单不存在' });
 
-    const parsed = UpdateMenuSchema.safeParse(await request.json());
+    const parsed = MenuCustomizationSchema.safeParse(await request.json());
     if (!parsed.success) return biz({ status: 400, code: 'menu.validation.invalid', detail: inputErrorMessage(parsed.error) });
     const body = parsed.data;
     if (hasMenuChildren(id) && current.type !== body.type) return biz({ status: 409, code: 'menu.node.has-children', detail: '存在子菜单，不能修改节点类型' });
@@ -99,6 +106,7 @@ export const menuHandlers = [
     const id = String(params.id);
     const current = menus.find(id);
     if (!current) return biz({ status: 404, code: 'menu.node.not-found', detail: '菜单不存在' });
+    if (!current.runtimeManaged) return biz({ status: 400, code: 'iam.menu.catalog-owned', detail: 'Catalog menus cannot be deleted' });
     if (hasMenuChildren(id)) return biz({ status: 409, code: 'menu.node.has-children', detail: '存在子菜单，不能直接删除' });
     menus.remove(id);
     return noContent();

@@ -48,17 +48,36 @@ test('data permission normalization removes department ids from non-custom scope
     roleModule.normalizeRoleDataPermission({
       defaultScope: 'dept',
       defaultDepartmentIds: ['hr'],
-      resources: {
-        members: { scope: 'inherit', departmentIds: ['fin'] },
-        files: { scope: 'custom', departmentIds: ['rd', 'fin'] },
-      },
+      resources: {},
     }),
   ).toEqual({
     defaultScope: 'dept',
     defaultDepartmentIds: [],
-    resources: {
-      members: { scope: 'inherit', departmentIds: [] },
-      files: { scope: 'custom', departmentIds: ['rd', 'fin'] },
-    },
+    resources: {},
   });
+});
+
+test('real role data scope is role-level only and preserves all five wire values', () => {
+  const { RoleDataPermissionSchema, normalizeRoleDataPermission } = roleModule;
+  for (const defaultScope of ['all', 'deptAndChildren', 'dept', 'self', 'custom'] as const) {
+    const parsed = RoleDataPermissionSchema.parse({
+      defaultScope,
+      defaultDepartmentIds: defaultScope === 'custom' ? ['018f4c52-3e77-7c42-a9d8-5d6629a4c101'] : [],
+      resources: {},
+    });
+    expect(normalizeRoleDataPermission(parsed).resources).toEqual({});
+  }
+  expect(
+    RoleDataPermissionSchema.safeParse({
+      defaultScope: 'self',
+      defaultDepartmentIds: [],
+      resources: { users: { scope: 'all', departmentIds: [] } },
+    }).success,
+  ).toBe(false);
+});
+
+test('real role contract exposes detail, update and disable endpoints', () => {
+  expect(typeof roleModule.roleDetailQuery).toBe('function');
+  expect(typeof roleModule.roleApi.updateRole).toBe('function');
+  expect(typeof roleModule.roleApi.disableRole).toBe('function');
 });

@@ -1,7 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { DataTable } from '@/components/pro/DataTable';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -17,27 +15,15 @@ import { SelectControl } from '@/components/ui/select';
 import {
   normalizeRoleDataPermission,
   type DataScope,
-  type ResourceDataPermission,
-  type ResourceDataScope,
   type RoleDataPermission,
 } from '@/modules/admin/roles/api';
 import type { DeptDto } from '@/modules/admin/users/api';
-
-interface DataResourceRow {
-  id: string;
-  label: string;
-  permission: ResourceDataPermission;
-  onScopeChange: (scope: ResourceDataScope) => void;
-  onDepartmentsChange: (departmentIds: string[]) => void;
-}
 
 interface DataPermissionDraftState {
   roleId: string;
   source: RoleDataPermission;
   draft: RoleDataPermission;
 }
-
-const resourceIds = ['members', 'files', 'notices', 'auditLogs'] as const;
 
 function cloneDataPermission(permission: RoleDataPermission): RoleDataPermission {
   return structuredClone(permission);
@@ -137,97 +123,6 @@ export function RoleDataPermissionEditor({
       })),
     [t],
   );
-  const resourceScopeOptions = useMemo(
-    () =>
-      (['inherit', 'all', 'deptAndChildren', 'dept', 'self', 'custom'] as const).map((scope) => ({
-        value: scope,
-        label: t(`roles.dataPermission.scopes.${scope}`),
-      })),
-    [t],
-  );
-  const resources = useMemo<DataResourceRow[]>(
-    () =>
-      resourceIds.map((id) => {
-        const resource = draft.resources[id] ?? { scope: 'inherit' as const, departmentIds: [] };
-        return {
-          id,
-          label: t(`roles.dataPermission.resources.${id}`),
-          permission: resource,
-          onScopeChange: (scope) => {
-            updateDraft((current) => ({
-              ...current,
-              resources: {
-                ...current.resources,
-                [id]: {
-                  scope,
-                  departmentIds: scope === 'custom' ? resource.departmentIds : [],
-                },
-              },
-            }));
-          },
-          onDepartmentsChange: (departmentIds) => {
-            updateDraft((current) => ({
-              ...current,
-              resources: {
-                ...current.resources,
-                [id]: { scope: 'custom', departmentIds },
-              },
-            }));
-          },
-        };
-      }),
-    [draft.resources, t, updateDraft],
-  );
-
-  const columns = useMemo<ColumnDef<DataResourceRow>[]>(
-    () => [
-      {
-        id: 'resource',
-        header: t('roles.dataPermission.columns.resource'),
-        cell: ({ row }) => <span className="font-medium">{row.original.label}</span>,
-        size: 170,
-        minSize: 150,
-      },
-      {
-        id: 'scope',
-        header: t('roles.dataPermission.columns.scope'),
-        cell: ({ row }) => {
-          return (
-            <SelectControl
-              size="sm"
-              value={row.original.permission.scope}
-              options={resourceScopeOptions}
-              aria-label={t('roles.dataPermission.resourceScopeLabel', { resource: row.original.label })}
-              onValueChange={(value) => row.original.onScopeChange(value as ResourceDataScope)}
-            />
-          );
-        },
-        size: 260,
-        minSize: 220,
-      },
-      {
-        id: 'departments',
-        header: t('roles.dataPermission.columns.departments'),
-        size: 220,
-        minSize: 180,
-        cell: ({ row }) => {
-          if (row.original.permission.scope !== 'custom') {
-            return <span className="text-text-3">{t('roles.dataPermission.notApplicable')}</span>;
-          }
-          return (
-            <DepartmentPicker
-              label={t('roles.dataPermission.selectResourceDepartments', { resource: row.original.label })}
-              departments={departments}
-              selectedIds={row.original.permission.departmentIds}
-              onChange={row.original.onDepartmentsChange}
-            />
-          );
-        },
-      },
-    ],
-    [departments, resourceScopeOptions, t],
-  );
-
   return (
     <div data-role-data-permission-editor className="flex flex-col">
       <FieldGroup className="mb-4 grid grid-cols-[minmax(220px,360px)_1fr] items-end gap-3">
@@ -263,15 +158,7 @@ export function RoleDataPermissionEditor({
         ) : null}
       </FieldGroup>
 
-      <div data-role-data-permission-content className="pb-2 pr-1">
-        <DataTable
-          columns={columns}
-          data={resources}
-          rowKey={(resource) => resource.id}
-          emptyText={t('roles.dataPermission.empty')}
-          loadingText={t('roles.refreshing')}
-        />
-      </div>
+      <div data-role-data-permission-content />
 
       {canGrant ? (
         <div className="mt-3 flex justify-end gap-2">

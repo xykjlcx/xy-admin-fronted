@@ -14,11 +14,13 @@ import { customerColumns } from './columns';
 
 export function CustomersScene({
   permissions,
+  systemAdmin = false,
   keyword,
   onKeywordChange,
   onDetail,
 }: {
   permissions: string[];
+  systemAdmin?: boolean;
   keyword: string;
   onKeywordChange: (keyword: string) => void;
   onDetail: (id: string) => void;
@@ -67,7 +69,7 @@ export function CustomersScene({
             containerClassName="w-[calc(280px*var(--app-scale))]"
           />
           <div className="flex-1" />
-          {matchPermission(permissions, 'lastmile:customer:create') && (
+          {matchPermission({ permissions, systemAdmin }, 'lastmile:customer:create') && (
             <Button onClick={() => setCreating(true)}>
               <Plus data-icon="inline-start" />
               {t('customers.create')}

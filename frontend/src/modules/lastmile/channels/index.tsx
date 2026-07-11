@@ -4,6 +4,7 @@ import { ChannelFormScene } from './form/ChannelFormScene';
 import { ChannelsScene } from './list/ChannelsScene';
 export function ChannelsPage(props: {
   permissions: string[];
+  systemAdmin?: boolean;
   keyword: string;
   kind: ChannelKindFilter;
   status: ChannelStatusFilter;
@@ -15,6 +16,7 @@ export function ChannelsPage(props: {
 export function ChannelDetailPage(props: {
   id: string;
   permissions: string[];
+  systemAdmin?: boolean;
   onBack: () => void;
   onEdit: () => void;
 }) {

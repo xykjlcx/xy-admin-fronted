@@ -29,7 +29,7 @@ type ItemFormTarget = DictionaryItemDto | 'create' | null;
 const emptyDictionaries: DictionaryDto[] = [];
 const emptyItems: DictionaryItemDto[] = [];
 
-export function DictionariesScene({ permissions }: { permissions: string[] }) {
+export function DictionariesScene({ permissions, systemAdmin = false }: { permissions: string[]; systemAdmin?: boolean }) {
   const { t } = useTranslation('admin');
   const queryClient = useQueryClient();
   const dictionariesResult = useQuery(dictionariesQuery);
@@ -48,9 +48,9 @@ export function DictionariesScene({ permissions }: { permissions: string[] }) {
     enabled: !!activeId,
   });
   const items = itemsResult.data ?? emptyItems;
-  const canCreate = matchPermission(permissions, 'sys:dict:create');
-  const canUpdate = matchPermission(permissions, 'sys:dict:update');
-  const canDelete = matchPermission(permissions, 'sys:dict:delete');
+  const canCreate = matchPermission({ permissions, systemAdmin }, 'sys:dict:create');
+  const canUpdate = matchPermission({ permissions, systemAdmin }, 'sys:dict:update');
+  const canDelete = matchPermission({ permissions, systemAdmin }, 'sys:dict:delete');
 
   const invalidateCatalog = () => queryClient.invalidateQueries({ queryKey: dictionaryKeys.all });
   const createDictionary = useMutation({

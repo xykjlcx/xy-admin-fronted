@@ -16,7 +16,7 @@ public final class UserService {
         return users.search(p,s,status,dept,direct,q);
     }
     public UserView detail(UUID id) { return users.find(id).orElseThrow(() -> new NotFound(() -> "iam.user.not-found", "User not found")); }
-    public UserView create(UUID id,String name,UUID dept,String role,String phone,String email) { return refresh.execute(AuthorizationRefreshService.Cause.USER_CHANGED,change(Set.of(),()->users.create(id,name,dept,role,phone,email))); }
+    public UserView create(UUID id,String name,UUID dept,String role,String phone,String email) { return refresh.executeInitialize(change(Set.of(id),()->users.create(id,name,dept,role,phone,email))); }
     public UserView update(UUID id,UserPatch patch) {
         return refresh.execute(AuthorizationRefreshService.Cause.USER_CHANGED, change(Set.of(id), () -> users.update(id,patch)));
     }

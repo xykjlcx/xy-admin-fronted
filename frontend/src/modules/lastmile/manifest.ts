@@ -11,6 +11,8 @@ export const lastmileManifest: SubsystemManifest = {
     builtin: false,
     enabled: true,
     sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
   },
   menuSeed: [
     {
@@ -23,6 +25,8 @@ export const lastmileManifest: SubsystemManifest = {
       icon: 'chart-no-axes-combined',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-overview',
@@ -34,6 +38,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:overview:view',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-shipments-dir',
@@ -45,6 +51,8 @@ export const lastmileManifest: SubsystemManifest = {
       icon: 'package',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-shipments',
@@ -56,6 +64,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:shipment:view',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-shipment-create',
@@ -66,6 +76,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:shipment:create',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-shipment-print',
@@ -76,6 +88,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:shipment:print',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-shipment-export',
@@ -86,6 +100,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:shipment:export',
       visible: true,
       sort: 3,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-customers-dir',
@@ -97,6 +113,8 @@ export const lastmileManifest: SubsystemManifest = {
       icon: 'users',
       visible: true,
       sort: 3,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-customers',
@@ -108,6 +126,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:customer:view',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-customer-create',
@@ -118,6 +138,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:customer:create',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-customer-authorize',
@@ -128,6 +150,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:customer:authorize',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-channels-dir',
@@ -139,6 +163,8 @@ export const lastmileManifest: SubsystemManifest = {
       icon: 'link',
       visible: true,
       sort: 4,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-channels',
@@ -150,6 +176,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:channel:view',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-channel-create',
@@ -160,6 +188,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:channel:create',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-channel-update',
@@ -170,6 +200,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:channel:update',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-channel-toggle',
@@ -180,6 +212,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:channel:toggle',
       visible: true,
       sort: 3,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-carriers',
@@ -191,6 +225,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:carrier:view',
       visible: true,
       sort: 2,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-carrier-create',
@@ -201,6 +237,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:carrier:create',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-suppliers',
@@ -212,6 +250,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:supplier:view',
       visible: true,
       sort: 3,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-supplier-create',
@@ -222,6 +262,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:supplier:create',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-billing-dir',
@@ -233,6 +275,8 @@ export const lastmileManifest: SubsystemManifest = {
       icon: 'circle-dollar-sign',
       visible: true,
       sort: 5,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-billing',
@@ -244,6 +288,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:billing:view',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
     {
       id: 'lm-billing-export',
@@ -254,6 +300,8 @@ export const lastmileManifest: SubsystemManifest = {
       permission: 'lastmile:billing:export',
       visible: true,
       sort: 1,
+      origin: 'catalog',
+      runtimeManaged: false,
     },
   ],
 };

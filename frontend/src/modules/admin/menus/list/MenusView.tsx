@@ -11,36 +11,40 @@ import {
   type SubsystemPanelProps,
 } from './SubsystemPanel';
 import { buildManagedMenuRows, collapsibleMenuIds, hasMenuChildren } from '../model';
-import type {
-  CreateMenuInput,
-  CreateSubsystemInput,
-  UpdateMenuInput,
-  UpdateSubsystemInput,
+import {
+  type CreateMenuInput,
+  type CreateSubsystemInput,
+  type UpdateMenuInput,
+  type UpdateSubsystemInput,
 } from '../api';
 import type { MenuCapabilities, MenuOverlay } from '../types';
 import type { MenuRecord, Subsystem } from '@/modules/types';
 
 export interface MenusViewProps {
   permissions: string[];
+  systemAdmin?: boolean;
   subsystems: Subsystem[];
   activeSubsystemKey: string;
   menus: MenuRecord[];
   refreshing?: boolean;
+  catalogManaged?: boolean;
   onActiveSubsystemChange: (key: string) => void;
-  onCreateSubsystem: (dto: CreateSubsystemInput) => void | Promise<void>;
+  onCreateSubsystem?: (dto: CreateSubsystemInput) => void | Promise<void>;
   onCreateMenu: (dto: CreateMenuInput) => void | Promise<void>;
   onUpdateMenu: (id: string, dto: UpdateMenuInput) => void | Promise<void>;
-  onUpdateSubsystem: (key: string, dto: UpdateSubsystemInput) => void | Promise<void>;
+  onUpdateSubsystem?: (key: string, dto: UpdateSubsystemInput) => void | Promise<void>;
   onDeleteMenu: (id: string) => void | Promise<void>;
   onSetMenuVisibility: (id: string, visible: boolean) => void | Promise<void>;
 }
 
 export function MenusView({
   permissions,
+  systemAdmin = false,
   subsystems,
   activeSubsystemKey,
   menus,
   refreshing = false,
+  catalogManaged = false,
   onActiveSubsystemChange,
   onCreateSubsystem,
   onCreateMenu,
@@ -87,10 +91,21 @@ export function MenusView({
     [menus, selectedMenu],
   );
   const capabilities: MenuCapabilities = {
-    create: matchPermission(permissions, 'iam:menu:create'),
-    update: matchPermission(permissions, 'iam:menu:update'),
-    delete: matchPermission(permissions, 'iam:menu:del'),
-    toggle: matchPermission(permissions, 'iam:menu:toggle'),
+    create: matchPermission({ permissions, systemAdmin }, 'iam:menu:create'),
+    update: matchPermission({ permissions, systemAdmin }, 'iam:menu:update'),
+    delete: matchPermission({ permissions, systemAdmin }, 'iam:menu:del'),
+    toggle: matchPermission({ permissions, systemAdmin }, 'iam:menu:toggle'),
+  };
+  const subsystemCapabilities: MenuCapabilities = {
+    ...capabilities,
+    create: capabilities.create && !!onCreateSubsystem,
+    update: capabilities.update && !!onUpdateSubsystem,
+  };
+  const nestedMenuCapabilities: MenuCapabilities = {
+    ...capabilities,
+    create: catalogManaged ? false : capabilities.create,
+    delete:
+      capabilities.delete && (!catalogManaged || selectedMenu?.runtimeManaged === true),
   };
 
   const selectSubsystem = (key: string) => {
@@ -108,7 +123,7 @@ export function MenusView({
     activeKey,
     locale,
     t,
-    capabilities,
+    capabilities: subsystemCapabilities,
     onSelect: selectSubsystem,
     onCreate: openCreateSubsystem,
     onEdit: openEditSubsystem,
@@ -124,6 +139,7 @@ export function MenusView({
 
     try {
       if (overlay.state.mode === 'create') {
+        if (catalogManaged && (dto.type !== 'dir' || dto.parentId !== null)) return;
         await onCreateMenu({ subsystemKey: activeKey, ...dto });
       } else {
         await onUpdateMenu(overlay.state.menu.id, dto);
@@ -138,17 +154,22 @@ export function MenusView({
       | { mode: 'create'; dto: CreateSubsystemInput }
       | { mode: 'edit'; key: string; dto: UpdateSubsystemInput },
   ) => {
-    if (payload.mode === 'create' ? !capabilities.create : !capabilities.update) return;
+    if (payload.mode === 'create' ? !subsystemCapabilities.create : !subsystemCapabilities.update) return;
     try {
-      if (payload.mode === 'create') await onCreateSubsystem(payload.dto);
-      else await onUpdateSubsystem(payload.key, payload.dto);
+      if (payload.mode === 'create') await onCreateSubsystem?.(payload.dto);
+      else await onUpdateSubsystem?.(payload.key, payload.dto);
     } catch {
       return;
     }
     setOverlay({ kind: 'none' });
   };
   const confirmDelete = async () => {
-    if (overlay.kind !== 'delete' || !capabilities.delete) return;
+    if (
+      overlay.kind !== 'delete' ||
+      !capabilities.delete ||
+      (catalogManaged && overlay.menu.runtimeManaged !== true)
+    )
+      return;
     try {
       await onDeleteMenu(overlay.menu.id);
     } catch {
@@ -181,7 +202,8 @@ export function MenusView({
           inspectorOpen={inspectorOpen}
           locale={locale}
           t={t}
-          capabilities={capabilities}
+          capabilities={nestedMenuCapabilities}
+          canCreateRoot={capabilities.create}
           onKeywordChange={setKeyword}
           onOpenNavigation={() => setSubsystemOpen(true)}
           onInspectorOpenChange={setInspectorOpen}
@@ -210,6 +232,7 @@ export function MenusView({
       />
 
       <MenuOverlays
+        codeOwnedLocked={catalogManaged}
         overlay={overlay}
         activeSubsystemKey={activeKey}
         menus={menus}

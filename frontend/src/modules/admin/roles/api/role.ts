@@ -29,15 +29,7 @@ export function normalizeRoleDataPermission(value: RoleDataPermission): RoleData
   return RoleDataPermissionSchema.parse({
     defaultScope: value.defaultScope,
     defaultDepartmentIds: value.defaultScope === 'custom' ? value.defaultDepartmentIds : [],
-    resources: Object.fromEntries(
-      Object.entries(value.resources).map(([resourceId, permission]) => [
-        resourceId,
-        {
-          scope: permission.scope,
-          departmentIds: permission.scope === 'custom' ? permission.departmentIds : [],
-        },
-      ]),
-    ),
+    resources: {},
   });
 }
 
@@ -45,6 +37,12 @@ export const rolesQuery = queryOptions({
   queryKey: roleKeys.list(),
   queryFn: ({ signal }) => http.get('/api/roles', undefined, rolesContract, { signal }),
 });
+
+export const roleDetailQuery = (roleId: string) =>
+  queryOptions({
+    queryKey: roleKeys.detail(roleId),
+    queryFn: ({ signal }) => http.get(`/api/roles/${roleId}`, undefined, roleContract, { signal }),
+  });
 
 export const permissionTreeQuery = queryOptions({
   queryKey: roleKeys.permissionTree(),
@@ -79,7 +77,10 @@ export const roleAuditLogsQuery = queryOptions({
 
 export const roleApi = {
   createRole: (dto: CreateRoleInput) => http.post('/api/roles', CreateRoleSchema.parse(dto), roleContract),
+  updateRole: (id: string, dto: CreateRoleInput) =>
+    http.put(`/api/roles/${id}`, CreateRoleSchema.parse(dto), roleContract),
   deleteRole: (id: string) => http.del(`/api/roles/${id}`, nullContract),
+  disableRole: (id: string) => http.post(`/api/roles/${id}/disable`, undefined, nullContract),
   saveRolePermissions: (id: string, permissions: RolePermissionMap) =>
     http.put(
       `/api/roles/${id}/permissions`,

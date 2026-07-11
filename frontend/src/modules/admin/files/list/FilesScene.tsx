@@ -27,10 +27,12 @@ const emptyFiles: FileEntryDto[] = [];
 
 export function FilesScene({
   permissions,
+  systemAdmin = false,
   fileId,
   onFileChange,
 }: {
   permissions: string[];
+  systemAdmin?: boolean;
   fileId?: string;
   onFileChange?: (fileId?: string) => void;
 }) {
@@ -56,11 +58,11 @@ export function FilesScene({
   const storage = useQuery(storageOverviewQuery);
   const entries = listResult.data?.list ?? emptyFiles;
   const selected = entries.find((entry) => entry.id === selectedId);
-  const canUpload = matchPermission(permissions, 'file:doc:upload');
-  const canDownload = matchPermission(permissions, 'file:doc:download');
-  const canRename = matchPermission(permissions, 'file:doc:rename');
-  const canDelete = matchPermission(permissions, 'file:doc:del');
-  const canShare = matchPermission(permissions, 'file:doc:share');
+  const canUpload = matchPermission({ permissions, systemAdmin }, 'file:doc:upload');
+  const canDownload = matchPermission({ permissions, systemAdmin }, 'file:doc:download');
+  const canRename = matchPermission({ permissions, systemAdmin }, 'file:doc:rename');
+  const canDelete = matchPermission({ permissions, systemAdmin }, 'file:doc:del');
+  const canShare = matchPermission({ permissions, systemAdmin }, 'file:doc:share');
   const invalidate = () => queryClient.invalidateQueries({ queryKey: fileKeys.all });
   const upload = useMutation({
     mutationFn: fileApi.upload,

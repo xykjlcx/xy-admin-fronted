@@ -13,5 +13,5 @@ export const Route = createFileRoute('/_auth/admin/company')({
 
 function CompanyRoute() {
   const { me } = Route.useRouteContext();
-  return <CompanyPage permissions={me.permissions} />;
+  return <CompanyPage permissions={me.permissions} systemAdmin={me.systemAdmin} />;
 }

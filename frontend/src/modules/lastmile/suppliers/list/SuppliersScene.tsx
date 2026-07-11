@@ -15,11 +15,13 @@ import { supplierApi, supplierKeys, suppliersQuery, type SupplierDto, type Suppl
 import { SupplierFormDialog } from '../form';
 export function SuppliersScene({
   permissions,
+  systemAdmin = false,
   keyword,
   onKeywordChange,
   onDetail,
 }: {
   permissions: string[];
+  systemAdmin?: boolean;
   keyword: string;
   onKeywordChange: (keyword: string) => void;
   onDetail: (id: string) => void;
@@ -93,7 +95,7 @@ export function SuppliersScene({
             containerClassName="w-[calc(260px*var(--app-scale))]"
           />
           <div className="flex-1" />
-          {matchPermission(permissions, 'lastmile:supplier:create') && (
+          {matchPermission({ permissions, systemAdmin }, 'lastmile:supplier:create') && (
             <Button onClick={() => setCreating(true)}>
               <Plus data-icon="inline-start" />
               {t('suppliers.create')}

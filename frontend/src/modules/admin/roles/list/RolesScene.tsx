@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useRouter } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
 import { PageFrame, PageSurface, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
 import { matchPermission } from '@/lib/permission';
+import { meQuery } from '@/modules/admin/auth/api';
+import { menuKeys } from '@/modules/admin/menus/api';
 import {
   permissionTreeQuery,
   roleApi,
@@ -20,7 +23,7 @@ import {
   type RolePermissionMap,
 } from '@/modules/admin/roles/api';
 import { deptsQuery } from '@/modules/admin/users/api';
-import { CreateRoleDialog } from '../form/RoleDialogs';
+import { CreateRoleDialog, EditRoleDialog } from '../form/RoleDialogs';
 import { RoleAuditLogsPanel } from './RoleAuditLogsPanel';
 import { RoleDetailsPanel } from '../detail/RoleDetailsPanel';
 import { RoleListPanel } from './RoleListPanel';
@@ -37,13 +40,22 @@ const emptyRoleDataPermission: RoleDataPermission = {
 
 export interface RolesPageProps {
   permissions: string[];
+  systemAdmin?: boolean;
   roleId: string;
   onRoleIdChange: (roleId: string) => void;
 }
 
-export function RolesScene({ permissions, roleId, onRoleIdChange }: RolesPageProps) {
+export function RolesScene({ permissions, systemAdmin = false, roleId, onRoleIdChange }: RolesPageProps) {
   const { t } = useTranslation('admin');
   const queryClient = useQueryClient();
+  const router = useRouter({ warn: false });
+  const invalidateAuthorization = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: meQuery.queryKey }),
+      queryClient.invalidateQueries({ queryKey: menuKeys.menuLists() }),
+    ]);
+    await router?.invalidate();
+  };
   const { data: roles } = useSuspenseQuery(rolesQuery);
   const { data: permissionTree } = useSuspenseQuery(permissionTreeQuery);
   const { data: departments } = useSuspenseQuery(deptsQuery);
@@ -69,6 +81,7 @@ export function RolesScene({ permissions, roleId, onRoleIdChange }: RolesPagePro
         queryClient.invalidateQueries({ queryKey: roleKeys.list() }),
         queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
       ]);
+      await invalidateAuthorization();
       onRoleIdChange(role.id);
       toast.success(t('roles.toast.created'));
     },
@@ -80,9 +93,34 @@ export function RolesScene({ permissions, roleId, onRoleIdChange }: RolesPagePro
         queryClient.invalidateQueries({ queryKey: roleKeys.list() }),
         queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
       ]);
+      await invalidateAuthorization();
       const nextRole = roles.find((role) => role.id !== id);
       onRoleIdChange(nextRole?.id ?? '');
       toast.success(t('roles.toast.deleted'));
+    },
+  });
+  const updateRole = useMutation({
+    mutationFn: ({ id, dto }: { id: string; dto: CreateRoleInput }) => roleApi.updateRole(id, dto),
+    onSuccess: async (_data, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: roleKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: roleKeys.detail(variables.id) }),
+        queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
+      ]);
+      await invalidateAuthorization();
+      toast.success(t('roles.toast.updated'));
+    },
+  });
+  const disableRole = useMutation({
+    mutationFn: roleApi.disableRole,
+    onSuccess: async (_data, id) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: roleKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) }),
+        queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
+      ]);
+      await invalidateAuthorization();
+      toast.success(t('roles.toast.disabled'));
     },
   });
   const saveRolePermissions = useMutation({
@@ -93,6 +131,7 @@ export function RolesScene({ permissions, roleId, onRoleIdChange }: RolesPagePro
         queryClient.invalidateQueries({ queryKey: roleKeys.permissions(variables.id) }),
         queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
       ]);
+      await invalidateAuthorization();
       toast.success(t('roles.toast.permissionsSaved'));
     },
   });
@@ -104,6 +143,7 @@ export function RolesScene({ permissions, roleId, onRoleIdChange }: RolesPagePro
         queryClient.invalidateQueries({ queryKey: roleKeys.dataPermissions(variables.id) }),
         queryClient.invalidateQueries({ queryKey: roleKeys.auditLogs() }),
       ]);
+      await invalidateAuthorization();
       toast.success(t('roles.toast.dataPermissionsSaved'));
     },
   });
@@ -117,6 +157,7 @@ export function RolesScene({ permissions, roleId, onRoleIdChange }: RolesPagePro
   return (
     <RolesView
       permissions={permissions}
+      systemAdmin={systemAdmin}
       roles={roles}
       activeRoleId={activeRoleId}
       permissionTree={permissionTree}
@@ -135,6 +176,8 @@ export function RolesScene({ permissions, roleId, onRoleIdChange }: RolesPagePro
       onDeleteRole={async (id: string) => {
         await deleteRole.mutateAsync(id);
       }}
+      onUpdateRole={async (id, dto) => { await updateRole.mutateAsync({ id, dto }); }}
+      onDisableRole={async (id) => { await disableRole.mutateAsync(id); }}
       onSaveRolePermissions={async (id: string, rolePermissions: RolePermissionMap) => {
         await saveRolePermissions.mutateAsync({ id, rolePermissions });
       }}
@@ -147,6 +190,7 @@ export function RolesScene({ permissions, roleId, onRoleIdChange }: RolesPagePro
 
 export function RolesView({
   permissions,
+  systemAdmin = false,
   roles,
   activeRoleId,
   permissionTree,
@@ -161,6 +205,8 @@ export function RolesView({
   onActiveRoleChange,
   onCreateRole,
   onDeleteRole,
+  onUpdateRole = async () => undefined,
+  onDisableRole = async () => undefined,
   onSaveRolePermissions,
   onSaveRoleDataPermissions,
 }: RolesViewProps) {
@@ -171,9 +217,10 @@ export function RolesView({
   const [detailTab, setDetailTab] = useState<DetailTab>('permissions');
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<RoleDto | null>(null);
-  const canCreateRole = matchPermission(permissions, 'iam:role:create');
-  const canDeleteRole = matchPermission(permissions, 'iam:role:del');
-  const canGrant = matchPermission(permissions, 'iam:role:grant');
+  const [editTarget, setEditTarget] = useState<RoleDto | null>(null);
+  const canCreateRole = matchPermission({ permissions, systemAdmin }, 'iam:role:create');
+  const canDeleteRole = matchPermission({ permissions, systemAdmin }, 'iam:role:del');
+  const canGrant = matchPermission({ permissions, systemAdmin }, 'iam:role:grant');
   const pageTabItems: PageTabItem<PageTab>[] = [
     { value: 'roles', label: t('roles.tabs.roles') },
     { value: 'auditLogs', label: t('roles.tabs.auditLogs') },
@@ -226,6 +273,8 @@ export function RolesView({
                 canGrant={canGrant}
                 onDetailTabChange={setDetailTab}
                 onDeleteRole={setDeleteTarget}
+                onUpdateRole={(role) => setEditTarget(role)}
+                onDisableRole={onDisableRole}
                 onSaveRolePermissions={onSaveRolePermissions}
                 onSaveRoleDataPermissions={onSaveRoleDataPermissions}
               />
@@ -237,6 +286,15 @@ export function RolesView({
       </PageSurface>
 
       <CreateRoleDialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen} onCreateRole={onCreateRole} />
+      <EditRoleDialog
+        open={!!editTarget}
+        role={editTarget}
+        onOpenChange={(open) => !open && setEditTarget(null)}
+        onUpdateRole={async (id, dto) => {
+          await onUpdateRole(id, dto);
+          setEditTarget(null);
+        }}
+      />
       <ConfirmDialog
         open={!!deleteTarget}
         title={t('roles.dialog.deleteRoleTitle')}
