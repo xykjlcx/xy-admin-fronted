@@ -6,7 +6,7 @@ Vite + React 19 + TypeScript + Tailwind v4 + shadcn/ui + TanStack(Router / Query
 
 ## 快速开始
 
-环境：Node 24 · pnpm 11.7+
+环境：Node `^20.19.0 || >=22.12.0`（推荐 Node 24）· pnpm 11.7+
 
 ```bash
 pnpm install
@@ -83,6 +83,7 @@ electron/        Main / Preload / shared IPC schema / 本地恢复页
 desktop.config.ts          派生项目桌面身份与开发默认值
 electron-builder.ts        DMG / ZIP / NSIS / 签名 / update metadata
 vite.renderer.config.ts    Web/Desktop 共享 Renderer 构建真值
+vite.desktop.config.ts     Vite 8 + vite-plugin-electron 的 Desktop 构建入口
 ```
 
 > 新业务复制 `modules/admin/users/` 的纵切结构（唯一范本）。`modules/admin/pages/{roles,menus,dashboard}` 是待迁移的横切遗留，勿模仿。

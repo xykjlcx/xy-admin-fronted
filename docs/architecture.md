@@ -31,8 +31,9 @@ flowchart LR
 
 边界与依赖方向：
 
-- `vite.renderer.config.ts` 是 Web/Desktop Renderer 的共享配置工厂；`vite.config.ts` 交付 Web，`electron.vite.config.ts` 只组装 Main/Preload/Desktop Renderer。Web 用 browser history 与 `/` base，Desktop 用 hash history、`./` base 和 `app://renderer` 安全协议。
-- `electron/main` 是唯一可访问窗口、系统存储、文件、网络下载和更新器的 owner；`electron/preload` 只经 `contextBridge` 暴露有限的 typed API；IPC channel 与 Zod schema 集中在 `electron/shared`。
+- `vite.renderer.config.ts` 是 Web/Desktop Renderer 的共享配置工厂；`vite.config.ts` 交付 Web，`vite.desktop.config.ts` 在同一 Renderer 工厂上加载 `vite-plugin-electron`，用 Vite 8/Rolldown 构建 Main、单文件 CJS Preload 与 Desktop Renderer。Web 用 browser history 与 `/` base，Desktop 用 hash history、`./` base 和 `app://renderer` 安全协议。
+- Main、Preload、Renderer 分别固定输出到 `out/main/index.js`、`out/preload/index.cjs` 与 `out/renderer/`；Electron/Node built-in 保持 external，`electron-updater` 等无原生二进制的运行时代码进入 Main bundle，使 builder 只打包 `out/** + package.json`，不重复携带 Web 依赖树。
+- `electron/main` 是窗口、协议、生命周期和 IPC owner；原生下载实现归 `electron/files`，更新编排归 `electron/updater`；`electron/preload` 只经 `contextBridge` 暴露有限的 typed API；IPC channel 与 Zod schema 集中在 `electron/shared`。
 - 业务层不知道 Electron：`src/**` 禁止 import `electron`/Node built-in、裸 `window.desktop` 和 `runtime === 'desktop'` 分支。Web/Desktop 适配由 `src/lib/platform` 完成，该约束由 `guard:desktop` 执行。
 - 会话由 `SessionCredentialService` 统一编排。Web 延续浏览器存储；Electron 只把密文写入 `userData/credentials`，使用 `safeStorage` 加密，Renderer `localStorage` 不存 token。
 - `desktop.config.ts` 是派生项目的桌面身份真值；`package.json.version` 是 Web/Desktop 版本唯一真值。生产 API、Web public base 和 update base 必须在构建时固定为无凭据 HTTPS URL。

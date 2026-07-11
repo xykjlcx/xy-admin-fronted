@@ -20,7 +20,7 @@ Desktop 提供两种构建时窗口模式：
 
 ## 2. 环境与命令
 
-要求 Node 24 与 pnpm 11.7+。
+要求 Node `^20.19.0 || >=22.12.0`（推荐 Node 24）与 pnpm 11.7+。当前基线固定为 `vite 8.1.1`、`@vitejs/plugin-react 6.0.3`、`vite-plugin-electron 1.1.0`；不使用 `electron-vite`。
 
 ```bash
 pnpm install
@@ -49,7 +49,7 @@ pnpm make:desktop -- --window-chrome=integrated
 
 尖括号是必须替换的占位符，不是可发布身份或真实域名。
 
-`build:desktop` 生成 `out/main`、`out/preload`、`out/renderer`。`make:desktop` 在当前平台构建安装包：
+`dev:desktop` 与 `build:desktop` 使用 `vite.desktop.config.ts`。该配置复用 `vite.renderer.config.ts`，并由 `vite-plugin-electron` 在 Vite 8/Rolldown 下生成 `out/main/index.js`、单文件 CJS `out/preload/index.cjs` 与 `out/renderer/`。Electron/Node built-in 保持 external，`electron-updater` 打入 Main bundle；builder 不额外复制 Web 依赖树。`make:desktop` 在当前平台构建安装包：
 
 ```text
 release/<native|integrated>/
@@ -152,6 +152,7 @@ pnpm make:desktop -- --window-chrome=integrated
 - ASAR 只包含编译产物与 `package.json`，无 `node_modules`、`.env`、证书、测试、快照、`.superpowers`。
 - Main/Preload/Renderer/恢复页存在，版本和 Main 入口一致，ASAR 体积不超过守卫上限。
 - CSP 不允许 script inline/eval；BrowserWindow 保持 sandbox/context isolation/web security；Main 实读所有 fuse。
+- Sonner 样式与 Radix scroll-lock 样式以静态 CSS 进入 Renderer；仓库用 pnpm patch 禁止这两个依赖在运行时创建 `<style>`。升级 `sonner` 或 `react-style-singleton` 时必须重新生成 patch，并在 packaged 更新弹窗/对话框打开后断言无 CSP style violation。
 - metadata path/version/platform/arch/size/SHA-512 与真实产物一致，二进制/blockmap 在 metadata 前进入本地 feed。
 
 ## 8. 运行时行为与排障
@@ -173,6 +174,8 @@ pnpm make:desktop -- --window-chrome=integrated
 | 更新包下载失败                          | 执行 `verify:update-feed`，检查 Range、Content-Length、MIME 和 SHA-512                     |
 | packaged 启动立即失败且提示 V8 snapshot | release fuse 的 browser-specific V8 snapshot 必须保持与产物能力一致；当前 profile 显式关闭 |
 | 首次启动停在 Keychain                   | 确认使用当前 credential vault；无密文时不应调用 `safeStorage`                              |
+| Main/Preload 输出缺失或入口不一致       | 执行 `pnpm typecheck:desktop` 与 `pnpm build:desktop`；确认只使用 `vite.desktop.config.ts`，且未恢复 `electron-vite` |
+| packaged 控制台出现 style-src violation | 检查两个 CSP pnpm patch 是否仍命中当前依赖版本，并重跑 `scripts/*-csp-contract.test.ts`      |
 
 ## 9. 验收证据级别
 

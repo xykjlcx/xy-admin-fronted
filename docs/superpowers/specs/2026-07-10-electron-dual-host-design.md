@@ -773,6 +773,7 @@ pnpm make:desktop -- --window-chrome=integrated
 
 - 工具链（已废止记录）：曾因 `electron-vite 5.0.0` peer dependency 将 Vite 暂时固定为 7.3.6、`@vitejs/plugin-react` 固定为 5.2.0；该基线及其 packaged 证据在 2026-07-11 的后续授权中作废，不再代表目标态。
 - 工具链（当前授权目标）：用户明确批准恢复 `vite 8.1.1`、`@vitejs/plugin-react 6.0.3`，用稳定版 `vite-plugin-electron 1.1.0` 替换 `electron-vite`。原因是保留稳定 Web 工具链，并使用明确支持 Vite 8/Rolldown 的适配层，降低与全栈重构分支的后续合并冲突。迁移后 Phase 0 packaged Spike、Web 零退化、双窗口构建、builder/updater metadata 与安全证据必须全部重新采集。
+- Vite 8 实施结果：`vite.desktop.config.ts` 复用共享 Renderer 工厂，并以 Flat API 构建 Main/Preload；Main/Preload/Renderer 实际输出为 `out/main/index.js`、`out/preload/index.cjs`、`out/renderer/`。Vite 8/Rolldown 构建、175 项 Desktop 单测、packaged 协议/CORS/鉴权/CSP/401 E2E、integrated 三布局三比例 E2E、Web 117 个文件/683 项测试和 Web 生产构建均已重新执行通过；`pnpm why electron-vite` 无结果。
 - Builder 配置：原设计的 YAML 载体改为 `electron-builder.ts`。理由是发布身份、macOS/Windows 签名前置条件、Spike fuse 例外和产物目录需要类型检查与单测；产物、安全和更新模型不变。守卫明确禁止 YAML/TS 双配置并存。
 - Fuse profile：Electron 43 提供 `LoadBrowserProcessSpecificV8Snapshot`，但当前 builder 产物不含 `browser_v8_context_snapshot`。实包验证证明开启后主进程会 fatal，因此 release profile 对该 fuse 显式关闭，其他 8 项保持本文安全要求；九项全部纳入 wire 实读断言。
 - 证据边界：native/integrated 均已生成 macOS arm64/x64 DMG+ZIP 并通过自动产物校验；macOS arm64 已完成 ad-hoc DMG 安装/启动/卸载 smoke。当前无 Developer ID 和 Windows 真实环境，因此真实签名旧版→新版更新、macOS x64 真机和 Windows x64 证据保持 `pending`，不由交叉构建或 Spike 代替。
