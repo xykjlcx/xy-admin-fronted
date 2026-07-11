@@ -4,7 +4,20 @@
 package com.metabuild.schema.platform;
 
 
+import com.metabuild.schema.platform.tables.MbAuthzRefreshOutbox;
+import com.metabuild.schema.platform.tables.MbDept;
+import com.metabuild.schema.platform.tables.MbLoginLog;
+import com.metabuild.schema.platform.tables.MbMenu;
+import com.metabuild.schema.platform.tables.MbMenuCustomization;
+import com.metabuild.schema.platform.tables.MbOperationLog;
+import com.metabuild.schema.platform.tables.MbPermission;
+import com.metabuild.schema.platform.tables.MbRefreshToken;
+import com.metabuild.schema.platform.tables.MbRole;
+import com.metabuild.schema.platform.tables.MbRoleCustomDept;
+import com.metabuild.schema.platform.tables.MbRolePermission;
 import com.metabuild.schema.platform.tables.MbSchemaProbe;
+import com.metabuild.schema.platform.tables.MbUser;
+import com.metabuild.schema.platform.tables.MbUserRole;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,9 +49,74 @@ public class Public extends SchemaImpl {
     public static final Public PUBLIC = new Public();
 
     /**
+     * The table <code>public.mb_authz_refresh_outbox</code>.
+     */
+    public final MbAuthzRefreshOutbox MB_AUTHZ_REFRESH_OUTBOX = MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX;
+
+    /**
+     * The table <code>public.mb_dept</code>.
+     */
+    public final MbDept MB_DEPT = MbDept.MB_DEPT;
+
+    /**
+     * The table <code>public.mb_login_log</code>.
+     */
+    public final MbLoginLog MB_LOGIN_LOG = MbLoginLog.MB_LOGIN_LOG;
+
+    /**
+     * The table <code>public.mb_menu</code>.
+     */
+    public final MbMenu MB_MENU = MbMenu.MB_MENU;
+
+    /**
+     * The table <code>public.mb_menu_customization</code>.
+     */
+    public final MbMenuCustomization MB_MENU_CUSTOMIZATION = MbMenuCustomization.MB_MENU_CUSTOMIZATION;
+
+    /**
+     * The table <code>public.mb_operation_log</code>.
+     */
+    public final MbOperationLog MB_OPERATION_LOG = MbOperationLog.MB_OPERATION_LOG;
+
+    /**
+     * The table <code>public.mb_permission</code>.
+     */
+    public final MbPermission MB_PERMISSION = MbPermission.MB_PERMISSION;
+
+    /**
+     * The table <code>public.mb_refresh_token</code>.
+     */
+    public final MbRefreshToken MB_REFRESH_TOKEN = MbRefreshToken.MB_REFRESH_TOKEN;
+
+    /**
+     * The table <code>public.mb_role</code>.
+     */
+    public final MbRole MB_ROLE = MbRole.MB_ROLE;
+
+    /**
+     * The table <code>public.mb_role_custom_dept</code>.
+     */
+    public final MbRoleCustomDept MB_ROLE_CUSTOM_DEPT = MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT;
+
+    /**
+     * The table <code>public.mb_role_permission</code>.
+     */
+    public final MbRolePermission MB_ROLE_PERMISSION = MbRolePermission.MB_ROLE_PERMISSION;
+
+    /**
      * The table <code>public.mb_schema_probe</code>.
      */
     public final MbSchemaProbe MB_SCHEMA_PROBE = MbSchemaProbe.MB_SCHEMA_PROBE;
+
+    /**
+     * The table <code>public.mb_user</code>.
+     */
+    public final MbUser MB_USER = MbUser.MB_USER;
+
+    /**
+     * The table <code>public.mb_user_role</code>.
+     */
+    public final MbUserRole MB_USER_ROLE = MbUserRole.MB_USER_ROLE;
 
     /**
      * No further instances allowed
@@ -56,7 +134,20 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
-            MbSchemaProbe.MB_SCHEMA_PROBE
+            MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX,
+            MbDept.MB_DEPT,
+            MbLoginLog.MB_LOGIN_LOG,
+            MbMenu.MB_MENU,
+            MbMenuCustomization.MB_MENU_CUSTOMIZATION,
+            MbOperationLog.MB_OPERATION_LOG,
+            MbPermission.MB_PERMISSION,
+            MbRefreshToken.MB_REFRESH_TOKEN,
+            MbRole.MB_ROLE,
+            MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT,
+            MbRolePermission.MB_ROLE_PERMISSION,
+            MbSchemaProbe.MB_SCHEMA_PROBE,
+            MbUser.MB_USER,
+            MbUserRole.MB_USER_ROLE
         );
     }
 }

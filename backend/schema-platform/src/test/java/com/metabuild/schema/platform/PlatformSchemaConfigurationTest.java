@@ -44,6 +44,22 @@ class PlatformSchemaConfigurationTest {
     String generatedSources = readAll(javaFiles);
     assertTrue(generatedSources.contains("package com.metabuild.schema.platform"));
     assertTrue(generatedSources.contains("\"mb_schema_probe\""));
+    for (String table : List.of(
+        "mb_user",
+        "mb_dept",
+        "mb_role",
+        "mb_role_custom_dept",
+        "mb_user_role",
+        "mb_permission",
+        "mb_role_permission",
+        "mb_menu",
+        "mb_menu_customization",
+        "mb_refresh_token",
+        "mb_authz_refresh_outbox",
+        "mb_login_log",
+        "mb_operation_log")) {
+      assertTrue(generatedSources.contains("\"" + table + "\""), "generated sources missing " + table);
+    }
     assertFalse(generatedSources.contains("\"biz_"));
     assertFalse(generatedSources.contains("com.metabuild.schema.lastmile"));
     assertFalse(generatedSources.contains("jOOQ version:"));

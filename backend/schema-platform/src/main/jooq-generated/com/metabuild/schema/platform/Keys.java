@@ -4,11 +4,38 @@
 package com.metabuild.schema.platform;
 
 
+import com.metabuild.schema.platform.tables.MbAuthzRefreshOutbox;
+import com.metabuild.schema.platform.tables.MbDept;
+import com.metabuild.schema.platform.tables.MbLoginLog;
+import com.metabuild.schema.platform.tables.MbMenu;
+import com.metabuild.schema.platform.tables.MbMenuCustomization;
+import com.metabuild.schema.platform.tables.MbOperationLog;
+import com.metabuild.schema.platform.tables.MbPermission;
+import com.metabuild.schema.platform.tables.MbRefreshToken;
+import com.metabuild.schema.platform.tables.MbRole;
+import com.metabuild.schema.platform.tables.MbRoleCustomDept;
+import com.metabuild.schema.platform.tables.MbRolePermission;
 import com.metabuild.schema.platform.tables.MbSchemaProbe;
+import com.metabuild.schema.platform.tables.MbUser;
+import com.metabuild.schema.platform.tables.MbUserRole;
+import com.metabuild.schema.platform.tables.records.MbAuthzRefreshOutboxRecord;
+import com.metabuild.schema.platform.tables.records.MbDeptRecord;
+import com.metabuild.schema.platform.tables.records.MbLoginLogRecord;
+import com.metabuild.schema.platform.tables.records.MbMenuCustomizationRecord;
+import com.metabuild.schema.platform.tables.records.MbMenuRecord;
+import com.metabuild.schema.platform.tables.records.MbOperationLogRecord;
+import com.metabuild.schema.platform.tables.records.MbPermissionRecord;
+import com.metabuild.schema.platform.tables.records.MbRefreshTokenRecord;
+import com.metabuild.schema.platform.tables.records.MbRoleCustomDeptRecord;
+import com.metabuild.schema.platform.tables.records.MbRolePermissionRecord;
+import com.metabuild.schema.platform.tables.records.MbRoleRecord;
 import com.metabuild.schema.platform.tables.records.MbSchemaProbeRecord;
+import com.metabuild.schema.platform.tables.records.MbUserRecord;
+import com.metabuild.schema.platform.tables.records.MbUserRoleRecord;
 
 import javax.annotation.processing.Generated;
 
+import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -32,5 +59,41 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<MbAuthzRefreshOutboxRecord> MB_AUTHZ_REFRESH_OUTBOX_OPERATION_ID_USER_ID_KEY = Internal.createUniqueKey(MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX, DSL.name("mb_authz_refresh_outbox_operation_id_user_id_key"), new TableField[] { MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX.OPERATION_ID, MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX.USER_ID }, true);
+    public static final UniqueKey<MbAuthzRefreshOutboxRecord> MB_AUTHZ_REFRESH_OUTBOX_PKEY = Internal.createUniqueKey(MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX, DSL.name("mb_authz_refresh_outbox_pkey"), new TableField[] { MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX.ID }, true);
+    public static final UniqueKey<MbDeptRecord> MB_DEPT_PKEY = Internal.createUniqueKey(MbDept.MB_DEPT, DSL.name("mb_dept_pkey"), new TableField[] { MbDept.MB_DEPT.ID }, true);
+    public static final UniqueKey<MbLoginLogRecord> MB_LOGIN_LOG_PKEY = Internal.createUniqueKey(MbLoginLog.MB_LOGIN_LOG, DSL.name("mb_login_log_pkey"), new TableField[] { MbLoginLog.MB_LOGIN_LOG.ID }, true);
+    public static final UniqueKey<MbMenuRecord> MB_MENU_PKEY = Internal.createUniqueKey(MbMenu.MB_MENU, DSL.name("mb_menu_pkey"), new TableField[] { MbMenu.MB_MENU.ID }, true);
+    public static final UniqueKey<MbMenuCustomizationRecord> MB_MENU_CUSTOMIZATION_PKEY = Internal.createUniqueKey(MbMenuCustomization.MB_MENU_CUSTOMIZATION, DSL.name("mb_menu_customization_pkey"), new TableField[] { MbMenuCustomization.MB_MENU_CUSTOMIZATION.MENU_ID }, true);
+    public static final UniqueKey<MbOperationLogRecord> MB_OPERATION_LOG_PKEY = Internal.createUniqueKey(MbOperationLog.MB_OPERATION_LOG, DSL.name("mb_operation_log_pkey"), new TableField[] { MbOperationLog.MB_OPERATION_LOG.ID }, true);
+    public static final UniqueKey<MbPermissionRecord> MB_PERMISSION_PKEY = Internal.createUniqueKey(MbPermission.MB_PERMISSION, DSL.name("mb_permission_pkey"), new TableField[] { MbPermission.MB_PERMISSION.ID }, true);
+    public static final UniqueKey<MbRefreshTokenRecord> MB_REFRESH_TOKEN_PKEY = Internal.createUniqueKey(MbRefreshToken.MB_REFRESH_TOKEN, DSL.name("mb_refresh_token_pkey"), new TableField[] { MbRefreshToken.MB_REFRESH_TOKEN.ID }, true);
+    public static final UniqueKey<MbRefreshTokenRecord> MB_REFRESH_TOKEN_TOKEN_HASH_KEY = Internal.createUniqueKey(MbRefreshToken.MB_REFRESH_TOKEN, DSL.name("mb_refresh_token_token_hash_key"), new TableField[] { MbRefreshToken.MB_REFRESH_TOKEN.TOKEN_HASH }, true);
+    public static final UniqueKey<MbRoleRecord> MB_ROLE_PKEY = Internal.createUniqueKey(MbRole.MB_ROLE, DSL.name("mb_role_pkey"), new TableField[] { MbRole.MB_ROLE.ID }, true);
+    public static final UniqueKey<MbRoleCustomDeptRecord> MB_ROLE_CUSTOM_DEPT_PKEY = Internal.createUniqueKey(MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT, DSL.name("mb_role_custom_dept_pkey"), new TableField[] { MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT.ROLE_ID, MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT.DEPT_ID }, true);
+    public static final UniqueKey<MbRolePermissionRecord> MB_ROLE_PERMISSION_PKEY = Internal.createUniqueKey(MbRolePermission.MB_ROLE_PERMISSION, DSL.name("mb_role_permission_pkey"), new TableField[] { MbRolePermission.MB_ROLE_PERMISSION.ROLE_ID, MbRolePermission.MB_ROLE_PERMISSION.PERMISSION_ID }, true);
     public static final UniqueKey<MbSchemaProbeRecord> MB_SCHEMA_PROBE_PKEY = Internal.createUniqueKey(MbSchemaProbe.MB_SCHEMA_PROBE, DSL.name("mb_schema_probe_pkey"), new TableField[] { MbSchemaProbe.MB_SCHEMA_PROBE.ID }, true);
+    public static final UniqueKey<MbUserRecord> MB_USER_PKEY = Internal.createUniqueKey(MbUser.MB_USER, DSL.name("mb_user_pkey"), new TableField[] { MbUser.MB_USER.ID }, true);
+    public static final UniqueKey<MbUserRoleRecord> MB_USER_ROLE_PKEY = Internal.createUniqueKey(MbUserRole.MB_USER_ROLE, DSL.name("mb_user_role_pkey"), new TableField[] { MbUserRole.MB_USER_ROLE.USER_ID, MbUserRole.MB_USER_ROLE.ROLE_ID }, true);
+
+    // -------------------------------------------------------------------------
+    // FOREIGN KEY definitions
+    // -------------------------------------------------------------------------
+
+    public static final ForeignKey<MbAuthzRefreshOutboxRecord, MbUserRecord> MB_AUTHZ_REFRESH_OUTBOX__MB_AUTHZ_REFRESH_OUTBOX_USER_ID_FKEY = Internal.createForeignKey(MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX, DSL.name("mb_authz_refresh_outbox_user_id_fkey"), new TableField[] { MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX.USER_ID }, Keys.MB_USER_PKEY, new TableField[] { MbUser.MB_USER.ID }, true);
+    public static final ForeignKey<MbDeptRecord, MbDeptRecord> MB_DEPT__MB_DEPT_PARENT_ID_FKEY = Internal.createForeignKey(MbDept.MB_DEPT, DSL.name("mb_dept_parent_id_fkey"), new TableField[] { MbDept.MB_DEPT.PARENT_ID }, Keys.MB_DEPT_PKEY, new TableField[] { MbDept.MB_DEPT.ID }, true);
+    public static final ForeignKey<MbLoginLogRecord, MbUserRecord> MB_LOGIN_LOG__MB_LOGIN_LOG_USER_ID_FKEY = Internal.createForeignKey(MbLoginLog.MB_LOGIN_LOG, DSL.name("mb_login_log_user_id_fkey"), new TableField[] { MbLoginLog.MB_LOGIN_LOG.USER_ID }, Keys.MB_USER_PKEY, new TableField[] { MbUser.MB_USER.ID }, true);
+    public static final ForeignKey<MbMenuRecord, MbPermissionRecord> MB_MENU__MB_MENU_PERMISSION_ID_FKEY = Internal.createForeignKey(MbMenu.MB_MENU, DSL.name("mb_menu_permission_id_fkey"), new TableField[] { MbMenu.MB_MENU.PERMISSION_ID }, Keys.MB_PERMISSION_PKEY, new TableField[] { MbPermission.MB_PERMISSION.ID }, true);
+    public static final ForeignKey<MbMenuCustomizationRecord, MbMenuRecord> MB_MENU_CUSTOMIZATION__MB_MENU_CUSTOMIZATION_MENU_ID_FKEY = Internal.createForeignKey(MbMenuCustomization.MB_MENU_CUSTOMIZATION, DSL.name("mb_menu_customization_menu_id_fkey"), new TableField[] { MbMenuCustomization.MB_MENU_CUSTOMIZATION.MENU_ID }, Keys.MB_MENU_PKEY, new TableField[] { MbMenu.MB_MENU.ID }, true);
+    public static final ForeignKey<MbMenuCustomizationRecord, MbMenuRecord> MB_MENU_CUSTOMIZATION__MB_MENU_CUSTOMIZATION_PARENT_ID_FKEY = Internal.createForeignKey(MbMenuCustomization.MB_MENU_CUSTOMIZATION, DSL.name("mb_menu_customization_parent_id_fkey"), new TableField[] { MbMenuCustomization.MB_MENU_CUSTOMIZATION.PARENT_ID }, Keys.MB_MENU_PKEY, new TableField[] { MbMenu.MB_MENU.ID }, true);
+    public static final ForeignKey<MbOperationLogRecord, MbUserRecord> MB_OPERATION_LOG__MB_OPERATION_LOG_ACTOR_ID_FKEY = Internal.createForeignKey(MbOperationLog.MB_OPERATION_LOG, DSL.name("mb_operation_log_actor_id_fkey"), new TableField[] { MbOperationLog.MB_OPERATION_LOG.ACTOR_ID }, Keys.MB_USER_PKEY, new TableField[] { MbUser.MB_USER.ID }, true);
+    public static final ForeignKey<MbRefreshTokenRecord, MbRefreshTokenRecord> MB_REFRESH_TOKEN__MB_REFRESH_TOKEN_REPLACED_BY_ID_FKEY = Internal.createForeignKey(MbRefreshToken.MB_REFRESH_TOKEN, DSL.name("mb_refresh_token_replaced_by_id_fkey"), new TableField[] { MbRefreshToken.MB_REFRESH_TOKEN.REPLACED_BY_ID }, Keys.MB_REFRESH_TOKEN_PKEY, new TableField[] { MbRefreshToken.MB_REFRESH_TOKEN.ID }, true);
+    public static final ForeignKey<MbRefreshTokenRecord, MbUserRecord> MB_REFRESH_TOKEN__MB_REFRESH_TOKEN_USER_ID_FKEY = Internal.createForeignKey(MbRefreshToken.MB_REFRESH_TOKEN, DSL.name("mb_refresh_token_user_id_fkey"), new TableField[] { MbRefreshToken.MB_REFRESH_TOKEN.USER_ID }, Keys.MB_USER_PKEY, new TableField[] { MbUser.MB_USER.ID }, true);
+    public static final ForeignKey<MbRoleCustomDeptRecord, MbDeptRecord> MB_ROLE_CUSTOM_DEPT__MB_ROLE_CUSTOM_DEPT_DEPT_ID_FKEY = Internal.createForeignKey(MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT, DSL.name("mb_role_custom_dept_dept_id_fkey"), new TableField[] { MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT.DEPT_ID }, Keys.MB_DEPT_PKEY, new TableField[] { MbDept.MB_DEPT.ID }, true);
+    public static final ForeignKey<MbRoleCustomDeptRecord, MbRoleRecord> MB_ROLE_CUSTOM_DEPT__MB_ROLE_CUSTOM_DEPT_ROLE_ID_FKEY = Internal.createForeignKey(MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT, DSL.name("mb_role_custom_dept_role_id_fkey"), new TableField[] { MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT.ROLE_ID }, Keys.MB_ROLE_PKEY, new TableField[] { MbRole.MB_ROLE.ID }, true);
+    public static final ForeignKey<MbRolePermissionRecord, MbPermissionRecord> MB_ROLE_PERMISSION__MB_ROLE_PERMISSION_PERMISSION_ID_FKEY = Internal.createForeignKey(MbRolePermission.MB_ROLE_PERMISSION, DSL.name("mb_role_permission_permission_id_fkey"), new TableField[] { MbRolePermission.MB_ROLE_PERMISSION.PERMISSION_ID }, Keys.MB_PERMISSION_PKEY, new TableField[] { MbPermission.MB_PERMISSION.ID }, true);
+    public static final ForeignKey<MbRolePermissionRecord, MbRoleRecord> MB_ROLE_PERMISSION__MB_ROLE_PERMISSION_ROLE_ID_FKEY = Internal.createForeignKey(MbRolePermission.MB_ROLE_PERMISSION, DSL.name("mb_role_permission_role_id_fkey"), new TableField[] { MbRolePermission.MB_ROLE_PERMISSION.ROLE_ID }, Keys.MB_ROLE_PKEY, new TableField[] { MbRole.MB_ROLE.ID }, true);
+    public static final ForeignKey<MbUserRecord, MbDeptRecord> MB_USER__MB_USER_DEPT_ID_FKEY = Internal.createForeignKey(MbUser.MB_USER, DSL.name("mb_user_dept_id_fkey"), new TableField[] { MbUser.MB_USER.DEPT_ID }, Keys.MB_DEPT_PKEY, new TableField[] { MbDept.MB_DEPT.ID }, true);
+    public static final ForeignKey<MbUserRoleRecord, MbRoleRecord> MB_USER_ROLE__MB_USER_ROLE_ROLE_ID_FKEY = Internal.createForeignKey(MbUserRole.MB_USER_ROLE, DSL.name("mb_user_role_role_id_fkey"), new TableField[] { MbUserRole.MB_USER_ROLE.ROLE_ID }, Keys.MB_ROLE_PKEY, new TableField[] { MbRole.MB_ROLE.ID }, true);
+    public static final ForeignKey<MbUserRoleRecord, MbUserRecord> MB_USER_ROLE__MB_USER_ROLE_USER_ID_FKEY = Internal.createForeignKey(MbUserRole.MB_USER_ROLE, DSL.name("mb_user_role_user_id_fkey"), new TableField[] { MbUserRole.MB_USER_ROLE.USER_ID }, Keys.MB_USER_PKEY, new TableField[] { MbUser.MB_USER.ID }, true);
 }

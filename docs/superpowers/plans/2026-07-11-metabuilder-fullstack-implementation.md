@@ -220,6 +220,8 @@ GREEN：最小 admin、角色、部门、Shell menu/permission seed；不实现�
 
 新增 admin auth application/security adapters：password login、refresh rotate、logout、snapshot compiler/store/request scope、refresh token user reverse index。
 
+bootstrap credential provisioning 属于本 Task：从环境 secret 读取初始密码，仅当 DB 仍为 `!bootstrap-credential-unset!` sentinel 时 CAS 写入标准 password hash；production 缺 secret 必须 fail-fast，二次启动不得覆盖已初始化 hash，错误 secret 必须有负向集成测试。禁止在 migration 或已跟踪配置内置可用默认密码。
+
 RED：真实 PostgreSQL+Redis+Sa-Token；login 写单 key snapshot、SaSession 无授权字段、token rotation/replay、logout 全撤销、低 revision login 不能覆盖 Fence、Redis 不可用 fail-closed。
 
 GREEN：实现 P1 只读授权投影；不实现管理员 refreshUsers。
