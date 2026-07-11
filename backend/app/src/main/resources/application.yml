@@ -21,6 +21,8 @@ metabuilder:
     deployment-mode: ${METABUILDER_DEPLOYMENT_MODE:}
   cors:
     allowed-origins: ${METABUILDER_CORS_ALLOWED_ORIGINS:}
+  data-scope:
+    system-principal-id: ${METABUILDER_SYSTEM_PRINCIPAL_ID:01900000-0000-7000-8000-000000000011}
 
 management:
   endpoints:

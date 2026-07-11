@@ -23,6 +23,19 @@
       <artifactId>metabuilder-admin-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.metabuild</groupId>
+      <artifactId>metabuilder-schema-platform</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.metabuild</groupId>
+      <artifactId>metabuilder-schema-lastmile</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+    </dependency>
+    <dependency><groupId>org.springframework</groupId><artifactId>spring-jdbc</artifactId></dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
@@ -52,6 +65,16 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

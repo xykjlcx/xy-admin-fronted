@@ -9,6 +9,7 @@ import com.metabuild.shared.kernel.Forbidden;
 import com.metabuild.shared.kernel.NotFound;
 import com.metabuild.shared.kernel.RateLimited;
 import com.metabuild.shared.kernel.Unauthorized;
+import com.metabuild.shared.kernel.ServiceUnavailable;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ class GlobalExceptionHandlerContractTest {
 
         assertEquals(
                 Set.of(BadRequest.class, Unauthorized.class, Forbidden.class,
-                        NotFound.class, Conflict.class, RateLimited.class),
+                        NotFound.class, Conflict.class, RateLimited.class, ServiceUnavailable.class),
                 declaredDomainTypes);
     }
 }
