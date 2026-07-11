@@ -91,6 +91,16 @@ export function findDesktopBoundaryViolations(files) {
     }
 
     if (normalizedFile.startsWith('electron/') && !testFile) {
+      if (/^electron\/main\/download-(?:manager|net)\.[cm]?[jt]s$/.test(normalizedFile)) {
+        violations.push(`${normalizedFile}: 文件能力必须归属 electron/files`);
+      }
+      if (
+        /^electron\/main\/(?:electron-updater-port|pending-update-marker|spike-updater|update-controller|update-source)\.[cm]?[jt]s$/.test(
+          normalizedFile,
+        )
+      ) {
+        violations.push(`${normalizedFile}: 更新能力必须归属 electron/updater`);
+      }
       if (usesBusinessOrReactImport(source)) {
         violations.push(`${normalizedFile}: electron/** 禁止业务或 React import`);
       }

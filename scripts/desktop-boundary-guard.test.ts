@@ -129,6 +129,22 @@ describe('desktop architecture guard', () => {
     ]);
   });
 
+  test('keeps file and updater implementations out of the Main lifecycle directory', () => {
+    const violations = findDesktopBoundaryViolations(
+      new Map([
+        ['electron/main/download-manager.ts', 'export const download = true;'],
+        ['electron/main/update-controller.ts', 'export const updater = true;'],
+        ['electron/files/download-manager.ts', 'export const download = true;'],
+        ['electron/updater/update-controller.ts', 'export const updater = true;'],
+      ]),
+    );
+
+    expect(violations).toEqual([
+      'electron/main/download-manager.ts: 文件能力必须归属 electron/files',
+      'electron/main/update-controller.ts: 更新能力必须归属 electron/updater',
+    ]);
+  });
+
   test('allows the designated config, preload, and Renderer platform adapter boundaries', () => {
     expect(
       findDesktopBoundaryViolations(

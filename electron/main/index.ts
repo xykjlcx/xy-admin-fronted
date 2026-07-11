@@ -24,9 +24,9 @@ import {
 } from '../config';
 import { createWindowOptions } from './create-window';
 import { createAtomicCredentialFileStore, createCredentialVault } from './credential-vault';
-import { createDownloadManager } from './download-manager';
-import { requestDownloadWithElectronNet } from './download-net';
-import { configureElectronUpdater, createElectronCancellationPort } from './electron-updater-port';
+import { createDownloadManager } from '../files/download-manager';
+import { requestDownloadWithElectronNet } from '../files/download-net';
+import { configureElectronUpdater, createElectronCancellationPort } from '../updater/electron-updater-port';
 import { registerDesktopIpcHandlers } from './ipc';
 import { decideNavigation } from './navigation-policy';
 import { buildRendererCsp, resolveRendererAssetPath } from './protocol';
@@ -35,10 +35,10 @@ import { bindWindowState } from './window-state';
 import { ipcEvents } from '../shared/ipc-channels';
 import { FileDownloadEventSchema } from '../shared/schemas';
 import { UpdateSnapshotSchema } from '../shared/schemas';
-import { createPendingUpdateMarker } from './pending-update-marker';
-import { createSpikeUpdaterHarness } from './spike-updater';
-import { createUpdateController } from './update-controller';
-import { createUpdateFeedUrl } from './update-source';
+import { createPendingUpdateMarker } from '../updater/pending-update-marker';
+import { createSpikeUpdaterHarness } from '../updater/spike-updater';
+import { createUpdateController } from '../updater/update-controller';
+import { createUpdateFeedUrl } from '../updater/update-source';
 import { createQuitCoordinator } from './quit-coordinator';
 import { claimSingleInstance } from './single-instance';
 import { createDesktopLogger } from './desktop-logger';
@@ -248,27 +248,7 @@ async function startApplication(): Promise<void> {
     state.__spikeInstallRequested = spikeUpdater.installRequested;
   }
   let updateInstallRequested = false;
-  let downloadManager: ReturnType<typeof createDownloadManager>;
-  const updateController = createUpdateController({
-    currentVersion: app.getVersion(),
-    updater: updaterPort,
-    createOperationId: randomUUID,
-    createCancellationToken: spikeUpdater?.createCancellationToken ?? createElectronCancellationPort,
-    writePendingMarker: (input) => pendingUpdateMarker.write(input),
-    prepareForInstall: async () => {
-      await downloadManager.dispose();
-      updateInstallRequested = true;
-    },
-    publish: (next) => {
-      const payload = UpdateSnapshotSchema.parse(next);
-      for (const window of BrowserWindow.getAllWindows()) {
-        if (!window.isDestroyed() && !window.webContents.isDestroyed()) {
-          window.webContents.send(ipcEvents.updaterStateChanged, payload);
-        }
-      }
-    },
-  });
-  downloadManager = createDownloadManager({
+  const downloadManager = createDownloadManager({
     apiBaseUrl: environment.apiBaseUrl,
     approvedOrigins: new Set([environment.apiOrigin, ...environment.downloadAllowedOrigins]),
     allowInsecureApi: environment.mode === 'development',
@@ -288,6 +268,25 @@ async function startApplication(): Promise<void> {
       for (const window of BrowserWindow.getAllWindows()) {
         if (!window.isDestroyed() && !window.webContents.isDestroyed()) {
           window.webContents.send(ipcEvents.fileDownloadChanged, payload);
+        }
+      }
+    },
+  });
+  const updateController = createUpdateController({
+    currentVersion: app.getVersion(),
+    updater: updaterPort,
+    createOperationId: randomUUID,
+    createCancellationToken: spikeUpdater?.createCancellationToken ?? createElectronCancellationPort,
+    writePendingMarker: (input) => pendingUpdateMarker.write(input),
+    prepareForInstall: async () => {
+      await downloadManager.dispose();
+      updateInstallRequested = true;
+    },
+    publish: (next) => {
+      const payload = UpdateSnapshotSchema.parse(next);
+      for (const window of BrowserWindow.getAllWindows()) {
+        if (!window.isDestroyed() && !window.webContents.isDestroyed()) {
+          window.webContents.send(ipcEvents.updaterStateChanged, payload);
         }
       }
     },

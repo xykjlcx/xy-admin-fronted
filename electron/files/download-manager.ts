@@ -80,7 +80,7 @@ function boundedFilename(value: string): string {
 export function sanitizeSuggestedFilename(value: string): string {
   const segment = value.normalize('NFC').split(/[\\/]/).at(-1) ?? '';
   const sanitized = segment
-    .replace(/[\u0000-\u001f\u007f<>:"|?*]/g, '_')
+    .replace(/[\p{Cc}<>:"|?*]/gu, '_')
     .replace(/^\.+/, '')
     .trim()
     .replace(/[. ]+$/g, '');
@@ -179,10 +179,9 @@ export function createDownloadManager(dependencies: DownloadManagerDependencies)
 
   async function execute(taskId: string, input: FileDownloadStartInput, controller: AbortController) {
     const filename = sanitizeSuggestedFilename(input.suggestedName);
-    let targetPath: string | null = null;
     let temporaryPath: string | null = null;
     try {
-      targetPath = await dependencies.showSaveDialog(filename);
+      const targetPath = await dependencies.showSaveDialog(filename);
       if (!targetPath || controller.signal.aborted) {
         dependencies.emit({ taskId, status: 'cancelled' });
         return;

@@ -69,7 +69,7 @@ function createBody(
 }
 
 async function* emptyBody(): AsyncIterable<Uint8Array> {
-  return;
+  yield* [] as Uint8Array[];
 }
 
 export function requestDownloadWithElectronNet(input: DownloadRequestInput): Promise<DownloadResponse> {
