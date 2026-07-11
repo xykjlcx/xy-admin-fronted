@@ -496,9 +496,22 @@ function assertAppScreen(session, key) {
   );
 }
 
-async function captureAppScreens() {
+function assertAppScreenAfterMockReady(session, key) {
+  try {
+    assertAppScreen(session, key);
+  } catch {
+    // Mock Service Worker 首次接管页面时允许一次整页恢复；第二次仍失败会继续阻断门禁。
+    agent(session, ['wait', '500']);
+    agent(session, ['reload']);
+    agent(session, ['wait', '1500']);
+    assertAppScreen(session, key);
+  }
+}
+
+async function captureAppScreens(sharedServer) {
   await ensureDir(reportDir);
-  const server = await ensureDevServer();
+  const server = sharedServer ?? (await ensureDevServer());
+  const ownsServer = sharedServer === undefined;
   const captures = [];
   const diffs = [];
 
@@ -548,7 +561,7 @@ async function captureAppScreens() {
 
     return { captures, diffs, serverReused: server.reused };
   } finally {
-    await server.stop();
+    if (ownsServer) await server.stop();
   }
 }
 
@@ -846,9 +859,10 @@ function assertMenuDialog(session) {
   );
 }
 
-async function runScaleChecks() {
+async function runScaleChecks(sharedServer) {
   await ensureDir(reportDir);
-  const server = await ensureDevServer();
+  const server = sharedServer ?? (await ensureDevServer());
+  const ownsServer = sharedServer === undefined;
   const results = [];
 
   try {
@@ -898,7 +912,7 @@ async function runScaleChecks() {
         agent(appSession, ['wait', '1000']);
         setZoom(appSession, zoom);
         agent(appSession, ['wait', '300']);
-        assertAppScreen(appSession, scenario.key);
+        assertAppScreenAfterMockReady(appSession, scenario.key);
         assertNoHorizontalOverflow(appSession);
         const pageShot = path.join(reportDir, `app-${scenario.key}-${zoom}.png`);
         agent(appSession, ['screenshot', pageShot]);
@@ -911,7 +925,7 @@ async function runScaleChecks() {
         agent(appSession, ['wait', '1000']);
         setZoom(appSession, zoom);
         agent(appSession, ['wait', '300']);
-        assertAppScreen(appSession, scenario.key);
+        assertAppScreenAfterMockReady(appSession, scenario.key);
         assertNoHorizontalOverflow(appSession);
         const pageShot = path.join(reportDir, `app-${scenario.key}-${zoom}.png`);
         agent(appSession, ['screenshot', pageShot]);
@@ -940,7 +954,7 @@ async function runScaleChecks() {
 
     return { results, serverReused: server.reused };
   } finally {
-    await server.stop();
+    if (ownsServer) await server.stop();
   }
 }
 
@@ -1019,10 +1033,11 @@ function assertMatrixStateApplied(session, expected) {
   );
 }
 
-async function runThemeMatrix() {
+async function runThemeMatrix(sharedServer) {
   const matrixDir = path.join(reportDir, 'theme-matrix');
   await ensureDir(matrixDir);
-  const server = await ensureDevServer();
+  const server = sharedServer ?? (await ensureDevServer());
+  const ownsServer = sharedServer === undefined;
   const cells = [];
   const expectedCells = 24;
   const assertionLabel = 'page-ready / state-applied / no-horizontal-overflow / sera-computed-contracts';
@@ -1068,7 +1083,7 @@ async function runThemeMatrix() {
       serverReused: server.reused,
     };
   } finally {
-    await server.stop();
+    if (ownsServer) await server.stop();
   }
 }
 
@@ -1138,17 +1153,21 @@ async function main() {
   agent('m0-probe', ['--version']);
 
   const data = {};
-  if (command === 'baseline' || command === 'all') {
+  if (command === 'all') {
     data.baselines = await capturePrototypeBaselines();
-  }
-  if (command === 'app' || command === 'all') {
-    data.app = await captureAppScreens();
-  }
-  if (command === 'scale' || command === 'all') {
-    data.scale = await runScaleChecks();
-  }
-  if (command === 'matrix' || command === 'all') {
-    data.matrix = await runThemeMatrix();
+    const server = await ensureDevServer();
+    try {
+      data.app = await captureAppScreens(server);
+      data.scale = await runScaleChecks(server);
+      data.matrix = await runThemeMatrix(server);
+    } finally {
+      await server.stop();
+    }
+  } else {
+    if (command === 'baseline') data.baselines = await capturePrototypeBaselines();
+    if (command === 'app') data.app = await captureAppScreens();
+    if (command === 'scale') data.scale = await runScaleChecks();
+    if (command === 'matrix') data.matrix = await runThemeMatrix();
   }
   if (!['baseline', 'app', 'scale', 'matrix', 'all'].includes(command)) {
     throw new Error(`unknown command: ${command}`);
