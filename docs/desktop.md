@@ -27,7 +27,9 @@ pnpm install
 pnpm dev:desktop
 ```
 
-开发命令默认使用 `desktop.config.ts` 的 localhost 开发值。生产 `build/make` 必须注入：
+`dev:desktop` 使用本地 Vite Renderer，开发态默认启用 MSW；无需单独启动 Mock 进程，可用 `admin / admin123` 登录。传入 `VITE_ENABLE_MOCK=false` 后才会关闭 Mock，此时必须让 `desktop.config.ts` 的开发 API 地址存在真实后端。开发态 IPC 仅信任 `vite-plugin-electron` 提供的精确 loopback Renderer origin，不接受其他 host、端口或页面。
+
+生产 `build/make` 会强制剥离 MSW/faker/mock worker，安装包始终连接构建时注入的真实后端 URL。生产 `build/make` 必须注入：
 
 | 变量                               | 要求                                                                     |
 | ---------------------------------- | ------------------------------------------------------------------------ |

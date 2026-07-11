@@ -19,6 +19,17 @@ function isRendererDocument(url: URL): boolean {
   );
 }
 
+function isDevelopmentRendererDocument(url: URL, developmentUrl: string | null): boolean {
+  const expected = developmentUrl ? parseUrl(developmentUrl) : null;
+  if (!expected || (expected.protocol !== 'http:' && expected.protocol !== 'https:')) return false;
+
+  const senderDocument = new URL(url);
+  senderDocument.hash = '';
+  const expectedDocument = new URL(expected);
+  expectedDocument.hash = '';
+  return senderDocument.href === expectedDocument.href;
+}
+
 export function decideNavigation(
   targetUrl: string,
   allowedExternalHosts: ReadonlySet<string>,
@@ -38,7 +49,9 @@ export function decideNavigation(
   return 'deny';
 }
 
-export function assertTrustedSender(senderUrl: string): void {
+export function assertTrustedSender(senderUrl: string, developmentUrl: string | null = null): void {
   const url = parseUrl(senderUrl);
-  if (!url || !isRendererDocument(url)) throw new Error('拒绝非 Renderer IPC sender');
+  if (!url || (!isRendererDocument(url) && !isDevelopmentRendererDocument(url, developmentUrl))) {
+    throw new Error('拒绝非 Renderer IPC sender');
+  }
 }

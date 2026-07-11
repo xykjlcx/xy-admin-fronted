@@ -29,6 +29,7 @@ interface IpcSenderEvent {
 }
 
 interface DesktopIpcDependencies {
+  rendererDevelopmentUrl?: string | null;
   writeClipboardText(text: string): void | Promise<void>;
   openExternal(url: string): void | Promise<void>;
   allowedExternalHosts: ReadonlySet<string>;
@@ -75,62 +76,64 @@ export function summarizeIpcContractError(error: unknown): string {
   return error instanceof Error ? error.name : 'UnknownError';
 }
 
-function validateSender(event: IpcSenderEvent): void {
-  assertTrustedSender(event.senderFrame?.url ?? '');
+function validateSender(event: IpcSenderEvent, developmentUrl: string | null): void {
+  assertTrustedSender(event.senderFrame?.url ?? '', developmentUrl);
 }
 
 export function createDesktopIpcHandlers(
   dependencies: DesktopIpcDependencies,
 ): Record<DesktopIpcChannel, DesktopIpcHandler> {
+  const validateIpcSender = (event: IpcSenderEvent) =>
+    validateSender(event, dependencies.rendererDevelopmentUrl ?? null);
   return {
     [ipcChannels.clipboardWrite]: async (event, input) => {
-      validateSender(event);
+      validateIpcSender(event);
       const { text } = ClipboardWriteInputSchema.parse(input);
       await dependencies.writeClipboardText(text);
       return IpcSuccessSchema.parse({ ok: true });
     },
     [ipcChannels.externalOpen]: async (event, input) => {
-      validateSender(event);
+      validateIpcSender(event);
       const { url } = ExternalOpenInputSchema.parse(input);
       if (!dependencies.allowedExternalHosts.has(new URL(url).hostname)) throw new Error('外链 host 未授权');
       await dependencies.openExternal(url);
       return IpcSuccessSchema.parse({ ok: true });
     },
     [ipcChannels.credentialRestore]: async (event, input) => {
-      validateSender(event);
+      validateIpcSender(event);
       CredentialRestoreInputSchema.parse(input);
       return CredentialRestoreResultSchema.parse({ token: await dependencies.credentials.restore() });
     },
     [ipcChannels.credentialPersist]: async (event, input) => {
-      validateSender(event);
+      validateIpcSender(event);
       const { token } = CredentialPersistInputSchema.parse(input);
       await dependencies.credentials.persist(token);
       return IpcSuccessSchema.parse({ ok: true });
     },
     [ipcChannels.credentialClear]: async (event, input) => {
-      validateSender(event);
+      validateIpcSender(event);
       CredentialClearInputSchema.parse(input);
       await dependencies.credentials.clear();
       return IpcSuccessSchema.parse({ ok: true });
     },
     [ipcChannels.fileDownloadStart]: async (event, input) => {
-      validateSender(event);
+      validateIpcSender(event);
       const descriptor = FileDownloadStartInputSchema.parse(input);
       return FileDownloadStartResultSchema.parse(dependencies.files.start(descriptor));
     },
     [ipcChannels.fileDownloadCancel]: async (event, input) => {
-      validateSender(event);
+      validateIpcSender(event);
       const { taskId } = FileDownloadCancelInputSchema.parse(input);
       dependencies.files.cancel(taskId);
       return IpcSuccessSchema.parse({ ok: true });
     },
     [ipcChannels.updaterGetSnapshot]: async (event, input) => {
-      validateSender(event);
+      validateIpcSender(event);
       UpdateGetSnapshotInputSchema.parse(input);
       return UpdateSnapshotSchema.parse(dependencies.updater.getSnapshot());
     },
     [ipcChannels.updaterCommand]: async (event, input) => {
-      validateSender(event);
+      validateIpcSender(event);
       const { command } = UpdateCommandInputSchema.parse(input);
       try {
         return UpdateCommandResultSchema.parse({

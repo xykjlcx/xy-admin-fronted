@@ -217,6 +217,14 @@
 - P2：`pnpm visual all` 在阶段间重启同 origin server 导致 MSW/HMR 接管竞态；改为单 server 生命周期后完整 20 页面 + 3 档 + 24/24 矩阵通过。
 - 复审结论：当前未发现新的 P0/P1 工程或 UI 阻断；剩余项均是外部签名/真实平台证据，不用自动化或未签名包冒充通过。
 
+## 2026-07-11 本地启动与登录回归复验
+
+- 复现：使用 `.invalid` 文档占位 URL 构建的生产安装包不含 Mock，API 固化为 `https://api.invalid`，因此无法登录；这不是需要额外启动 Mock 进程，而是生产包必须连接真实后端。
+- 另发现开发态缺陷：Vite Renderer 的 `http://localhost:5173/#/...` 被仅认可 `app://renderer` 的 IPC sender 守卫拒绝，导致凭证恢复/持久化失败。
+- RED → GREEN：新增精确 Vite development document、相邻端口/host/path 拒绝和 IPC 透传测试；实现只允许 `vite-plugin-electron` 提供的精确 loopback origin，且生产模式忽略该开发 URL。Desktop 单测现为 34 个文件/177 项。
+- 真实运行验证：`VITE_ENABLE_MOCK=true pnpm dev:desktop -- --window-chrome=integrated` 启动后，通过 Electron DevTools Protocol 输入 `admin / admin123`；Preload bridge 存在、Service Worker 已控制页面、凭证可从 Main 恢复，`/api/auth/me` 返回 HTTP 200/业务码 0 并进入 `/admin/users`。
+- 回归门禁：`pnpm typecheck:desktop`、扩展 Electron ESLint、`pnpm test:desktop` 全绿；packaged Spike 及 integrated 三布局 × 三比例 E2E 分别通过。
+
 ## Pending 与后续人工动作
 
 - Phase 0–8 工程实现、文档与当前平台可执行证据已收口；本目标累计执行 4 小时以上。

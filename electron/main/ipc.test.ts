@@ -3,6 +3,7 @@ import { ipcChannels } from '../shared/ipc-channels';
 import { createDesktopIpcHandlers, summarizeIpcContractError } from './ipc';
 
 const trustedEvent = { senderFrame: { url: 'app://renderer/index.html#/admin/dashboard' } };
+const trustedDevelopmentEvent = { senderFrame: { url: 'http://localhost:5173/#/login' } };
 const untrustedEvent = { senderFrame: { url: 'https://evil.example.com' } };
 const idleUpdateSnapshot = {
   status: 'idle',
@@ -123,6 +124,28 @@ describe('desktop IPC handlers', () => {
     ).rejects.toThrow('拒绝非 Renderer IPC sender');
     expect(credentials.persist).toHaveBeenCalledWith('next-token');
     expect(credentials.clear).toHaveBeenCalledTimes(1);
+  });
+
+  test('passes the exact configured development Renderer URL into sender validation', async () => {
+    const credentials = {
+      restore: vi.fn().mockResolvedValue(null),
+      persist: vi.fn().mockResolvedValue(undefined),
+      clear: vi.fn().mockResolvedValue(undefined),
+    };
+    const handlers = createDesktopIpcHandlers({
+      rendererDevelopmentUrl: 'http://localhost:5173/',
+      writeClipboardText: vi.fn(),
+      openExternal: vi.fn(),
+      allowedExternalHosts: new Set(),
+      credentials,
+      files: { start: vi.fn(), cancel: vi.fn() },
+      updater: updaterDependencies(),
+    });
+
+    await expect(
+      handlers[ipcChannels.credentialRestore](trustedDevelopmentEvent, undefined),
+    ).resolves.toEqual({ token: null });
+    expect(credentials.restore).toHaveBeenCalledTimes(1);
   });
 
   test('starts and cancels downloads only after sender and descriptor validation', async () => {

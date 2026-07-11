@@ -39,6 +39,8 @@ pnpm make:desktop -- --window-chrome=native
 pnpm make:desktop -- --window-chrome=integrated
 ```
 
+`pnpm dev:desktop` 开发态默认启用内置 MSW，可使用 `admin / admin123` 登录；Mock 不需要独立进程。上面的 `.invalid` 地址是故意不可访问的文档占位符，直接用它们打出的安装包只能验证壳和静态资源，无法登录。可安装包不会携带 Mock，必须把三个地址替换为真实 HTTPS 服务。
+
 `native` 使用系统标题栏；`integrated` 把内容延伸进标题栏，macOS 红黄绿按钮/窗口安全区由 Shell 自动消费。发布身份、签名、generic update feed 和产物目录见 `docs/desktop.md`。
 
 ## 文档地图（先读这几份）

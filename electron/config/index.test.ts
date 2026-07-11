@@ -89,5 +89,11 @@ describe('desktop environment', () => {
     expect(() => readRendererDevelopmentUrl({ VITE_DEV_SERVER_URL: 'file:///tmp/index.html' })).toThrow(
       'VITE_DEV_SERVER_URL',
     );
+    expect(() =>
+      readRendererDevelopmentUrl({ VITE_DEV_SERVER_URL: 'https://evil.example.com/' }),
+    ).toThrow('loopback');
+    expect(() =>
+      readRendererDevelopmentUrl({ VITE_DEV_SERVER_URL: 'http://user:secret@localhost:5173/' }),
+    ).toThrow('VITE_DEV_SERVER_URL');
   });
 });

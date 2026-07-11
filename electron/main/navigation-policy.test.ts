@@ -32,4 +32,19 @@ describe('desktop navigation policy', () => {
     expect(() => assertTrustedSender('https://api.example.com')).toThrow('拒绝非 Renderer IPC sender');
     expect(() => assertTrustedSender('app://other/index.html')).toThrow('拒绝非 Renderer IPC sender');
   });
+
+  test('accepts IPC only from the exact configured Vite development document', () => {
+    const developmentUrl = 'http://localhost:5173/';
+
+    expect(() => assertTrustedSender('http://localhost:5173/#/login', developmentUrl)).not.toThrow();
+    expect(() => assertTrustedSender('http://localhost:5174/#/login', developmentUrl)).toThrow(
+      '拒绝非 Renderer IPC sender',
+    );
+    expect(() => assertTrustedSender('http://127.0.0.1:5173/#/login', developmentUrl)).toThrow(
+      '拒绝非 Renderer IPC sender',
+    );
+    expect(() => assertTrustedSender('http://localhost:5173/embedded.html', developmentUrl)).toThrow(
+      '拒绝非 Renderer IPC sender',
+    );
+  });
 });

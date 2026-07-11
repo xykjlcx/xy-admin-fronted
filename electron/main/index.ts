@@ -72,6 +72,8 @@ const spikeDownloadPath = parseSpikeDownloadPath(
 );
 const rendererRoot = path.join(app.getAppPath(), 'out/renderer');
 const allowedExternalHosts = new Set([new URL(environment.webPublicBaseUrl).hostname]);
+const rendererDevelopmentUrl =
+  environment.mode === 'development' ? readRendererDevelopmentUrl() : null;
 let mainWindow: BrowserWindow | null = null;
 let startupLogger: ReturnType<typeof createDesktopLogger> | null = null;
 
@@ -135,10 +137,13 @@ function createMainWindow(
   });
   attachNavigationPolicy(window, logger);
   window.once('ready-to-show', () => window.show());
-  const developmentUrl = readRendererDevelopmentUrl();
   let rendererHealthConfirmed = false;
   window.webContents.on('did-finish-load', () => {
-    if (rendererHealthConfirmed || !isHealthyRendererUrl(window.webContents.getURL(), developmentUrl)) return;
+    if (
+      rendererHealthConfirmed ||
+      !isHealthyRendererUrl(window.webContents.getURL(), rendererDevelopmentUrl)
+    )
+      return;
     rendererHealthConfirmed = true;
     logger.info('renderer healthy');
     onRendererHealthy();
@@ -156,7 +161,7 @@ function createMainWindow(
     if (mainWindow === window) mainWindow = null;
   });
 
-  const targetUrl = developmentUrl ?? 'app://renderer/index.html#/admin/dashboard';
+  const targetUrl = rendererDevelopmentUrl ?? 'app://renderer/index.html#/admin/dashboard';
   void window.loadURL(targetUrl).catch((error: unknown) => {
     logger.error('renderer load promise rejected', error);
   });
@@ -293,6 +298,7 @@ async function startApplication(): Promise<void> {
   });
   const disposeIpc = registerDesktopIpcHandlers(
     {
+      rendererDevelopmentUrl,
       writeClipboardText: (text) => clipboard.writeText(text),
       openExternal: (url) => shell.openExternal(url),
       allowedExternalHosts,

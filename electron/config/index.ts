@@ -152,8 +152,18 @@ export function readRendererDevelopmentUrl(environment: RawEnvironment = process
   const value = environment.VITE_DEV_SERVER_URL;
   if (!value) return null;
   const url = new URL(value);
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-    throw new Error('VITE_DEV_SERVER_URL 必须使用 HTTP 或 HTTPS');
+  if (
+    (url.protocol !== 'http:' && url.protocol !== 'https:') ||
+    url.username ||
+    url.password ||
+    url.pathname !== '/' ||
+    url.search ||
+    url.hash
+  ) {
+    throw new Error('VITE_DEV_SERVER_URL 必须是无凭据、无路径/query/hash 的 HTTP(S) origin');
+  }
+  if (!['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)) {
+    throw new Error('VITE_DEV_SERVER_URL 必须指向 loopback');
   }
   return url.toString();
 }
