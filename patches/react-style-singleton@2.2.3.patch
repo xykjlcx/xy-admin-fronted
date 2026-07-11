@@ -1,0 +1,61 @@
+diff --git a/dist/es2015/hook.js b/dist/es2015/hook.js
+index b7646bd9c170c9b2d2fda7517b2e5ca9d3e5f04a..1b4cf6f8dc34b561596d44854bd86e7e58821466 100644
+--- a/dist/es2015/hook.js
++++ b/dist/es2015/hook.js
+@@ -10,13 +10,6 @@ import { stylesheetSingleton } from './singleton';
+  * useStyle('body { overflow: hidden}');
+  */
+ export var styleHookSingleton = function () {
+-    var sheet = stylesheetSingleton();
+-    return function (styles, isDynamic) {
+-        React.useEffect(function () {
+-            sheet.add(styles);
+-            return function () {
+-                sheet.remove();
+-            };
+-        }, [styles && isDynamic]);
+-    };
++    // CSP_STATIC_SCROLL_LOCK: 应用已提供静态滚动锁 CSS，禁止运行时 <style> 注入。
++    return function () { };
+ };
+diff --git a/dist/es2019/hook.js b/dist/es2019/hook.js
+index c405cdee49ad42a2325ddf55c9e1dbf2425489bd..ee1deeafa1dadf7524ec8ca585bf0b6605321de8 100644
+--- a/dist/es2019/hook.js
++++ b/dist/es2019/hook.js
+@@ -10,13 +10,6 @@ import { stylesheetSingleton } from './singleton';
+  * useStyle('body { overflow: hidden}');
+  */
+ export const styleHookSingleton = () => {
+-    const sheet = stylesheetSingleton();
+-    return (styles, isDynamic) => {
+-        React.useEffect(() => {
+-            sheet.add(styles);
+-            return () => {
+-                sheet.remove();
+-            };
+-        }, [styles && isDynamic]);
+-    };
++    // CSP_STATIC_SCROLL_LOCK: 应用已提供静态滚动锁 CSS，禁止运行时 <style> 注入。
++    return () => { };
+ };
+diff --git a/dist/es5/hook.js b/dist/es5/hook.js
+index 55c8c908cc08815b987dd6873293228a26d5f31b..dac19ebbdfc45d568df23e5e9b9a303cf8352853 100644
+--- a/dist/es5/hook.js
++++ b/dist/es5/hook.js
+@@ -14,14 +14,7 @@ var singleton_1 = require("./singleton");
+  * useStyle('body { overflow: hidden}');
+  */
+ var styleHookSingleton = function () {
+-    var sheet = (0, singleton_1.stylesheetSingleton)();
+-    return function (styles, isDynamic) {
+-        React.useEffect(function () {
+-            sheet.add(styles);
+-            return function () {
+-                sheet.remove();
+-            };
+-        }, [styles && isDynamic]);
+-    };
++    // CSP_STATIC_SCROLL_LOCK: 应用已提供静态滚动锁 CSS，禁止运行时 <style> 注入。
++    return function () { };
+ };
+ exports.styleHookSingleton = styleHookSingleton;

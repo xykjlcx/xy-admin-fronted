@@ -1,5 +1,6 @@
 @import 'tailwindcss' source('../');
 @import 'tw-animate-css';
+@import 'sonner/dist/styles.css';
 @import './tokens.base.css';
 @import './tokens.feishu.css';
 @import './tokens.claude.css';
@@ -118,6 +119,26 @@
   [role='menuitem']:not([aria-disabled='true']):not([data-disabled]),
   [data-clickable='true']:not([aria-disabled='true']):not([data-disabled]) {
     cursor: pointer;
+  }
+
+  /* Radix RemoveScroll 继续维护 data-scroll-locked 计数；样式改为静态资源，避免 Electron CSP 拒绝运行时 <style>。
+     Shell 的滚动容器位于 #shell-main，body 无滚动条宽度需要补偿。 */
+  .with-scroll-bars-hidden,
+  body[data-scroll-locked] {
+    overflow: hidden !important;
+    overscroll-behavior: contain;
+  }
+
+  body[data-scroll-locked] {
+    --removed-body-scroll-bar-size: 0px;
+  }
+
+  .right-scroll-bar-position {
+    right: 0 !important;
+  }
+
+  .width-before-scroll-bar {
+    margin-right: 0 !important;
   }
 }
 

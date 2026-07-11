@@ -37,6 +37,7 @@ function DialogOverlay({ className, ...props }: React.ComponentProps<typeof Dial
 type DialogContentProps = React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
   closeOnInteractOutside?: boolean;
+  closeLabel?: string;
 };
 
 function DialogContent({
@@ -44,6 +45,7 @@ function DialogContent({
   children,
   showCloseButton = true,
   closeOnInteractOutside = false,
+  closeLabel = 'Close',
   onPointerDownOutside,
   onInteractOutside,
   ...props
@@ -81,7 +83,7 @@ function DialogContent({
             className="absolute right-6 top-[calc(22px*var(--app-scale))] flex size-[calc(30px*var(--app-scale))] cursor-pointer items-center justify-center rounded-7 text-(--overlay-close-fg) outline-none transition-colors hover:bg-(--overlay-close-bg-hover) hover:text-(--overlay-close-fg-hover) focus-visible:ring-[length:var(--focus-ring)] focus-visible:ring-(--button-ring) disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none"
           >
             <XIcon className="size-[calc(18px*var(--app-scale))]" />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{closeLabel}</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>

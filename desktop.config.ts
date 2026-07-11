@@ -12,7 +12,7 @@ const DesktopPackagingConfigSchema = z
       .trim()
       .min(1)
       .max(120)
-      .refine((value) => !/[\\/\u0000-\u001f]/.test(value), 'productName 包含非法字符'),
+      .refine((value) => !/[\\/\p{Cc}]/u.test(value), 'productName 包含非法字符'),
     executableName: z
       .string()
       .min(1)

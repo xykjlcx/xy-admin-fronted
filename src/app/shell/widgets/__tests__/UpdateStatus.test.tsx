@@ -1,9 +1,12 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { expect, test, vi } from 'vitest';
+import { toast } from 'sonner';
 import { UpdateStatus } from '@/app/shell/widgets/UpdateStatus';
 import type { AppPlatform, UpdateSnapshot } from '@/lib/platform';
 import { i18nInit } from '@/lib/i18n';
+
+vi.mock('sonner', () => ({ toast: { error: vi.fn() } }));
 
 beforeAll(async () => i18nInit);
 
@@ -69,9 +72,13 @@ test('Desktop background check stays quiet until an update becomes available', a
   expect(screen.queryByRole('button', { name: /更新/ })).not.toBeInTheDocument();
   act(() => harness.emit(available));
   await userEvent.click(screen.getByRole('button', { name: '发现新版本 0.2.0' }));
-  expect(screen.getByRole('dialog', { name: '软件更新' })).toBeInTheDocument();
+  const dialog = screen.getByRole('dialog', { name: '软件更新' });
+  expect(dialog).toHaveClass('max-h-[calc(100vh-2rem)]');
+  expect(dialog.querySelector('[data-slot="update-dialog-body"]')).toHaveClass('overflow-y-auto');
+  expect(screen.getByRole('button', { name: '关闭' })).toBeInTheDocument();
   expect(screen.getByText('安全性与稳定性改进')).toBeInTheDocument();
   expect(screen.getByText('0.1.0 → 0.2.0')).toBeInTheDocument();
+  expect(screen.getByText(new Date(available.releaseDate!).toLocaleString('zh-CN'))).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: '下载更新' }));
   expect(harness.updater.download).toHaveBeenCalledOnce();
 
@@ -120,4 +127,14 @@ test('Desktop error entry exposes only a retry action', async () => {
   expect(screen.queryByText('UPDATE_CHECK_FAILED')).not.toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: '重试' }));
   expect(harness.updater.retry).toHaveBeenCalledOnce();
+});
+
+test('Desktop contains rejected updater adapter calls instead of leaking unhandled promises', async () => {
+  const harness = createUpdater(baseSnapshot);
+  harness.updater.getSnapshot = vi.fn().mockRejectedValue(new Error('snapshot unavailable'));
+  harness.updater.check = vi.fn().mockRejectedValue(new Error('check unavailable'));
+
+  render(<UpdateStatus updater={harness.updater} />);
+
+  await waitFor(() => expect(toast.error).toHaveBeenCalledOnce());
 });

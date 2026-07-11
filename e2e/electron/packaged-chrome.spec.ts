@@ -51,6 +51,17 @@ async function selectAppearance(page: Page, layout: ShellLayout, zoom: Zoom): Pr
   await page.waitForTimeout(350);
 }
 
+async function captureStableScreenshot(page: Page, screenshotPath: string): Promise<void> {
+  // Electron/macOS 的离屏 fullPage tile 偶发返回黑块；视觉证据只采当前原生窗口视口。
+  await page.bringToFront();
+  await page.evaluate(
+    () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
+  );
+  await page.screenshot({ animations: 'disabled', caret: 'hide' });
+  await page.waitForTimeout(150);
+  await page.screenshot({ path: screenshotPath, animations: 'disabled', caret: 'hide' });
+}
+
 async function setFullScreenAndWait(desktop: ElectronApplication, fullScreen: boolean): Promise<void> {
   await desktop.evaluate(async ({ BrowserWindow }, desiredState) => {
     const window = BrowserWindow.getAllWindows()[0];
@@ -101,6 +112,10 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
 
   try {
     const page = await desktop.firstWindow();
+    const consoleErrors: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'error') consoleErrors.push(message.text());
+    });
     await page.waitForLoadState('domcontentloaded');
     await expect(page.getByRole('heading', { name: '欢迎回来' })).toBeVisible();
     await page.locator('#login-username').fill('chrome-user');
@@ -204,10 +219,7 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
             geometry.viewportWidth - geometry.controlsInsetRight,
           );
         }
-        await page.screenshot({
-          path: path.join(screenshotRoot, `${layout}-${zoom}.png`),
-          fullPage: true,
-        });
+        await captureStableScreenshot(page, path.join(screenshotRoot, `${layout}-${zoom}.png`));
       }
     }
     expect(existsSync(pendingMarkerPath)).toBe(true);
@@ -243,6 +255,36 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
         }),
       )
       .toEqual([`${String(expectedInsets.left)}px`, `${String(expectedInsets.right)}px`]);
+
+    await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(900, 700));
+    await expect(page.locator('[data-shell-layout="sidebar"]')).toBeVisible();
+    const compactGeometry = await page.evaluate(() => {
+      const header = document.querySelector<HTMLElement>('.shell-window-header');
+      const left = document.querySelector<HTMLElement>('[data-slot="shell-header-left"]');
+      const center = document.querySelector<HTMLElement>('[data-slot="shell-header-center"]');
+      const right = document.querySelector<HTMLElement>('[data-slot="shell-header-right"]');
+      const bounds = (element: HTMLElement | null) => element?.getBoundingClientRect() ?? null;
+      return {
+        viewportWidth: document.documentElement.clientWidth,
+        horizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        header: bounds(header),
+        left: bounds(left),
+        center: bounds(center),
+        right: bounds(right),
+      };
+    });
+    expect(compactGeometry.viewportWidth).toBeLessThanOrEqual(1023);
+    expect(compactGeometry.horizontalOverflow).toBe(false);
+    expect(compactGeometry.header).not.toBeNull();
+    expect(compactGeometry.left?.right ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(
+      compactGeometry.center?.left ?? Number.NEGATIVE_INFINITY,
+    );
+    expect(compactGeometry.center?.right ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(
+      compactGeometry.right?.left ?? Number.NEGATIVE_INFINITY,
+    );
+    expect(consoleErrors.filter((message) => message.includes('Applying inline style violates'))).toEqual(
+      [],
+    );
 
     await quitAndExpectExit(desktop);
     desktop = await electron.launch({

@@ -8,3 +8,6 @@ onlyBuiltDependencies:
   - electron-winstaller
   - esbuild
   - msw
+patchedDependencies:
+  react-style-singleton@2.2.3: patches/react-style-singleton@2.2.3.patch
+  sonner@2.0.7: patches/sonner@2.0.7.patch

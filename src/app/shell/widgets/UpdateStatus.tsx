@@ -38,7 +38,7 @@ export function UpdateStatus({
   updater?: AppPlatform['updater'];
   autoCheck?: boolean;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [snapshot, setSnapshot] = useState<UpdateSnapshot | null>(null);
   const [open, setOpen] = useState(false);
   const [commandPending, setCommandPending] = useState(false);
@@ -46,18 +46,30 @@ export function UpdateStatus({
   useEffect(() => {
     if (!updater.supported) return;
     let active = true;
+    let failureReported = false;
+    const reportAdapterFailure = () => {
+      if (!active || failureReported) return;
+      failureReported = true;
+      toast.error(t('update.commandFailed'));
+    };
     const unsubscribe = updater.subscribe((next) => {
       if (active) setSnapshot(next);
     });
-    void updater.getSnapshot().then((next) => {
-      if (active) setSnapshot(next);
-    });
+    void updater
+      .getSnapshot()
+      .then((next) => {
+        if (active) setSnapshot(next);
+      })
+      .catch(reportAdapterFailure);
 
     const check = () => {
       if (!autoCheck || !navigator.onLine) return;
-      void updater.check().then((result) => {
-        if (active && result.ok) setSnapshot(result.snapshot);
-      });
+      void updater
+        .check()
+        .then((result) => {
+          if (active && result.ok) setSnapshot(result.snapshot);
+        })
+        .catch(reportAdapterFailure);
     };
     check();
     window.addEventListener('online', check);
@@ -66,7 +78,7 @@ export function UpdateStatus({
       unsubscribe();
       window.removeEventListener('online', check);
     };
-  }, [autoCheck, updater]);
+  }, [autoCheck, t, updater]);
 
   if (!updater.supported) return null;
 
@@ -103,17 +115,20 @@ export function UpdateStatus({
         </Button>
       )}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent
+          closeLabel={t('actions.close')}
+          className="max-h-[calc(100vh-2rem)] grid-rows-[auto_minmax(0,1fr)_auto]"
+        >
           <DialogHeader>
             <DialogTitle>{t('update.title')}</DialogTitle>
             <DialogDescription>{versionSummary}</DialogDescription>
           </DialogHeader>
           {snapshot && (
-            <div className="grid gap-4 text-sm">
+            <div data-slot="update-dialog-body" className="grid min-h-0 gap-4 overflow-y-auto text-sm">
               {snapshot.releaseDate && (
                 <div>
                   <div className="font-medium">{t('update.releaseDate')}</div>
-                  <div>{new Date(snapshot.releaseDate).toLocaleString()}</div>
+                  <div>{new Date(snapshot.releaseDate).toLocaleString(i18n.language)}</div>
                 </div>
               )}
               {snapshot.releaseNotes && (

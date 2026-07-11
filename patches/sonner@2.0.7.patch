@@ -1,0 +1,24 @@
+diff --git a/dist/index.js b/dist/index.js
+index bd21e898f431298b70e941833c78819a1eb53a36..beb771e54f97ce0294f2efa77b80fc3205a6331c 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,5 +1,7 @@
+ 'use client';
+ function __insertCSS(code) {
++  // 样式由应用作为静态 CSS 资源引入，避免运行时 <style> 违反 Electron CSP。
++  return
+   if (!code || typeof document == 'undefined') return
+   let head = document.head || document.getElementsByTagName('head')[0]
+   let style = document.createElement('style')
+diff --git a/dist/index.mjs b/dist/index.mjs
+index d0c7a5a1fa1ed8b19c27bea968bb404f2437a07e..0dec5873c624915b34221b70e280a60441dc0708 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -1,5 +1,7 @@
+ 'use client';
+ function __insertCSS(code) {
++  // 样式由应用作为静态 CSS 资源引入，避免运行时 <style> 违反 Electron CSP。
++  return
+   if (!code || typeof document == 'undefined') return
+   let head = document.head || document.getElementsByTagName('head')[0]
+   let style = document.createElement('style')

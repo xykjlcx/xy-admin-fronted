@@ -13,7 +13,7 @@ export function createWindowOptions(input: CreateWindowOptionsInput): BrowserWin
   return {
     width: 1440,
     height: 900,
-    minWidth: 1024,
+    minWidth: 900,
     minHeight: 640,
     show: false,
     titleBarStyle:

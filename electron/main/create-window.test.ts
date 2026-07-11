@@ -19,7 +19,7 @@ describe('BrowserWindow security and chrome options', () => {
       expect(options).toMatchObject({
         width: 1440,
         height: 900,
-        minWidth: 1024,
+        minWidth: 900,
         minHeight: 640,
         titleBarStyle,
         titleBarOverlay,
