@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_auth/lastmile/billing')({
     labelKey: 'billing.title',
     permission: 'lastmile:billing:view',
     groupKey: 'common.subsystem',
-    actions: [{ code: 'lastmile:billing:export', labelKey: 'billing.export' }],
+    actions: [{ key: 'billing-export', code: 'lastmile:billing:export', labelKey: 'billing.export' }],
   },
   component: BillingRoute,
 });

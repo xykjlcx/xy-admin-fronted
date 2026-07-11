@@ -3,7 +3,7 @@ import { ShipmentNewPage } from '@/modules/lastmile/shipments';
 export const Route = createFileRoute('/_auth/lastmile/shipments/new')({
   staticData: {
     labelKey: 'shipments.newTitle',
-    permission: 'lastmile:shipment:create',
+    permissionRef: 'lastmile:shipment:create',
     groupKey: 'shipments.title',
   },
   component: ShipmentNewRoute,

@@ -3,7 +3,7 @@ import { ChannelFormPage } from '@/modules/lastmile/channels';
 export const Route = createFileRoute('/_auth/lastmile/channels/new')({
   staticData: {
     labelKey: 'channels.newTitle',
-    permission: 'lastmile:channel:create',
+    permissionRef: 'lastmile:channel:create',
     groupKey: 'channels.title',
   },
   component: ChannelNewRoute,

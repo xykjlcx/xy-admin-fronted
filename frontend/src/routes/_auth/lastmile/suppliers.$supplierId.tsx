@@ -3,7 +3,7 @@ import { SupplierDetailPage } from '@/modules/lastmile/suppliers';
 export const Route = createFileRoute('/_auth/lastmile/suppliers/$supplierId')({
   staticData: {
     labelKey: 'suppliers.detailTitle',
-    permission: 'lastmile:supplier:view',
+    permissionRef: 'lastmile:supplier:view',
     groupKey: 'channels.title',
   },
   component: SupplierDetailRoute,

@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_auth/lastmile/carriers/')({
     labelKey: 'carriers.title',
     permission: 'lastmile:carrier:view',
     groupKey: 'channels.title',
-    actions: [{ code: 'lastmile:carrier:create', labelKey: 'carriers.create' }],
+    actions: [{ key: 'carrier-create', code: 'lastmile:carrier:create', labelKey: 'carriers.create' }],
   },
   component: CarriersRoute,
 });

@@ -15,7 +15,8 @@ export const Route = createFileRoute('/_auth')({
       throw redirect({ to: appConfig.routes.login, search: { redirect: location.pathname + location.searchStr } });
     const me = await context.queryClient.ensureQueryData(meQuery);
     // 页面级守卫：取目标叶子路由 staticData.permission 校验（只 throw，禁 toast——preload=intent hover 即触发）
-    const need = matches[matches.length - 1]?.staticData?.permission;
+    const leaf = matches[matches.length - 1]?.staticData;
+    const need = leaf?.permission ?? leaf?.permissionRef;
     if (need && !matchPermission(me.permissions, need)) throw redirect({ to: appConfig.routes.forbidden });
     // Shell 用 useSuspenseQuery 取导航数据——此处预取进缓存，渲染时同步命中不触发 Suspense（无首屏闪烁）
     const subsystemKey = subsystemKeyFromPath(location.pathname);

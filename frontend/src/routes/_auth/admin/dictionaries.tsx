@@ -7,9 +7,9 @@ export const Route = createFileRoute('/_auth/admin/dictionaries')({
     permission: 'sys:dict:view',
     groupKey: 'dictionaries.breadcrumbGroup',
     actions: [
-      { code: 'sys:dict:create', labelKey: 'dictionaries.actions.create' },
-      { code: 'sys:dict:update', labelKey: 'dictionaries.actions.edit' },
-      { code: 'sys:dict:delete', labelKey: 'dictionaries.actions.delete' },
+      { key: 'dict-create', code: 'sys:dict:create', labelKey: 'dictionaries.actions.create' },
+      { key: 'dict-update', code: 'sys:dict:update', labelKey: 'dictionaries.actions.edit' },
+      { key: 'dict-delete', code: 'sys:dict:delete', labelKey: 'dictionaries.actions.delete' },
     ],
   },
   component: DictionariesRoute,

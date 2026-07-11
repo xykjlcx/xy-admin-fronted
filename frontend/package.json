@@ -18,6 +18,8 @@
     "visual:app": "node scripts/visual-agent-browser.mjs app",
     "visual:scale": "node scripts/visual-agent-browser.mjs scale",
     "visual:matrix": "node scripts/visual-agent-browser.mjs matrix",
+    "permissions:generate": "node --experimental-strip-types scripts/permissions/generate.ts generate",
+    "permissions:check": "node --experimental-strip-types scripts/permissions/generate.ts check",
     "preview": "vite preview"
   },
   "dependencies": {

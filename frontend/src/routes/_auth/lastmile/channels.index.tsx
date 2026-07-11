@@ -13,9 +13,9 @@ export const Route = createFileRoute('/_auth/lastmile/channels/')({
     permission: 'lastmile:channel:view',
     groupKey: 'common.subsystem',
     actions: [
-      { code: 'lastmile:channel:create', labelKey: 'channels.create' },
-      { code: 'lastmile:channel:update', labelKey: 'common.edit' },
-      { code: 'lastmile:channel:toggle', labelKey: 'common.status' },
+      { key: 'channel-create', code: 'lastmile:channel:create', labelKey: 'channels.create' },
+      { key: 'channel-update', code: 'lastmile:channel:update', labelKey: 'common.edit' },
+      { key: 'channel-toggle', code: 'lastmile:channel:toggle', labelKey: 'common.status' },
     ],
   },
   component: ChannelsRoute,

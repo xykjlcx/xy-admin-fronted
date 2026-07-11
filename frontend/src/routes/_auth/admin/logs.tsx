@@ -7,8 +7,8 @@ export const Route = createFileRoute('/_auth/admin/logs')({
     permission: 'audit:oplog:view',
     groupKey: 'logs.breadcrumbGroup',
     actions: [
-      { code: 'audit:oplog:export', labelKey: 'logs.actions.export' },
-      { code: 'audit:login:export', labelKey: 'logs.actions.export' },
+      { key: 'oplog-export', code: 'audit:oplog:export', labelKey: 'logs.actions.export' },
+      { key: 'login-export', code: 'audit:login:export', labelKey: 'logs.actions.export' },
     ],
   },
   component: LogsRoute,

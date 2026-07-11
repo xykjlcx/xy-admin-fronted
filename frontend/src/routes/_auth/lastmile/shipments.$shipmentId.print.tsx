@@ -3,7 +3,7 @@ import { ShipmentPrintPage } from '@/modules/lastmile/shipments';
 export const Route = createFileRoute('/_auth/lastmile/shipments/$shipmentId/print')({
   staticData: {
     labelKey: 'shipments.printTitle',
-    permission: 'lastmile:shipment:print',
+    permissionRef: 'lastmile:shipment:print',
     groupKey: 'shipments.title',
   },
   component: ShipmentPrintRoute,

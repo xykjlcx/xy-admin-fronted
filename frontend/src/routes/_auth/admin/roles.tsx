@@ -45,9 +45,9 @@ export const Route = createFileRoute('/_auth/admin/roles')({
     permission: 'iam:role:view',
     groupKey: 'roles.breadcrumbGroup',
     actions: [
-      { code: 'iam:role:create', labelKey: 'roles.actions.addRole' },
-      { code: 'iam:role:del', labelKey: 'roles.actions.deleteRole' },
-      { code: 'iam:role:grant', labelKey: 'roles.actions.savePermissions' },
+      { key: 'role-create', code: 'iam:role:create', labelKey: 'roles.actions.addRole' },
+      { key: 'role-del', code: 'iam:role:del', labelKey: 'roles.actions.deleteRole' },
+      { key: 'role-grant', code: 'iam:role:grant', labelKey: 'roles.actions.savePermissions' },
     ],
   },
   component: RolesRoute,

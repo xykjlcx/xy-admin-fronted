@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.metabuild.modules.admin.AdminModuleMarker;
 import com.metabuild.modules.lastmile.LastmileModuleMarker;
+import com.metabuild.api.contract.ApiContractMarker;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,8 @@ class MetaBuilderApplicationContractTest {
         .containsExactlyInAnyOrder(
             MetaBuilderApplication.class,
             AdminModuleMarker.class,
-            LastmileModuleMarker.class);
+            LastmileModuleMarker.class,
+            ApiContractMarker.class);
     Method main = applicationClass.getDeclaredMethod("main", String[].class);
     assertThat(main.getReturnType()).isEqualTo(void.class);
   }

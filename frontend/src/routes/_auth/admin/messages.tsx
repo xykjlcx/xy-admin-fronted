@@ -7,8 +7,8 @@ export const Route = createFileRoute('/_auth/admin/messages')({
     permission: 'notice:msg:view',
     groupKey: 'messages.breadcrumbGroup',
     actions: [
-      { code: 'notice:msg:edit', labelKey: 'messages.actions.approve' },
-      { code: 'notice:msg:del', labelKey: 'messages.actions.delete' },
+      { key: 'msg-edit', code: 'notice:msg:edit', labelKey: 'messages.actions.approve' },
+      { key: 'msg-del', code: 'notice:msg:del', labelKey: 'messages.actions.delete' },
     ],
   },
   component: MessagesRoute,

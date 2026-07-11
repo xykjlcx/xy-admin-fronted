@@ -1,0 +1,377 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "sourceKey": "/_auth/admin/company#action:org-edit",
+      "code": "sys:org:edit",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/company",
+      "labelKey": "company.actions.edit"
+    },
+    {
+      "sourceKey": "/_auth/admin/company#page",
+      "code": "sys:org:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/admin/company",
+      "labelKey": "company.title"
+    },
+    {
+      "sourceKey": "/_auth/admin/dashboard#page",
+      "code": "dashboard:overview:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/admin/dashboard",
+      "labelKey": "dashboard.navTitle"
+    },
+    {
+      "sourceKey": "/_auth/admin/dictionaries#action:dict-create",
+      "code": "sys:dict:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/dictionaries",
+      "labelKey": "dictionaries.actions.create"
+    },
+    {
+      "sourceKey": "/_auth/admin/dictionaries#action:dict-delete",
+      "code": "sys:dict:delete",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/dictionaries",
+      "labelKey": "dictionaries.actions.delete"
+    },
+    {
+      "sourceKey": "/_auth/admin/dictionaries#action:dict-update",
+      "code": "sys:dict:update",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/dictionaries",
+      "labelKey": "dictionaries.actions.edit"
+    },
+    {
+      "sourceKey": "/_auth/admin/dictionaries#page",
+      "code": "sys:dict:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/admin/dictionaries",
+      "labelKey": "dictionaries.title"
+    },
+    {
+      "sourceKey": "/_auth/admin/files#action:doc-del",
+      "code": "file:doc:del",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/files",
+      "labelKey": "files.actions.delete"
+    },
+    {
+      "sourceKey": "/_auth/admin/files#action:doc-download",
+      "code": "file:doc:download",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/files",
+      "labelKey": "files.actions.download"
+    },
+    {
+      "sourceKey": "/_auth/admin/files#action:doc-rename",
+      "code": "file:doc:rename",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/files",
+      "labelKey": "files.actions.rename"
+    },
+    {
+      "sourceKey": "/_auth/admin/files#action:doc-share",
+      "code": "file:doc:share",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/files",
+      "labelKey": "files.actions.share"
+    },
+    {
+      "sourceKey": "/_auth/admin/files#action:doc-upload",
+      "code": "file:doc:upload",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/files",
+      "labelKey": "files.actions.upload"
+    },
+    {
+      "sourceKey": "/_auth/admin/files#page",
+      "code": "file:doc:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/admin/files",
+      "labelKey": "files.title"
+    },
+    {
+      "sourceKey": "/_auth/admin/logs#action:login-export",
+      "code": "audit:login:export",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/logs",
+      "labelKey": "logs.actions.export"
+    },
+    {
+      "sourceKey": "/_auth/admin/logs#action:oplog-export",
+      "code": "audit:oplog:export",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/logs",
+      "labelKey": "logs.actions.export"
+    },
+    {
+      "sourceKey": "/_auth/admin/logs#page",
+      "code": "audit:oplog:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/admin/logs",
+      "labelKey": "logs.title"
+    },
+    {
+      "sourceKey": "/_auth/admin/menus#action:menu-create",
+      "code": "iam:menu:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/menus",
+      "labelKey": "menus.actions.create"
+    },
+    {
+      "sourceKey": "/_auth/admin/menus#action:menu-del",
+      "code": "iam:menu:del",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/menus",
+      "labelKey": "menus.actions.delete"
+    },
+    {
+      "sourceKey": "/_auth/admin/menus#action:menu-toggle",
+      "code": "iam:menu:toggle",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/menus",
+      "labelKey": "menus.actions.toggleVisible"
+    },
+    {
+      "sourceKey": "/_auth/admin/menus#action:menu-update",
+      "code": "iam:menu:update",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/menus",
+      "labelKey": "menus.actions.edit"
+    },
+    {
+      "sourceKey": "/_auth/admin/menus#page",
+      "code": "iam:menu:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/admin/menus",
+      "labelKey": "menus.title"
+    },
+    {
+      "sourceKey": "/_auth/admin/messages#action:msg-del",
+      "code": "notice:msg:del",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/messages",
+      "labelKey": "messages.actions.delete"
+    },
+    {
+      "sourceKey": "/_auth/admin/messages#action:msg-edit",
+      "code": "notice:msg:edit",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/messages",
+      "labelKey": "messages.actions.approve"
+    },
+    {
+      "sourceKey": "/_auth/admin/messages#page",
+      "code": "notice:msg:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/admin/messages",
+      "labelKey": "messages.title"
+    },
+    {
+      "sourceKey": "/_auth/admin/roles#action:role-create",
+      "code": "iam:role:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/roles",
+      "labelKey": "roles.actions.addRole"
+    },
+    {
+      "sourceKey": "/_auth/admin/roles#action:role-del",
+      "code": "iam:role:del",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/roles",
+      "labelKey": "roles.actions.deleteRole"
+    },
+    {
+      "sourceKey": "/_auth/admin/roles#action:role-grant",
+      "code": "iam:role:grant",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/roles",
+      "labelKey": "roles.actions.savePermissions"
+    },
+    {
+      "sourceKey": "/_auth/admin/roles#page",
+      "code": "iam:role:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/admin/roles",
+      "labelKey": "roles.title"
+    },
+    {
+      "sourceKey": "/_auth/admin/users#action:dept-create",
+      "code": "iam:dept:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/users",
+      "labelKey": "users.actions.createDept"
+    },
+    {
+      "sourceKey": "/_auth/admin/users#action:dept-update",
+      "code": "iam:dept:update",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/users",
+      "labelKey": "users.actions.editDept"
+    },
+    {
+      "sourceKey": "/_auth/admin/users#action:user-create",
+      "code": "iam:user:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/users",
+      "labelKey": "users.actions.create"
+    },
+    {
+      "sourceKey": "/_auth/admin/users#action:user-del",
+      "code": "iam:user:del",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/users",
+      "labelKey": "users.actions.delete"
+    },
+    {
+      "sourceKey": "/_auth/admin/users#action:user-resign",
+      "code": "iam:user:resign",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/users",
+      "labelKey": "users.actions.resign"
+    },
+    {
+      "sourceKey": "/_auth/admin/users#action:user-update",
+      "code": "iam:user:update",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/users",
+      "labelKey": "users.actions.edit"
+    },
+    {
+      "sourceKey": "/_auth/admin/users#page",
+      "code": "iam:user:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/admin/users",
+      "labelKey": "users.title"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/billing#action:billing-export",
+      "code": "lastmile:billing:export",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/billing",
+      "labelKey": "billing.export"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/billing#page",
+      "code": "lastmile:billing:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/lastmile/billing",
+      "labelKey": "billing.title"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/carriers/#action:carrier-create",
+      "code": "lastmile:carrier:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/carriers/",
+      "labelKey": "carriers.create"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/carriers/#page",
+      "code": "lastmile:carrier:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/lastmile/carriers/",
+      "labelKey": "carriers.title"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/channels/#action:channel-create",
+      "code": "lastmile:channel:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/channels/",
+      "labelKey": "channels.create"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/channels/#action:channel-toggle",
+      "code": "lastmile:channel:toggle",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/channels/",
+      "labelKey": "common.status"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/channels/#action:channel-update",
+      "code": "lastmile:channel:update",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/channels/",
+      "labelKey": "common.edit"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/channels/#page",
+      "code": "lastmile:channel:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/lastmile/channels/",
+      "labelKey": "channels.title"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/customers/#action:customer-authorize",
+      "code": "lastmile:customer:authorize",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/customers/",
+      "labelKey": "customers.tabs.authorization"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/customers/#action:customer-create",
+      "code": "lastmile:customer:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/customers/",
+      "labelKey": "customers.create"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/customers/#page",
+      "code": "lastmile:customer:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/lastmile/customers/",
+      "labelKey": "customers.title"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/overview#page",
+      "code": "lastmile:overview:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/lastmile/overview",
+      "labelKey": "overview.title"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/shipments/#action:shipment-create",
+      "code": "lastmile:shipment:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/shipments/",
+      "labelKey": "shipments.create"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/shipments/#action:shipment-export",
+      "code": "lastmile:shipment:export",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/shipments/",
+      "labelKey": "shipments.export"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/shipments/#action:shipment-print",
+      "code": "lastmile:shipment:print",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/shipments/",
+      "labelKey": "shipments.print"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/shipments/#page",
+      "code": "lastmile:shipment:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/lastmile/shipments/",
+      "labelKey": "shipments.title"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/suppliers/#action:supplier-create",
+      "code": "lastmile:supplier:create",
+      "kind": "ACTION",
+      "routeId": "/_auth/lastmile/suppliers/",
+      "labelKey": "suppliers.create"
+    },
+    {
+      "sourceKey": "/_auth/lastmile/suppliers/#page",
+      "code": "lastmile:supplier:view",
+      "kind": "PAGE",
+      "routeId": "/_auth/lastmile/suppliers/",
+      "labelKey": "suppliers.title"
+    }
+  ],
+  "digest": "0e36391c671beb4021db28327ac920a1fb4f39dbf7014ec7904d14cf5363ae01"
+}

@@ -44,6 +44,7 @@
     <testcontainers.version>1.21.4</testcontainers.version>
     <spring-boot.version>3.5.3</spring-boot.version>
     <sa-token.version>1.39.0</sa-token.version>
+    <springdoc.version>2.8.9</springdoc.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
     <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
     <skipTests>false</skipTests>
@@ -120,6 +121,11 @@
         <groupId>com.metabuild</groupId>
         <artifactId>metabuilder-lastmile</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+        <version>${springdoc.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jooq</groupId>

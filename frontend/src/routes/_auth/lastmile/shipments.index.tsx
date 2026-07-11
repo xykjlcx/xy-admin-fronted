@@ -12,9 +12,9 @@ export const Route = createFileRoute('/_auth/lastmile/shipments/')({
     permission: 'lastmile:shipment:view',
     groupKey: 'common.subsystem',
     actions: [
-      { code: 'lastmile:shipment:create', labelKey: 'shipments.create' },
-      { code: 'lastmile:shipment:print', labelKey: 'shipments.print' },
-      { code: 'lastmile:shipment:export', labelKey: 'shipments.export' },
+      { key: 'shipment-create', code: 'lastmile:shipment:create', labelKey: 'shipments.create' },
+      { key: 'shipment-print', code: 'lastmile:shipment:print', labelKey: 'shipments.print' },
+      { key: 'shipment-export', code: 'lastmile:shipment:export', labelKey: 'shipments.export' },
     ],
   },
   component: ShipmentListRoute,

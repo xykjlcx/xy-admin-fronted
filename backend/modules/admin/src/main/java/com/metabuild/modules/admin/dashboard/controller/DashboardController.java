@@ -6,13 +6,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.metabuild.modules.admin.auth.api.CurrentAuthorizationProvider;
 import com.metabuild.shared.kernel.Forbidden;
+import com.metabuild.admin.api.security.RequiresPermissions;
 
 @RestController
 @RequestMapping("/api/dashboard")
 public final class DashboardController {
     private final CurrentAuthorizationProvider authorization;
     public DashboardController(CurrentAuthorizationProvider authorization) { this.authorization=authorization; }
-    @GetMapping("/overview") public Map<String,Object> overview() {
+    @GetMapping("/overview")
+    @RequiresPermissions(codes = "dashboard:overview:view")
+    public Map<String,Object> overview() {
         var current = authorization.current();
         if (!current.systemAdmin() && !current.permissions().contains("dashboard:overview:view"))
             throw new Forbidden(() -> "auth.permission.denied", "Dashboard permission required");

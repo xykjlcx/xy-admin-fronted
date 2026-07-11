@@ -8,8 +8,8 @@ export const Route = createFileRoute('/_auth/lastmile/customers/')({
     permission: 'lastmile:customer:view',
     groupKey: 'common.subsystem',
     actions: [
-      { code: 'lastmile:customer:create', labelKey: 'customers.create' },
-      { code: 'lastmile:customer:authorize', labelKey: 'customers.tabs.authorization' },
+      { key: 'customer-create', code: 'lastmile:customer:create', labelKey: 'customers.create' },
+      { key: 'customer-authorize', code: 'lastmile:customer:authorize', labelKey: 'customers.tabs.authorization' },
     ],
   },
   component: CustomersRoute,

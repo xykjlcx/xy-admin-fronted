@@ -7,7 +7,8 @@ declare module '@tanstack/react-router' {
     label?: string; // 旧兜底；新增路由优先用 labelKey，避免用户可见中文散落在路由元数据中
     labelKey?: string; // 面包屑 i18n key
     permission?: string; // 页面 view 权限符（_auth beforeLoad 据此做页面级守卫）
-    actions?: { code: string; label?: string; labelKey?: string }[]; // 按钮级权限点（角色配置页聚合用）
+    permissionRef?: string; // 引用已由其他 route/action 声明的权限码，不创建 catalog 行
+    actions?: { key: string; code: string; label?: string; labelKey?: string }[]; // key 是与 code 解耦的稳定声明身份
     group?: string; // 旧兜底；新增路由优先用 groupKey
     groupKey?: string; // 权限配置页"模块"分组 i18n key
   }

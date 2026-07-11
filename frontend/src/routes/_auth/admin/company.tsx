@@ -6,7 +6,7 @@ export const Route = createFileRoute('/_auth/admin/company')({
     labelKey: 'company.title',
     permission: 'sys:org:view',
     groupKey: 'company.breadcrumbGroup',
-    actions: [{ code: 'sys:org:edit', labelKey: 'company.actions.edit' }],
+    actions: [{ key: 'org-edit', code: 'sys:org:edit', labelKey: 'company.actions.edit' }],
   },
   component: CompanyRoute,
 });

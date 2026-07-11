@@ -3,7 +3,7 @@ import { CustomerDetailPage } from '@/modules/lastmile/customers';
 export const Route = createFileRoute('/_auth/lastmile/customers/$customerId')({
   staticData: {
     labelKey: 'customers.detailTitle',
-    permission: 'lastmile:customer:view',
+    permissionRef: 'lastmile:customer:view',
     groupKey: 'customers.title',
   },
   component: CustomerDetailRoute,
