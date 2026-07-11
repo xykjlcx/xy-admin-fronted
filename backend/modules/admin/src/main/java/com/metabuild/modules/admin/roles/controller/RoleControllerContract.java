@@ -6,7 +6,7 @@ import com.metabuild.shared.kernel.UuidV7Generator;
 import java.util.*;
 import org.springframework.web.bind.annotation.*;
 
-/** Task16 前仅供契约测试，不注册为 production bean。 */
+@RestController
 @RequestMapping("/api")
 public final class RoleControllerContract {
  private final RoleService roles; private final UuidV7Generator ids;

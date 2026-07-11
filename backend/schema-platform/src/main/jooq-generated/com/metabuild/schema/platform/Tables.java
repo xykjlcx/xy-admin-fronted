@@ -11,6 +11,8 @@ import com.metabuild.schema.platform.tables.MbMenu;
 import com.metabuild.schema.platform.tables.MbMenuCustomization;
 import com.metabuild.schema.platform.tables.MbOperationLog;
 import com.metabuild.schema.platform.tables.MbPermission;
+import com.metabuild.schema.platform.tables.MbPermissionAlias;
+import com.metabuild.schema.platform.tables.MbPermissionCatalogVersion;
 import com.metabuild.schema.platform.tables.MbRefreshToken;
 import com.metabuild.schema.platform.tables.MbRole;
 import com.metabuild.schema.platform.tables.MbRoleCustomDept;
@@ -68,6 +70,16 @@ public class Tables {
      * The table <code>public.mb_permission</code>.
      */
     public static final MbPermission MB_PERMISSION = MbPermission.MB_PERMISSION;
+
+    /**
+     * The table <code>public.mb_permission_alias</code>.
+     */
+    public static final MbPermissionAlias MB_PERMISSION_ALIAS = MbPermissionAlias.MB_PERMISSION_ALIAS;
+
+    /**
+     * The table <code>public.mb_permission_catalog_version</code>.
+     */
+    public static final MbPermissionCatalogVersion MB_PERMISSION_CATALOG_VERSION = MbPermissionCatalogVersion.MB_PERMISSION_CATALOG_VERSION;
 
     /**
      * The table <code>public.mb_refresh_token</code>.

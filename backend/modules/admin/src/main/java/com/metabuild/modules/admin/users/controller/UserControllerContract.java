@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.*;
 
-/** Task16 前仅供契约测试，不注册为 production bean。 */
+@RestController
 @RequestMapping("/api/users")
 public final class UserControllerContract {
  private final UserService users; private final UuidV7Generator ids;

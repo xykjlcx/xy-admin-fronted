@@ -9,6 +9,7 @@ import java.util.UUID;
 /** PostgreSQL 侧授权命令协议。 */
 public interface AuthorizationRefreshPort {
     <T> T inTransaction(TransactionWork<T> work);
+    default void lockCatalogSeed(){throw new UnsupportedOperationException("Catalog lock is not configured");}
     void lockAuthzGraph();
     Map<UUID, Long> revisions(Set<UUID> userIds);
     Map<UUID, Long> incrementRevisions(Set<UUID> userIds);

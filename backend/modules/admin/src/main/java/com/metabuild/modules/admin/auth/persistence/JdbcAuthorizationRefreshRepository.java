@@ -17,6 +17,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public final class JdbcAuthorizationRefreshRepository implements AuthorizationRefreshPort {
     private static final long AUTHZ_GRAPH_LOCK = 0x4d425f41555A5448L;
+    private static final long CATALOG_SEED_LOCK = 0x4d425f434154414cL;
     private final JdbcTemplate jdbc; private final TransactionTemplate transactions;
     private final AuthorizationGraphRepository graphs; private final AuthorizationSnapshotCompiler compiler;
     private final UuidV7Generator ids; private final Clock clock;
@@ -25,6 +26,7 @@ public final class JdbcAuthorizationRefreshRepository implements AuthorizationRe
         this.jdbc=jdbc;this.transactions=new TransactionTemplate(manager);this.graphs=graphs;this.compiler=compiler;this.ids=ids;this.clock=clock;
     }
     @Override public <T>T inTransaction(TransactionWork<T> work){return transactions.execute(status->work.run());}
+    @Override public void lockCatalogSeed(){jdbc.query("select pg_advisory_xact_lock(?)",ps->ps.setLong(1,CATALOG_SEED_LOCK),rs->null);}
     @Override public void lockAuthzGraph(){jdbc.query("select pg_advisory_xact_lock(?)",ps->ps.setLong(1,AUTHZ_GRAPH_LOCK),rs->null);}
     @Override public Map<UUID,Long> revisions(Set<UUID> users){
         if(users.isEmpty())return Map.of();

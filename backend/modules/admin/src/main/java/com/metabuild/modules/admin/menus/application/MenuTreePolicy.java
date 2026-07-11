@@ -29,7 +29,7 @@ public final class MenuTreePolicy {
         candidates.stream().filter(row -> retained.contains(row.id()))
                 .sorted(Comparator.comparingInt(MenuRow::sort).thenComparing(MenuRow::id))
                 .forEach(row -> result.add(new MenuItem(row.id(), row.parentId(), row.subsystemKey(), row.type(),
-                        labels(row.labelKey()), row.icon(), row.path(), row.permission(), true, row.sort())));
+                        labels(row), row.icon(), row.path(), row.permission(), true, row.sort())));
         return List.copyOf(result);
     }
     private static boolean hasCompleteAncestorChain(MenuRow row, java.util.Map<UUID,MenuRow> byId) {
@@ -43,7 +43,9 @@ public final class MenuTreePolicy {
         }
         return true;
     }
-    private static Map<String,String> labels(String key) {
+    private static Map<String,String> labels(MenuRow row) {
+        if(row.localizedLabel()!=null&&!row.localizedLabel().isEmpty())return row.localizedLabel();
+        String key=row.labelKey();
         return switch (key) {
             case "nav.workspace" -> Map.of("zh-CN","工作台","en-US","Workspace");
             case "nav.organization" -> Map.of("zh-CN","组织与权限","en-US","Organization & Access");

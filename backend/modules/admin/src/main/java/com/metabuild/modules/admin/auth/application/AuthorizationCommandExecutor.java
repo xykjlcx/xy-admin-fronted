@@ -27,12 +27,19 @@ public final class AuthorizationCommandExecutor implements AuthorizationRefreshS
             Supplier<UUID> operationIds,Clock clock,LogoutRecoveryHandler terminal){this.database=database;this.snapshots=snapshots;this.operationIds=operationIds;this.clock=clock;this.tokens=null;this.sessions=null;this.terminal=terminal;}
 
     @Override public <T> T execute(Cause cause, AuthorizationChange<T> change) {
+        return executeRefresh(cause,change,false);
+    }
+    @Override public <T> T executeCatalog(Cause cause, AuthorizationChange<T> change) {
+        return executeRefresh(cause,change,true);
+    }
+    private <T> T executeRefresh(Cause cause, AuthorizationChange<T> change,boolean catalog) {
         UUID operationId=operationIds.get();
         Holder<Map<UUID,AuthorizationSnapshot>> preimage=new Holder<>();
         Holder<Set<UUID>> fenced=new Holder<>();
         TransactionResult<T> committed;
         try {
             committed=database.inTransaction(() -> {
+                if(catalog)database.lockCatalogSeed();
                 database.lockAuthzGraph();
                 Set<UUID> users=Set.copyOf(change.affectedUserIds());
                 Map<UUID,Long> oldRevisions=database.revisions(users);

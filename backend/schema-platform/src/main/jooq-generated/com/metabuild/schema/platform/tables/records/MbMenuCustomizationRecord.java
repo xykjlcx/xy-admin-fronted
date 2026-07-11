@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.annotation.processing.Generated;
 
+import org.jooq.JSONB;
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 
@@ -141,6 +142,48 @@ public class MbMenuCustomizationRecord extends UpdatableRecordImpl<MbMenuCustomi
         return (OffsetDateTime) get(7);
     }
 
+    /**
+     * Setter for <code>public.mb_menu_customization.label_zh_cn</code>.
+     */
+    public void setLabelZhCn(String value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_menu_customization.label_zh_cn</code>.
+     */
+    public String getLabelZhCn() {
+        return (String) get(8);
+    }
+
+    /**
+     * Setter for <code>public.mb_menu_customization.label_en_us</code>.
+     */
+    public void setLabelEnUs(String value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_menu_customization.label_en_us</code>.
+     */
+    public String getLabelEnUs() {
+        return (String) get(9);
+    }
+
+    /**
+     * Setter for <code>public.mb_menu_customization.localized_label</code>.
+     */
+    public void setLocalizedLabel(JSONB value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_menu_customization.localized_label</code>.
+     */
+    public JSONB getLocalizedLabel() {
+        return (JSONB) get(10);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -164,7 +207,7 @@ public class MbMenuCustomizationRecord extends UpdatableRecordImpl<MbMenuCustomi
     /**
      * Create a detached, initialised MbMenuCustomizationRecord
      */
-    public MbMenuCustomizationRecord(UUID menuId, Boolean parentOverridden, UUID parentId, String labelKey, String icon, Integer sort, Boolean visible, OffsetDateTime updatedAt) {
+    public MbMenuCustomizationRecord(UUID menuId, Boolean parentOverridden, UUID parentId, String labelKey, String icon, Integer sort, Boolean visible, OffsetDateTime updatedAt, String labelZhCn, String labelEnUs, JSONB localizedLabel) {
         super(MbMenuCustomization.MB_MENU_CUSTOMIZATION);
 
         setMenuId(menuId);
@@ -175,6 +218,9 @@ public class MbMenuCustomizationRecord extends UpdatableRecordImpl<MbMenuCustomi
         setSort(sort);
         setVisible(visible);
         setUpdatedAt(updatedAt);
+        setLabelZhCn(labelZhCn);
+        setLabelEnUs(labelEnUs);
+        setLocalizedLabel(localizedLabel);
         resetChangedOnNotNull();
     }
 }

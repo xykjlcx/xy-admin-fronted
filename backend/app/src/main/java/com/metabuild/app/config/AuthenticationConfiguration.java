@@ -44,6 +44,7 @@ import com.metabuild.modules.admin.auth.persistence.JdbcCurrentUserRepository;
 import com.metabuild.modules.admin.menus.application.MenuQuery;
 import com.metabuild.modules.admin.menus.application.MenuRepository;
 import com.metabuild.modules.admin.menus.persistence.JdbcMenuRepository;
+import com.metabuild.modules.admin.menus.controller.MenuController;
 import com.metabuild.modules.admin.auth.api.CurrentAuthorizationProvider;
 import com.metabuild.modules.admin.auth.application.LogoutRecoveryPort;
 import com.metabuild.modules.admin.auth.application.LogoutRecoveryHandler;
@@ -92,13 +93,23 @@ public class AuthenticationConfiguration {
     @Bean AuthorizationReconciliationScheduler authorizationReconciliationScheduler(AuthorizationReconciler reconciler){return new AuthorizationReconciliationScheduler(reconciler);}
     @Bean UserRepository userRepository(JdbcTemplate jdbc){return new JdbcUserRepository(jdbc);}
     @Bean UserService userService(UserRepository users,AuthorizationRefreshService refresh){return new UserService(users,refresh);}
-    @Bean UserControllerContract userController(UserService users,UuidV7Generator ids){return new UserControllerContract(users,ids);}
     @Bean DepartmentRepository departmentRepository(JdbcTemplate jdbc){return new JdbcDepartmentRepository(jdbc);}
     @Bean DepartmentService departmentService(DepartmentRepository depts,AuthorizationRefreshService refresh){return new DepartmentService(depts,refresh);}
-    @Bean DepartmentControllerContract departmentController(DepartmentService depts,UuidV7Generator ids){return new DepartmentControllerContract(depts,ids);}
     @Bean RoleRepository roleRepository(JdbcTemplate jdbc){return new JdbcRoleRepository(jdbc);}
     @Bean RoleService roleService(RoleRepository roles,AuthorizationRefreshService refresh){return new RoleService(roles,refresh);}
-    @Bean RoleControllerContract roleController(RoleService roles,UuidV7Generator ids){return new RoleControllerContract(roles,ids);}
+    @Bean PermissionCatalogSynchronizer permissionCatalogSynchronizer(JdbcTemplate jdbc,
+            PlatformTransactionManager manager,AuthorizationRefreshService refresh,UuidV7Generator ids,ObjectMapper json){
+        return new PermissionCatalogSynchronizer(jdbc,refresh,ids,json);
+    }
+    @Bean IamRuntimeCompletenessGate iamRuntimeCompletenessGate(AuthorizationRefreshService refresh,
+            AuthorizationBatchSnapshotStore fence,AuthorizationReconciler reconciler,
+            PermissionCatalogSynchronizer synchronizer){return new IamRuntimeCompletenessGate(refresh,fence,reconciler,synchronizer);}
+    @Bean ApplicationRunner permissionCatalogStartupSynchronizer(PermissionCatalogSynchronizer synchronizer,
+            AuthorizationReconciler reconciler,UserControllerContract users,DepartmentControllerContract departments,
+            RoleControllerContract roles,IamRuntimeCompletenessGate gate){
+        // 参数是启动完备性门禁：Fence/Reconciler 与 IAM 写入口缺任一 bean，context 必须失败。
+        return ignored -> synchronizer.synchronize();
+    }
     @Bean SaTokenSessionControl saTokenSessionControl() { return new SaTokenSessionControl(); }
     @Bean AccountSessionPort accountSessions(SaTokenSessionControl sessions) { return new AccountSessionAdapter(sessions); }
     @Bean RefreshTokenStore refreshTokens(JdbcTemplate jdbc, PlatformTransactionManager transactions,
@@ -128,7 +139,7 @@ public class AuthenticationConfiguration {
     @Bean CurrentUserRepository currentUsers(JdbcTemplate jdbc) { return new JdbcCurrentUserRepository(jdbc); }
     @Bean CurrentUserQuery currentUserQuery(CurrentAuthorizationProvider authorization,
             CurrentUserRepository users) { return new CurrentUserQuery(authorization, users); }
-    @Bean MenuRepository menuRepository(JdbcTemplate jdbc) { return new JdbcMenuRepository(jdbc); }
+    @Bean MenuRepository menuRepository(JdbcTemplate jdbc,ObjectMapper json) { return new JdbcMenuRepository(jdbc,json); }
     @Bean CurrentAuthorizationProvider currentAuthorization(AccountSessionPort sessions, RequestAuthorizationContext context) {
         return () -> {
             var userId = sessions.currentUserId();

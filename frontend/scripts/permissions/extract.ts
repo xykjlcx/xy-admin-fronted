@@ -6,6 +6,7 @@ export type PermissionDeclaration = {
   kind: 'PAGE' | 'ACTION';
   routeId: string;
   labelKey?: string;
+  aliases?: string[];
 };
 
 export type MenuDeclaration = {

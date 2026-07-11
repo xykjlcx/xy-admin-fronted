@@ -9,6 +9,16 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const routesRoot = join(root, 'frontend/src/routes');
 const outputRoot = join(root, 'backend/api-contract/src/main/resources/permissions');
 const menuManifest = join(root, 'frontend/scripts/permissions/menu-manifest.json');
+const aliasManifest = join(root, 'frontend/scripts/permissions/permission-aliases.json');
+type AliasDeclaration={sourceKey:string;oldCode:string;newCode:string};
+const permissionCode=/^[a-z][a-z0-9-]*:[a-z][a-z0-9-]*:[a-z][a-z0-9-]*$/;
+
+export function applyAliases(permissions:PermissionDeclaration[],aliases:AliasDeclaration[]):void{
+  const bySource=new Map(permissions.map(item=>[item.sourceKey,item]));const oldCodes=new Set<string>();
+  for(const alias of aliases){if(!permissionCode.test(alias.oldCode)||!permissionCode.test(alias.newCode))throw new Error(`alias permission code 非法: ${alias.oldCode}`);if(!oldCodes.add(alias.oldCode))throw new Error(`重复 alias oldCode: ${alias.oldCode}`);const target=bySource.get(alias.sourceKey);if(!target)throw new Error(`alias sourceKey 未声明: ${alias.sourceKey}`);if(target.code!==alias.newCode)throw new Error(`alias newCode 未匹配当前声明: ${alias.sourceKey}`);if(alias.oldCode===alias.newCode)throw new Error(`alias oldCode 与 newCode 相同: ${alias.oldCode}`);target.aliases=[...(target.aliases??[]),alias.oldCode].sort();}
+}
+
+export function validateMenuDag(menus:MenuDeclaration[]):void{const bySource=new Map(menus.map(item=>[item.sourceKey,item]));const done=new Set<string>();const visiting=new Set<string>();const visit=(key:string)=>{if(done.has(key))return;if(visiting.has(key))throw new Error(`menu parent cycle: ${key}`);visiting.add(key);const parent=bySource.get(key)?.parentSourceKey;if(parent!==null&&parent!==undefined){if(!bySource.has(parent))throw new Error(`menu parent 不存在: ${key}`);visit(parent);}visiting.delete(key);done.add(key);};for(const key of bySource.keys())visit(key);}
 
 async function filesUnder(directory: string): Promise<string[]> {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -40,6 +50,11 @@ export async function generateDocuments(routeFiles?: string[]) {
   permissions.sort((a, b) => a.sourceKey.localeCompare(b.sourceKey));
   menus.sort((a, b) => a.sourceKey.localeCompare(b.sourceKey));
   validateDeclarations(permissions);
+  const aliasDocument=JSON.parse(await readFile(aliasManifest,'utf8')) as {version?:unknown;items?:unknown};
+  if(!aliasDocument||aliasDocument.version!==1||!Array.isArray(aliasDocument.items)||Object.keys(aliasDocument).sort().join(',')!=='items,version')throw new Error('permission alias manifest root schema 非法');
+  const aliasKeys='newCode,oldCode,sourceKey';
+  for(const raw of aliasDocument.items)if(!raw||typeof raw!=='object'||Array.isArray(raw)||Object.keys(raw).sort().join(',')!==aliasKeys)throw new Error('permission alias manifest item schema 非法');
+  applyAliases(permissions,aliasDocument.items as AliasDeclaration[]);
   const declared = new Set(permissions.map(item => item.code));
   const pageCodeBySource = new Map(permissions.filter(item => item.kind === 'PAGE').map(item => [item.sourceKey, item.code]));
   for (const reference of references) {
@@ -72,6 +87,7 @@ export async function generateDocuments(routeFiles?: string[]) {
   const menuSources = new Set(menus.map(item => item.sourceKey));
   if (menuSources.size !== menus.length) throw new Error('重复 menu sourceKey');
   for (const item of menus) if (item.parentSourceKey !== null && !menuSources.has(item.parentSourceKey)) throw new Error(`menu parent 不存在: ${item.sourceKey}`);
+  validateMenuDag(menus);
   for (const sourceKey of pageSources) if (!menuSources.has(sourceKey)) throw new Error(`page permission 缺 menu metadata: ${sourceKey}`);
   return {
     'permission-catalog.json': document(permissions),

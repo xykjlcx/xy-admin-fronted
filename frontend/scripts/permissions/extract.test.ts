@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { extractRouteSource, validateDeclarations } from './extract.ts';
-import { generateDocuments } from './generate.ts';
+import { applyAliases, generateDocuments, validateMenuDag } from './generate.ts';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
@@ -56,6 +56,10 @@ describe('permission route AST extractor', () => {
   it('generates deterministic byte-identical documents', async () => {
     expect(await generateDocuments()).toEqual(await generateDocuments());
   });
+
+  it('applies explicit rename aliases only to the matching current source and code',()=>{const permissions=[{sourceKey:'/_auth/admin/users#page',code:'iam:user:view-v2',kind:'PAGE' as const,routeId:'/_auth/admin/users'}];applyAliases(permissions,[{sourceKey:'/_auth/admin/users#page',oldCode:'iam:user:view',newCode:'iam:user:view-v2'}]);expect(permissions[0]?.aliases).toEqual(['iam:user:view']);expect(()=>applyAliases(permissions,[{sourceKey:'/_auth/admin/users#page',oldCode:'iam:user:old',newCode:'iam:user:wrong'}])).toThrow('newCode');});
+
+  it.each([[[['a','a']]],[[['a','b'],['b','a']]],[[['a','b'],['b','c'],['c','a']]]])('rejects menu parent cycles: %j',(edges)=>{const menus=edges.map(([sourceKey,parentSourceKey])=>({sourceKey,subsystemKey:'admin',routeKey:null,type:'dir' as const,path:null,labelKey:sourceKey,permission:null,parentSourceKey,icon:null,sort:1,visible:true}));expect(()=>validateMenuDag(menus)).toThrow('cycle');});
 
   it('keeps committed backend classpath artifacts byte-identical', async () => {
     const generated = await generateDocuments();

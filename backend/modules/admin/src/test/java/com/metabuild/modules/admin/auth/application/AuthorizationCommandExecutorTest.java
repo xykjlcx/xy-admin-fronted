@@ -69,6 +69,10 @@ class AuthorizationCommandExecutorTest {
     }
     @Test void pipelineExceptionAfterPartialFenceCompensatesAllCandidates(){var port=new FakePort();var snapshots=new FakeSnapshots(port);snapshots.fenceFailure=true;var executor=executor(port,snapshots);assertThatThrownBy(()->executor.execute(AuthorizationRefreshService.Cause.ROLE_CHANGED,change(port))).isInstanceOf(AuthorizationUnavailable.class);assertThat(snapshots.compensated).containsExactly(OP);}
 
+    @Test void catalogCommandLocksCatalogBeforeAuthzAndPublishesReadyOnlyAfterCommit(){var port=new FakePort();var snapshots=new FakeSnapshots(port);var executor=executor(port,snapshots);assertThat(executor.executeCatalog(AuthorizationRefreshService.Cause.GRANT_CHANGED,change(port))).isEqualTo("ok");assertThat(port.events).containsExactly("catalog-lock","lock","revisions","compile","fence","mutate","increment","outbox","commit","compile","ready","done");}
+
+    @Test void catalogCommitFailureCompensatesFenceAndNeverPublishesReady(){var port=new FakePort();port.failCommit=true;var snapshots=new FakeSnapshots(port);var executor=executor(port,snapshots);assertThatThrownBy(()->executor.executeCatalog(AuthorizationRefreshService.Cause.GRANT_CHANGED,change(port))).isInstanceOf(IllegalStateException.class);assertThat(port.events).containsExactly("catalog-lock","lock","revisions","compile","fence","mutate","increment","outbox","rollback","compensate");assertThat(snapshots.readyBatches).isZero();}
+
     private static AuthorizationRefreshService.AuthorizationChange<String> change(FakePort port) {
         return new AuthorizationRefreshService.AuthorizationChange<>() {
             public Set<UUID> affectedUserIds() { return Set.of(USER); }
@@ -82,8 +86,9 @@ class AuthorizationCommandExecutorTest {
     }
 
     private static final class FakePort implements AuthorizationRefreshPort {
-        final List<String> events = new ArrayList<>(); final List<UUID> outbox = new ArrayList<>(); boolean failMutation;
-        public <T> T inTransaction(TransactionWork<T> work) { try { T value=work.run(); events.add("commit"); return value; } catch(RuntimeException e){events.add("rollback");throw e;} }
+        final List<String> events = new ArrayList<>(); final List<UUID> outbox = new ArrayList<>(); boolean failMutation,failCommit;
+        public <T> T inTransaction(TransactionWork<T> work) { try { T value=work.run();if(failCommit)throw new IllegalStateException("commit"); events.add("commit"); return value; } catch(RuntimeException e){events.add("rollback");throw e;} }
+        public void lockCatalogSeed(){events.add("catalog-lock");}
         public void lockAuthzGraph(){events.add("lock");}
         public Map<UUID,Long> revisions(Set<UUID> ids){events.add("revisions");return Map.of(USER, 2L);}
         public Map<UUID,Long> incrementRevisions(Set<UUID> ids){events.add("increment");return Map.of(USER, 3L);}

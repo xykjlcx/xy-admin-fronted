@@ -29,7 +29,8 @@ class PermissionControllerCoverageTest {
     void scansEveryProductionControllerAndRequiresMachineReadablePermissionsOutsideBaseline() throws Exception {
         Set<Class<?>> controllers = productionControllers();
         assertThat(controllers).extracting(Class::getSimpleName).containsExactlyInAnyOrder(
-                "AuthController", "DashboardController", "MenuController", "ShellMessageController", "SubsystemController");
+                "AuthController", "DashboardController", "MenuController", "ShellMessageController", "SubsystemController",
+                "UserControllerContract","DepartmentControllerContract","RoleControllerContract");
         Set<String> consumed = validateCoverage(controllers);
         var loader = new PermissionCatalogLoader(new ObjectMapper());
         PermissionContractVerifier.verify(loader.load("permissions/permission-catalog.json"),

@@ -22,6 +22,7 @@ import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.InverseForeignKey;
+import org.jooq.JSONB;
 import org.jooq.Name;
 import org.jooq.Path;
 import org.jooq.PlainSQL;
@@ -107,6 +108,21 @@ public class MbMenuCustomization extends TableImpl<MbMenuCustomizationRecord> {
      * The column <code>public.mb_menu_customization.updated_at</code>.
      */
     public final TableField<MbMenuCustomizationRecord, OffsetDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
+
+    /**
+     * The column <code>public.mb_menu_customization.label_zh_cn</code>.
+     */
+    public final TableField<MbMenuCustomizationRecord, String> LABEL_ZH_CN = createField(DSL.name("label_zh_cn"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column <code>public.mb_menu_customization.label_en_us</code>.
+     */
+    public final TableField<MbMenuCustomizationRecord, String> LABEL_EN_US = createField(DSL.name("label_en_us"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column <code>public.mb_menu_customization.localized_label</code>.
+     */
+    public final TableField<MbMenuCustomizationRecord, JSONB> LOCALIZED_LABEL = createField(DSL.name("localized_label"), SQLDataType.JSONB, this, "");
 
     private MbMenuCustomization(Name alias, Table<MbMenuCustomizationRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -222,6 +238,7 @@ public class MbMenuCustomization extends TableImpl<MbMenuCustomizationRecord> {
     @Override
     public List<Check<MbMenuCustomizationRecord>> getChecks() {
         return Arrays.asList(
+            Internal.createCheck(this, DSL.name("mb_menu_custom_label_shape"), "(((localized_label IS NULL) OR ((jsonb_typeof(localized_label) = 'object'::text) AND (localized_label <> '{}'::jsonb))))", true),
             Internal.createCheck(this, DSL.name("mb_menu_customization_not_self_parent"), "(((parent_id IS NULL) OR (parent_id <> menu_id)))", true)
         );
     }

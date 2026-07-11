@@ -12,6 +12,11 @@ public interface AuthorizationRefreshService {
 
     <T> T execute(Cause cause, AuthorizationChange<T> change);
 
+    /** Catalog 命令必须在同一真实事务中先取得 CATALOG_SEED，再取得 AUTHZ_GRAPH。 */
+    default <T> T executeCatalog(Cause cause, AuthorizationChange<T> change) {
+        throw new UnsupportedOperationException("Catalog protocol is not configured");
+    }
+
     <T> T executeTerminal(TerminalChange<T> change);
     default <T> T executeEnable(AuthorizationChange<T> change){return execute(Cause.USER_CHANGED,change);}
 

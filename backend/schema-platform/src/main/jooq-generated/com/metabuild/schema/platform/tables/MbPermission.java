@@ -8,6 +8,7 @@ import com.metabuild.schema.platform.Indexes;
 import com.metabuild.schema.platform.Keys;
 import com.metabuild.schema.platform.Public;
 import com.metabuild.schema.platform.tables.MbMenu.MbMenuPath;
+import com.metabuild.schema.platform.tables.MbPermissionAlias.MbPermissionAliasPath;
 import com.metabuild.schema.platform.tables.MbRole.MbRolePath;
 import com.metabuild.schema.platform.tables.MbRolePermission.MbRolePermissionPath;
 import com.metabuild.schema.platform.tables.records.MbPermissionRecord;
@@ -216,6 +217,19 @@ public class MbPermission extends TableImpl<MbPermissionRecord> {
             _mbMenu = new MbMenuPath(this, null, Keys.MB_MENU__MB_MENU_PERMISSION_ID_FKEY.getInverseKey());
 
         return _mbMenu;
+    }
+
+    private transient MbPermissionAliasPath _mbPermissionAlias;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.mb_permission_alias</code> table
+     */
+    public MbPermissionAliasPath mbPermissionAlias() {
+        if (_mbPermissionAlias == null)
+            _mbPermissionAlias = new MbPermissionAliasPath(this, null, Keys.MB_PERMISSION_ALIAS__MB_PERMISSION_ALIAS_PERMISSION_ID_FKEY.getInverseKey());
+
+        return _mbPermissionAlias;
     }
 
     private transient MbRolePermissionPath _mbRolePermission;

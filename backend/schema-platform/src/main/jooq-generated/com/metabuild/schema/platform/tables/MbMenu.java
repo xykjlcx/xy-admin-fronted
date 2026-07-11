@@ -25,6 +25,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
+import org.jooq.JSONB;
 import org.jooq.Name;
 import org.jooq.Path;
 import org.jooq.PlainSQL;
@@ -145,6 +146,31 @@ public class MbMenu extends TableImpl<MbMenuRecord> {
      * The column <code>public.mb_menu.updated_at</code>.
      */
     public final TableField<MbMenuRecord, OffsetDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
+
+    /**
+     * The column <code>public.mb_menu.default_path</code>.
+     */
+    public final TableField<MbMenuRecord, String> DEFAULT_PATH = createField(DSL.name("default_path"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column <code>public.mb_menu.default_type</code>.
+     */
+    public final TableField<MbMenuRecord, String> DEFAULT_TYPE = createField(DSL.name("default_type"), SQLDataType.VARCHAR(16).nullable(false).defaultValue(DSL.field(DSL.raw("'dir'::character varying"), SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>public.mb_menu.runtime_label_zh_cn</code>.
+     */
+    public final TableField<MbMenuRecord, String> RUNTIME_LABEL_ZH_CN = createField(DSL.name("runtime_label_zh_cn"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column <code>public.mb_menu.runtime_label_en_us</code>.
+     */
+    public final TableField<MbMenuRecord, String> RUNTIME_LABEL_EN_US = createField(DSL.name("runtime_label_en_us"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column <code>public.mb_menu.runtime_label</code>.
+     */
+    public final TableField<MbMenuRecord, JSONB> RUNTIME_LABEL = createField(DSL.name("runtime_label"), SQLDataType.JSONB, this, "");
 
     private MbMenu(Name alias, Table<MbMenuRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -278,8 +304,11 @@ public class MbMenu extends TableImpl<MbMenuRecord> {
     @Override
     public List<Check<MbMenuRecord>> getChecks() {
         return Arrays.asList(
+            Internal.createCheck(this, DSL.name("mb_menu_catalog_navigation_shape"), "((((origin)::text <> 'CATALOG'::text) OR ((default_type)::text = 'dir'::text) OR ((route_key IS NOT NULL) AND (default_path IS NOT NULL))))", true),
+            Internal.createCheck(this, DSL.name("mb_menu_default_type_check"), "(((default_type)::text = ANY ((ARRAY['dir'::character varying, 'menu'::character varying])::text[])))", true),
             Internal.createCheck(this, DSL.name("mb_menu_origin_check"), "(((origin)::text = ANY ((ARRAY['CATALOG'::character varying, 'RUNTIME'::character varying])::text[])))", true),
             Internal.createCheck(this, DSL.name("mb_menu_origin_shape_check"), "(((((origin)::text = 'CATALOG'::text) AND (source_key IS NOT NULL)) OR (((origin)::text = 'RUNTIME'::text) AND (source_key IS NULL) AND (route_key IS NULL) AND (permission_id IS NULL))))", true),
+            Internal.createCheck(this, DSL.name("mb_menu_runtime_label_shape"), "((((origin)::text <> 'RUNTIME'::text) OR ((jsonb_typeof(runtime_label) = 'object'::text) AND (runtime_label <> '{}'::jsonb))))", true),
             Internal.createCheck(this, DSL.name("mb_menu_status_check"), "(((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DEPRECATED'::character varying])::text[])))", true)
         );
     }

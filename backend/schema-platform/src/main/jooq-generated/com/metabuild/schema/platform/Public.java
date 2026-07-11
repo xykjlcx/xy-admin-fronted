@@ -11,6 +11,8 @@ import com.metabuild.schema.platform.tables.MbMenu;
 import com.metabuild.schema.platform.tables.MbMenuCustomization;
 import com.metabuild.schema.platform.tables.MbOperationLog;
 import com.metabuild.schema.platform.tables.MbPermission;
+import com.metabuild.schema.platform.tables.MbPermissionAlias;
+import com.metabuild.schema.platform.tables.MbPermissionCatalogVersion;
 import com.metabuild.schema.platform.tables.MbRefreshToken;
 import com.metabuild.schema.platform.tables.MbRole;
 import com.metabuild.schema.platform.tables.MbRoleCustomDept;
@@ -84,6 +86,16 @@ public class Public extends SchemaImpl {
     public final MbPermission MB_PERMISSION = MbPermission.MB_PERMISSION;
 
     /**
+     * The table <code>public.mb_permission_alias</code>.
+     */
+    public final MbPermissionAlias MB_PERMISSION_ALIAS = MbPermissionAlias.MB_PERMISSION_ALIAS;
+
+    /**
+     * The table <code>public.mb_permission_catalog_version</code>.
+     */
+    public final MbPermissionCatalogVersion MB_PERMISSION_CATALOG_VERSION = MbPermissionCatalogVersion.MB_PERMISSION_CATALOG_VERSION;
+
+    /**
      * The table <code>public.mb_refresh_token</code>.
      */
     public final MbRefreshToken MB_REFRESH_TOKEN = MbRefreshToken.MB_REFRESH_TOKEN;
@@ -141,6 +153,8 @@ public class Public extends SchemaImpl {
             MbMenuCustomization.MB_MENU_CUSTOMIZATION,
             MbOperationLog.MB_OPERATION_LOG,
             MbPermission.MB_PERMISSION,
+            MbPermissionAlias.MB_PERMISSION_ALIAS,
+            MbPermissionCatalogVersion.MB_PERMISSION_CATALOG_VERSION,
             MbRefreshToken.MB_REFRESH_TOKEN,
             MbRole.MB_ROLE,
             MbRoleCustomDept.MB_ROLE_CUSTOM_DEPT,

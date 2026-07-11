@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.annotation.processing.Generated;
 
+import org.jooq.JSONB;
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 
@@ -239,6 +240,76 @@ public class MbMenuRecord extends UpdatableRecordImpl<MbMenuRecord> {
         return (OffsetDateTime) get(14);
     }
 
+    /**
+     * Setter for <code>public.mb_menu.default_path</code>.
+     */
+    public void setDefaultPath(String value) {
+        set(15, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_menu.default_path</code>.
+     */
+    public String getDefaultPath() {
+        return (String) get(15);
+    }
+
+    /**
+     * Setter for <code>public.mb_menu.default_type</code>.
+     */
+    public void setDefaultType(String value) {
+        set(16, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_menu.default_type</code>.
+     */
+    public String getDefaultType() {
+        return (String) get(16);
+    }
+
+    /**
+     * Setter for <code>public.mb_menu.runtime_label_zh_cn</code>.
+     */
+    public void setRuntimeLabelZhCn(String value) {
+        set(17, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_menu.runtime_label_zh_cn</code>.
+     */
+    public String getRuntimeLabelZhCn() {
+        return (String) get(17);
+    }
+
+    /**
+     * Setter for <code>public.mb_menu.runtime_label_en_us</code>.
+     */
+    public void setRuntimeLabelEnUs(String value) {
+        set(18, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_menu.runtime_label_en_us</code>.
+     */
+    public String getRuntimeLabelEnUs() {
+        return (String) get(18);
+    }
+
+    /**
+     * Setter for <code>public.mb_menu.runtime_label</code>.
+     */
+    public void setRuntimeLabel(JSONB value) {
+        set(19, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_menu.runtime_label</code>.
+     */
+    public JSONB getRuntimeLabel() {
+        return (JSONB) get(19);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -262,7 +333,7 @@ public class MbMenuRecord extends UpdatableRecordImpl<MbMenuRecord> {
     /**
      * Create a detached, initialised MbMenuRecord
      */
-    public MbMenuRecord(UUID id, String sourceKey, String origin, String subsystemKey, String routeKey, UUID permissionId, String defaultParentSourceKey, String defaultLabelKey, String defaultIcon, Integer defaultSort, Boolean defaultVisible, String status, OffsetDateTime deletedAt, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MbMenuRecord(UUID id, String sourceKey, String origin, String subsystemKey, String routeKey, UUID permissionId, String defaultParentSourceKey, String defaultLabelKey, String defaultIcon, Integer defaultSort, Boolean defaultVisible, String status, OffsetDateTime deletedAt, OffsetDateTime createdAt, OffsetDateTime updatedAt, String defaultPath, String defaultType, String runtimeLabelZhCn, String runtimeLabelEnUs, JSONB runtimeLabel) {
         super(MbMenu.MB_MENU);
 
         setId(id);
@@ -280,6 +351,11 @@ public class MbMenuRecord extends UpdatableRecordImpl<MbMenuRecord> {
         setDeletedAt(deletedAt);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
+        setDefaultPath(defaultPath);
+        setDefaultType(defaultType);
+        setRuntimeLabelZhCn(runtimeLabelZhCn);
+        setRuntimeLabelEnUs(runtimeLabelEnUs);
+        setRuntimeLabel(runtimeLabel);
         resetChangedOnNotNull();
     }
 }
