@@ -52,7 +52,7 @@ export function ProfileDevicesPanel() {
                 {device.current ? ` · ${t('profile.devices.current')}` : ''}
               </p>
               <p className="mt-1 text-xs text-text-3">
-                {device.location} · {device.ip} · {device.lastActive}
+                {device.location} · {device.ip} · {device.lastActive ?? '—'}
               </p>
             </div>
             {!device.current && (

@@ -23,14 +23,15 @@ import org.springframework.web.method.HandlerMethod;
 
 class PermissionControllerCoverageTest {
     private static final Set<String> SHELL_OR_AUTH_BASELINES = Set.of(
-            "/api/auth", "/api/menus", "/api/messages", "/api/subsystems");
+            "/api/auth", "/api/menus", "/api/messages", "/api/subsystems", "/api/profile");
 
     @Test
     void scansEveryProductionControllerAndRequiresMachineReadablePermissionsOutsideBaseline() throws Exception {
         Set<Class<?>> controllers = productionControllers();
         assertThat(controllers).extracting(Class::getSimpleName).containsExactlyInAnyOrder(
                 "AuthController", "DashboardController", "MenuController", "ShellMessageController", "SubsystemController",
-                "UserControllerContract","DepartmentControllerContract","RoleControllerContract");
+                "UserControllerContract","DepartmentControllerContract","RoleControllerContract",
+                "DictionaryController","CompanyController","ProfileController");
         Set<String> consumed = validateCoverage(controllers);
         var loader = new PermissionCatalogLoader(new ObjectMapper());
         PermissionContractVerifier.verify(loader.load("permissions/permission-catalog.json"),

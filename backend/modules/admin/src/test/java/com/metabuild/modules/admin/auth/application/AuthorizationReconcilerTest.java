@@ -81,6 +81,6 @@ class AuthorizationReconcilerTest {
         public boolean fence(AuthorizationFence f){return true;}public boolean deleteIfFence(AuthorizationFence f){return true;}public void delete(UUID u){}
     }
     private static final class Tokens implements RefreshTokenStore {public String issue(UUID u){return "";}public RefreshRotationOutcome rotate(String t){return RefreshRotationOutcome.rejected();}public void revoke(String t){}public void revokeAll(UUID u){}}
-    private static final class Sessions implements AccountSessionPort {public AccessSession login(UUID u){return null;}public void logoutToken(String t){}public void kickoutAll(UUID u){}}
+    private static final class Sessions implements AccountSessionPort {public AccessSession login(UUID u,long revision){return null;}public void logoutToken(String t){}public void kickoutAll(UUID u){}}
     private static final class Recovery implements LogoutRecoveryPort {public void record(AuthorizationFence f,RuntimeException e){}public void complete(AuthorizationFence f){}public boolean advance(AuthorizationFence f,String expected,String next){return true;}}
 }

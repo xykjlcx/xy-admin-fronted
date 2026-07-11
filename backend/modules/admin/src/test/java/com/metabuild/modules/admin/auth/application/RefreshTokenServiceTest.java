@@ -57,6 +57,25 @@ class RefreshTokenServiceTest {
         assertThatThrownBy(() -> service.rotate(token)).isInstanceOf(RefreshTokenRejected.class);
     }
 
+    @Test void passwordCommitAfterRotationButBeforeAccessReturnRevokesReplacementAndAccess() {
+        var store=new AtomicRefreshTokenStore(CLOCK);var sessions=new TrackingSessions();
+        var service=new RefreshTokenService(store,readyStore(),ignored->1,sessions);
+        var original=store.issue(USER);
+        assertThatThrownBy(()->service.rotateForAccess(original,(id,revision)->sessions.login(id,revision))).isInstanceOf(RefreshTokenRejected.class);
+        assertThat(sessions.loggedOut).isEqualTo("raced-access");
+        assertThatThrownBy(()->service.rotate(original)).isInstanceOf(RefreshTokenRejected.class);
+    }
+
+    @Test void refreshAccessSessionCarriesCapturedCredentialRevision() {
+        var store=new AtomicRefreshTokenStore(CLOCK);var sessions=new TrackingSessions();
+        var service=new RefreshTokenService(store,readyStore(),ignored->5,sessions);
+        var original=store.issue(USER,5);
+        service.rotateForAccess(original,(id,revision)->sessions.login(id,revision));
+        assertThat(sessions.revision).isEqualTo(5L);
+    }
+
+    private static final class TrackingSessions implements AccountSessionPort {String loggedOut;long revision=-1;public AccessSession login(UUID id,long revision){this.revision=revision;return new AccessSession("raced-access",60);}public void logoutToken(String token){loggedOut=token;}public void kickoutAll(UUID id){}}
+
     private static RefreshTokenService service(RefreshTokenStore store, AuthorizationSnapshotStore snapshots) {
         return new RefreshTokenService(store, snapshots);
     }

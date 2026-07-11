@@ -10,6 +10,7 @@ import com.metabuild.shared.kernel.security.AuthorizationSnapshot;
 
 public final class AuthenticationService {
     private static final ErrorCode INVALID_CREDENTIALS = () -> "auth.credentials.invalid";
+    private static final ErrorCode CREDENTIALS_CHANGED = () -> "auth.credentials.changed";
     private final AuthUserRepository users;
     private final PasswordVerifier passwords;
     private final AuthorizationGraphRepository graphs;
@@ -36,12 +37,14 @@ public final class AuthenticationService {
         if (user == null || !user.enabled() || user.deleted() || !passwords.matches(password, user.passwordHash())) {
             throw new Unauthorized(INVALID_CREDENTIALS, "Invalid credentials");
         }
-        var refresh = refreshTokens.issue(user.id());
+        var refresh = refreshTokens.issue(user.id(),user.credentialRevision());
         AccessSession access = null;
         try {
-            access = sessions.login(user.id());
+            access = sessions.login(user.id(), user.credentialRevision());
             var snapshot = compiler.compile(graphs.load(user.id()), clock.instant());
             if (!snapshots.initializeReady(snapshot)) throw new AuthorizationUnavailable();
+            if(users.credentialRevision(user.id())!=user.credentialRevision())
+                throw new Unauthorized(CREDENTIALS_CHANGED,"Credentials changed during sign-in");
             return new LoginResult(access.token(), refresh, access.expiresInSeconds());
         } catch (RuntimeException exception) {
             try { refreshTokens.revoke(refresh); } catch (RuntimeException cleanup) { exception.addSuppressed(cleanup); }

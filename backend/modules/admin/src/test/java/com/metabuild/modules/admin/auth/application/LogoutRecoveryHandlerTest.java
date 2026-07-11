@@ -62,7 +62,7 @@ class LogoutRecoveryHandlerTest {
         public void revoke(String t){} public void revokeAll(UUID id){}
     }
     private static class NoopSessions implements AccountSessionPort {
-        public AccessSession login(UUID id){return new AccessSession("",1);} public void logoutToken(String t){} public void kickoutAll(UUID id){}
+        public AccessSession login(UUID id,long revision){return new AccessSession("",1);} public void logoutToken(String t){} public void kickoutAll(UUID id){}
     }
     private static final class CountingTokens extends NoopTokens {final AtomicInteger calls=new AtomicInteger();@Override public void revokeAll(UUID id){calls.incrementAndGet();}}
     private static final class CountingSessions extends NoopSessions {final AtomicInteger calls=new AtomicInteger();@Override public void kickoutAll(UUID id){calls.incrementAndGet();}}

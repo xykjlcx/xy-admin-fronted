@@ -5,7 +5,11 @@ package com.metabuild.schema.platform;
 
 
 import com.metabuild.schema.platform.tables.MbAuthzRefreshOutbox;
+import com.metabuild.schema.platform.tables.MbCompany;
+import com.metabuild.schema.platform.tables.MbCredentialRevocationOutbox;
 import com.metabuild.schema.platform.tables.MbDept;
+import com.metabuild.schema.platform.tables.MbDictionary;
+import com.metabuild.schema.platform.tables.MbDictionaryItem;
 import com.metabuild.schema.platform.tables.MbLoginLog;
 import com.metabuild.schema.platform.tables.MbMenu;
 import com.metabuild.schema.platform.tables.MbMenuCustomization;
@@ -19,6 +23,7 @@ import com.metabuild.schema.platform.tables.MbRoleCustomDept;
 import com.metabuild.schema.platform.tables.MbRolePermission;
 import com.metabuild.schema.platform.tables.MbSchemaProbe;
 import com.metabuild.schema.platform.tables.MbUser;
+import com.metabuild.schema.platform.tables.MbUserProfile;
 import com.metabuild.schema.platform.tables.MbUserRole;
 
 import javax.annotation.processing.Generated;
@@ -42,9 +47,29 @@ public class Tables {
     public static final MbAuthzRefreshOutbox MB_AUTHZ_REFRESH_OUTBOX = MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX;
 
     /**
+     * The table <code>public.mb_company</code>.
+     */
+    public static final MbCompany MB_COMPANY = MbCompany.MB_COMPANY;
+
+    /**
+     * The table <code>public.mb_credential_revocation_outbox</code>.
+     */
+    public static final MbCredentialRevocationOutbox MB_CREDENTIAL_REVOCATION_OUTBOX = MbCredentialRevocationOutbox.MB_CREDENTIAL_REVOCATION_OUTBOX;
+
+    /**
      * The table <code>public.mb_dept</code>.
      */
     public static final MbDept MB_DEPT = MbDept.MB_DEPT;
+
+    /**
+     * The table <code>public.mb_dictionary</code>.
+     */
+    public static final MbDictionary MB_DICTIONARY = MbDictionary.MB_DICTIONARY;
+
+    /**
+     * The table <code>public.mb_dictionary_item</code>.
+     */
+    public static final MbDictionaryItem MB_DICTIONARY_ITEM = MbDictionaryItem.MB_DICTIONARY_ITEM;
 
     /**
      * The table <code>public.mb_login_log</code>.
@@ -110,6 +135,11 @@ public class Tables {
      * The table <code>public.mb_user</code>.
      */
     public static final MbUser MB_USER = MbUser.MB_USER;
+
+    /**
+     * The table <code>public.mb_user_profile</code>.
+     */
+    public static final MbUserProfile MB_USER_PROFILE = MbUserProfile.MB_USER_PROFILE;
 
     /**
      * The table <code>public.mb_user_role</code>.

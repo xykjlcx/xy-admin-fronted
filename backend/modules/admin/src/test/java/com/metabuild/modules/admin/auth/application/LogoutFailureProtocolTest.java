@@ -61,7 +61,7 @@ class LogoutFailureProtocolTest {
     }
     private static final class FailingSessions implements AccountSessionPort {
         private final Failure failure; private FailingSessions(Failure failure) { this.failure=failure; }
-        @Override public AccessSession login(UUID userId) { return new AccessSession("a",1); }
+        @Override public AccessSession login(UUID userId,long revision) { return new AccessSession("a",1); }
         @Override public void logoutToken(String token) {}
         @Override public void kickoutAll(UUID userId) { if (failure == Failure.KICKOUT) throw new IllegalStateException("kickout"); }
     }

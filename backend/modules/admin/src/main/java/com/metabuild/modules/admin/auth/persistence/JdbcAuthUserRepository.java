@@ -10,11 +10,12 @@ public final class JdbcAuthUserRepository implements AuthUserRepository {
 
     @Override public AuthUser findByUsername(String username) {
         var rows = jdbc.query("""
-                select id, username, password_hash, status, deleted_at
+                select id, username, password_hash, status, deleted_at, credential_revision
                 from mb_user where lower(username) = lower(?)
                 """, (rs, row) -> new AuthUser(rs.getObject("id", java.util.UUID.class),
                 rs.getString("username"), rs.getString("password_hash"),
-                "ACTIVE".equals(rs.getString("status")), rs.getObject("deleted_at") != null), username);
+                "ACTIVE".equals(rs.getString("status")), rs.getObject("deleted_at") != null,rs.getLong("credential_revision")), username);
         return rows.isEmpty() ? null : rows.getFirst();
     }
+    @Override public long credentialRevision(java.util.UUID id){Long value=jdbc.queryForObject("select credential_revision from mb_user where id=? and deleted_at is null",Long.class,id);return value==null?-1:value;}
 }

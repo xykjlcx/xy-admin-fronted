@@ -308,7 +308,7 @@ public class MbMenu extends TableImpl<MbMenuRecord> {
             Internal.createCheck(this, DSL.name("mb_menu_default_type_check"), "(((default_type)::text = ANY ((ARRAY['dir'::character varying, 'menu'::character varying])::text[])))", true),
             Internal.createCheck(this, DSL.name("mb_menu_origin_check"), "(((origin)::text = ANY ((ARRAY['CATALOG'::character varying, 'RUNTIME'::character varying])::text[])))", true),
             Internal.createCheck(this, DSL.name("mb_menu_origin_shape_check"), "(((((origin)::text = 'CATALOG'::text) AND (source_key IS NOT NULL)) OR (((origin)::text = 'RUNTIME'::text) AND (source_key IS NULL) AND (route_key IS NULL) AND (permission_id IS NULL))))", true),
-            Internal.createCheck(this, DSL.name("mb_menu_runtime_label_shape"), "((((origin)::text <> 'RUNTIME'::text) OR ((jsonb_typeof(runtime_label) = 'object'::text) AND (runtime_label <> '{}'::jsonb))))", true),
+            Internal.createCheck(this, DSL.name("mb_menu_runtime_label_shape"), "((((origin)::text <> 'RUNTIME'::text) OR mb_non_empty_string_map(runtime_label)))", true),
             Internal.createCheck(this, DSL.name("mb_menu_status_check"), "(((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DEPRECATED'::character varying])::text[])))", true)
         );
     }

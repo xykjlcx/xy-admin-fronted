@@ -197,6 +197,20 @@ public class MbUserRecord extends UpdatableRecordImpl<MbUserRecord> {
         return (OffsetDateTime) get(11);
     }
 
+    /**
+     * Setter for <code>public.mb_user.credential_revision</code>.
+     */
+    public void setCredentialRevision(Long value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_user.credential_revision</code>.
+     */
+    public Long getCredentialRevision() {
+        return (Long) get(12);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -220,7 +234,7 @@ public class MbUserRecord extends UpdatableRecordImpl<MbUserRecord> {
     /**
      * Create a detached, initialised MbUserRecord
      */
-    public MbUserRecord(UUID id, UUID deptId, String username, String passwordHash, String displayName, String email, String phone, String status, Long authzRevision, OffsetDateTime deletedAt, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MbUserRecord(UUID id, UUID deptId, String username, String passwordHash, String displayName, String email, String phone, String status, Long authzRevision, OffsetDateTime deletedAt, OffsetDateTime createdAt, OffsetDateTime updatedAt, Long credentialRevision) {
         super(MbUser.MB_USER);
 
         setId(id);
@@ -235,6 +249,7 @@ public class MbUserRecord extends UpdatableRecordImpl<MbUserRecord> {
         setDeletedAt(deletedAt);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
+        setCredentialRevision(credentialRevision);
         resetChangedOnNotNull();
     }
 }

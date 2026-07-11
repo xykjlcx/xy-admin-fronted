@@ -37,7 +37,8 @@ public final class AuthController {
     @PostMapping("/refresh") public TokenResponse refresh(@RequestBody RefreshRequest request) {
         if (request.refreshToken() == null || request.refreshToken().isBlank())
             throw new BadRequest(() -> "request.validation.failed", "Refresh token is required");
-        var result = refreshTokens.rotateForAccess(request.refreshToken(), sessions::login);
+        var result = refreshTokens.rotateForAccess(request.refreshToken(),
+                (userId, credentialRevision) -> sessions.login(userId, credentialRevision));
         return new TokenResponse(result.accessToken(), result.refreshToken(), result.expiresInSeconds());
     }
     @PostMapping("/logout") public ResponseEntity<Void> logout() {

@@ -155,6 +155,20 @@ public class MbRefreshTokenRecord extends UpdatableRecordImpl<MbRefreshTokenReco
         return (OffsetDateTime) get(8);
     }
 
+    /**
+     * Setter for <code>public.mb_refresh_token.credential_revision</code>.
+     */
+    public void setCredentialRevision(Long value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>public.mb_refresh_token.credential_revision</code>.
+     */
+    public Long getCredentialRevision() {
+        return (Long) get(9);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -178,7 +192,7 @@ public class MbRefreshTokenRecord extends UpdatableRecordImpl<MbRefreshTokenReco
     /**
      * Create a detached, initialised MbRefreshTokenRecord
      */
-    public MbRefreshTokenRecord(UUID id, UUID userId, UUID familyId, String tokenHash, OffsetDateTime expiresAt, OffsetDateTime consumedAt, OffsetDateTime revokedAt, UUID replacedById, OffsetDateTime createdAt) {
+    public MbRefreshTokenRecord(UUID id, UUID userId, UUID familyId, String tokenHash, OffsetDateTime expiresAt, OffsetDateTime consumedAt, OffsetDateTime revokedAt, UUID replacedById, OffsetDateTime createdAt, Long credentialRevision) {
         super(MbRefreshToken.MB_REFRESH_TOKEN);
 
         setId(id);
@@ -190,6 +204,7 @@ public class MbRefreshTokenRecord extends UpdatableRecordImpl<MbRefreshTokenReco
         setRevokedAt(revokedAt);
         setReplacedById(replacedById);
         setCreatedAt(createdAt);
+        setCredentialRevision(credentialRevision);
         resetChangedOnNotNull();
     }
 }

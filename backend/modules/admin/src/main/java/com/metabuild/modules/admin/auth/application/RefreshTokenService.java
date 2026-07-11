@@ -3,11 +3,13 @@ package com.metabuild.modules.admin.auth.application;
 public final class RefreshTokenService {
     private final RefreshTokenStore tokens;
     private final AuthorizationSnapshotStore snapshots;
+    private final CredentialRevisionReader credentials;
+    private final AccountSessionPort sessions;
 
     public RefreshTokenService(RefreshTokenStore tokens, AuthorizationSnapshotStore snapshots) {
-        this.tokens = tokens;
-        this.snapshots = snapshots;
+        this(tokens,snapshots,userId->0,null);
     }
+    public RefreshTokenService(RefreshTokenStore tokens,AuthorizationSnapshotStore snapshots,CredentialRevisionReader credentials,AccountSessionPort sessions){this.tokens=tokens;this.snapshots=snapshots;this.credentials=credentials;this.sessions=sessions;}
 
     public RefreshRotation rotate(String token) {
         var outcome = tokens.rotate(token);
@@ -25,13 +27,20 @@ public final class RefreshTokenService {
         return rotation;
     }
 
-    public RefreshResult rotateForAccess(String token, java.util.function.Function<java.util.UUID, AccessSession> accessIssuer) {
+    public RefreshResult rotateForAccess(String token,
+            java.util.function.BiFunction<java.util.UUID, Long, AccessSession> accessIssuer) {
         var rotation = rotate(token);
+        AccessSession access=null;
         try {
-            var access = accessIssuer.apply(rotation.userId());
+            access = accessIssuer.apply(rotation.userId(), rotation.credentialRevision());
+            if(credentials.credentialRevision(rotation.userId())!=rotation.credentialRevision()){
+                tokens.revokeFamily(rotation.token());
+                throw new RefreshTokenRejected();
+            }
             return new RefreshResult(access.token(), rotation.token(), access.expiresInSeconds());
         } catch (RuntimeException failure) {
-            tokens.revokeAll(rotation.userId());
+            tokens.revokeFamily(rotation.token());
+            if(access!=null&&sessions!=null)try{sessions.logoutToken(access.token());}catch(RuntimeException cleanup){failure.addSuppressed(cleanup);}
             throw failure;
         }
     }

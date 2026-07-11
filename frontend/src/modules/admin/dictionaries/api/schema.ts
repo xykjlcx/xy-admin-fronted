@@ -21,22 +21,23 @@ export const DictionaryItemSchema = z.object({
 });
 
 export const CreateDictionarySchema = z.object({
-  name: z.string().trim().min(1),
+  name: z.string().trim().min(1).max(128),
   code: z
     .string()
     .trim()
+    .max(128)
     .regex(/^[a-z][a-z0-9_]*$/),
-  remark: z.string().trim(),
+  remark: z.string().trim().max(512),
   builtin: z.boolean(),
 });
 export const UpdateDictionarySchema = CreateDictionarySchema.pick({ name: true, remark: true });
 export const CreateDictionaryItemSchema = z.object({
-  label: z.string().trim().min(1),
-  value: z.string().trim().min(1),
+  label: z.string().trim().min(1).max(128),
+  value: z.string().trim().min(1).max(128),
   sort: z.number().int(),
   enabled: z.boolean(),
   color: DictionaryItemColorSchema,
-  remark: z.string().trim(),
+  remark: z.string().trim().max(512),
 });
 export const UpdateDictionaryItemSchema = CreateDictionaryItemSchema;
 export const SetDictionaryItemEnabledSchema = z.object({ enabled: z.boolean() });

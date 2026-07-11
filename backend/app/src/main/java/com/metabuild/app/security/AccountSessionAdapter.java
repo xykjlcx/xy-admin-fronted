@@ -12,6 +12,10 @@ public final class AccountSessionAdapter implements AccountSessionPort {
         var token = sessions.login(userId.toString());
         return new AccessSession(token.value(), token.expiresInSeconds());
     }
+    @Override public AccessSession login(UUID userId, long credentialRevision) {
+        var token = sessions.login(userId.toString(), credentialRevision);
+        return new AccessSession(token.value(), token.expiresInSeconds());
+    }
     @Override public void logoutToken(String token) { sessions.logoutToken(token); }
     @Override public void kickoutAll(UUID userId) { sessions.kickoutAll(userId.toString()); }
     @Override public UUID currentUserId() {

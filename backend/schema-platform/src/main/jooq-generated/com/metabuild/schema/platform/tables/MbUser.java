@@ -8,11 +8,13 @@ import com.metabuild.schema.platform.Indexes;
 import com.metabuild.schema.platform.Keys;
 import com.metabuild.schema.platform.Public;
 import com.metabuild.schema.platform.tables.MbAuthzRefreshOutbox.MbAuthzRefreshOutboxPath;
+import com.metabuild.schema.platform.tables.MbCredentialRevocationOutbox.MbCredentialRevocationOutboxPath;
 import com.metabuild.schema.platform.tables.MbDept.MbDeptPath;
 import com.metabuild.schema.platform.tables.MbLoginLog.MbLoginLogPath;
 import com.metabuild.schema.platform.tables.MbOperationLog.MbOperationLogPath;
 import com.metabuild.schema.platform.tables.MbRefreshToken.MbRefreshTokenPath;
 import com.metabuild.schema.platform.tables.MbRole.MbRolePath;
+import com.metabuild.schema.platform.tables.MbUserProfile.MbUserProfilePath;
 import com.metabuild.schema.platform.tables.MbUserRole.MbUserRolePath;
 import com.metabuild.schema.platform.tables.records.MbUserRecord;
 
@@ -136,6 +138,11 @@ public class MbUser extends TableImpl<MbUserRecord> {
      */
     public final TableField<MbUserRecord, OffsetDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
 
+    /**
+     * The column <code>public.mb_user.credential_revision</code>.
+     */
+    public final TableField<MbUserRecord, Long> CREDENTIAL_REVISION = createField(DSL.name("credential_revision"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BIGINT)), this, "");
+
     private MbUser(Name alias, Table<MbUserRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }
@@ -249,6 +256,19 @@ public class MbUser extends TableImpl<MbUserRecord> {
         return _mbAuthzRefreshOutbox;
     }
 
+    private transient MbCredentialRevocationOutboxPath _mbCredentialRevocationOutbox;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.mb_credential_revocation_outbox</code> table
+     */
+    public MbCredentialRevocationOutboxPath mbCredentialRevocationOutbox() {
+        if (_mbCredentialRevocationOutbox == null)
+            _mbCredentialRevocationOutbox = new MbCredentialRevocationOutboxPath(this, null, Keys.MB_CREDENTIAL_REVOCATION_OUTBOX__MB_CREDENTIAL_REVOCATION_OUTBOX_USER_ID_FKEY.getInverseKey());
+
+        return _mbCredentialRevocationOutbox;
+    }
+
     private transient MbLoginLogPath _mbLoginLog;
 
     /**
@@ -288,6 +308,19 @@ public class MbUser extends TableImpl<MbUserRecord> {
         return _mbRefreshToken;
     }
 
+    private transient MbUserProfilePath _mbUserProfile;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.mb_user_profile</code> table
+     */
+    public MbUserProfilePath mbUserProfile() {
+        if (_mbUserProfile == null)
+            _mbUserProfile = new MbUserProfilePath(this, null, Keys.MB_USER_PROFILE__MB_USER_PROFILE_USER_ID_FKEY.getInverseKey());
+
+        return _mbUserProfile;
+    }
+
     private transient MbUserRolePath _mbUserRole;
 
     /**
@@ -313,6 +346,7 @@ public class MbUser extends TableImpl<MbUserRecord> {
     public List<Check<MbUserRecord>> getChecks() {
         return Arrays.asList(
             Internal.createCheck(this, DSL.name("mb_user_authz_revision_check"), "((authz_revision >= 0))", true),
+            Internal.createCheck(this, DSL.name("mb_user_credential_revision_nonnegative"), "((credential_revision >= 0))", true),
             Internal.createCheck(this, DSL.name("mb_user_status_check"), "(((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DISABLED'::character varying, 'UNACTIVATED'::character varying, 'LEFT'::character varying])::text[])))", true)
         );
     }

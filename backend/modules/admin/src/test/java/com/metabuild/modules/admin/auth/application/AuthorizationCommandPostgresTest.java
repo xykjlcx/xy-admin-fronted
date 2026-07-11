@@ -46,7 +46,7 @@ class AuthorizationCommandPostgresTest {
     @Test void oldRefreshTokenNeverRevivesAfterDisableAndEnable(){
         var manager=new DataSourceTransactionManager(ds);var tokens=new JdbcRefreshTokenStore(jdbc,manager,new UuidV7Generator(),Clock.systemUTC(),Duration.ofDays(1));
         String old=tokens.issue(ADMIN);var port=new JdbcAuthorizationRefreshRepository(jdbc,manager,new JdbcAuthorizationGraphRepository(jdbc),new AuthorizationSnapshotCompiler(),new UuidV7Generator(),Clock.systemUTC());
-        AccountSessionPort sessions=new AccountSessionPort(){public AccessSession login(UUID u){return null;}public void logoutToken(String t){}public void kickoutAll(UUID u){}};
+        AccountSessionPort sessions=new AccountSessionPort(){public AccessSession login(UUID u,long revision){return null;}public void logoutToken(String t){}public void kickoutAll(UUID u){}};
         var terminal=new AuthorizationCommandExecutor(port,batch,new UuidV7Generator()::generate,Clock.systemUTC(),tokens,sessions);
         terminal.executeTerminal(new AuthorizationRefreshService.TerminalChange<>(){public Set<UUID> affectedUserIds(){return Set.of(ADMIN);}public Integer mutate(){return jdbc.update("update mb_user set status='DISABLED' where id=?",ADMIN);}public AuthorizationRefreshService.TerminalAction terminalAction(){return AuthorizationRefreshService.TerminalAction.DISABLE_ACCOUNT;}});
         terminal.executeEnable(new AuthorizationRefreshService.AuthorizationChange<>(){public Set<UUID> affectedUserIds(){return Set.of(ADMIN);}public Integer mutate(){return jdbc.update("update mb_user set status='ACTIVE' where id=?",ADMIN);}});

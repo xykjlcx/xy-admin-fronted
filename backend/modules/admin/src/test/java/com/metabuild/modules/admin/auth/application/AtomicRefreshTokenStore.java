@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 final class AtomicRefreshTokenStore implements RefreshTokenStore {
-    private record Entry(UUID userId, UUID familyId, boolean consumed, boolean revoked) {}
+    private record Entry(UUID userId, UUID familyId, long credentialRevision, boolean consumed, boolean revoked) {}
     private final Clock clock;
     private final Map<String, Entry> entries = new HashMap<>();
     private final Map<UUID, Set<String>> reverseIndex = new HashMap<>();
@@ -16,12 +16,13 @@ final class AtomicRefreshTokenStore implements RefreshTokenStore {
     AtomicRefreshTokenStore(Clock clock) { this.clock = clock; }
 
     @Override public synchronized String issue(UUID userId) {
-        return issue(userId, UUID.randomUUID());
+        return issue(userId, 0);
     }
+    @Override public synchronized String issue(UUID userId,long credentialRevision) { return issue(userId, UUID.randomUUID(), credentialRevision); }
 
-    private String issue(UUID userId, UUID familyId) {
+    private String issue(UUID userId, UUID familyId, long credentialRevision) {
         String token = userId + "." + clock.instant().toEpochMilli() + "." + UUID.randomUUID();
-        entries.put(token, new Entry(userId, familyId, false, false));
+        entries.put(token, new Entry(userId, familyId, credentialRevision, false, false));
         reverseIndex.computeIfAbsent(userId, ignored -> new HashSet<>()).add(token);
         return token;
     }
@@ -33,23 +34,23 @@ final class AtomicRefreshTokenStore implements RefreshTokenStore {
             revokeFamily(entry.familyId());
             return RefreshRotationOutcome.rejected();
         }
-        entries.put(token, new Entry(entry.userId(), entry.familyId(), true, false));
-        return RefreshRotationOutcome.success(new RefreshRotation(entry.userId(), issue(entry.userId(), entry.familyId())));
+        entries.put(token, new Entry(entry.userId(), entry.familyId(), entry.credentialRevision(), true, false));
+        return RefreshRotationOutcome.success(new RefreshRotation(entry.userId(), issue(entry.userId(), entry.familyId(), entry.credentialRevision()), entry.credentialRevision()));
     }
 
     private void revokeFamily(UUID familyId) {
         entries.replaceAll((token, entry) -> entry.familyId().equals(familyId)
-                ? new Entry(entry.userId(), entry.familyId(), entry.consumed(), true) : entry);
+                ? new Entry(entry.userId(), entry.familyId(), entry.credentialRevision(), entry.consumed(), true) : entry);
     }
 
     @Override public synchronized void revokeAll(UUID userId) {
         for (var token : reverseIndex.getOrDefault(userId, Set.of())) {
             var entry = entries.get(token);
-            if (entry != null) entries.put(token, new Entry(entry.userId(), entry.familyId(), entry.consumed(), true));
+            if (entry != null) entries.put(token, new Entry(entry.userId(), entry.familyId(), entry.credentialRevision(), entry.consumed(), true));
         }
     }
     @Override public synchronized void revoke(String token) {
         var entry = entries.get(token);
-        if (entry != null) entries.put(token, new Entry(entry.userId(), entry.familyId(), entry.consumed(), true));
+        if (entry != null) entries.put(token, new Entry(entry.userId(), entry.familyId(), entry.credentialRevision(), entry.consumed(), true));
     }
 }

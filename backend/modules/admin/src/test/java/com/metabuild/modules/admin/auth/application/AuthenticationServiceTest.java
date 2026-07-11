@@ -24,7 +24,7 @@ class AuthenticationServiceTest {
 
     @Test
     void correctPasswordCreatesAccountSessionAndSingleReadySnapshot() {
-        var users = new FakeUsers(new AuthUser(USER, "admin", "encoded", true, false));
+        var users = new FakeUsers(new AuthUser(USER, "admin", "encoded", true, false, 7));
         var snapshots = new FakeSnapshots();
         var sessions = new FakeSessions();
         var service = service(users, snapshots, sessions);
@@ -36,6 +36,7 @@ class AuthenticationServiceTest {
         assertThat(snapshots.writes).hasSize(1);
         assertThat(sessions.accountSessionKeys).doesNotContainKeys(
                 "roles", "permissions", "dataScope", "authorizationSnapshot");
+        assertThat(sessions.lastCredentialRevision).isEqualTo(7L);
     }
 
     @Test
@@ -67,6 +68,15 @@ class AuthenticationServiceTest {
         assertThat(tokens.revoked).isEqualTo(tokens.issued);
     }
 
+    @Test void passwordCommitDuringLoginRevokesEveryTokenIssuedFromOldCredentialRevision() {
+        var users=new FakeUsers(new AuthUser(USER,"admin","encoded",true,false,0));
+        var snapshots=new FakeSnapshots();var tokens=new InMemoryRefreshTokenStore(CLOCK);
+        var sessions=new FakeSessions(){@Override public AccessSession login(UUID id,long revision){users.revision=1;return super.login(id,revision);}};
+        var service=service(users,snapshots,sessions,tokens);
+        assertThatThrownBy(()->service.login("admin","secret")).isInstanceOf(Unauthorized.class).hasMessageContaining("Credentials changed");
+        assertThat(tokens.revoked).isEqualTo(tokens.issued);assertThat(sessions.loginCount).isZero();
+    }
+
     private static AuthenticationService service(FakeUsers users, FakeSnapshots snapshots, FakeSessions sessions) {
         return service(users, snapshots, sessions, new InMemoryRefreshTokenStore(CLOCK));
     }
@@ -81,8 +91,10 @@ class AuthenticationServiceTest {
 
     private static final class FakeUsers implements AuthUserRepository {
         private final AuthUser user;
-        private FakeUsers(AuthUser user) { this.user = user; }
+        private long revision;
+        private FakeUsers(AuthUser user) { this.user = user; this.revision = user.credentialRevision(); }
         @Override public AuthUser findByUsername(String username) { return user; }
+        @Override public long credentialRevision(UUID id){return revision;}
     }
 
     private static final class FakeSnapshots implements AuthorizationSnapshotStore {
@@ -99,10 +111,11 @@ class AuthenticationServiceTest {
         @Override public void delete(UUID userId) { state = null; }
     }
 
-    private static final class FakeSessions implements AccountSessionPort {
-        private int loginCount;
+    private static class FakeSessions implements AccountSessionPort {
+        int loginCount;
+        long lastCredentialRevision = -1;
         private final Map<String, Object> accountSessionKeys = new ConcurrentHashMap<>();
-        @Override public AccessSession login(UUID userId) { loginCount++; accountSessionKeys.put("username", "admin"); return new AccessSession("access", 3600); }
+        @Override public AccessSession login(UUID userId,long credentialRevision) { lastCredentialRevision=credentialRevision;loginCount++; accountSessionKeys.put("username", "admin"); return new AccessSession("access", 3600); }
         @Override public void logoutToken(String token) { loginCount--; }
         @Override public void kickoutAll(UUID userId) {}
     }

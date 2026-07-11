@@ -106,5 +106,5 @@ class AuthorizationCommandExecutorTest {
         public boolean terminalDelete(UUID op,UUID user,long revision){terminalDeletes++;return true;}
     }
     private static final class FakeTokens implements RefreshTokenStore {final List<UUID> revoked=new ArrayList<>();public String issue(UUID u){throw new UnsupportedOperationException();}public RefreshRotationOutcome rotate(String t){throw new UnsupportedOperationException();}public void revoke(String t){}public void revokeAll(UUID u){revoked.add(u);}}
-    private static final class FakeSessions implements AccountSessionPort {boolean fail;public AccessSession login(UUID u){throw new UnsupportedOperationException();}public void logoutToken(String t){}public void kickoutAll(UUID u){if(fail)throw new IllegalStateException("down");}}
+    private static final class FakeSessions implements AccountSessionPort {boolean fail;public AccessSession login(UUID u,long revision){throw new UnsupportedOperationException();}public void logoutToken(String t){}public void kickoutAll(UUID u){if(fail)throw new IllegalStateException("down");}}
 }

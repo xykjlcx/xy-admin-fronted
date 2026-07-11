@@ -5,7 +5,11 @@ package com.metabuild.schema.platform;
 
 
 import com.metabuild.schema.platform.tables.MbAuthzRefreshOutbox;
+import com.metabuild.schema.platform.tables.MbCompany;
+import com.metabuild.schema.platform.tables.MbCredentialRevocationOutbox;
 import com.metabuild.schema.platform.tables.MbDept;
+import com.metabuild.schema.platform.tables.MbDictionary;
+import com.metabuild.schema.platform.tables.MbDictionaryItem;
 import com.metabuild.schema.platform.tables.MbLoginLog;
 import com.metabuild.schema.platform.tables.MbMenu;
 import com.metabuild.schema.platform.tables.MbMenuCustomization;
@@ -19,6 +23,7 @@ import com.metabuild.schema.platform.tables.MbRoleCustomDept;
 import com.metabuild.schema.platform.tables.MbRolePermission;
 import com.metabuild.schema.platform.tables.MbSchemaProbe;
 import com.metabuild.schema.platform.tables.MbUser;
+import com.metabuild.schema.platform.tables.MbUserProfile;
 import com.metabuild.schema.platform.tables.MbUserRole;
 
 import java.util.Arrays;
@@ -56,9 +61,29 @@ public class Public extends SchemaImpl {
     public final MbAuthzRefreshOutbox MB_AUTHZ_REFRESH_OUTBOX = MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX;
 
     /**
+     * The table <code>public.mb_company</code>.
+     */
+    public final MbCompany MB_COMPANY = MbCompany.MB_COMPANY;
+
+    /**
+     * The table <code>public.mb_credential_revocation_outbox</code>.
+     */
+    public final MbCredentialRevocationOutbox MB_CREDENTIAL_REVOCATION_OUTBOX = MbCredentialRevocationOutbox.MB_CREDENTIAL_REVOCATION_OUTBOX;
+
+    /**
      * The table <code>public.mb_dept</code>.
      */
     public final MbDept MB_DEPT = MbDept.MB_DEPT;
+
+    /**
+     * The table <code>public.mb_dictionary</code>.
+     */
+    public final MbDictionary MB_DICTIONARY = MbDictionary.MB_DICTIONARY;
+
+    /**
+     * The table <code>public.mb_dictionary_item</code>.
+     */
+    public final MbDictionaryItem MB_DICTIONARY_ITEM = MbDictionaryItem.MB_DICTIONARY_ITEM;
 
     /**
      * The table <code>public.mb_login_log</code>.
@@ -126,6 +151,11 @@ public class Public extends SchemaImpl {
     public final MbUser MB_USER = MbUser.MB_USER;
 
     /**
+     * The table <code>public.mb_user_profile</code>.
+     */
+    public final MbUserProfile MB_USER_PROFILE = MbUserProfile.MB_USER_PROFILE;
+
+    /**
      * The table <code>public.mb_user_role</code>.
      */
     public final MbUserRole MB_USER_ROLE = MbUserRole.MB_USER_ROLE;
@@ -147,7 +177,11 @@ public class Public extends SchemaImpl {
     public final List<Table<?>> getTables() {
         return Arrays.asList(
             MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX,
+            MbCompany.MB_COMPANY,
+            MbCredentialRevocationOutbox.MB_CREDENTIAL_REVOCATION_OUTBOX,
             MbDept.MB_DEPT,
+            MbDictionary.MB_DICTIONARY,
+            MbDictionaryItem.MB_DICTIONARY_ITEM,
             MbLoginLog.MB_LOGIN_LOG,
             MbMenu.MB_MENU,
             MbMenuCustomization.MB_MENU_CUSTOMIZATION,
@@ -161,6 +195,7 @@ public class Public extends SchemaImpl {
             MbRolePermission.MB_ROLE_PERMISSION,
             MbSchemaProbe.MB_SCHEMA_PROBE,
             MbUser.MB_USER,
+            MbUserProfile.MB_USER_PROFILE,
             MbUserRole.MB_USER_ROLE
         );
     }

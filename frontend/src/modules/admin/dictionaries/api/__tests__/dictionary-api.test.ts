@@ -31,3 +31,11 @@ test('dictionary api exposes all catalog and item mutations', () => {
     expect(typeof api?.[operation], operation).toBe('function');
   }
 });
+
+test('dictionary writes reject values wider than V10 columns', () => {
+  expect(dictionaryModule.CreateDictionarySchema.safeParse({ name: 'n'.repeat(129), code: 'ok', remark: '', builtin: false }).success).toBe(false);
+  expect(dictionaryModule.CreateDictionarySchema.safeParse({ name: 'ok', code: `a${'b'.repeat(128)}`, remark: '', builtin: false }).success).toBe(false);
+  expect(dictionaryModule.CreateDictionarySchema.safeParse({ name: 'ok', code: 'ok', remark: 'r'.repeat(513), builtin: false }).success).toBe(false);
+  expect(dictionaryModule.CreateDictionaryItemSchema.safeParse({ label: 'l'.repeat(129), value: 'ok', sort: 0, enabled: true, color: 'neutral', remark: '' }).success).toBe(false);
+  expect(dictionaryModule.CreateDictionaryItemSchema.safeParse({ label: 'ok', value: 'v'.repeat(129), sort: 0, enabled: true, color: 'neutral', remark: '' }).success).toBe(false);
+});

@@ -5,7 +5,9 @@ package com.metabuild.schema.platform;
 
 
 import com.metabuild.schema.platform.tables.MbAuthzRefreshOutbox;
+import com.metabuild.schema.platform.tables.MbCredentialRevocationOutbox;
 import com.metabuild.schema.platform.tables.MbDept;
+import com.metabuild.schema.platform.tables.MbDictionaryItem;
 import com.metabuild.schema.platform.tables.MbLoginLog;
 import com.metabuild.schema.platform.tables.MbMenu;
 import com.metabuild.schema.platform.tables.MbOperationLog;
@@ -41,7 +43,10 @@ public class Indexes {
 
     public static final Index MB_AUTHZ_REFRESH_OUTBOX_PENDING_IDX = Internal.createIndex(DSL.name("mb_authz_refresh_outbox_pending_idx"), MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX, new OrderField[] { MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX.NEXT_ATTEMPT_AT, MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX.ID }, false);
     public static final Index MB_AUTHZ_REFRESH_OUTBOX_RECLAIM_IDX = Internal.createIndex(DSL.name("mb_authz_refresh_outbox_reclaim_idx"), MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX, new OrderField[] { MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX.LEASE_UNTIL, MbAuthzRefreshOutbox.MB_AUTHZ_REFRESH_OUTBOX.ID }, false);
+    public static final Index MB_CREDENTIAL_REVOCATION_PENDING_IDX = Internal.createIndex(DSL.name("mb_credential_revocation_pending_idx"), MbCredentialRevocationOutbox.MB_CREDENTIAL_REVOCATION_OUTBOX, new OrderField[] { MbCredentialRevocationOutbox.MB_CREDENTIAL_REVOCATION_OUTBOX.NEXT_ATTEMPT_AT, MbCredentialRevocationOutbox.MB_CREDENTIAL_REVOCATION_OUTBOX.ID }, false);
+    public static final Index MB_CREDENTIAL_REVOCATION_RECLAIM_IDX = Internal.createIndex(DSL.name("mb_credential_revocation_reclaim_idx"), MbCredentialRevocationOutbox.MB_CREDENTIAL_REVOCATION_OUTBOX, new OrderField[] { MbCredentialRevocationOutbox.MB_CREDENTIAL_REVOCATION_OUTBOX.LEASE_UNTIL, MbCredentialRevocationOutbox.MB_CREDENTIAL_REVOCATION_OUTBOX.ID }, false);
     public static final Index MB_DEPT_PARENT_ACTIVE_IDX = Internal.createIndex(DSL.name("mb_dept_parent_active_idx"), MbDept.MB_DEPT, new OrderField[] { MbDept.MB_DEPT.PARENT_ID }, false);
+    public static final Index MB_DICTIONARY_ITEM_ORDER = Internal.createIndex(DSL.name("mb_dictionary_item_order"), MbDictionaryItem.MB_DICTIONARY_ITEM, new OrderField[] { MbDictionaryItem.MB_DICTIONARY_ITEM.DICTIONARY_ID, MbDictionaryItem.MB_DICTIONARY_ITEM.SORT, MbDictionaryItem.MB_DICTIONARY_ITEM.ID }, false);
     public static final Index MB_LOGIN_LOG_USER_CREATED_IDX = Internal.createIndex(DSL.name("mb_login_log_user_created_idx"), MbLoginLog.MB_LOGIN_LOG, new OrderField[] { MbLoginLog.MB_LOGIN_LOG.USER_ID, MbLoginLog.MB_LOGIN_LOG.CREATED_AT.desc() }, false);
     public static final Index MB_MENU_SOURCE_KEY_ACTIVE_UQ = Internal.createIndex(DSL.name("mb_menu_source_key_active_uq"), MbMenu.MB_MENU, new OrderField[] { MbMenu.MB_MENU.SOURCE_KEY }, true);
     public static final Index MB_MENU_SUBSYSTEM_IDX = Internal.createIndex(DSL.name("mb_menu_subsystem_idx"), MbMenu.MB_MENU, new OrderField[] { MbMenu.MB_MENU.SUBSYSTEM_KEY, MbMenu.MB_MENU.DEFAULT_SORT }, false);

@@ -238,7 +238,7 @@ public class MbMenuCustomization extends TableImpl<MbMenuCustomizationRecord> {
     @Override
     public List<Check<MbMenuCustomizationRecord>> getChecks() {
         return Arrays.asList(
-            Internal.createCheck(this, DSL.name("mb_menu_custom_label_shape"), "(((localized_label IS NULL) OR ((jsonb_typeof(localized_label) = 'object'::text) AND (localized_label <> '{}'::jsonb))))", true),
+            Internal.createCheck(this, DSL.name("mb_menu_custom_label_shape"), "(((localized_label IS NULL) OR mb_non_empty_string_map(localized_label)))", true),
             Internal.createCheck(this, DSL.name("mb_menu_customization_not_self_parent"), "(((parent_id IS NULL) OR (parent_id <> menu_id)))", true)
         );
     }

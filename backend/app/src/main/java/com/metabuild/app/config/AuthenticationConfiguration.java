@@ -29,6 +29,12 @@ import com.metabuild.modules.admin.auth.application.AuthorizationReconciler;
 import com.metabuild.modules.admin.users.application.UserRepository;
 import com.metabuild.modules.admin.users.application.UserService;
 import com.metabuild.modules.admin.users.persistence.JdbcUserRepository;
+import com.metabuild.modules.admin.dictionaries.application.*;
+import com.metabuild.modules.admin.dictionaries.persistence.JooqDictionaryRepository;
+import com.metabuild.modules.admin.company.application.*;
+import com.metabuild.modules.admin.company.persistence.JooqCompanyRepository;
+import com.metabuild.modules.admin.profile.application.*;
+import com.metabuild.modules.admin.profile.persistence.JooqProfileRepository;
 import com.metabuild.modules.admin.users.controller.UserControllerContract;
 import com.metabuild.modules.admin.departments.application.DepartmentRepository;
 import com.metabuild.modules.admin.departments.application.DepartmentService;
@@ -98,6 +104,14 @@ public class AuthenticationConfiguration {
     @Bean DepartmentService departmentService(DepartmentRepository depts,AuthorizationRefreshService refresh){return new DepartmentService(depts,refresh);}
     @Bean RoleRepository roleRepository(JdbcTemplate jdbc){return new JdbcRoleRepository(jdbc);}
     @Bean RoleService roleService(RoleRepository roles,AuthorizationRefreshService refresh){return new RoleService(roles,refresh);}
+    @Bean DictionaryRepository dictionaryRepository(org.jooq.DSLContext db){return new JooqDictionaryRepository(db);}
+    @Bean DictionaryService dictionaryService(DictionaryRepository repository,UuidV7Generator ids){return new DictionaryService(repository,ids);}
+    @Bean CompanyRepository companyRepository(org.jooq.DSLContext db,UuidV7Generator ids){return new JooqCompanyRepository(db,ids);}
+    @Bean CompanyService companyService(CompanyRepository repository){return new CompanyService(repository);}
+    @Bean ProfileRepository profileRepository(org.jooq.DSLContext db){return new JooqProfileRepository(db);}
+    @Bean ProfileSessionPort profileSessions(SaTokenSessionControl sessions,RefreshTokenStore refresh){return new SaProfileSessionAdapter(sessions,refresh);}
+    @Bean ProfileService profileService(ProfileRepository repository,ProfileSessionPort sessions,BCryptPasswordEncoder passwords){return new ProfileService(repository,sessions,new PasswordCodec(){public String hash(String raw){return passwords.encode(raw);}public boolean matches(String raw,String encoded){return passwords.matches(raw,encoded);}});}
+    @Bean CredentialRevocationScheduler credentialRevocationScheduler(ProfileService profiles){return new CredentialRevocationScheduler(profiles);}
     @Bean PermissionCatalogSynchronizer permissionCatalogSynchronizer(JdbcTemplate jdbc,
             PlatformTransactionManager manager,AuthorizationRefreshService refresh,UuidV7Generator ids,ObjectMapper json){
         return new PermissionCatalogSynchronizer(jdbc,refresh,ids,json);
@@ -117,8 +131,8 @@ public class AuthenticationConfiguration {
             UuidV7Generator ids, Clock clock) {
         return new JdbcRefreshTokenStore(jdbc, transactions, ids, clock, Duration.ofDays(7));
     }
-    @Bean RefreshTokenService refreshTokenService(RefreshTokenStore tokens, AuthorizationSnapshotStore snapshots) {
-        return new RefreshTokenService(tokens, snapshots);
+    @Bean RefreshTokenService refreshTokenService(RefreshTokenStore tokens, AuthorizationSnapshotStore snapshots,AuthUserRepository users,AccountSessionPort sessions) {
+        return new RefreshTokenService(tokens, snapshots,users,sessions);
     }
     @Bean AuthenticationService authenticationService(AuthUserRepository users, BCryptPasswordEncoder passwords,
             AuthorizationGraphRepository graphs, AuthorizationSnapshotCompiler compiler,

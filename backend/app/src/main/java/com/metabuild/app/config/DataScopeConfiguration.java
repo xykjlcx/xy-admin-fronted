@@ -25,12 +25,13 @@ public class DataScopeConfiguration {
         // 当前 generated schema 只包含 IAM/授权基础设施与 schema probe，均不是租户业务数据。
         // 必须显式列出；不可从 generated schema 自动 whitelist，否则新表会绕过启动门禁。
         List<DataScopeRegistry.Rule> rules = List.of(
-                whitelist("mb_authz_refresh_outbox"), whitelist("mb_dept"), whitelist("mb_login_log"),
+                whitelist("mb_authz_refresh_outbox"), whitelist("mb_credential_revocation_outbox"), whitelist("mb_dept"), whitelist("mb_login_log"),
+                whitelist("mb_company"), whitelist("mb_dictionary"), whitelist("mb_dictionary_item"),
                 whitelist("mb_menu"), whitelist("mb_menu_customization"), whitelist("mb_operation_log"),
                 whitelist("mb_permission"), whitelist("mb_permission_alias"),whitelist("mb_permission_catalog_version"),
                 whitelist("mb_refresh_token"), whitelist("mb_role"),
                 whitelist("mb_role_custom_dept"), whitelist("mb_role_permission"), whitelist("mb_schema_probe"),
-                whitelist("mb_user"), whitelist("mb_user_role"), whitelist("biz_schema_probe"));
+                whitelist("mb_user"), whitelist("mb_user_profile"), whitelist("mb_user_role"), whitelist("biz_schema_probe"));
         return new DataScopeRegistry(rules);
     }
 

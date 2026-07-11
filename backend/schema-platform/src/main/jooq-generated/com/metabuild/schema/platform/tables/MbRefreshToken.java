@@ -116,6 +116,11 @@ public class MbRefreshToken extends TableImpl<MbRefreshTokenRecord> {
      */
     public final TableField<MbRefreshTokenRecord, OffsetDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
 
+    /**
+     * The column <code>public.mb_refresh_token.credential_revision</code>.
+     */
+    public final TableField<MbRefreshTokenRecord, Long> CREDENTIAL_REVISION = createField(DSL.name("credential_revision"), SQLDataType.BIGINT.nullable(false), this, "");
+
     private MbRefreshToken(Name alias, Table<MbRefreshTokenRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }
@@ -237,6 +242,7 @@ public class MbRefreshToken extends TableImpl<MbRefreshTokenRecord> {
     @Override
     public List<Check<MbRefreshTokenRecord>> getChecks() {
         return Arrays.asList(
+            Internal.createCheck(this, DSL.name("mb_refresh_token_credential_revision_nonnegative"), "((credential_revision >= 0))", true),
             Internal.createCheck(this, DSL.name("mb_refresh_token_expiry_check"), "((expires_at > created_at))", true)
         );
     }

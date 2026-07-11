@@ -2,20 +2,20 @@ import { z } from 'zod';
 
 export const ProfileSchema = z.object({
   id: z.string(),
-  name: z.string().trim().min(1),
+  name: z.string().trim().min(1).max(128),
   email: z.string().email(),
-  phone: z.string().trim().min(1),
+  phone: z.string().trim().max(32),
   company: z.string(),
   department: z.string(),
   role: z.string(),
-  location: z.string().trim().min(1),
+  location: z.string().trim().min(1).max(200),
   employeeNo: z.string(),
-  title: z.string().trim().min(1),
+  title: z.string().trim().min(1).max(128),
   joinedAt: z.string(),
   manager: z.string(),
-  language: z.string(),
-  timezone: z.string(),
-  bio: z.string().trim().min(1),
+  language: z.string().trim().min(1).max(32),
+  timezone: z.string().trim().min(1).max(128),
+  bio: z.string().trim().min(1).max(2000),
   emailVerified: z.boolean(),
   lastActive: z.string(),
 });
@@ -39,7 +39,7 @@ export const ChangePasswordSchema = z.object({
 });
 export const PreferenceSchema = z.object({
   language: z.enum(['zh-CN', 'en-US']),
-  timezone: z.string(),
+  timezone: z.string().trim().min(1).max(128),
   weeklyDigest: z.boolean(),
   compactNotifications: z.boolean(),
 });
@@ -48,7 +48,7 @@ export const LoginDeviceSchema = z.object({
   name: z.string(),
   location: z.string(),
   ip: z.string(),
-  lastActive: z.string(),
+  lastActive: z.string().nullable(),
   current: z.boolean(),
 });
 export const NullSchema = z.null();
