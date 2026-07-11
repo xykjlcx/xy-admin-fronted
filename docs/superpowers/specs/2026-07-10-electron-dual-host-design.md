@@ -1,7 +1,7 @@
 # Electron 双宿主打包与在线更新设计
 
 日期：2026-07-10  
-状态：已完成对抗审阅，待用户复核
+状态：目标规格（2026-07-11 经用户授权修订 Vite 8 构建适配层）
 
 ## 1. 结论
 
@@ -10,10 +10,10 @@
 ```text
 同一套 src/
 ├── Web：Vite → dist/
-└── Desktop：electron-vite → out/{main,preload,renderer}
-                         ↓
-                electron-builder
-                         ↓
+└── Desktop：Vite 8 + vite-plugin-electron → out/{main,preload,renderer}
+                                      ↓
+                             electron-builder
+                                      ↓
        macOS DMG/ZIP · Windows NSIS · update metadata
 ```
 
@@ -112,7 +112,7 @@ src/lib/platform/
 └── desktop.ts                   # window.desktop 适配
 
 desktop.config.ts                # 非敏感桌面默认配置
-electron.vite.config.ts          # Main/Preload/Renderer 桌面构建
+vite.desktop.config.ts           # 复用 Renderer 工厂并加载 Main/Preload 构建插件
 electron-builder.ts              # 可类型检查/可测试的安装包、签名、产物和更新元数据
 ```
 
@@ -144,12 +144,13 @@ routes/modules/app/components
 
 ### 6.1 分工
 
-- 现有 Vite：继续负责 Web 开发和生产构建。
-- `electron-vite`：负责 Electron Main、Preload、Renderer 三种上下文的开发热更新和生产输出。
+- Vite `8.1.1`：统一负责 Web 与 Electron Renderer 的开发、生产构建，使用 Rolldown 配置键。
+- `@vitejs/plugin-react` `6.0.3`：Web 与 Desktop Renderer 共用 React 插件版本。
+- `vite-plugin-electron` `1.1.0`：作为稳定的 Electron 构建适配层，在独立 Desktop Vite 配置中编排 Main、Preload 的构建和开发态重启；插件明确支持 Vite 7/8，并在 Vite 8 下使用 `build.rolldownOptions`。
 - `electron-builder`：负责 app 打包、DMG/ZIP、NSIS、签名配置入口和更新元数据。
 - `electron-updater`：负责通用 HTTPS 更新源、签名校验、下载进度和安装编排。
 
-不采用 Electron Forge Vite plugin：官方页面仍将其标为 experimental，而本项目已有复杂 Vite/Tailwind/TanStack Router 配置，没有必要为官方模板迁移现有 Renderer。`electron-vite` 只作为桌面构建编排器，Web 仍以当前 `vite.config.ts` 为真值。
+不采用 Electron Forge Vite plugin：官方页面仍将其标为 experimental，而本项目已有复杂 Vite/Tailwind/TanStack Router 配置，没有必要为官方模板迁移现有 Renderer。也不采用 `electron-vite@6` beta；`electron-vite@5` 的 peerDependencies 不支持 Vite 8。Web 仍使用 `vite.config.ts`，Desktop 使用 `vite.desktop.config.ts`，二者共同消费唯一 Renderer 配置工厂。
 
 ### 6.2 共享 Renderer 配置
 
@@ -169,12 +170,14 @@ interface RendererConfigOptions {
 declare function createRendererConfig(options: RendererConfigOptions): UserConfig;
 ```
 
-- `vite.config.ts` 与 `electron.vite.config.ts` 的 Renderer 配置都调用该工厂。
+- `vite.config.ts` 与 `vite.desktop.config.ts` 的 Renderer 配置都调用该工厂。
 - TanStack Router、React、Tailwind、alias、Mock 生产门禁和 Mock worker 剥离逻辑只有一个定义源。
 - `stripMockWorkerPlugin` 必须接收实际 `outDir`，禁止继续硬编码 `dist/`。
 - Web 使用 browser history 和现有 base；Desktop 使用 hash history 和相对静态资源 base，这些差异由显式 target 参数控制。
 - 两套构建消费同一份 `src/routeTree.gen.ts`，禁止生成 Desktop 专属路由树。
 - 共享工厂本身不读取 `process.env` 或 `import.meta.env`；环境值由各自唯一配置入口解析、校验后传入。
+- Main 与 Preload 由 `vite-plugin-electron` 的 Flat API 构建；Main 输出 `out/main/index.js`，Preload 固定输出 CJS `out/preload/index.cjs`，Renderer 输出 `out/renderer/`。三者路径必须同时受配置测试、builder 文件清单和 packaged 启动验证约束。
+- Vite 8 配置使用 `build.rolldownOptions`；禁止新增只在 Rollup 兼容层下工作的 `build.rollupOptions`。Main 默认把 Electron/Node built-in 视为 external，但将 `electron-updater` 等无原生二进制的运行时代码打入 Main bundle，以匹配 builder 的最小 `files` 清单；仓库不引入原生运行时依赖。
 
 ### 6.3 命令契约
 
@@ -192,6 +195,10 @@ pnpm test:desktop
 ```
 
 由跨平台 Node 脚本解析 `--window-chrome`，禁止在 package scripts 中使用只兼容 Unix 的环境变量写法。非法值、缺失生产 API 地址、缺失生产更新地址必须在构建开始前失败。
+
+- `dev:desktop` 等价于 `vite --config vite.desktop.config.ts`，由 `vite-plugin-electron` 监听 Main/Preload 并启动 Electron；开发 URL 通过插件提供的 `VITE_DEV_SERVER_URL` 传入 Main。
+- `build:desktop` 先执行类型、边界守卫，再执行 `vite build --config vite.desktop.config.ts` 和 Renderer 产物校验。
+- `make:desktop` 在 `build:desktop` 后继续执行现有 `electron-builder` 与 release/feed 校验，不改变 updater 或 generic provider。
 
 环境读取继续分域：Renderer 仍只有 `src/config/env.ts` 可以读取 `import.meta.env`；Main 只有 `electron/config/index.ts` 可以读取 `process.env`。`desktop.config.ts` 只放可提交的非敏感默认值，证书和发布凭据只能从构建环境注入。
 
@@ -228,7 +235,7 @@ Electron 包只包含编译产物、静态资源和 Main 真正需要的运行�
 
 ### 7.3 Packaged 纵向 Spike
 
-正式实现平台能力前，先用最小 packaged app 证明以下链路：
+正式实现平台能力前，先用最小 packaged app 证明以下链路。构建适配层发生变化时，这五项必须基于新适配层重新执行，旧工具链证据作废：
 
 1. `app://renderer` 只加载 `out/renderer` 白名单资源，favicon、动态 chunk 和字体均使用正确相对路径。
 2. Hash 路由能进入业务页，并在刷新、后退、前进后恢复 path 与 search。
@@ -237,6 +244,8 @@ Electron 包只包含编译产物、静态资源和 Main 真正需要的运行�
 5. 401 redirect 从 `router.state.location` 读取内部路由，不产生 `app://renderer/index.html` redirect。
 
 Spike 必须运行在 packaged 产物，不以 Vite dev server 结果替代。任一项失败都先修正协议、base、CORS 或 Router 设计，再进入后续阶段。
+
+Vite 8 迁移后的 Spike 还必须先证明 Main、Preload、Renderer 三个输出均来自 `vite-plugin-electron@1.1.0` 编排，实际文件路径与 `package.json.main`、Preload 路径和 builder 清单一致；同时复验 Rolldown externalization、静态资源协议、安装产物、更新 metadata 和 Web 宿主零退化。禁止沿用 `electron-vite` 或 Vite 7 产物作为通过证据。
 
 ## 8. 窗口 chrome 模式
 
@@ -604,7 +613,7 @@ macOS 产物在 macOS 环境构建；Windows 产物在 Windows 环境构建。�
 ### 17.1 RED → GREEN 顺序
 
 1. 先加模块边界守卫，证明 Electron import、裸 `window.desktop` 和任意 IPC 会失败。
-2. 先写共享 Renderer Vite factory、outDir、Mock 剥离和版本一致性测试，再接 Web/Desktop 配置。
+2. 先写共享 Renderer Vite factory、outDir、Mock 剥离、Vite 8 Rolldown 配置、`vite-plugin-electron` Main/Preload 输出和版本一致性测试，再接 Web/Desktop 配置。
 3. 先写 desktop config/schema 测试，再实现构建参数解析。
 4. 先写更新纯状态机的合法命令、single-flight、重试和 listener 生命周期测试，再接 `electron-updater` 事件。
 5. 先写 credential vault 与 `SessionCredentialService` 的失败、refresh、清理和双真值防漂移测试，再接 `safeStorage`。
@@ -650,6 +659,8 @@ pnpm make:desktop -- --window-chrome=native
 pnpm make:desktop -- --window-chrome=integrated
 ```
 
+门禁还必须确认 `pnpm why electron-vite` 无结果，`vite --version` 为 `8.1.1`，Node 满足 Vite 8 engines；不允许通过 `--force`、peer 忽略或 pnpm override 伪造兼容。
+
 还必须断言：
 
 - Web 生产包无 `electron`、`electron-updater`、Node built-in 和桌面 preload 代码。
@@ -684,7 +695,7 @@ pnpm make:desktop -- --window-chrome=integrated
 建议分期：
 
 0. **Packaged Spike**：最小 Main/Preload/Renderer、自定义协议、静态资源、hash history、真实 API CORS、CSP 和 401 链路；不通过不扩展功能。
-1. **宿主骨架**：共享 Renderer Vite factory、electron-vite、Main/Preload、安全窗口、Web 回归。
+1. **宿主骨架**：共享 Renderer Vite factory、Vite 8 + vite-plugin-electron、Main/Preload、安全窗口、Web 回归。
 2. **平台边界**：platform adapter、typed IPC、守卫、clipboard/external。
 3. **鉴权**：`SessionCredentialService`、内存 auth store、Web credential adapter、safeStorage vault、启动恢复。
 4. **窗口 chrome**：`native`、`integrated`、三布局安全区消费者、三比例验证。
@@ -750,8 +761,9 @@ pnpm make:desktop -- --window-chrome=integrated
 - Electron 自定义协议：<https://www.electronjs.org/docs/latest/api/protocol/>
 - Electron safeStorage：<https://www.electronjs.org/docs/latest/api/safe-storage>
 - Electron Code Signing：<https://www.electronjs.org/docs/latest/tutorial/code-signing>
-- electron-vite：<https://electron-vite.org/guide/>
-- electron-vite 生产构建：<https://electron-vite.org/guide/build>
+- Vite 8 迁移：<https://vite.dev/guide/migration>
+- Vite 8 生产构建：<https://vite.dev/guide/build>
+- vite-plugin-electron：<https://github.com/electron-vite/vite-plugin-electron>
 - electron-builder Auto Update：<https://www.electron.build/docs/features/auto-update/>
 - electron-builder Publish：<https://www.electron.build/docs/publish/>
 - electron-builder Target Selection：<https://www.electron.build/docs/targets/>
@@ -759,7 +771,8 @@ pnpm make:desktop -- --window-chrome=integrated
 
 ## 23. 实施记录（2026-07-11）
 
-- 工具链：`electron-vite 5.0.0` 的 peer dependency 不支持 Vite 8。经用户确认，将 Vite 从 8.1.1 固定为 7.3.6，`@vitejs/plugin-react` 固定为 5.2.0。共享 Renderer 配置、TanStack Router、Tailwind v4、Web 682 项测试、Web 生产构建与 Desktop 双构建均已回归，未发现现有项目功能退化。
+- 工具链（已废止记录）：曾因 `electron-vite 5.0.0` peer dependency 将 Vite 暂时固定为 7.3.6、`@vitejs/plugin-react` 固定为 5.2.0；该基线及其 packaged 证据在 2026-07-11 的后续授权中作废，不再代表目标态。
+- 工具链（当前授权目标）：用户明确批准恢复 `vite 8.1.1`、`@vitejs/plugin-react 6.0.3`，用稳定版 `vite-plugin-electron 1.1.0` 替换 `electron-vite`。原因是保留稳定 Web 工具链，并使用明确支持 Vite 8/Rolldown 的适配层，降低与全栈重构分支的后续合并冲突。迁移后 Phase 0 packaged Spike、Web 零退化、双窗口构建、builder/updater metadata 与安全证据必须全部重新采集。
 - Builder 配置：原设计的 YAML 载体改为 `electron-builder.ts`。理由是发布身份、macOS/Windows 签名前置条件、Spike fuse 例外和产物目录需要类型检查与单测；产物、安全和更新模型不变。守卫明确禁止 YAML/TS 双配置并存。
 - Fuse profile：Electron 43 提供 `LoadBrowserProcessSpecificV8Snapshot`，但当前 builder 产物不含 `browser_v8_context_snapshot`。实包验证证明开启后主进程会 fatal，因此 release profile 对该 fuse 显式关闭，其他 8 项保持本文安全要求；九项全部纳入 wire 实读断言。
 - 证据边界：native/integrated 均已生成 macOS arm64/x64 DMG+ZIP 并通过自动产物校验；macOS arm64 已完成 ad-hoc DMG 安装/启动/卸载 smoke。当前无 Developer ID 和 Windows 真实环境，因此真实签名旧版→新版更新、macOS x64 真机和 Windows x64 证据保持 `pending`，不由交叉构建或 Spike 代替。
