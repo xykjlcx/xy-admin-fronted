@@ -4,6 +4,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BACKEND_DIR="$ROOT_DIR/backend"
+FRONTEND_DIR="$ROOT_DIR/frontend"
 RUNTIME_DIR="$ROOT_DIR/.metabuilder-dev"
 ENV_FILE="$BACKEND_DIR/.env"
 ENV_EXAMPLE="$BACKEND_DIR/.env.example"
@@ -84,7 +85,7 @@ process_belongs_to_repo() {
       marker="metabuilder-app-"
       ;;
     frontend)
-      expected_cwd="$ROOT_DIR"
+      expected_cwd="$FRONTEND_DIR"
       marker="vite"
       ;;
     *)
@@ -246,9 +247,9 @@ package_backend() {
 }
 
 ensure_frontend_dependencies() {
-  if [[ ! -x "$ROOT_DIR/node_modules/.bin/vite" ]]; then
+  if [[ ! -x "$FRONTEND_DIR/node_modules/.bin/vite" ]]; then
     require_command pnpm
-    (cd "$ROOT_DIR" && pnpm install --frozen-lockfile)
+    (cd "$FRONTEND_DIR" && pnpm install --frozen-lockfile)
   fi
 }
 
@@ -285,8 +286,8 @@ start_frontend() {
 
   ensure_frontend_dependencies
   (
-    cd "$ROOT_DIR"
-    nohup "$ROOT_DIR/node_modules/.bin/vite" --host 127.0.0.1 --port 5173 --strictPort >"$FRONTEND_LOG" 2>&1 </dev/null &
+    cd "$FRONTEND_DIR"
+    nohup "$FRONTEND_DIR/node_modules/.bin/vite" --host 127.0.0.1 --port 5173 --strictPort >"$FRONTEND_LOG" 2>&1 </dev/null &
     printf '%s\n' "$!" >"$FRONTEND_PID_FILE"
   )
   FRONTEND_STARTED_THIS_RUN=1

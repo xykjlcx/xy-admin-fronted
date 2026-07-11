@@ -1,21 +1,33 @@
 # 通用后台管理脚手架
 
-Vite + React 19 + TypeScript + Tailwind v4 + shadcn/ui + TanStack(Router / Query / Table) 的企业后台管理模板。
+MetaBuilder 采用 monorepo 结构：`frontend/` 是 Vite + React 19 + TypeScript + Tailwind v4 + shadcn/ui + TanStack 前端，`backend/` 是 Spring Boot 后端。
 
 **定位**：让基于它启动的每个项目（外包 / 自有产品 / 内部系统）把「壳」（布局、主题、导航、鉴权、请求、国际化）的成本压到接近零，把精力投入具体业务。
 
 ## 快速开始
 
-环境：Node 24 · pnpm 11.7+
+环境：Node 24 · pnpm 11.7+ · Java 21 · Docker
+
+全栈开发：
 
 ```bash
+./scripts/dev.sh start
+./scripts/dev.sh status
+./scripts/dev.sh stop
+```
+
+只运行前端：
+
+```bash
+cd frontend
 pnpm install
 pnpm dev            # 开发态默认启用 mock，无需真后端
 ```
 
-构建与校验：
+前端构建与校验：
 
 ```bash
+cd frontend
 pnpm build          # tsc -b && vite build（生产包自动剥离 faker/msw/mock worker）
 pnpm test           # vitest
 pnpm lint           # eslint src
@@ -27,7 +39,7 @@ pnpm design:lint    # 三套 flavor 的 DESIGN.md 校验
 
 | 文档 | 定位 | 何时读 |
 |---|---|---|
-| `AGENTS.md`（`CLAUDE.md` 是它的软链接） | **AI / 人的执行铁律速查**，单一真相源 | 动手前必读 |
+| `CLAUDE.md`（`AGENTS.md` 是它的软链接） | **AI / 人的执行铁律速查**，单一真相源 | 动手前必读 |
 | `docs/architecture.md` | **工程架构真相源**（分层 / 数据流 / 缓存 / token / 守卫） | 理解「为什么这样组织」 |
 | `docs/NEW-PROJECT.md` | **基于本脚手架启动新项目的清单** | 派生新项目时 |
 | `docs/design/*.design.md` | 三套 flavor（飞书 / Claude / shadcn）的设计身份与 token 值 | 改主题 / 加 flavor |
@@ -48,15 +60,18 @@ pnpm design:lint    # 三套 flavor 的 DESIGN.md 校验
 ## 目录总览
 
 ```text
-src/
-├── app/         全局装配：providers / QueryClient / Shell / mount
-├── config/      启动策略与默认值：env(唯一读 import.meta.env) / app / features / request / appearance
-├── routes/      文件式路由「薄壳」：URL / validateSearch / staticData / loader
-├── modules/<key>/<business>/   业务纵切包（api / mocks / list / detail / form）
-├── components/{ui,pro}         shadcn 原语 / 后台通用业务无关组件
-├── lib/         http(client / contract) / i18n / permission / icon-registry
-├── stores/      zustand：auth(token) / appearance
-└── locales/  mocks/  styles/
+├── frontend/
+│   ├── src/
+│   │   ├── app/         全局装配：providers / QueryClient / Shell / mount
+│   │   ├── config/      启动策略与默认值
+│   │   ├── routes/      文件式路由薄壳
+│   │   ├── modules/     业务纵切包
+│   │   ├── components/  UI / Pro 组件
+│   │   └── lib/ stores/ locales/ mocks/ styles/
+│   └── package.json
+├── backend/         Spring Boot 多模块工程
+├── scripts/dev.sh   全栈开发入口
+└── compose.dev.yml  PostgreSQL / Redis 本地依赖
 ```
 
 > 新业务复制 `modules/admin/users/` 的纵切结构（唯一范本）。`modules/admin/pages/{roles,menus,dashboard}` 是待迁移的横切遗留，勿模仿。

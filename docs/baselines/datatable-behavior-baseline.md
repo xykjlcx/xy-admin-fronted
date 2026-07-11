@@ -12,18 +12,18 @@
 
 ## 代码与测试证据
 
-- `src/components/pro/DataTable.tsx`
+- `frontend/src/components/pro/DataTable.tsx`
   - `selectedIds` 内部状态：line 88
   - `resetSelectionKey` diff 清空：lines 100-104
   - `toggleRow`：lines 126-130
   - `toggleVisibleRows`：lines 132-138
-- `src/modules/admin/users/list/MembersTable.tsx`
+- `frontend/src/modules/admin/users/list/MembersTable.tsx`
   - `resetSelectionKey` 包含 `variant/status/deptId/directOnly/keyword/page/pageSize/currentPageIds/bulkResetVersion`：lines 50-60
   - `onPageChange` 写入 `{ page }`：line 116
   - 批量操作成功后 `bulkResetVersion + 1`：lines 62-65
 - 聚焦测试：
-  - `./node_modules/.bin/vitest run src/components/pro/__tests__/data-table.test.tsx src/modules/admin/users/__tests__/users-page-step4.test.tsx src/modules/admin/users/__tests__/users-page-step5.test.tsx`
-  - 结果：3 files / 15 tests passed
+  - `cd frontend && ./node_modules/.bin/vitest run src/components/pro/__tests__/data-table.test.tsx src/modules/admin/users/__tests__/members-table-page-correction.test.tsx`
+  - 当前复验结果：2 files / 14 tests passed（2026-07-11 monorepo 归位后）
 
 ## Browser 行为证据
 

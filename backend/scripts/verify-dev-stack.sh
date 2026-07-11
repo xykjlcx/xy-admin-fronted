@@ -131,7 +131,7 @@ run_round() {
   assert_managed_process \
     "${backend_pid}" backend "${REPO_DIR}/backend" 8080 metabuilder-app-
   assert_managed_process \
-    "${frontend_pid}" frontend "${REPO_DIR}" 5173 vite
+    "${frontend_pid}" frontend "${REPO_DIR}/frontend" 5173 vite
 
   liveness="$(curl -fsS http://127.0.0.1:8080/actuator/health/liveness)"
   readiness="$(curl -fsS http://127.0.0.1:8080/actuator/health/readiness)"

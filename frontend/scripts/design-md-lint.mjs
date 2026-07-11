@@ -1,9 +1,12 @@
 import { readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
+const frontendRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const repoRoot = resolve(frontendRoot, '..');
 const designDir = 'docs/design';
-const files = readdirSync(designDir)
+const files = readdirSync(join(repoRoot, designDir))
   .filter((file) => file.endsWith('.design.md'))
   .sort()
   .map((file) => join(designDir, file));
@@ -73,7 +76,8 @@ const warnings = [];
 const unexpectedWarnings = [];
 
 for (const file of files) {
-  const result = spawnSync('npx', ['--yes', '@google/design.md', 'lint', file], {
+  const result = spawnSync('npx', ['--yes', '@google/design.md', 'lint', join(repoRoot, file)], {
+    cwd: frontendRoot,
     encoding: 'utf8',
   });
 

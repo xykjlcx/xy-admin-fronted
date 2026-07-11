@@ -1,5 +1,6 @@
 .DS_Store
 node_modules/
+.pnpm-store/
 dist/
 dist-ssr/
 .env
@@ -8,9 +9,7 @@ dist-ssr/
 *.local
 
 # Logs
-logs
-!src/modules/admin/logs/
-!src/modules/admin/logs/**
+/logs/
 *.log
 npm-debug.log*
 yarn-debug.log*

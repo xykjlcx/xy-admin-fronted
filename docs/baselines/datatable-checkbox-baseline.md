@@ -23,19 +23,19 @@
 
 | # | 文件 | 当前补丁 | 证据 |
 | --- | --- | --- | --- |
-| 1 | `src/components/pro/DataTable.tsx` | `selectionColumnWidth = 'calc(44px * var(--app-scale))'` | line 61 |
-| 2 | `src/components/pro/DataTable.tsx` | `selectionCellClassName = 'h-14 p-0'` | line 64 |
-| 3 | `src/components/pro/DataTable.tsx` | `bodyCellWithSelectionClassName = 'h-14 py-0'` | line 63 |
-| 4 | `src/components/pro/DataTable.tsx` | `selectionSlotClassName = 'flex h-full items-center justify-center'` | line 65 |
-| 5 | `src/components/ui/table.tsx` | `[&:has([role=checkbox])]:pr-0` | lines 73, 86 |
-| 6 | `src/components/ui/table.tsx` | `[&>[role=checkbox]]:translate-y-[calc(2px*var(--app-scale))]` | lines 73, 86 |
+| 1 | `frontend/src/components/pro/DataTable.tsx` | `selectionColumnWidth = 'calc(44px * var(--app-scale))'` | line 61 |
+| 2 | `frontend/src/components/pro/DataTable.tsx` | `selectionCellClassName = 'h-14 p-0'` | line 64 |
+| 3 | `frontend/src/components/pro/DataTable.tsx` | `bodyCellWithSelectionClassName = 'h-14 py-0'` | line 63 |
+| 4 | `frontend/src/components/pro/DataTable.tsx` | `selectionSlotClassName = 'flex h-full items-center justify-center'` | line 65 |
+| 5 | `frontend/src/components/ui/table.tsx` | `[&:has([role=checkbox])]:pr-0` | lines 73, 86 |
+| 6 | `frontend/src/components/ui/table.tsx` | `[&>[role=checkbox]]:translate-y-[calc(2px*var(--app-scale))]` | lines 73, 86 |
 
-额外同类补丁：`selectionCheckboxClassName = 'size-[calc(16px*var(--app-scale))]'` 位于 `src/components/pro/DataTable.tsx:66`，Step 3 也应随选择列普通化删除。
+额外同类补丁：`selectionCheckboxClassName = 'size-[calc(16px*var(--app-scale))]'` 位于 `frontend/src/components/pro/DataTable.tsx:66`，Step 3 也应随选择列普通化删除。
 
 grep 证据命令：
 
 ```bash
-rg -n "selectionColumnWidth|selectionCellClassName|bodyCellWithSelectionClassName|selectionSlotClassName|selectionCheckboxClassName|\[role=checkbox\]|translate-y" src/components/pro/DataTable.tsx src/components/ui/table.tsx
+rg -n "selectionColumnWidth|selectionCellClassName|bodyCellWithSelectionClassName|selectionSlotClassName|selectionCheckboxClassName|\[role=checkbox\]|translate-y" frontend/src/components/pro/DataTable.tsx frontend/src/components/ui/table.tsx
 ```
 
 ## 三档截图

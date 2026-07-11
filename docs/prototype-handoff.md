@@ -1,6 +1,6 @@
 # 原型交接稿（历史存档）
 
-> ⚠️ 本文是项目最初的**原型交接稿**，描述 `后台管理脚手架.dc.html` 的完整设计范围（含「尾程快递 lastmile」等**尚未实现**的子系统），**不代表当前实现范围**。
+> ⚠️ 本文是项目最初的**原型交接稿**，描述 `frontend/后台管理脚手架.dc.html` 的完整设计范围（含「尾程快递 lastmile」等**尚未实现**的子系统），**不代表当前实现范围**。
 >
 > 当前工程范围、快速开始与文档地图见 `README.md`；架构约束以 `docs/architecture.md` 为准。保留本文仅用于追溯原型的完整设计意图与视觉规格。技术栈方面，本文早期建议的「Ant Design 5 / react-router」**已不采用**——实际栈是 TanStack Router + shadcn/ui。
 
@@ -8,7 +8,7 @@
 一套通用企业后台管理脚手架原型，用于快速搭建 ERP / OA 类系统。含账号鉴权、组织权限、审计、文件、字典、菜单，以及一个完整的业务子系统「尾程快递」（跨境物流尾程面单/运单/渠道）。支持多子系统切换、飞书 / Claude 两套界面风格、明暗模式、主题色、三种导航布局、显示比例与圆角风格调节、中英文语言切换。
 
 ## About the Design Files
-本包中的 `.dc.html` 文件是**用 HTML 编写的设计参考稿**（展示预期外观与交互的原型），**不是可直接照搬上线的生产代码**。它运行在一个内部的「Design Component」运行时（`support.js` + `{{ }}` 模板 + `class Component extends DCLogic`），仅用于原型演示。
+本包中的 `.dc.html` 文件是**用 HTML 编写的设计参考稿**（展示预期外观与交互的原型），**不是可直接照搬上线的生产代码**。它运行在一个内部的「Design Component」运行时（`frontend/support.js` + `{{ }}` 模板 + `class Component extends DCLogic`），仅用于原型演示。
 
 交接目标：**在目标代码库既有的工程环境里重建这些设计**。本仓库最终采用的技术栈是 **React + TypeScript + Vite + TanStack(Router/Query/Table) + shadcn/ui + Tailwind v4**；主题/换肤用 CSS 变量（本原型已是纯 CSS 变量驱动，token 已迁移）。
 
@@ -57,7 +57,7 @@
 - `--border` 边框: `#e5e6eb` / `#2c2f38`
 - Claude 风格浅色另用暖米色系。
 
-> 注：token 的当前权威值已迁移到 `src/styles/tokens.css` 与 `docs/design/*.design.md`；本节仅为原型时期的参考快照。
+> 注：token 的当前权威值已迁移到 `frontend/src/styles/tokens.<flavor>.css`、`frontend/src/styles/tokens.base.css` 与 `docs/design/*.design.md`；本节仅为原型时期的参考快照。
 
 语义色：成功 `#16a34a`/底 `#e8f7ee`；警告 `#ff8000`/底 `#fff3e8`；危险 `#f53f3f`/底 `#feecec`；信息=主色。
 
@@ -87,7 +87,7 @@
 - Toast 轻提示；开关 switch 即时生效。
 
 ## Files
-- `后台管理脚手架.dc.html` —— 全部设计的唯一源文件（约 478KB，模板 + 逻辑类）。可直接在浏览器打开查看每个页面与交互；实现时对照其内联样式取精确值。
+- `frontend/后台管理脚手架.dc.html` —— 全部设计的唯一源文件（约 478KB，模板 + 逻辑类）。可直接在浏览器打开查看每个页面与交互；实现时对照其内联样式取精确值。
 
 ## Assets
 无外部图片依赖。图标均为内联 SVG（lucide 风格），迁移用 `lucide-react` 同名图标。承运商 logo（DHL/DPD/GLS…）为文字色块占位。面单条形码为 CSS 竖条占位，正式项目用条码库（如 `bwip-js`）。

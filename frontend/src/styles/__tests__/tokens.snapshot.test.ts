@@ -12,7 +12,7 @@ const css = [
   .map((f) => readFileSync(`src/styles/${f}`, 'utf8'))
   .join('\n');
 const globalCss = readFileSync('src/styles/global.css', 'utf8');
-const claudeDesignSource = readFileSync('docs/design/claude.design.md', 'utf8');
+const claudeDesignSource = readFileSync('../docs/design/claude.design.md', 'utf8');
 const appearanceDomSource = readFileSync('src/lib/appearance-dom.ts', 'utf8');
 const appearanceConfigSource = readFileSync('src/config/appearance.ts', 'utf8');
 const buttonSource = readFileSync('src/components/ui/button.tsx', 'utf8');

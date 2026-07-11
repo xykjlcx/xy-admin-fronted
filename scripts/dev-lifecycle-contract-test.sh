@@ -40,7 +40,7 @@ create_fake_project() {
   mkdir -p \
     "$project/scripts" \
     "$project/backend/app/target" \
-    "$project/node_modules/.bin" \
+    "$project/frontend/node_modules/.bin" \
     "$project/test-bin" \
     "$project/test-fixtures" \
     "$project/outside"
@@ -66,8 +66,8 @@ create_fake_project() {
     "const server = http.createServer((_request, response) => response.end('vite'));" \
     "server.listen(5173, '127.0.0.1');" \
     "process.on('SIGTERM', () => server.close(() => process.exit(0)));" \
-    >"$project/node_modules/.bin/vite"
-  chmod +x "$project/node_modules/.bin/vite"
+    >"$project/frontend/node_modules/.bin/vite"
+  chmod +x "$project/frontend/node_modules/.bin/vite"
 
   printf '%s\n' \
     '#!/usr/bin/env bash' \

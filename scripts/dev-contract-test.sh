@@ -48,6 +48,7 @@ done
 
 assert_contains "$COMPOSE_FILE" "postgres:16-alpine"
 assert_contains "$COMPOSE_FILE" "redis:7-alpine"
+assert_contains "$DEV_SCRIPT" 'FRONTEND_DIR="$ROOT_DIR/frontend"'
 assert_contains "$ADR_FILE" "RFC 9457"
 assert_contains "$ADR_FILE" "/api/*"
 assert_contains "$ADR_FILE" "UUIDv7"

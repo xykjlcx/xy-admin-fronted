@@ -1,9 +1,9 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const root = process.cwd();
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const viewport = { width: 1440, height: 900 };
 const baselineDir = path.join(root, 'e2e', 'baseline');
 const reportDir = path.join(root, 'test-results', 'm0-visual');

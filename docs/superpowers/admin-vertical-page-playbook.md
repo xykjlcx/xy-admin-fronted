@@ -51,7 +51,7 @@ modules/<key>/<business>/
 
 ## 5. Mock 可用闭环
 
-每个业务包的 Mock 与业务共置，并在 `src/mocks/handlers.ts` 聚合。Mock 不是静态假数据，至少满足：
+每个业务包的 Mock 与业务共置，并在 `frontend/src/mocks/handlers.ts` 聚合。Mock 不是静态假数据，至少满足：
 
 1. 列表或详情可读取。
 2. 原型中的新增、编辑、删除、状态切换、审批或导出动作能执行。

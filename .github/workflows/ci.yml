@@ -18,15 +18,33 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: monorepo 路径守卫
+        run: bash scripts/monorepo-layout-contract-test.sh
 
       - run: pnpm install --frozen-lockfile
+        working-directory: frontend
 
       - run: ./node_modules/.bin/eslint src
+        working-directory: frontend
       - run: ./node_modules/.bin/tsc -b --noEmit
+        working-directory: frontend
       - run: pnpm theme:guard
+        working-directory: frontend
       - run: pnpm design:lint
+        working-directory: frontend
       - run: ./node_modules/.bin/vitest run
+        working-directory: frontend
       - run: ./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build
+        working-directory: frontend
 
       - name: mock 剥离验收
         run: |
@@ -34,4 +52,9 @@ jobs:
             echo "production bundle contains mock-only code"
             exit 1
           fi
+        working-directory: frontend
       - run: node --check scripts/visual-agent-browser.mjs
+        working-directory: frontend
+
+      - name: 后端与真实开发栈门禁
+        run: backend/scripts/verify-p0a.sh

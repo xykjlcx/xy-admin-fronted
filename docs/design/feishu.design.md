@@ -125,7 +125,7 @@ components:
 数据来源：2026-07-04 admin.feishu.cn 真实登录态 computed style 实测 + 飞书主应用 UD token 体系全量
 dump（13273 个变量，`docs/design/research/feishu-ud-tokens.json`；组件实测见同目录
 `feishu-admin-measurements.md`）。dark mode 值不在本文件（飞书后台无深色模式），
-本项目的 feishu 暗色映射见 `src/styles/tokens.css` 的 `[data-flavor='feishu'][data-mode='dark']` block。
+本项目的 feishu 暗色映射见 `frontend/src/styles/tokens.feishu.css` 的 `[data-flavor='feishu'][data-mode='dark']` block。
 
 v4 修正（第七轮，UD 官方体系）：**hover 方向变浅**（UD primary 四态 default→hover 是升阶变浅，
 pressed 才变深；primary-hover = 主蓝混 15% 白）；**交互底 alpha 化**（hover = N900@8%、pressed = N900@12%、

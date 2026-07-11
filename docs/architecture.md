@@ -5,6 +5,13 @@
 > 配套：铁律速查见 `AGENTS.md`；可执行改造见对应 `SPEC-*.md`。
 > 面向对象：维护者本人与协作 AI agent（Claude Code / Codex）。
 
+## Monorepo 边界
+
+- 仓库根目录只承载全栈编排、后端、共享文档和守卫；前端构建入口统一归位到 `frontend/`。
+- 前端命令默认在 `frontend/` 内执行；根目录全栈开发入口是 `scripts/dev.sh`。
+- `frontend/vite.config.ts` 将 `/api` 代理到本地后端 `http://127.0.0.1:8080`。
+- Tailwind 的 `source('../')` 相对 `frontend/src/styles/global.css` 解析，只扫描 `frontend/src`。
+
 ## 0. 一句话架构
 
 **样式向下收敛，数据向下请求，状态就近安放，一致性交给缓存。**
@@ -18,23 +25,23 @@
 
 | 层级 | 路径 | 职责 | 禁止事项 |
 | --- | --- | --- | --- |
-| App | `src/app` | Provider、QueryClient、Shell、布局注册、全局装配 | 放业务页面实现 |
-| Config | `src/config` | 环境变量校验、应用默认路由、存储 key、feature flags、request 默认策略、外观默认值 | 放运行时用户状态、业务菜单、业务 DTO、页面权限实现 |
-| Routes | `src/routes` | URL 协议、`staticData`、`validateSearch`、可选 loader、route context 适配 | 写页面 UI、写 Query/Mutation hook、发 toast、i18n 业务文案、直接依赖 module 子组件 |
-| Business（纵切包） | `src/modules/<key>/<business>` | 一个业务域的全部：入口骨架、api、mocks、model、list/detail/form 场景 | 被跨业务复用、承载基础 UI 抽象 |
-| Business API | `src/modules/<key>/<business>/api` | zod schema（唯一类型源）、query key factory、queryOptions、mutation hooks | 持有 React UI 状态 |
-| Business Mocks | `src/modules/<key>/<business>/mocks` | MSW handler、mock 数据规则 | 被生产代码直接依赖 |
-| UI | `src/components/ui` | shadcn/ui 基础原语 | 写业务权限、业务文案、业务请求 |
-| Pro | `src/components/pro` | 后台通用业务无关组件（DataTable、Tree、表格壳、状态徽标、过渡容器…） | 绑定具体模块 DTO、import `@/modules/**`、`useTranslation` |
-| Lib | `src/lib` | 纯函数、i18n、权限判断、图标注册、HTTP 基础设施 | 读写组件本地状态 |
-| Stores | `src/stores` | token、外观、折叠态等纯客户端状态 | 存服务端数据副本 |
+| App | `frontend/src/app` | Provider、QueryClient、Shell、布局注册、全局装配 | 放业务页面实现 |
+| Config | `frontend/src/config` | 环境变量校验、应用默认路由、存储 key、feature flags、request 默认策略、外观默认值 | 放运行时用户状态、业务菜单、业务 DTO、页面权限实现 |
+| Routes | `frontend/src/routes` | URL 协议、`staticData`、`validateSearch`、可选 loader、route context 适配 | 写页面 UI、写 Query/Mutation hook、发 toast、i18n 业务文案、直接依赖 module 子组件 |
+| Business（纵切包） | `frontend/src/modules/<key>/<business>` | 一个业务域的全部：入口骨架、api、mocks、model、list/detail/form 场景 | 被跨业务复用、承载基础 UI 抽象 |
+| Business API | `frontend/src/modules/<key>/<business>/api` | zod schema（唯一类型源）、query key factory、queryOptions、mutation hooks | 持有 React UI 状态 |
+| Business Mocks | `frontend/src/modules/<key>/<business>/mocks` | MSW handler、mock 数据规则 | 被生产代码直接依赖 |
+| UI | `frontend/src/components/ui` | shadcn/ui 基础原语 | 写业务权限、业务文案、业务请求 |
+| Pro | `frontend/src/components/pro` | 后台通用业务无关组件（DataTable、Tree、表格壳、状态徽标、过渡容器…） | 绑定具体模块 DTO、import `@/modules/**`、`useTranslation` |
+| Lib | `frontend/src/lib` | 纯函数、i18n、权限判断、图标注册、HTTP 基础设施 | 读写组件本地状态 |
+| Stores | `frontend/src/stores` | token、外观、折叠态等纯客户端状态 | 存服务端数据副本 |
 
 依赖方向只能自上而下：`routes → modules/<key>/<business> → components/pro + components/ui + lib`。`components/ui`、`components/pro` 不反向依赖模块页面。
 
 **全局目录总览：**
 
 ```text
-src/
+frontend/src/
 ├── app/            全局装配：providers / QueryClient(query.ts) / Shell / mount
 ├── config/         启动策略与默认值：env(唯一读 import.meta.env) / app / features / request / appearance
 ├── routes/         文件式路由「薄壳」：URL / validateSearch / staticData / loader / context
@@ -51,7 +58,7 @@ src/
 
 - **脚手架核心**（每个派生项目共享、回流价值高）：`app/`、`config/`、`lib/`、`components/{ui,pro}`、`stores/`、`styles/`、`routes/{__root,_auth,login,403}.tsx`。修 bug 主要落在这里，也是长期自有产品该 `git merge scaffold` 吃回来的部分。
 - **示例业务**（每个派生项目替换、不回流）：`modules/admin/{users,roles,menus,dashboard}` 及其 mock 种子、`dashboard` 假数据。它们是「怎么写业务」的范本，新项目照 `users` 纵切结构重写，不保留示例数据。
-- **原型 / 开发产物**（派生时删除）：`后台管理脚手架.dc.html`、`support.js`、`docs/design/research/`、`docs/baselines/`、`docs/日志/`、`docs/prototype-handoff.md`。
+- **原型 / 开发产物**（派生时删除）：`frontend/后台管理脚手架.dc.html`、`frontend/support.js`、`docs/design/research/`、`docs/baselines/`、`docs/日志/`、`docs/prototype-handoff.md`。
 
 ## 2. 业务纵切包（标准形态与范本）
 
@@ -91,7 +98,7 @@ modules/<key>/<business>/
 
 ## 2.2 Config 边界
 
-`src/config` 是脚手架启动策略和默认值中心，不是后台设置中心。
+`frontend/src/config` 是脚手架启动策略和默认值中心，不是后台设置中心。
 
 - `env.ts` 是唯一读取 `import.meta.env` 的源码文件；其他运行时代码必须通过 config 导出读取环境策略。
 - `app.ts` 放应用默认路由、版本、locale、storage key 等框架级常量。
@@ -108,7 +115,7 @@ Route 文件只做边界装配：
 - `validateSearch` 管 URL search 的输入协议（筛选条件存 URL，可分享/可后退/刷新不丢）。
 - loader 只做首屏体验优化和可选预取；不是所有页面必须有 loader。
 - Route 不写 `useQuery`、`useMutation`、`useQueryClient`、`useSuspenseQuery`、toast、i18n 业务文案。
-- Route 从 `src/modules/<key>/<business>` 导入页面入口。
+- Route 从 `frontend/src/modules/<key>/<business>` 导入页面入口。
 - Shell 稳定性属 App/Shell 层职责，业务页面不处理 Header/Sidebar 是否刷新。
 
 ## 4. 数据流与状态归属
@@ -184,8 +191,8 @@ UI 状态住在「所有消费它的组件的最近公共父」，不多不少�
 
 ## 6. HTTP 契约
 
-- `src/lib/http/client.ts` 负责统一请求、鉴权 header、timeout、abort、envelope 拆包、401 事件和错误归一。token 用绑定式 getter 注入，避免基础库反依赖业务。
-- `src/lib/http/contract.ts` 是响应契约入口；后台接口必须通过 `defineApiContract({ response: Schema })` 声明运行时 response schema，响应用 `safeParse` 校验，字段漂移即早失败（`ContractError`）。
+- `frontend/src/lib/http/client.ts` 负责统一请求、鉴权 header、timeout、abort、envelope 拆包、401 事件和错误归一。token 用绑定式 getter 注入，避免基础库反依赖业务。
+- `frontend/src/lib/http/contract.ts` 是响应契约入口；后台接口必须通过 `defineApiContract({ response: Schema })` 声明运行时 response schema，响应用 `safeParse` 校验，字段漂移即早失败（`ContractError`）。
 - 分页接口用 `pageResultSchema(ItemSchema)`，不各模块手写 `{ list, total }`。
 - Module API 调 `http.get/post/put/patch/del` 必须传 response contract，**禁止** `http.get<T>()` 只靠 TypeScript 的写法（编译期无法证明运行时 shape）。
 - DTO 类型只从 zod schema `z.infer`，DTO/mock/真实接口共用一份 schema；表单入参也用 zod schema 定义并与表单校验共用（RHF + `zodResolver`），字段对齐只有一处真相。
@@ -200,7 +207,7 @@ UI 状态住在「所有消费它的组件的最近公共父」，不多不少�
 
 ## 8. 组件设计
 
-- `src/components/ui` 是基础 UI 体系入口，承接 token、尺寸、状态、无障碍和控件 API。页面不自己实现 Button/Input/Textarea/Select/RadioGroup/Tabs/Table/Dialog/Alert/Badge/Skeleton/Empty/Checkbox 等原子控件。
+- `frontend/src/components/ui` 是基础 UI 体系入口，承接 token、尺寸、状态、无障碍和控件 API。页面不自己实现 Button/Input/Textarea/Select/RadioGroup/Tabs/Table/Dialog/Alert/Badge/Skeleton/Empty/Checkbox 等原子控件。
 - 基础 UI 以 shadcn/Radix 源码模式维护在项目内；从 `@/components/ui/*` 引入的是项目本地组件。新增基础原语先查官方 shadcn（`pnpm dlx shadcn@latest docs <c>` / `add <c> --dry-run` / `--diff <file>`），无明确理由不从空白手写。已定制的基础组件不得直接 `--overwrite`；先看 diff 再把上游无障碍/组合/依赖合并进本地 token/variant。
 - 样式定制优先级：全局 token / `@theme inline` → shadcn 组件 variant → `components/pro` 组合层 → 页面 className。页面层只做布局微调，不承担基础控件视觉定义。
 - Button 标准变体 `primary`/`secondary`/`dashed`/`text`/`danger`/`danger-ghost`；`default`/`outline`/`ghost`/`link`/`destructive` 只作旧调用别名逐步迁移。
@@ -217,7 +224,7 @@ UI 状态住在「所有消费它的组件的最近公共父」，不多不少�
 
 约束：
 
-- token 定义入口是 `src/styles/tokens.base.css`（flavor 无关共享骨架，必须最先 @import）+ `tokens.<flavor>.css`（当前为 feishu/claude/shadcn/sera，per-flavor profile）；组件只消费 token，不判断 `flavor`。
+- token 定义入口是 `frontend/src/styles/tokens.base.css`（flavor 无关共享骨架，必须最先 @import）+ `tokens.<flavor>.css`（当前为 feishu/claude/shadcn/sera，per-flavor profile）；组件只消费 token，不判断 `flavor`。
 - UI 组件族用组件状态 token：`--field-*`、`--button-*`、`--option-*`、`--overlay-*`、`--tabs-*`、`--choice-*`、`--table-*`。Pro/Shell 用组合 token：`--pro-*`、`--side-list-*`、`--nav-item-*`、`--pagination-*`。
 - 组件 token 不进 `@theme inline`，用 Tailwind v4 括号变量：`bg-(--token)`、`border-(--token)`、`text-(--token)`。状态优先级靠 `global.css` 声明顺序，不依赖 Tailwind 变体生成顺序。
 - 业务页面不得用 `bg-pri-soft`、`text-pri`、`border-pri`、`ring-soft`、`hover:bg-surface-2` 等 primitive class 表达控件状态（guard 会拦）。通用 hover/focus/active/selected/expanded/open 状态必须沉到 UI 或 Pro 组件。
@@ -256,11 +263,11 @@ UI 状态住在「所有消费它的组件的最近公共父」，不多不少�
 
 - 文案走 i18n key；禁止新增中文硬编码进组件。路由 `staticData` 用 `labelKey/groupKey/action.labelKey`。
 - 前端权限只负责体验与防误触，不是安全边界；生产权限必须后端校验。
-- mock 只在开发态/demo/`VITE_ENABLE_MOCK=true` 启用；生产构建必须剥离 faker/msw/mock worker。mock 随业务纵切（`<business>/mocks/`），在 `src/mocks` 总聚合挂载。
+- mock 只在开发态/demo/`VITE_ENABLE_MOCK=true` 启用；生产构建必须剥离 faker/msw/mock worker。mock 随业务纵切（`<business>/mocks/`），在 `frontend/src/mocks` 总聚合挂载。
 
 ## 13. 约定即测试（守卫哲学）
 
-架构约束不靠自觉，靠可执行守卫。凡本文架构不变量，均须有一条自动化断言守住（`src/app/__tests__/module-boundaries.test.ts` 等）：路由薄壳、api 必传 contract、env 只在 config 读、业务层不用裸 `<input>`、生产包不含 faker/msw、queryKey 来自 factory、index 无 query/mutation、pro 层不 import modules、纵切结构合规……新增架构规则的正确姿势：先加守卫测试，再让实现变绿。
+架构约束不靠自觉，靠可执行守卫。凡本文架构不变量，均须有一条自动化断言守住（`frontend/src/app/__tests__/module-boundaries.test.ts` 等）：路由薄壳、api 必传 contract、env 只在 config 读、业务层不用裸 `<input>`、生产包不含 faker/msw、queryKey 来自 factory、index 无 query/mutation、pro 层不 import modules、纵切结构合规……新增架构规则的正确姿势：先加守卫测试，再让实现变绿。
 
 主题门禁：
 
@@ -273,13 +280,13 @@ UI 状态住在「所有消费它的组件的最近公共父」，不多不少�
 
 **新增业务页：**
 
-1. 建 `src/modules/<key>/<business>/`（index + api + mocks + model + list/detail/form）。
+1. 建 `frontend/src/modules/<key>/<business>/`（index + api + mocks + model + list/detail/form）。
 2. list/detail/form 场景与子组件按第 2 章骨架拆分。
-3. 在 `src/routes/_auth/<key>/<page>.tsx` 只写 route 协议、可选 loader、URL/context 适配，从纵切包导入入口。
+3. 在 `frontend/src/routes/_auth/<key>/<page>.tsx` 只写 route 协议、可选 loader、URL/context 适配，从纵切包导入入口。
 4. 补 `staticData` 的 i18n key、权限 code、action key。
 5. 服务端数据走 `api/` 的 queryOptions/mutation hooks，数据请求下沉到场景组件。
 6. 本地 loading/empty/error 在内容区处理，不让 Shell 随业务数据刷新。
-7. `modules/registry.ts` 注册 manifest；`src/mocks` 总聚合挂 handlers；补 locales；新图标进 icon-registry。
+7. `modules/registry.ts` 注册 manifest；`frontend/src/mocks` 总聚合挂 handlers；补 locales；新图标进 icon-registry。
 8. 补页面测试与守卫；跑 `tsc`、`vitest`、`eslint`、必要时 `theme:guard`。
 
 **删除业务页：** 删纵切包、删路由壳、registry 除名、删 locales namespace、从 mock 聚合摘除。`admin` 是内核子系统；登录/消息中心/个人中心是 Shell 入口依赖，不当普通业务页随意删除。
