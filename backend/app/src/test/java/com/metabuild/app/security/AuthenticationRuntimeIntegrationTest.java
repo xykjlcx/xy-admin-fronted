@@ -148,7 +148,7 @@ class AuthenticationRuntimeIntegrationTest {
                 UUID.fromString("01900000-0000-7000-8000-000000000099"), Instant.EPOCH);
         snapshots.putFence(logoutFence);
         assertThat(snapshots.fencedCandidates(Instant.now(), 10))
-                .contains(ADMIN + "|" + logoutFence.operationId());
+                .contains(logoutFence);
         assertThatThrownBy(() -> authentication.login("admin", "task12-local-secret"))
                 .isInstanceOf(AuthorizationUnavailable.class);
         assertThat(snapshots.deleteIfFence(logoutFence)).isTrue();

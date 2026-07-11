@@ -21,14 +21,14 @@ public final class JdbcLogoutRecoveryRepository implements LogoutRecoveryPort {
     }
     @Override public void complete(AuthorizationFence fence) {
         jdbc.update("""
-                update mb_authz_refresh_outbox set status='DONE',recovery_phase='SESSIONS_KICKED',processed_at=current_timestamp
+                update mb_authz_refresh_outbox set status='DONE',worker_id=null,claimed_at=null,lease_until=null,recovery_phase='SESSIONS_KICKED',processed_at=current_timestamp
                 where operation_id=? and user_id=? and event_type='LOGOUT_ALL'
                 """, fence.operationId(), fence.userId());
     }
-    @Override public void advance(AuthorizationFence fence, String phase) {
-        jdbc.update("""
+    @Override public boolean advance(AuthorizationFence fence, String expectedPhase,String nextPhase) {
+        return jdbc.update("""
                 update mb_authz_refresh_outbox set recovery_phase=?
-                where operation_id=? and user_id=? and event_type='LOGOUT_ALL' and status<>'DONE'
-                """, phase, fence.operationId(), fence.userId());
+                where operation_id=? and user_id=? and event_type='LOGOUT_ALL' and status<>'DONE' and recovery_phase=?
+                """, nextPhase, fence.operationId(), fence.userId(),expectedPhase)==1;
     }
 }

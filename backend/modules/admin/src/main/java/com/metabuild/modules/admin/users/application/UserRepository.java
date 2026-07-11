@@ -14,6 +14,7 @@ public interface UserRepository {
     UserView update(UUID id, UserPatch patch);
     Set<UUID> softDelete(UUID id);
     Set<UUID> disable(Set<UUID> ids);
+    Set<UUID> enable(Set<UUID> ids);
     Set<UUID> moveToDepartment(Set<UUID> ids, UUID deptId);
     Set<UUID> usersInDepartments(Set<UUID> deptIds);
     BatchResult<UUID, UserSummary> batchGet(Set<UUID> ids);

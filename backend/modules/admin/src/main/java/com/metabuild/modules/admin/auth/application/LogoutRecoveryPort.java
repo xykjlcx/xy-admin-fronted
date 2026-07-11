@@ -5,6 +5,6 @@ import com.metabuild.shared.kernel.security.AuthorizationFence;
 @FunctionalInterface
 public interface LogoutRecoveryPort {
     void record(AuthorizationFence fence, RuntimeException failure);
-    default void advance(AuthorizationFence fence, String phase) {}
+    default boolean advance(AuthorizationFence fence, String expectedPhase, String nextPhase) { return true; }
     default void complete(AuthorizationFence fence) {}
 }

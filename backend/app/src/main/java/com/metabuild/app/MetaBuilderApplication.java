@@ -8,6 +8,7 @@ import com.metabuild.api.contract.ApiContractMarker;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackageClasses = {
     MetaBuilderApplication.class,
@@ -16,6 +17,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
     ApiContractMarker.class
 })
 @EnableConfigurationProperties({MetaBuilderAuthProperties.class, MetaBuilderCorsProperties.class})
+@EnableScheduling
 public class MetaBuilderApplication {
 
   public static void main(String[] args) {

@@ -49,38 +49,25 @@ public final class JdbcAuthorizationGraphRepository implements AuthorizationGrap
             if (permission != null) role.permissions.add(permission);
         });
 
-        Set<UUID> roleIds = new HashSet<>();
-        users.values().forEach(user -> roleIds.addAll(user.roles.keySet()));
-        if (!roleIds.isEmpty()) jdbc.query("""
-                select rcd.role_id,d.id dept_id from mb_role_custom_dept rcd
-                join mb_dept d on d.id=rcd.dept_id and d.status='ACTIVE' and d.deleted_at is null
-                where rcd.role_id in (:roleIds)
-                """, new MapSqlParameterSource("roleIds", roleIds), (RowCallbackHandler) rs -> {
-            UUID roleId = rs.getObject("role_id", UUID.class);
-            UUID deptId = rs.getObject("dept_id", UUID.class);
-            users.values().forEach(user -> {
-                var role = user.roles.get(roleId);
-                if (role != null && role.scope == ScopeType.CUSTOM_DEPT) role.depts.add(deptId);
-            });
-        });
-
-        Set<UUID> roots = new HashSet<>();
-        users.values().stream().filter(UserBuilder::needsSubtree).map(user -> user.deptId).forEach(roots::add);
         var subtrees = new LinkedHashMap<UUID, Set<UUID>>();
-        if (!roots.isEmpty()) jdbc.query("""
-                with recursive subtree(root_id,id) as (
-                  select id,id from mb_dept where id in (:roots) and status='ACTIVE' and deleted_at is null
-                  union all select s.root_id,d.id from mb_dept d join subtree s on d.parent_id=s.id
+        jdbc.query("""
+                with recursive subtree(user_id,root_id,id) as (
+                  select u.id,u.dept_id,u.dept_id from mb_user u where u.id in (:userIds) and u.dept_id is not null
+                  union all select s.user_id,s.root_id,d.id from mb_dept d join subtree s on d.parent_id=s.id
                   where d.status='ACTIVE' and d.deleted_at is null
-                ) select root_id,id from subtree
-                """, new MapSqlParameterSource("roots", roots), (RowCallbackHandler) rs -> subtrees
-                .computeIfAbsent(rs.getObject("root_id", UUID.class), ignored -> new HashSet<>())
-                .add(rs.getObject("id", UUID.class)));
+                ), scopes as (
+                  select ur.user_id,rcd.role_id,d.id dept_id,'CUSTOM' kind from mb_user_role ur
+                  join mb_role r on r.id=ur.role_id and r.status='ACTIVE' and r.deleted_at is null and r.data_scope_type='CUSTOM_DEPT'
+                  join mb_role_custom_dept rcd on rcd.role_id=r.id join mb_dept d on d.id=rcd.dept_id and d.status='ACTIVE' and d.deleted_at is null
+                  where ur.user_id in (:userIds)
+                  union all select s.user_id,null::uuid,s.id,'SUBTREE' from subtree s
+                ) select user_id,role_id,dept_id,kind from scopes
+                """,parameters,(RowCallbackHandler)rs->{UUID userId=rs.getObject("user_id",UUID.class),deptId=rs.getObject("dept_id",UUID.class);if("SUBTREE".equals(rs.getString("kind"))){subtrees.computeIfAbsent(userId,ignored->new HashSet<>()).add(deptId);}else{var user=users.get(userId);if(user!=null){var role=user.roles.get(rs.getObject("role_id",UUID.class));if(role!=null)role.depts.add(deptId);}}});
 
         var result = new LinkedHashMap<UUID, AuthorizationGraph>();
         users.forEach((userId, user) -> {
             user.roles.values().stream().filter(role -> role.scope == ScopeType.OWN_DEPT_AND_BELOW)
-                    .forEach(role -> role.depts.addAll(subtrees.getOrDefault(user.deptId, Set.of())));
+                    .forEach(role -> role.depts.addAll(subtrees.getOrDefault(userId, Set.of())));
             var grants = new ArrayList<AuthorizationGrant>();
             user.roles.values().forEach(role -> grants.add(new AuthorizationGrant(
                     role.code, role.systemAdmin, role.scope, role.depts, role.permissions)));

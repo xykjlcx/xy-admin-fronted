@@ -13,6 +13,7 @@ public interface AuthorizationRefreshService {
     <T> T execute(Cause cause, AuthorizationChange<T> change);
 
     <T> T executeTerminal(TerminalChange<T> change);
+    default <T> T executeEnable(AuthorizationChange<T> change){return execute(Cause.USER_CHANGED,change);}
 
     interface AuthorizationChange<T> {
         /** 取得全局锁后、mutation 前固化目标用户。 */

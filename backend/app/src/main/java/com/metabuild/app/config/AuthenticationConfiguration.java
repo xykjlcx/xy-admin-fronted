@@ -9,6 +9,10 @@ import com.metabuild.modules.admin.auth.application.AuthenticationService;
 import com.metabuild.modules.admin.auth.application.AuthorizationGraphRepository;
 import com.metabuild.modules.admin.auth.application.AuthorizationSnapshotCompiler;
 import com.metabuild.modules.admin.auth.application.AuthorizationSnapshotStore;
+import com.metabuild.modules.admin.auth.application.AuthorizationBatchSnapshotStore;
+import com.metabuild.modules.admin.auth.application.AuthorizationCommandExecutor;
+import com.metabuild.modules.admin.auth.application.AuthorizationRefreshPort;
+import com.metabuild.modules.admin.auth.api.AuthorizationRefreshService;
 import com.metabuild.modules.admin.auth.application.AuthUserRepository;
 import com.metabuild.modules.admin.auth.application.BootstrapCredentialProvisioner;
 import com.metabuild.modules.admin.auth.application.RefreshTokenService;
@@ -18,6 +22,22 @@ import com.metabuild.modules.admin.auth.persistence.JdbcAuthUserRepository;
 import com.metabuild.modules.admin.auth.persistence.JdbcBootstrapCredentialRepository;
 import com.metabuild.modules.admin.auth.persistence.JdbcRefreshTokenStore;
 import com.metabuild.modules.admin.auth.persistence.JdbcLogoutRecoveryRepository;
+import com.metabuild.modules.admin.auth.persistence.JdbcAuthorizationRefreshRepository;
+import com.metabuild.modules.admin.auth.persistence.JdbcAuthorizationReconciliationRepository;
+import com.metabuild.modules.admin.auth.application.AuthorizationReconciliationPort;
+import com.metabuild.modules.admin.auth.application.AuthorizationReconciler;
+import com.metabuild.modules.admin.users.application.UserRepository;
+import com.metabuild.modules.admin.users.application.UserService;
+import com.metabuild.modules.admin.users.persistence.JdbcUserRepository;
+import com.metabuild.modules.admin.users.controller.UserControllerContract;
+import com.metabuild.modules.admin.departments.application.DepartmentRepository;
+import com.metabuild.modules.admin.departments.application.DepartmentService;
+import com.metabuild.modules.admin.departments.persistence.JdbcDepartmentRepository;
+import com.metabuild.modules.admin.departments.controller.DepartmentControllerContract;
+import com.metabuild.modules.admin.roles.application.RoleRepository;
+import com.metabuild.modules.admin.roles.application.RoleService;
+import com.metabuild.modules.admin.roles.persistence.JdbcRoleRepository;
+import com.metabuild.modules.admin.roles.controller.RoleControllerContract;
 import com.metabuild.modules.admin.auth.application.CurrentUserQuery;
 import com.metabuild.modules.admin.auth.application.CurrentUserRepository;
 import com.metabuild.modules.admin.auth.persistence.JdbcCurrentUserRepository;
@@ -56,6 +76,29 @@ public class AuthenticationConfiguration {
     @Bean RedisAuthorizationSnapshotStore authorizationSnapshotStore(StringRedisTemplate redis, ObjectMapper json) {
         return new RedisAuthorizationSnapshotStore(redis, json);
     }
+    @Bean AuthorizationRefreshPort authorizationRefreshPort(JdbcTemplate jdbc,PlatformTransactionManager manager,
+            AuthorizationGraphRepository graphs,AuthorizationSnapshotCompiler compiler,UuidV7Generator ids,Clock clock){
+        return new JdbcAuthorizationRefreshRepository(jdbc,manager,graphs,compiler,ids,clock);
+    }
+    @Bean AuthorizationRefreshService authorizationRefreshService(AuthorizationRefreshPort database,
+            AuthorizationBatchSnapshotStore snapshots,UuidV7Generator ids,Clock clock,LogoutRecoveryHandler terminal){
+        return new AuthorizationCommandExecutor(database,snapshots,ids::generate,clock,terminal);
+    }
+    @Bean AuthorizationReconciliationPort authorizationReconciliationPort(JdbcTemplate jdbc,Clock clock){return new JdbcAuthorizationReconciliationRepository(jdbc,clock);}
+    @Bean AuthorizationReconciler authorizationReconciler(AuthorizationReconciliationPort tasks,AuthorizationRefreshPort database,
+            AuthorizationBatchSnapshotStore batch,AuthorizationSnapshotStore states,LogoutRecoveryHandler terminal,Clock clock,UuidV7Generator ids){
+        return new AuthorizationReconciler(tasks,database,batch,states,terminal,(com.metabuild.modules.admin.auth.application.AuthorizationFenceIndex)states,clock,ids.generate(),100);
+    }
+    @Bean AuthorizationReconciliationScheduler authorizationReconciliationScheduler(AuthorizationReconciler reconciler){return new AuthorizationReconciliationScheduler(reconciler);}
+    @Bean UserRepository userRepository(JdbcTemplate jdbc){return new JdbcUserRepository(jdbc);}
+    @Bean UserService userService(UserRepository users,AuthorizationRefreshService refresh){return new UserService(users,refresh);}
+    @Bean UserControllerContract userController(UserService users,UuidV7Generator ids){return new UserControllerContract(users,ids);}
+    @Bean DepartmentRepository departmentRepository(JdbcTemplate jdbc){return new JdbcDepartmentRepository(jdbc);}
+    @Bean DepartmentService departmentService(DepartmentRepository depts,AuthorizationRefreshService refresh){return new DepartmentService(depts,refresh);}
+    @Bean DepartmentControllerContract departmentController(DepartmentService depts,UuidV7Generator ids){return new DepartmentControllerContract(depts,ids);}
+    @Bean RoleRepository roleRepository(JdbcTemplate jdbc){return new JdbcRoleRepository(jdbc);}
+    @Bean RoleService roleService(RoleRepository roles,AuthorizationRefreshService refresh){return new RoleService(roles,refresh);}
+    @Bean RoleControllerContract roleController(RoleService roles,UuidV7Generator ids){return new RoleControllerContract(roles,ids);}
     @Bean SaTokenSessionControl saTokenSessionControl() { return new SaTokenSessionControl(); }
     @Bean AccountSessionPort accountSessions(SaTokenSessionControl sessions) { return new AccountSessionAdapter(sessions); }
     @Bean RefreshTokenStore refreshTokens(JdbcTemplate jdbc, PlatformTransactionManager transactions,
