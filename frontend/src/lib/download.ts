@@ -1,13 +1,14 @@
-export async function downloadFile(url: string, filename: string) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Download failed with status ${response.status}`);
+import { http } from './http/client';
+import { blobContract } from './http/contract';
 
-  const blob = await response.blob();
+export async function downloadFile(url: string, filename: string) {
+  const result = await http.get(url, undefined, blobContract);
+  const blob = result.blob;
   const objectUrl = URL.createObjectURL(blob);
   try {
     const anchor = document.createElement('a');
     anchor.href = objectUrl;
-    anchor.download = filename;
+    anchor.download = result.filename ?? filename;
     anchor.click();
   } finally {
     URL.revokeObjectURL(objectUrl);

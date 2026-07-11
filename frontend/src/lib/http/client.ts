@@ -1,50 +1,103 @@
-import { adapter } from './adapter';
-import { BizError, AuthExpiredError, ContractError, HttpError } from './errors';
+import { z } from 'zod';
+import { AuthExpiredError, BizError, ContractError, HttpError } from './errors';
 import { authEvents } from './events';
 import { requestConfig } from '@/config';
-import type { ApiContract } from './contract';
+import type { ApiContract, BlobResult } from './contract';
 
 const BASE = requestConfig.baseUrl;
-let getToken: () => string | null = () => null;
+const PROBLEM_DETAIL_SCHEMA = z.object({
+  type: z.string().optional(),
+  title: z.string().optional(),
+  status: z.number().int(),
+  detail: z.string(),
+  instance: z.string().optional(),
+  code: z.string().regex(/^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+$/),
+  traceId: z.string().optional(),
+});
 
-// HTTP 层不直接 import auth store，避免基础库反向依赖业务状态。
-// auth.api.ts 在模块加载时绑定 token getter，后续若换认证实现，只改绑定点。
+let getToken: () => string | null = () => null;
+let getLocale: () => string | null = () =>
+  document.documentElement.lang || navigator.language || 'zh-CN';
+export interface AuthRefreshBinding {
+  refresh: (signal: AbortSignal) => Promise<string>;
+  commitToken: (token: string) => void;
+}
+
+let refreshBinding: AuthRefreshBinding | null = null;
+let observedTokenUsed: string | null = null;
+let authGeneration = 0;
+let authStateInitialized = false;
+
+interface AuthAttempt {
+  tokenUsed: string | null;
+  generation: number;
+}
+
+interface RefreshLatch extends AuthAttempt {
+  controller: AbortController;
+  promise: Promise<void>;
+}
+
+interface ExpiryLatch extends AuthAttempt {
+  error: AuthExpiredError;
+}
+
+let refreshLatch: RefreshLatch | null = null;
+let expiryLatch: ExpiryLatch | null = null;
+
+function currentTokenUsed(): string | null {
+  const token = getToken()?.trim();
+  return token || null;
+}
+
+function resetAuthTracking() {
+  refreshLatch?.controller.abort(new DOMException('auth session advanced', 'AbortError'));
+  observedTokenUsed = currentTokenUsed();
+  authGeneration += 1;
+  authStateInitialized = true;
+  refreshLatch = null;
+  expiryLatch = null;
+}
+
+export function bumpAuthSessionEpoch() {
+  resetAuthTracking();
+}
+
 export function bindTokenGetter(fn: () => string | null) {
   getToken = fn;
+  resetAuthTracking();
+}
+
+export function bindLocaleGetter(fn: () => string | null) {
+  getLocale = fn;
+}
+
+// Task 13 在此绑定真实 refresh 与 token 持久化；Task 9 只提供不反向依赖 auth 模块的窄口。
+export function bindAuthRefreshHandler(binding: AuthRefreshBinding | null) {
+  refreshBinding = binding;
+  resetAuthTracking();
 }
 
 export interface HttpRequestOptions {
   signal?: AbortSignal;
   timeoutMs?: number;
-  // 401 处理策略：默认 'expire'（广播会话过期 + 抛 AuthExpiredError）。
-  // 登录等“401 表示业务失败（密码错）”的接口传 'reject'，只抛普通 HttpError(401)，不触发全局登出。
   on401?: 'expire' | 'reject';
 }
 
 function toQueryString(params: Record<string, unknown>): string {
-  const mapped = adapter.mapRequestParams(params);
   const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(mapped)) {
+  for (const [key, value] of Object.entries(params)) {
     if (value === undefined || value === null) continue;
     search.set(key, String(value));
   }
   return search.toString();
 }
 
-function abortErrorMessage(error: unknown, timedOut: boolean): string | null {
-  if (timedOut) return 'request timeout';
-  if (error instanceof DOMException && error.name === 'AbortError') return 'request aborted';
-  if (error instanceof Error && error.name === 'AbortError') return 'request aborted';
-  return null;
-}
-
-function createAbortController(options?: HttpRequestOptions) {
-  // 统一把“全局超时”和“调用方主动取消”合并成 fetch 的一个 signal。
-  // dispose 必须清 timer 和 listener，否则表格快速切页/卸载时会积累无效回调。
+function createRequestDeadline(options?: HttpRequestOptions) {
   const controller = new AbortController();
   let timedOut = false;
   const timeoutMs = options?.timeoutMs ?? requestConfig.timeoutMs;
-  const timeoutId = window.setTimeout(() => {
+  const timeoutId = globalThis.setTimeout(() => {
     timedOut = true;
     controller.abort();
   }, timeoutMs);
@@ -57,13 +110,336 @@ function createAbortController(options?: HttpRequestOptions) {
     signal: controller.signal,
     didTimeout: () => timedOut,
     dispose: () => {
-      window.clearTimeout(timeoutId);
+      globalThis.clearTimeout(timeoutId);
       options?.signal?.removeEventListener('abort', abortFromCaller);
     },
   };
 }
 
-async function request<T>(
+type RequestDeadline = ReturnType<typeof createRequestDeadline>;
+
+function abortError(deadline: RequestDeadline, cause?: unknown): HttpError {
+  return new HttpError(0, deadline.didTimeout() ? 'request timeout' : 'request aborted',
+    cause === undefined ? undefined : { cause });
+}
+
+function raceWithSignal<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const cleanup = () => signal.removeEventListener('abort', onAbort);
+    const resolveOnce = (value: T) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(value);
+    };
+    const rejectOnce = (error: unknown) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(error);
+    };
+    const onAbort = () => {
+      rejectOnce(signal.reason);
+    };
+    void promise.then(
+      (value) => resolveOnce(value),
+      (error: unknown) => rejectOnce(error),
+    );
+    if (signal.aborted) onAbort();
+    else signal.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+function encodeBody(body: unknown): { body?: BodyInit; contentType?: string } {
+  if (body === undefined) return {};
+  if (body instanceof FormData) return { body };
+  return { body: JSON.stringify(body), contentType: 'application/json' };
+}
+
+function currentLocale(): string {
+  return getLocale() || 'zh-CN';
+}
+
+function parseFilename(contentDisposition: string | null): string | null {
+  if (!contentDisposition) return null;
+  const encoded = contentDisposition.match(/filename\*\s*=\s*(?:UTF-8'')?([^;]+)/i)?.[1];
+  const plain = contentDisposition.match(/filename\s*=\s*(?:"([^"]+)"|([^;]+))/i);
+  const raw = encoded ?? plain?.[1] ?? plain?.[2];
+  if (!raw) return null;
+  const trimmed = raw.trim().replace(/^"|"$/g, '');
+  try {
+    return decodeURIComponent(trimmed);
+  } catch {
+    return trimmed;
+  }
+}
+
+function parseRetryAfter(value: string | null): number | null {
+  if (!value) return null;
+  const normalized = value.trim();
+  if (/^\d+$/.test(normalized)) return Number(normalized) * 1_000;
+  const date = Date.parse(normalized);
+  if (Number.isNaN(date)) return null;
+  return Math.max(0, date - Date.now());
+}
+
+async function readLimitedText(response: Response, signal: AbortSignal): Promise<string> {
+  if (!response.body) return '';
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  const chunks: string[] = [];
+  let bytesRead = 0;
+  let reachedNaturalEof = false;
+  try {
+    while (bytesRead < requestConfig.maxErrorBodyBytes) {
+      const { done, value } = await raceWithSignal(reader.read(), signal);
+      if (done) {
+        reachedNaturalEof = true;
+        break;
+      }
+      const remaining = requestConfig.maxErrorBodyBytes - bytesRead;
+      const accepted = value.subarray(0, remaining);
+      chunks.push(decoder.decode(accepted, { stream: true }));
+      bytesRead += accepted.byteLength;
+      if (accepted.byteLength < value.byteLength || bytesRead >= requestConfig.maxErrorBodyBytes) {
+        await reader.cancel();
+        break;
+      }
+    }
+    // 只在真实 EOF 刷新 decoder；被 byte cap 截断时丢弃缓冲的半个 UTF-8 码点。
+    if (reachedNaturalEof) chunks.push(decoder.decode());
+    return chunks.join('');
+  } catch (error) {
+    await reader.cancel(error).catch(() => undefined);
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+async function readOwnedBodyParts(response: Response, signal: AbortSignal): Promise<ArrayBuffer[]> {
+  if (!response.body) return [];
+  const reader = response.body.getReader();
+  const parts: ArrayBuffer[] = [];
+  let cancelled = false;
+  const cancelOnce = async (reason: unknown) => {
+    if (cancelled) return;
+    cancelled = true;
+    await reader.cancel(reason).catch(() => undefined);
+  };
+
+  try {
+    while (true) {
+      const { done, value } = await raceWithSignal(reader.read(), signal);
+      if (done) break;
+      const ownedPart = new ArrayBuffer(value.byteLength);
+      new Uint8Array(ownedPart).set(value);
+      parts.push(ownedPart);
+    }
+  } catch (error) {
+    await cancelOnce(error);
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+
+  return parts;
+}
+
+function mergeBodyParts(parts: ArrayBuffer[]): Uint8Array {
+  const totalBytes = parts.reduce((total, part) => total + part.byteLength, 0);
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const part of parts) {
+    bytes.set(new Uint8Array(part), offset);
+    offset += part.byteLength;
+  }
+  return bytes;
+}
+
+async function readAllBodyBytes(response: Response, signal: AbortSignal): Promise<Uint8Array> {
+  return mergeBodyParts(await readOwnedBodyParts(response, signal));
+}
+
+async function discardOwnedBody(response: Response, signal: AbortSignal): Promise<void> {
+  if (!response.body) return;
+  const reader = response.body.getReader();
+  try {
+    await raceWithSignal(reader.cancel('void response body is ignored'), signal);
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+async function decodeError(response: Response, signal: AbortSignal): Promise<BizError> {
+  const traceId = response.headers.get(requestConfig.traceHeaderName);
+  const retryAfter = parseRetryAfter(response.headers.get('Retry-After'));
+  const contentType = response.headers.get('Content-Type')?.toLowerCase() ?? '';
+  const body = await readLimitedText(response, signal);
+
+  if (contentType.includes('json') && body) {
+    try {
+      const parsed = PROBLEM_DETAIL_SCHEMA.safeParse(JSON.parse(body));
+      if (parsed.success) {
+        return new BizError({
+          status: response.status,
+          code: parsed.data.code,
+          detail: parsed.data.detail,
+          traceId: parsed.data.traceId ?? traceId,
+          instance: parsed.data.instance ?? null,
+          retryAfter,
+        });
+      }
+    } catch {
+      // 非法 JSON 与畸形 ProblemDetail 统一落到安全 transport fallback。
+    }
+  }
+
+  const summarySource = contentType.includes('text/html') ? body.replace(/<[^>]*>/g, ' ') : body;
+  const summary = summarySource
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, requestConfig.maxErrorSummaryChars);
+  return new BizError({
+    status: response.status,
+    code: 'transport.http-error',
+    detail: summary || response.statusText || `HTTP ${response.status}`,
+    traceId,
+    instance: null,
+    retryAfter,
+  });
+}
+
+function canRetryTransport(method: string, retryCount: number): boolean {
+  return (
+    requestConfig.retryableMethods.includes(method) &&
+    retryCount < requestConfig.maxTransportRetries
+  );
+}
+
+function waitForRetry(delayMs: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) return Promise.reject(signal.reason);
+  if (delayMs <= 0) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const cleanup = () => signal.removeEventListener('abort', onAbort);
+    const timeoutId = globalThis.setTimeout(() => {
+      cleanup();
+      resolve();
+    }, delayMs);
+    const onAbort = () => {
+      globalThis.clearTimeout(timeoutId);
+      cleanup();
+      reject(signal.reason);
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+function authReplayExcluded(url: string): boolean {
+  return requestConfig.authReplayExcludedPaths.some(
+    (path) => url === path || url.startsWith(`${path}?`),
+  );
+}
+
+function observeAuthState(): AuthAttempt {
+  const tokenUsed = currentTokenUsed();
+  if (!authStateInitialized) {
+    observedTokenUsed = tokenUsed;
+    authStateInitialized = true;
+  } else if (tokenUsed !== observedTokenUsed) {
+    observedTokenUsed = tokenUsed;
+    authGeneration += 1;
+    refreshLatch = null;
+    expiryLatch = null;
+  }
+  return { tokenUsed, generation: authGeneration };
+}
+
+function sameAuthAttempt(left: AuthAttempt, right: AuthAttempt): boolean {
+  return left.tokenUsed === right.tokenUsed && left.generation === right.generation;
+}
+
+function failAuthExpired(failedAttempt: AuthAttempt, cause?: unknown): AuthExpiredError {
+  const current = observeAuthState();
+  if (!sameAuthAttempt(failedAttempt, current)) {
+    return new AuthExpiredError('auth expired', cause === undefined ? undefined : { cause });
+  }
+  if (expiryLatch && sameAuthAttempt(expiryLatch, failedAttempt)) return expiryLatch.error;
+  const error = new AuthExpiredError('auth expired', cause === undefined ? undefined : { cause });
+  expiryLatch = { ...failedAttempt, error };
+  authEvents.emit('expired');
+  return error;
+}
+
+function refreshOnce(failedAttempt: AuthAttempt): Promise<void> {
+  const current = observeAuthState();
+  if (!sameAuthAttempt(failedAttempt, current)) return Promise.resolve();
+  if (refreshLatch && sameAuthAttempt(refreshLatch, failedAttempt)) return refreshLatch.promise;
+  const binding = refreshBinding;
+  const controller = new AbortController();
+  const promise = (async () => {
+    try {
+      if (!binding) throw new Error('auth refresh binding is not configured');
+      const returnedToken = await raceWithSignal(binding.refresh(controller.signal), controller.signal);
+      const nextToken = returnedToken.trim();
+      if (!nextToken) throw new Error('auth refresh returned an empty access token');
+      if (controller.signal.aborted || !sameAuthAttempt(failedAttempt, observeAuthState())) {
+        throw controller.signal.reason ?? new DOMException('auth session advanced', 'AbortError');
+      }
+      binding.commitToken(nextToken);
+      if (refreshLatch?.controller === controller) refreshLatch = null;
+      bumpAuthSessionEpoch();
+    } catch (error) {
+      if (controller.signal.aborted || !sameAuthAttempt(failedAttempt, observeAuthState())) throw error;
+      throw failAuthExpired(failedAttempt, error);
+    }
+  })();
+  refreshLatch = { ...failedAttempt, controller, promise };
+  return promise;
+}
+
+async function decodeSuccess<T>(
+  response: Response,
+  method: string,
+  url: string,
+  contract: ApiContract<T>,
+  signal: AbortSignal,
+): Promise<T> {
+  let raw: unknown;
+  if (contract.responseKind === 'void') {
+    await discardOwnedBody(response, signal);
+    raw = undefined;
+  } else if (contract.responseKind === 'blob') {
+    const contentType = response.headers.get('Content-Type');
+    const parts = await readOwnedBodyParts(response, signal);
+    const blob = new Blob(parts, { type: contentType ?? '' });
+    const result: BlobResult = {
+      blob,
+      filename: parseFilename(response.headers.get('Content-Disposition')),
+      contentType: contentType ?? (blob.type || null),
+    };
+    raw = result;
+  } else {
+    try {
+      const bytes = await readAllBodyBytes(response, signal);
+      raw = JSON.parse(new TextDecoder().decode(bytes));
+    } catch (error) {
+      throw new HttpError(response.status, 'invalid json response', { cause: error });
+    }
+  }
+
+  try {
+    return contract.parse(raw);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw new ContractError(`Response contract failed for ${method} ${url}`, error.issues);
+    }
+    throw error;
+  }
+}
+
+async function requestCore<T>(
   method: string,
   url: string,
   body: unknown,
@@ -71,69 +447,111 @@ async function request<T>(
   contract: ApiContract<T>,
   options?: HttpRequestOptions,
 ): Promise<T> {
-  const qs = params ? toQueryString(params) : '';
-  const token = getToken();
-  const abort = createAbortController(options);
-  let res: Response;
+  const query = params ? toQueryString(params) : '';
+  const target = `${BASE}${url}${query ? `?${query}` : ''}`;
+  const encoded = encodeBody(body);
+  const originalRequestHadAccessToken = observeAuthState().tokenUsed !== null;
+  let retryCount = 0;
+  let authReplayCount = 0;
+  const deadline = createRequestDeadline(options);
+
   try {
-    res = await fetch(`${BASE}${url}${qs ? `?${qs}` : ''}`, {
-      method,
-      headers: {
-        ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
-        ...(token
-          ? { [requestConfig.authHeaderName]: `${requestConfig.authTokenPrefix} ${token}` }
-          : {}),
-      },
-      body: body === undefined ? undefined : JSON.stringify(body),
-      signal: abort.signal,
-    });
-  } catch (e) {
-    const message = abortErrorMessage(e, abort.didTimeout());
-    if (message) throw new HttpError(0, message, { cause: e });
-    throw new HttpError(0, 'network error', { cause: e });
+    if (deadline.signal.aborted) throw deadline.signal.reason;
+    while (true) {
+      const attemptAuth = observeAuthState();
+      let response: Response;
+      try {
+        response = await raceWithSignal(
+          fetch(target, {
+            method,
+            credentials: requestConfig.credentials,
+            headers: {
+              Accept:
+                contract.responseKind === 'blob'
+                  ? '*/*'
+                  : 'application/json, application/problem+json',
+              'Accept-Language': currentLocale(),
+              ...(encoded.contentType ? { 'Content-Type': encoded.contentType } : {}),
+              ...(attemptAuth.tokenUsed
+                ? {
+                    [requestConfig.authHeaderName]:
+                      `${requestConfig.authTokenPrefix} ${attemptAuth.tokenUsed}`,
+                  }
+                : {}),
+            },
+            body: encoded.body,
+            signal: deadline.signal,
+          }),
+          deadline.signal,
+        );
+      } catch (error) {
+        if (deadline.signal.aborted) throw error;
+        if (canRetryTransport(method, retryCount)) {
+          retryCount += 1;
+          continue;
+        }
+        throw new HttpError(0, 'network error', { cause: error });
+      }
+
+      if (response.ok) {
+        const result = await decodeSuccess(response, method, url, contract, deadline.signal);
+        if (deadline.signal.aborted) throw abortError(deadline);
+        return result;
+      }
+      const error = await decodeError(response, deadline.signal);
+      const refreshable401 =
+        response.status === requestConfig.authExpiredStatus &&
+        originalRequestHadAccessToken &&
+        attemptAuth.tokenUsed !== null &&
+        options?.on401 !== 'reject' &&
+        !authReplayExcluded(url) &&
+        requestConfig.refreshableProblemCodes.includes(error.code);
+      if (refreshable401) {
+        if (authReplayCount > 0) throw failAuthExpired(attemptAuth, error);
+        const currentAuth = observeAuthState();
+        if (sameAuthAttempt(attemptAuth, currentAuth)) {
+          await raceWithSignal(refreshOnce(attemptAuth), deadline.signal);
+        }
+        authReplayCount += 1;
+        continue;
+      }
+      if (
+        requestConfig.retryableStatuses.includes(response.status) &&
+        canRetryTransport(method, retryCount)
+      ) {
+        retryCount += 1;
+        await waitForRetry(error.retryAfter ?? 0, deadline.signal);
+        continue;
+      }
+      throw error;
+    }
+  } catch (error) {
+    if (deadline.signal.aborted) throw abortError(deadline, error);
+    throw error;
   } finally {
-    abort.dispose();
+    deadline.dispose();
   }
-  if (res.status === requestConfig.authExpiredStatus) {
-    // on401:'reject' 显式声明本接口的 401 是业务失败（如登录密码错），不当会话过期广播。
-    if (options?.on401 === 'reject') throw new HttpError(res.status, 'unauthorized');
-    // 默认：401 是全局身份事件，不在具体页面里各自处理；mount.tsx 订阅后统一清状态并跳登录。
-    authEvents.emit('expired');
-    throw new AuthExpiredError('auth expired');
-  }
-  if (!res.ok) throw new HttpError(res.status, res.statusText);
-  let raw: unknown;
-  try {
-    raw = await res.json();
-  } catch (e) {
-    throw new HttpError(res.status, 'invalid json response', { cause: e });
-  }
-  const env = adapter.parseEnvelope<T>(raw);
-  if (typeof env.code !== 'number') throw new HttpError(res.status, 'unexpected response shape');
-  if (!requestConfig.successCodes.includes(env.code)) throw new BizError(env.code, env.message);
-  // contract 必填：TypeScript 只能约束前端编译期，不能证明后端或 mock 实际返回 shape。
-  // 所有关键接口在这里做运行时契约校验，字段漂移时尽早失败，而不是让页面静默渲染错数据。
-  const result = contract.response.safeParse(env.data);
-  if (!result.success) {
-    throw new ContractError(`Response contract failed for ${method} ${url}`, result.error.issues);
-  }
-  return result.data as T;
 }
-// contract 为必填参数：任何请求都必须声明运行时响应契约，编译期类型无法证明后端/mock 的实际 shape。
-// params/body 保持在 contract 之前（仍可传 undefined），维持既有调用点参数顺序。
+
 export const http = {
   get: <T>(
     url: string,
     params: Record<string, unknown> | undefined,
     contract: ApiContract<T>,
     options?: HttpRequestOptions,
-  ) => request<T>('GET', url, undefined, params, contract, options),
+  ) => requestCore('GET', url, undefined, params, contract, options),
+  head: <T>(
+    url: string,
+    params: Record<string, unknown> | undefined,
+    contract: ApiContract<T>,
+    options?: HttpRequestOptions,
+  ) => requestCore('HEAD', url, undefined, params, contract, options),
   post: <T>(url: string, body: unknown, contract: ApiContract<T>, options?: HttpRequestOptions) =>
-    request<T>('POST', url, body, undefined, contract, options),
+    requestCore('POST', url, body, undefined, contract, options),
   put: <T>(url: string, body: unknown, contract: ApiContract<T>, options?: HttpRequestOptions) =>
-    request<T>('PUT', url, body, undefined, contract, options),
+    requestCore('PUT', url, body, undefined, contract, options),
   patch: <T>(url: string, body: unknown, contract: ApiContract<T>, options?: HttpRequestOptions) =>
-    request<T>('PATCH', url, body, undefined, contract, options),
+    requestCore('PATCH', url, body, undefined, contract, options),
   del: <T>(url: string, contract: ApiContract<T>, options?: HttpRequestOptions) =>
-    request<T>('DELETE', url, undefined, undefined, contract, options),
+    requestCore('DELETE', url, undefined, undefined, contract, options),
 };

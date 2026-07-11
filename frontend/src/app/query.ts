@@ -2,6 +2,9 @@ import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import i18next from 'i18next';
 import { AuthExpiredError, BizError } from '@/lib/http/errors';
+import { bindLocaleGetter } from '@/lib/http/client';
+
+bindLocaleGetter(() => i18next.resolvedLanguage ?? i18next.language ?? 'zh-CN');
 
 // QueryClient 是服务端状态的统一策略点。
 // 页面只声明 queryKey/queryFn，不在各页面重复写 retry、refetch 等全局规则。
@@ -30,9 +33,13 @@ export const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
-      // 等价原 retry:1，但 401(AuthExpiredError) 不重试——否则会二次触发 auth:expired
-      retry: (failureCount, error) => failureCount < 1 && !(error instanceof AuthExpiredError),
+      // 传输层已按 HTTP 语义限定 GET/HEAD 重试；Query 层不再叠加一轮无差别重试。
+      retry: false,
       refetchOnWindowFocus: false,
+    },
+    mutations: {
+      // mutation 仅由 request core 允许一次认证 replay，TanStack 不做通用重放。
+      retry: false,
     },
   },
 });

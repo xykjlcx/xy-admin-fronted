@@ -91,8 +91,20 @@ test('request config is derived from validated env and keeps backend contract kn
     authHeaderName: 'Authorization',
     authTokenPrefix: 'Bearer',
     authExpiredStatus: 401,
-    successCodes: [0],
-    envelope: { code: 'code', data: 'data', message: 'message' },
+    traceHeaderName: 'X-Trace-Id',
+    credentials: 'same-origin',
+    refreshableProblemCodes: ['auth.token.expired'],
+    authReplayExcludedPaths: [
+      '/api/auth/login',
+      '/api/auth/sms-login',
+      '/api/auth/qr-login',
+      '/api/auth/refresh',
+    ],
+    retryableMethods: ['GET', 'HEAD'],
+    retryableStatuses: [408, 429, 502, 503, 504],
+    maxTransportRetries: 1,
+    maxErrorBodyBytes: 64 * 1024,
+    maxErrorSummaryChars: 512,
   });
 });
 

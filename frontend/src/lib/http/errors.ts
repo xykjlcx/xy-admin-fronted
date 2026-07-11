@@ -1,11 +1,29 @@
-// 错误类型拆开是为了让 Query、路由守卫和页面能按失败性质处理：
-// HTTP/网络失败、登录过期、业务失败、接口契约漂移不应该走同一套兜底逻辑。
+export interface BizErrorDetails {
+  status: number;
+  code: string;
+  detail: string;
+  traceId: string | null;
+  instance: string | null;
+  retryAfter: number | null;
+}
+
 export class BizError extends Error {
-  code: number;
-  constructor(code: number, message: string) {
-    super(message);
+  readonly status: number;
+  readonly code: string;
+  readonly detail: string;
+  readonly traceId: string | null;
+  readonly instance: string | null;
+  readonly retryAfter: number | null;
+
+  constructor(details: BizErrorDetails, options?: ErrorOptions) {
+    super(details.detail, options);
     this.name = 'BizError';
-    this.code = code;
+    this.status = details.status;
+    this.code = details.code;
+    this.detail = details.detail;
+    this.traceId = details.traceId;
+    this.instance = details.instance;
+    this.retryAfter = details.retryAfter;
   }
 }
 export class AuthExpiredError extends Error {

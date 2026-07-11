@@ -4,17 +4,44 @@ import { authApi, meQuery } from '@/modules/admin/auth/api';
 import { queryClient } from '@/app/query';
 import { resetSession } from '@/lib/reset-auth';
 import { useAuth } from '@/stores/auth';
+import { http as mswHttp, HttpResponse } from 'msw';
+import {
+  bindAuthRefreshHandler,
+  http as request,
+} from '@/lib/http/client';
+import { authEvents } from '@/lib/http/events';
+import { AuthExpiredError } from '@/lib/http/errors';
+import { defineApiContract } from '@/lib/http/contract';
+import { z } from 'zod';
 
 const server = setupServer(...authHandlers);
 beforeAll(() => server.listen());
 afterEach(() => {
   queryClient.clear();
   useAuth.setState({ token: null });
+  bindAuthRefreshHandler(null);
+  server.resetHandlers();
 });
 afterAll(() => server.close());
 
 // 防回归：换账号不串权限。若 resetSession 不清 me 缓存，ensureQueryData 会返回上个账号的缓存。
 test('预置 admin me 缓存 → viewer 登录 resetSession → beforeLoad 取到 viewer 权限', async () => {
+  // Task 10 批量迁移 handler 前，本集成测试局部使用 Task 9 的 direct JSON 方言。
+  server.use(
+    mswHttp.post('/api/auth/login', () => HttpResponse.json({ token: 'viewer-token' })),
+    mswHttp.get('/api/auth/me', () =>
+      HttpResponse.json({
+        user: { id: 'u2', name: '查看者', username: 'viewer' },
+        roles: ['viewer'],
+        permissions: [
+          'dashboard:overview:view',
+          'iam:user:view',
+          'iam:dept:view',
+          'notice:msg:view',
+        ],
+      }),
+    ),
+  );
   queryClient.setQueryData(meQuery.queryKey, {
     user: { id: 'u1', name: '超级管理员', username: 'admin' },
     roles: ['superadmin'],
@@ -74,4 +101,92 @@ test('resetSession 取消在途请求，被取消的结果不回填缓存', asyn
 
   expect(aborted).toBe(true);
   expect(queryClient.getQueryData(inflightKey)).toBeUndefined();
+});
+
+test('resetSession explicitly advances auth epoch even when a token value is reused', async () => {
+  const contract = defineApiContract({ response: z.object({ id: z.number() }) });
+  let refreshCalls = 0;
+  let expiryEvents = 0;
+  const off = authEvents.on('expired', () => {
+    expiryEvents += 1;
+  });
+  bindAuthRefreshHandler({
+    refresh: async () => {
+      refreshCalls += 1;
+      throw new Error('refresh denied');
+    },
+    commitToken: (token) => useAuth.getState().setToken(token),
+  });
+  server.use(
+    mswHttp.get('/api/auth-epoch-probe', () =>
+      HttpResponse.json(
+        { status: 401, code: 'auth.token.expired', detail: 'expired' },
+        { status: 401, headers: { 'Content-Type': 'application/problem+json' } },
+      ),
+    ),
+  );
+
+  await resetSession('old-token');
+  await expect(request.get('/api/auth-epoch-probe', undefined, contract)).rejects.toBeInstanceOf(
+    AuthExpiredError,
+  );
+  await resetSession(null);
+  await resetSession('old-token');
+  await expect(request.get('/api/auth-epoch-probe', undefined, contract)).rejects.toBeInstanceOf(
+    AuthExpiredError,
+  );
+
+  expect(refreshCalls).toBe(2);
+  expect(expiryEvents).toBe(2);
+  off();
+});
+
+test('resetSession aborts an old refresh flight and stale resolution cannot overwrite the new session', async () => {
+  const contract = defineApiContract({ response: z.object({ id: z.number() }) });
+  let refreshSignal: AbortSignal | undefined;
+  let releaseRefresh: () => void = () => undefined;
+  let commitCalls = 0;
+  let expiryEvents = 0;
+  const refreshGate = new Promise<void>((resolve) => {
+    releaseRefresh = resolve;
+  });
+  const off = authEvents.on('expired', () => {
+    expiryEvents += 1;
+  });
+  bindAuthRefreshHandler({
+    refresh: async (signal: AbortSignal) => {
+      refreshSignal = signal;
+      await refreshGate;
+      return 'stale-refresh-token';
+    },
+    commitToken: (token: string) => {
+      commitCalls += 1;
+      useAuth.getState().setToken(token);
+    },
+  });
+  server.use(
+    mswHttp.get('/api/stale-refresh-probe', () =>
+      HttpResponse.json(
+        { status: 401, code: 'auth.token.expired', detail: 'expired' },
+        { status: 401, headers: { 'Content-Type': 'application/problem+json' } },
+      ),
+    ),
+  );
+
+  await resetSession('old-session-token');
+  const oldRequest = request
+    .get('/api/stale-refresh-probe', undefined, contract)
+    .catch((error: unknown) => error);
+  await vi.waitFor(() => expect(refreshSignal).toBeInstanceOf(AbortSignal));
+
+  await resetSession('new-session-token');
+  expect(refreshSignal?.aborted).toBe(true);
+  releaseRefresh();
+  await oldRequest;
+  await Promise.resolve();
+
+  expect(useAuth.getState().token).toBe('new-session-token');
+  expect(commitCalls).toBe(0);
+  expect(expiryEvents).toBe(0);
+  off();
 });
