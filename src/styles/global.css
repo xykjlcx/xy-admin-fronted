@@ -170,9 +170,13 @@
 }
 
 .rail-window-drag-region {
+  --rail-window-clearance: max(
+    0px,
+    calc(min(var(--desktop-titlebar-height), var(--window-controls-inset-left)) - 16px)
+  );
   width: max(100%, var(--window-controls-inset-left));
-  height: min(var(--desktop-titlebar-height), var(--window-controls-inset-left));
-  min-height: min(var(--desktop-titlebar-height), var(--window-controls-inset-left));
+  height: var(--rail-window-clearance);
+  min-height: var(--rail-window-clearance);
 }
 
 .inset-window-brand {
@@ -330,9 +334,7 @@
 
   /* 固定列必须是最终不透明表面：状态色只叠加一次，底层横向滚动内容不可透出。 */
   .ui-table-pinned-cell {
-    background:
-      linear-gradient(var(--_table-row-bg), var(--_table-row-bg)),
-      var(--table-bg);
+    background: linear-gradient(var(--_table-row-bg), var(--_table-row-bg)), var(--table-bg);
   }
 
   .ui-table-row.ui-table-row:focus-visible {

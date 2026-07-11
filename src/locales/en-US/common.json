@@ -15,8 +15,11 @@
     "title": "Software update",
     "entry": {
       "available": "Version {{version}} available",
+      "checking": "Checking for updates",
       "downloading": "Downloading {{percent}}%",
       "downloaded": "Update downloaded",
+      "installing": "Installing update",
+      "cancelled": "Update download cancelled",
       "error": "Update check failed"
     },
     "releaseDate": "Release date",

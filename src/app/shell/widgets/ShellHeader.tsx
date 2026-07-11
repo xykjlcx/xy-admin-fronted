@@ -69,17 +69,14 @@ export function ShellHeader({
     >
       <div
         data-slot="shell-header-left"
-        className="desktop-no-drag flex min-w-0 items-center gap-[calc(18px*var(--app-scale))]"
+        className="flex min-w-0 items-center gap-[calc(18px*var(--app-scale))]"
       >
         {left}
       </div>
-      <div
-        data-slot="shell-header-center"
-        className="desktop-no-drag flex min-w-0 items-center justify-center gap-3"
-      >
+      <div data-slot="shell-header-center" className="flex min-w-0 items-center justify-center gap-3">
         {center}
       </div>
-      <div data-slot="shell-header-right" className="desktop-no-drag flex items-center justify-end gap-1.5">
+      <div data-slot="shell-header-right" className="flex items-center justify-end gap-1.5">
         {right}
       </div>
     </header>

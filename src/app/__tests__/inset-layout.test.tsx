@@ -129,6 +129,9 @@ test('Inset 布局把子系统切换和用户入口放回侧栏', async () => {
   expect(aside).not.toContainElement(collapseButton);
   expect(brand).toHaveClass('desktop-drag-region');
   expect(header).toHaveClass('desktop-drag-region');
+  expect(headerStart).not.toHaveClass('desktop-no-drag');
+  expect(headerCenter).not.toHaveClass('desktop-no-drag');
+  expect(headerSuffix).not.toHaveClass('desktop-no-drag');
   expect(headerSuffix).toHaveClass('inset-window-controls-right');
   expect(aside).toHaveClass('w-[calc(248px*var(--app-scale))]');
   expect(surface).toHaveClass('m-2');
@@ -213,9 +216,15 @@ test('Rail 布局由左侧窗口区消费 macOS inset，右侧 Header 不重复�
   expect(await screen.findByText('Users content')).toBeInTheDocument();
   const railWindowRegion = document.querySelector('[data-slot="rail-window-drag-region"]');
   const header = document.querySelector('header');
+  const headerLeft = document.querySelector('[data-slot="shell-header-left"]');
+  const headerCenter = document.querySelector('[data-slot="shell-header-center"]');
+  const headerRight = document.querySelector('[data-slot="shell-header-right"]');
 
   expect(railWindowRegion).toBeInTheDocument();
   expect(railWindowRegion).toHaveClass('desktop-drag-region');
   expect(header).toHaveAttribute('data-window-inset-left', 'false');
   expect(header).toHaveClass('desktop-drag-region');
+  expect(headerLeft).not.toHaveClass('desktop-no-drag');
+  expect(headerCenter).not.toHaveClass('desktop-no-drag');
+  expect(headerRight).not.toHaveClass('desktop-no-drag');
 });

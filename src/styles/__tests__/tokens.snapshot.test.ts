@@ -1120,6 +1120,10 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(paginationSource).toContain('text-(--pagination-current-fg)');
   expect(paginationSource).not.toContain('--nav-item');
   expect(shellHeaderSource).toContain('bg-(--shell-header-bg)');
+  expect(globalCss).toContain('--rail-window-clearance: max(');
+  expect(globalCss).toContain(
+    'min(var(--desktop-titlebar-height), var(--window-controls-inset-left)) - 16px',
+  );
 
   for (const source of [
     navMenuSidebarSource,

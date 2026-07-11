@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { Download, RefreshCw } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -28,13 +27,27 @@ function entryLabel(snapshot: UpdateSnapshot, t: ReturnType<typeof useTranslatio
     return t('update.entry.downloading', { percent: Math.round(snapshot.percent) });
   }
   if (snapshot.status === 'downloaded') return t('update.entry.downloaded');
-  return t('update.entry.error');
+  if (snapshot.status === 'checking') return t('update.entry.checking');
+  if (snapshot.status === 'installing') return t('update.entry.installing');
+  if (snapshot.status === 'cancelled') return t('update.entry.cancelled');
+  if (snapshot.status === 'error') return t('update.entry.error');
+  return t('update.actions.check');
+}
+
+export interface UpdateStatusEntry {
+  supported: boolean;
+  label: string;
+  status: UpdateSnapshot['status'] | null;
+  pending: boolean;
+  activate(): void;
 }
 
 export function UpdateStatus({
+  children,
   updater = platform.updater,
   autoCheck = true,
 }: {
+  children: (entry: UpdateStatusEntry) => ReactNode;
   updater?: AppPlatform['updater'];
   autoCheck?: boolean;
 }) {
@@ -80,8 +93,6 @@ export function UpdateStatus({
     };
   }, [autoCheck, t, updater]);
 
-  if (!updater.supported) return null;
-
   const runCommand = async (command: 'download' | 'cancelDownload' | 'install' | 'retry'): Promise<void> => {
     setCommandPending(true);
     try {
@@ -95,7 +106,42 @@ export function UpdateStatus({
     }
   };
 
-  const visible = snapshot && ['available', 'downloading', 'downloaded', 'error'].includes(snapshot.status);
+  const checkManually = async (): Promise<void> => {
+    setCommandPending(true);
+    try {
+      const result = await updater.check();
+      if (!result.ok) {
+        toast.error(t('update.commandRejected'));
+        return;
+      }
+      setSnapshot(result.snapshot);
+      if (result.snapshot.status === 'upToDate') toast.success(t('update.upToDate'));
+      if (['available', 'error'].includes(result.snapshot.status)) setOpen(true);
+    } catch {
+      toast.error(t('update.commandFailed'));
+    } finally {
+      setCommandPending(false);
+    }
+  };
+
+  const activate = () => {
+    if (!updater.supported || commandPending || snapshot?.status === 'checking') return;
+    if (!snapshot || snapshot.status === 'idle' || snapshot.status === 'upToDate') {
+      void checkManually();
+      return;
+    }
+    setOpen(true);
+  };
+  const entry = children({
+    supported: updater.supported,
+    label: snapshot ? entryLabel(snapshot, t) : t('update.actions.check'),
+    status: snapshot?.status ?? null,
+    pending: commandPending || snapshot?.status === 'checking',
+    activate,
+  });
+
+  if (!updater.supported) return <>{entry}</>;
+
   const targetVersion = snapshot?.targetVersion;
   const versionSummary = targetVersion
     ? `${snapshot.currentVersion} → ${targetVersion}`
@@ -103,17 +149,7 @@ export function UpdateStatus({
 
   return (
     <>
-      {visible && snapshot && (
-        <Button
-          variant="outline"
-          size="sm"
-          aria-label={entryLabel(snapshot, t)}
-          onClick={() => setOpen(true)}
-        >
-          {snapshot.status === 'error' ? <RefreshCw /> : <Download />}
-          <span className="max-lg:hidden">{entryLabel(snapshot, t)}</span>
-        </Button>
-      )}
+      {entry}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
           closeLabel={t('actions.close')}

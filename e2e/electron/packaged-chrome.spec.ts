@@ -96,6 +96,45 @@ async function setFullScreenAndWait(desktop: ElectronApplication, fullScreen: bo
   }, fullScreen);
 }
 
+async function assertHeaderBackgroundDragRegion(page: Page): Promise<void> {
+  const evidence = await page.evaluate(() => {
+    const header = document.querySelector<HTMLElement>('.shell-window-header');
+    if (!header) throw new Error('shell header is missing');
+    const headerBounds = header.getBoundingClientRect();
+    const interactiveBounds = [
+      ...header.querySelectorAll<HTMLElement>(
+        'button,a,input,textarea,select,[role="button"],[role="menuitem"],[role="searchbox"]',
+      ),
+    ].map((element) => element.getBoundingClientRect());
+    const y = (headerBounds.top + headerBounds.bottom) / 2;
+    for (let x = headerBounds.left + 16; x <= headerBounds.right - 16; x += 8) {
+      const blocked = interactiveBounds.some(
+        (bounds) =>
+          x >= bounds.left - 4 && x <= bounds.right + 4 && y >= bounds.top - 4 && y <= bounds.bottom + 4,
+      );
+      if (!blocked) {
+        const hit = document.elementFromPoint(x, y);
+        const ancestry: HTMLElement[] = [];
+        for (let node = hit; node instanceof HTMLElement; node = node.parentElement) ancestry.push(node);
+        return {
+          point: { x, y },
+          headerRegion: getComputedStyle(header).getPropertyValue('app-region'),
+          blockedByNoDragAncestor: ancestry.some(
+            (node) =>
+              node.classList.contains('desktop-no-drag') ||
+              getComputedStyle(node).getPropertyValue('app-region') === 'no-drag',
+          ),
+        };
+      }
+    }
+    throw new Error('no draggable header background point is available');
+  });
+
+  expect(evidence.headerRegion).toBe('drag');
+  expect(evidence.blockedByNoDragAncestor).toBe(false);
+  expect(evidence.point.y).toBeGreaterThan(16);
+}
+
 test('packaged integrated chrome consumes safe areas in three Shell layouts at three scales', async () => {
   const executablePath = requiredEnvironment('SPIKE_APP_EXECUTABLE');
   const userDataPath = requiredEnvironment('SPIKE_USER_DATA_PATH');
@@ -127,6 +166,8 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
     const nextVersion = `${appVersion.slice(0, appVersion.lastIndexOf('.') + 1)}${String(
       Number(appVersion.slice(appVersion.lastIndexOf('.') + 1)) + 1,
     )}`;
+    await selectAppearance(page, 'rail', 'md');
+    await assertHeaderBackgroundDragRegion(page);
     await userFacingUpdateFlow(page, appVersion, nextVersion);
     const pendingMarkerPath = path.join(userDataPath, 'updates', 'pending.json');
     await expect.poll(() => existsSync(pendingMarkerPath)).toBe(true);
@@ -211,9 +252,10 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
         expect(geometry.appScale).toBeCloseTo(expectedScale[zoom], 4);
         expect(geometry.horizontalOverflow).toBe(false);
         if (expectedPlatform === 'darwin') {
-          if (layout === 'rail')
-            expect(geometry.interactiveTop).toBeGreaterThanOrEqual(geometry.titlebarHeight);
-          else expect(geometry.interactiveLeft).toBeGreaterThanOrEqual(geometry.controlsInsetLeft);
+          if (layout === 'rail') {
+            expect(geometry.interactiveTop).toBeGreaterThanOrEqual(geometry.titlebarHeight - 16);
+            expect(geometry.interactiveTop).toBeLessThan(geometry.titlebarHeight);
+          } else expect(geometry.interactiveLeft).toBeGreaterThanOrEqual(geometry.controlsInsetLeft);
         } else {
           expect(geometry.rightConsumerEdge).toBeLessThanOrEqual(
             geometry.viewportWidth - geometry.controlsInsetRight,
@@ -282,9 +324,7 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
     expect(compactGeometry.center?.right ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(
       compactGeometry.right?.left ?? Number.NEGATIVE_INFINITY,
     );
-    expect(consoleErrors.filter((message) => message.includes('Applying inline style violates'))).toEqual(
-      [],
-    );
+    expect(consoleErrors.filter((message) => message.includes('Applying inline style violates'))).toEqual([]);
 
     await quitAndExpectExit(desktop);
     desktop = await electron.launch({
@@ -303,7 +343,10 @@ test('packaged integrated chrome consumes safe areas in three Shell layouts at t
 });
 
 async function userFacingUpdateFlow(page: Page, currentVersion: string, nextVersion: string): Promise<void> {
-  await userEventButton(page, `发现新版本 ${nextVersion}`);
+  await userEventButton(page, /Packaged Spike/);
+  const updateEntry = page.getByRole('menuitem', { name: `发现新版本 ${nextVersion}` });
+  await expect(updateEntry).toBeVisible();
+  await updateEntry.click();
   await expect(page.getByRole('dialog', { name: '软件更新' })).toBeVisible();
   await expect(page.getByText(`${currentVersion} → ${nextVersion}`)).toBeVisible();
   await page.getByRole('button', { name: '下载更新' }).click();
@@ -311,7 +354,7 @@ async function userFacingUpdateFlow(page: Page, currentVersion: string, nextVers
   await page.getByRole('button', { name: '重启并安装' }).click();
 }
 
-async function userEventButton(page: Page, name: string): Promise<void> {
+async function userEventButton(page: Page, name: string | RegExp): Promise<void> {
   const button = page.getByRole('button', { name });
   await expect(button).toBeVisible();
   await button.click();

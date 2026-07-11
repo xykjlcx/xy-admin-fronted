@@ -6,7 +6,7 @@ import { UpdateStatus } from '@/app/shell/widgets/UpdateStatus';
 import type { AppPlatform, UpdateSnapshot } from '@/lib/platform';
 import { i18nInit } from '@/lib/i18n';
 
-vi.mock('sonner', () => ({ toast: { error: vi.fn() } }));
+vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
 beforeAll(async () => i18nInit);
 
@@ -45,9 +45,23 @@ function createUpdater(initial: UpdateSnapshot, supported = true) {
   return { updater, emit: (snapshot: UpdateSnapshot) => listener?.(snapshot) };
 }
 
+function renderUpdateStatus(updater: AppPlatform['updater'], options: { autoCheck?: boolean } = {}) {
+  return render(
+    <UpdateStatus updater={updater} autoCheck={options.autoCheck}>
+      {(entry) =>
+        entry.supported ? (
+          <button type="button" onClick={() => entry.activate()}>
+            {entry.label}
+          </button>
+        ) : null
+      }
+    </UpdateStatus>,
+  );
+}
+
 test('Web host renders no updater entry and performs no update command', () => {
   const { updater } = createUpdater(baseSnapshot, false);
-  const { container } = render(<UpdateStatus updater={updater} />);
+  const { container } = renderUpdateStatus(updater);
   expect(container).toBeEmptyDOMElement();
   expect(updater.check).not.toHaveBeenCalled();
 });
@@ -66,10 +80,10 @@ test('Desktop background check stays quiet until an update becomes available', a
   };
   const harness = createUpdater(baseSnapshot);
   harness.updater.check = vi.fn().mockResolvedValue({ ok: true, snapshot: baseSnapshot });
-  render(<UpdateStatus updater={harness.updater} />);
+  renderUpdateStatus(harness.updater);
 
   await waitFor(() => expect(harness.updater.check).toHaveBeenCalledOnce());
-  expect(screen.queryByRole('button', { name: /更新/ })).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '检查更新' })).toBeInTheDocument();
   act(() => harness.emit(available));
   await userEvent.click(screen.getByRole('button', { name: '发现新版本 0.2.0' }));
   const dialog = screen.getByRole('dialog', { name: '软件更新' });
@@ -121,7 +135,7 @@ test('Desktop error entry exposes only a retry action', async () => {
     errorCode: 'UPDATE_CHECK_FAILED',
   };
   const harness = createUpdater(errorSnapshot);
-  render(<UpdateStatus updater={harness.updater} autoCheck={false} />);
+  renderUpdateStatus(harness.updater, { autoCheck: false });
   await userEvent.click(await screen.findByRole('button', { name: '更新检查失败' }));
   expect(screen.getByRole('alert')).toHaveTextContent('无法检查更新，请稍后重试');
   expect(screen.queryByText('UPDATE_CHECK_FAILED')).not.toBeInTheDocument();
@@ -134,7 +148,22 @@ test('Desktop contains rejected updater adapter calls instead of leaking unhandl
   harness.updater.getSnapshot = vi.fn().mockRejectedValue(new Error('snapshot unavailable'));
   harness.updater.check = vi.fn().mockRejectedValue(new Error('check unavailable'));
 
-  render(<UpdateStatus updater={harness.updater} />);
+  renderUpdateStatus(harness.updater);
 
   await waitFor(() => expect(toast.error).toHaveBeenCalledOnce());
+});
+
+test('Desktop idle menu entry performs a manual check without opening an empty dialog', async () => {
+  const harness = createUpdater(baseSnapshot);
+  harness.updater.check = vi.fn().mockResolvedValue({
+    ok: true,
+    snapshot: { ...baseSnapshot, status: 'upToDate', lastCommand: 'check' },
+  });
+
+  renderUpdateStatus(harness.updater, { autoCheck: false });
+  await userEvent.click(screen.getByRole('button', { name: '检查更新' }));
+
+  expect(harness.updater.check).toHaveBeenCalledOnce();
+  expect(screen.queryByRole('dialog', { name: '软件更新' })).not.toBeInTheDocument();
+  expect(toast.success).toHaveBeenCalledWith('当前已是最新版本');
 });
