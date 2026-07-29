@@ -6,6 +6,7 @@ import com.metabuild.app.security.AccountSessionAdapter;
 import com.metabuild.infrastructure.security.SaTokenSessionControl;
 import com.metabuild.modules.admin.auth.application.AccountSessionPort;
 import com.metabuild.modules.admin.auth.application.AuthenticationService;
+import com.metabuild.modules.admin.auth.application.LoginAuditPort;
 import com.metabuild.modules.admin.auth.application.AuthorizationGraphRepository;
 import com.metabuild.modules.admin.auth.application.AuthorizationSnapshotCompiler;
 import com.metabuild.modules.admin.auth.application.AuthorizationSnapshotStore;
@@ -51,6 +52,14 @@ import com.metabuild.modules.admin.menus.application.MenuQuery;
 import com.metabuild.modules.admin.menus.application.MenuRepository;
 import com.metabuild.modules.admin.menus.persistence.JdbcMenuRepository;
 import com.metabuild.modules.admin.menus.controller.MenuController;
+import com.metabuild.modules.admin.messages.application.*;
+import com.metabuild.modules.admin.messages.persistence.*;
+import com.metabuild.modules.admin.audit.application.*;
+import com.metabuild.modules.admin.audit.persistence.*;
+import com.metabuild.modules.admin.dashboard.application.DashboardRepository;
+import com.metabuild.modules.admin.dashboard.persistence.JooqDashboardRepository;
+import com.metabuild.admin.api.*;
+import com.metabuild.infrastructure.observability.OperationAuditInterceptor;
 import com.metabuild.modules.admin.auth.api.CurrentAuthorizationProvider;
 import com.metabuild.modules.admin.auth.application.LogoutRecoveryPort;
 import com.metabuild.modules.admin.auth.application.LogoutRecoveryHandler;
@@ -111,6 +120,19 @@ public class AuthenticationConfiguration {
     @Bean ProfileRepository profileRepository(org.jooq.DSLContext db){return new JooqProfileRepository(db);}
     @Bean ProfileSessionPort profileSessions(SaTokenSessionControl sessions,RefreshTokenStore refresh){return new SaProfileSessionAdapter(sessions,refresh);}
     @Bean ProfileService profileService(ProfileRepository repository,ProfileSessionPort sessions,BCryptPasswordEncoder passwords){return new ProfileService(repository,sessions,new PasswordCodec(){public String hash(String raw){return passwords.encode(raw);}public boolean matches(String raw,String encoded){return passwords.matches(raw,encoded);}});}
+    @Bean MessageRepository messageRepository(org.jooq.DSLContext db){return new JooqMessageRepository(db);}
+    @Bean MessageService messageService(MessageRepository repository){return new MessageService(repository);}
+    @Bean InboxOutboxSignal inboxOutboxSignal(){return new InboxOutboxSignal();}
+    @Bean InboxPublisher inboxPublisher(org.jooq.DSLContext db,UuidV7Generator ids,InboxOutboxSignal signal){return new JooqInboxPublisher(db,ids,signal);}
+    @Bean InboxPublishOutboxWorker inboxPublishOutboxWorker(org.jooq.DSLContext db,InboxOutboxSignal signal){return new InboxPublishOutboxWorker(db,signal);}
+    @Bean InboxOutboxScheduler inboxOutboxScheduler(InboxPublishOutboxWorker worker){return new InboxOutboxScheduler(worker);}
+    @Bean AuditRepository auditRepository(org.jooq.DSLContext db){return new JooqAuditRepository(db);}
+    @Bean LoginAuditPort loginAuditPort(org.jooq.DSLContext db,UuidV7Generator ids,PlatformTransactionManager manager){return new JooqLoginAuditWriter(db,ids,manager);}
+    @Bean LoginAuditOutboxWorker loginAuditOutboxWorker(org.jooq.DSLContext db){return new LoginAuditOutboxWorker(db);}
+    @Bean LoginAuditOutboxScheduler loginAuditOutboxScheduler(LoginAuditOutboxWorker worker){return new LoginAuditOutboxScheduler(worker);}
+    @Bean AuditEventWriter auditEventWriter(org.jooq.DSLContext db,UuidV7Generator ids){return new JooqAuditEventWriter(db,ids);}
+    @Bean DashboardRepository dashboardRepository(org.jooq.DSLContext db){return new JooqDashboardRepository(db);}
+    @Bean OperationAuditInterceptor operationAuditInterceptor(SaTokenSessionControl sessions,AuditEventWriter writer){return new OperationAuditInterceptor(sessions,writer);}
     @Bean CredentialRevocationScheduler credentialRevocationScheduler(ProfileService profiles){return new CredentialRevocationScheduler(profiles);}
     @Bean PermissionCatalogSynchronizer permissionCatalogSynchronizer(JdbcTemplate jdbc,
             PlatformTransactionManager manager,AuthorizationRefreshService refresh,UuidV7Generator ids,ObjectMapper json){
@@ -137,9 +159,10 @@ public class AuthenticationConfiguration {
     @Bean AuthenticationService authenticationService(AuthUserRepository users, BCryptPasswordEncoder passwords,
             AuthorizationGraphRepository graphs, AuthorizationSnapshotCompiler compiler,
             AuthorizationSnapshotStore snapshots, AccountSessionPort sessions,
-            RefreshTokenStore refreshTokens, Clock clock, UuidV7Generator ids, LogoutRecoveryPort logoutRecovery) {
+            RefreshTokenStore refreshTokens, Clock clock, UuidV7Generator ids, LogoutRecoveryPort logoutRecovery,
+            LoginAuditPort loginAudit) {
         return new AuthenticationService(users, passwords::matches, graphs, compiler, snapshots, sessions,
-                refreshTokens, clock, ids::generate, logoutRecovery);
+                refreshTokens, clock, ids::generate, logoutRecovery,loginAudit);
     }
     @Bean LogoutRecoveryPort logoutRecovery(JdbcTemplate jdbc, UuidV7Generator ids) {
         return new JdbcLogoutRecoveryRepository(jdbc, ids);
@@ -178,13 +201,14 @@ public class AuthenticationConfiguration {
         return new PermissionAuthorizationInterceptor(sessions, context);
     }
     @Bean WebMvcConfigurer authorizationWebMvcConfigurer(AuthorizationSnapshotInterceptor interceptor,
-            PermissionAuthorizationInterceptor permissions) {
+            PermissionAuthorizationInterceptor permissions,OperationAuditInterceptor audit) {
         return new WebMvcConfigurer() {
             @Override public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(interceptor)
                         .excludePathPatterns("/api/auth/login", "/api/auth/refresh", "/actuator/**", "/__task12/**")
                         .order(0);
                 registry.addInterceptor(permissions).order(1);
+                registry.addInterceptor(audit).addPathPatterns("/api/**").order(2);
             }
         };
     }

@@ -103,10 +103,7 @@ test('菜单树暴露标准展开和选中状态', async () => {
 
   const activeTreeItem = getTreeNodeButton('工作台');
   const inactiveTreeItem = getTreeNodeButton('企业概览');
-  expect(screen.getByRole('button', { name: '展开或折叠工作台' })).toHaveAttribute(
-    'aria-expanded',
-    'true',
-  );
+  expect(screen.getByRole('button', { name: '展开或折叠工作台' })).toHaveAttribute('aria-expanded', 'true');
   expect(activeTreeItem).toHaveAttribute('aria-selected', 'true');
 
   await userEvent.click(inactiveTreeItem);

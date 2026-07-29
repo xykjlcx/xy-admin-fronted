@@ -1,4 +1,11 @@
-import { createContext, Fragment, useContext, useLayoutEffect, type ComponentProps, type ReactNode } from 'react';
+import {
+  createContext,
+  Fragment,
+  useContext,
+  useLayoutEffect,
+  type ComponentProps,
+  type ReactNode,
+} from 'react';
 import { AnimatedTabs } from '@/components/pro/AnimatedTabs';
 import { cn } from '@/lib/utils';
 
@@ -31,13 +38,7 @@ type PageFrameProps = Omit<ComponentProps<'section'>, 'children'> & {
   children: ReactNode;
 };
 
-export function PageFrame({
-  breadcrumbs,
-  children,
-  className,
-  style,
-  ...props
-}: PageFrameProps) {
+export function PageFrame({ breadcrumbs, children, className, style, ...props }: PageFrameProps) {
   const {
     breadcrumbPrefix,
     breadcrumbPlacement = 'frame',
@@ -85,7 +86,9 @@ export function PageFrame({
             {breadcrumbs.map((item, index) => (
               <Fragment key={index}>
                 {index > 0 && <span>›</span>}
-                <span className={cn('truncate', index === breadcrumbs.length - 1 && 'text-text')}>{item.label}</span>
+                <span className={cn('truncate', index === breadcrumbs.length - 1 && 'text-text')}>
+                  {item.label}
+                </span>
               </Fragment>
             ))}
           </div>
@@ -100,11 +103,7 @@ type PageSurfaceProps = Omit<ComponentProps<'div'>, 'children'> & {
   children: ReactNode;
 };
 
-export function PageSurface({
-  children,
-  className,
-  ...props
-}: PageSurfaceProps) {
+export function PageSurface({ children, className, ...props }: PageSurfaceProps) {
   return (
     <div
       {...props}
@@ -122,10 +121,7 @@ export function PageSplit({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       data-testid="page-split"
-      className={cn(
-        'grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]',
-        className,
-      )}
+      className={cn('grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]', className)}
       {...props}
     />
   );
@@ -258,8 +254,7 @@ export function PageSection({
       className={cn(
         'rounded-10 p-3',
         variant === 'subtle' && 'bg-(--pro-page-bg)',
-        variant === 'card' &&
-          'border border-(--page-section-divider) bg-(--pro-panel-bg) shadow-card-sm',
+        variant === 'card' && 'border border-(--page-section-divider) bg-(--pro-panel-bg) shadow-card-sm',
         variant === 'plain' && 'rounded-none bg-transparent p-0',
         className,
       )}

@@ -10,6 +10,9 @@ import com.metabuild.schema.platform.tables.MbCredentialRevocationOutbox;
 import com.metabuild.schema.platform.tables.MbDept;
 import com.metabuild.schema.platform.tables.MbDictionary;
 import com.metabuild.schema.platform.tables.MbDictionaryItem;
+import com.metabuild.schema.platform.tables.MbInboxMessage;
+import com.metabuild.schema.platform.tables.MbInboxPublishOutbox;
+import com.metabuild.schema.platform.tables.MbLoginAuditOutbox;
 import com.metabuild.schema.platform.tables.MbLoginLog;
 import com.metabuild.schema.platform.tables.MbMenu;
 import com.metabuild.schema.platform.tables.MbMenuCustomization;
@@ -84,6 +87,21 @@ public class Public extends SchemaImpl {
      * The table <code>public.mb_dictionary_item</code>.
      */
     public final MbDictionaryItem MB_DICTIONARY_ITEM = MbDictionaryItem.MB_DICTIONARY_ITEM;
+
+    /**
+     * The table <code>public.mb_inbox_message</code>.
+     */
+    public final MbInboxMessage MB_INBOX_MESSAGE = MbInboxMessage.MB_INBOX_MESSAGE;
+
+    /**
+     * The table <code>public.mb_inbox_publish_outbox</code>.
+     */
+    public final MbInboxPublishOutbox MB_INBOX_PUBLISH_OUTBOX = MbInboxPublishOutbox.MB_INBOX_PUBLISH_OUTBOX;
+
+    /**
+     * The table <code>public.mb_login_audit_outbox</code>.
+     */
+    public final MbLoginAuditOutbox MB_LOGIN_AUDIT_OUTBOX = MbLoginAuditOutbox.MB_LOGIN_AUDIT_OUTBOX;
 
     /**
      * The table <code>public.mb_login_log</code>.
@@ -182,6 +200,9 @@ public class Public extends SchemaImpl {
             MbDept.MB_DEPT,
             MbDictionary.MB_DICTIONARY,
             MbDictionaryItem.MB_DICTIONARY_ITEM,
+            MbInboxMessage.MB_INBOX_MESSAGE,
+            MbInboxPublishOutbox.MB_INBOX_PUBLISH_OUTBOX,
+            MbLoginAuditOutbox.MB_LOGIN_AUDIT_OUTBOX,
             MbLoginLog.MB_LOGIN_LOG,
             MbMenu.MB_MENU,
             MbMenuCustomization.MB_MENU_CUSTOMIZATION,

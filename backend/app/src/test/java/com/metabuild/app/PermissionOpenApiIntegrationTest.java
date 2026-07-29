@@ -10,6 +10,7 @@ import com.metabuild.api.contract.permissions.PermissionContractVerifier;
 import com.metabuild.api.contract.permissions.PermissionOperationCustomizer;
 import com.metabuild.modules.admin.auth.api.CurrentAuthorizationProvider;
 import com.metabuild.modules.admin.dashboard.controller.DashboardController;
+import com.metabuild.modules.admin.dashboard.application.DashboardRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,6 +34,7 @@ class PermissionOpenApiIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
     @MockitoBean CurrentAuthorizationProvider authorization;
+    @MockitoBean DashboardRepository dashboardRepository;
 
     @Test
     void actualSpringdocEndpointExportsAndReconcilesAllConsumedPermissions() throws Exception {

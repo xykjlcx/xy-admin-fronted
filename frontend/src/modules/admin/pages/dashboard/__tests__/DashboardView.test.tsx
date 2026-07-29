@@ -21,6 +21,10 @@ const overviewFixture: DashboardOverviewDto = {
     newRoles: { value: '3', delta: '1', negative: false },
     auditLogs: { value: '1,284', delta: '38', negative: true },
   },
+  trend: [
+    { month: '2026-06', value: 82 },
+    { month: '2026-07', value: 96 },
+  ],
   todo: {
     stats: {
       pending: { value: '10', label: '待办任务' },

@@ -6,6 +6,7 @@ import com.metabuild.shared.kernel.Conflict;
 import com.metabuild.shared.kernel.DomainException;
 import com.metabuild.shared.kernel.Forbidden;
 import com.metabuild.shared.kernel.NotFound;
+import com.metabuild.shared.kernel.PayloadTooLarge;
 import com.metabuild.shared.kernel.RateLimited;
 import com.metabuild.shared.kernel.ServiceUnavailable;
 import com.metabuild.shared.kernel.Unauthorized;
@@ -94,6 +95,11 @@ public final class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleServiceUnavailable(
             ServiceUnavailable exception, HttpServletRequest request) {
         return handleDomain(exception, HttpStatus.SERVICE_UNAVAILABLE, request);
+    }
+
+    @ExceptionHandler(PayloadTooLarge.class)
+    public ResponseEntity<ProblemDetail> handlePayloadTooLarge(PayloadTooLarge exception,HttpServletRequest request) {
+        return handleDomain(exception,HttpStatus.PAYLOAD_TOO_LARGE,request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

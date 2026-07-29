@@ -80,6 +80,12 @@ frontend/src/
 - 通用、业务无关的表格/树/分页用 `components/pro`(DataTable / Tree / Pagination / TableShell …);业务层只组装、填数据、传回调。
 - pro 组件业务无关:**禁止** import `@/modules/**`、**禁止** `useTranslation`(文案由外部 props 注入)。
 - 业务页面**禁止**手写分页状态;行选择只能使用 `DataTable` 的 selection API,不得自建选择列/checkbox 状态机;**禁止**裸 `<input>`(用 `Input` / `SearchField` / `SelectControl`)。
+- **组件第一抄袭源:coss/ui**(https://coss.com/ui,GitHub cosscom/coss,copy-in 的 `apps/ui` 部分 **MIT**;Cal.com 官方设计系统、Origin UI 血统;标准 shadcn registry 协议,`shadcn add` 可直拉;56 组件 + 500 particles。2026-07-28 洋哥裁决"能抄直接抄"):
+  1. 缺件**先抄 coss 再改**,不从 shadcn 基础件起步;coss 也没有才看 shadcn/自写;
+  2. 存量 `components/ui` 件**不换 primitives**(保持 Radix 系),对照 coss 同名件吸收动画/无障碍/细节处理;
+  3. 抄入件必须完成本项目 token 化才算落地:组件族 token + `/dev/theme-states` 状态矩阵 + guard(见"样式与 token 纪律");coss 变量与 shadcn 全同名,经 shadcn 词汇兼容层落 token,兼容层需补 `--info/--success/--warning` 一组映射;
+  4. **表单类警示**:coss/Base UI 走原生 FormData 范式,无 react-hook-form 官方桥——表单件抄入必须接回本项目 RHF + zod 体系(`form.tsx`);
+  5. 新件带入的 `@base-ui/react` 依赖放行(v1.6+,MUI/前 Radix 团队维护),组件头注释登记来源;同一交互域内不混用两套 primitives。
 
 ## 显示比例纪律
 

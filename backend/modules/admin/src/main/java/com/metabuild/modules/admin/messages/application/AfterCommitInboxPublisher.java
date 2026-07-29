@@ -1,0 +1,4 @@
+package com.metabuild.modules.admin.messages.application;
+import com.metabuild.admin.api.*;import java.util.*;import java.util.stream.Collectors;import org.springframework.transaction.support.*;
+/** 业务事务提交前不可见，提交后再将幂等消息交给持久化端口。 */
+public final class AfterCommitInboxPublisher implements InboxPublisher {private final InboxPublisher delegate;public AfterCommitInboxPublisher(InboxPublisher delegate){this.delegate=delegate;}public PublishResult publish(Collection<InboxMessageCommand> commands){var copy=List.copyOf(commands);if(!TransactionSynchronizationManager.isActualTransactionActive()||!TransactionSynchronizationManager.isSynchronizationActive())return delegate.publish(copy);TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization(){@Override public void afterCommit(){delegate.publish(copy);}});return new PublishResult(copy.stream().map(InboxMessageCommand::idempotencyKey).collect(Collectors.toSet()),Set.of());}}

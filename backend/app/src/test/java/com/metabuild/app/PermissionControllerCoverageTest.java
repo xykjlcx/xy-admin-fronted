@@ -31,7 +31,7 @@ class PermissionControllerCoverageTest {
         assertThat(controllers).extracting(Class::getSimpleName).containsExactlyInAnyOrder(
                 "AuthController", "DashboardController", "MenuController", "ShellMessageController", "SubsystemController",
                 "UserControllerContract","DepartmentControllerContract","RoleControllerContract",
-                "DictionaryController","CompanyController","ProfileController");
+                "DictionaryController","CompanyController","ProfileController","AuditController");
         Set<String> consumed = validateCoverage(controllers);
         var loader = new PermissionCatalogLoader(new ObjectMapper());
         PermissionContractVerifier.verify(loader.load("permissions/permission-catalog.json"),

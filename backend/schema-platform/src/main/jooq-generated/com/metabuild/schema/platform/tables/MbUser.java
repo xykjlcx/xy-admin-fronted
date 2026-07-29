@@ -10,6 +10,9 @@ import com.metabuild.schema.platform.Public;
 import com.metabuild.schema.platform.tables.MbAuthzRefreshOutbox.MbAuthzRefreshOutboxPath;
 import com.metabuild.schema.platform.tables.MbCredentialRevocationOutbox.MbCredentialRevocationOutboxPath;
 import com.metabuild.schema.platform.tables.MbDept.MbDeptPath;
+import com.metabuild.schema.platform.tables.MbInboxMessage.MbInboxMessagePath;
+import com.metabuild.schema.platform.tables.MbInboxPublishOutbox.MbInboxPublishOutboxPath;
+import com.metabuild.schema.platform.tables.MbLoginAuditOutbox.MbLoginAuditOutboxPath;
 import com.metabuild.schema.platform.tables.MbLoginLog.MbLoginLogPath;
 import com.metabuild.schema.platform.tables.MbOperationLog.MbOperationLogPath;
 import com.metabuild.schema.platform.tables.MbRefreshToken.MbRefreshTokenPath;
@@ -267,6 +270,60 @@ public class MbUser extends TableImpl<MbUserRecord> {
             _mbCredentialRevocationOutbox = new MbCredentialRevocationOutboxPath(this, null, Keys.MB_CREDENTIAL_REVOCATION_OUTBOX__MB_CREDENTIAL_REVOCATION_OUTBOX_USER_ID_FKEY.getInverseKey());
 
         return _mbCredentialRevocationOutbox;
+    }
+
+    private transient MbInboxMessagePath _mbInboxMessageDecidedByFkey;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.mb_inbox_message</code> table, via the
+     * <code>mb_inbox_message_decided_by_fkey</code> key
+     */
+    public MbInboxMessagePath mbInboxMessageDecidedByFkey() {
+        if (_mbInboxMessageDecidedByFkey == null)
+            _mbInboxMessageDecidedByFkey = new MbInboxMessagePath(this, null, Keys.MB_INBOX_MESSAGE__MB_INBOX_MESSAGE_DECIDED_BY_FKEY.getInverseKey());
+
+        return _mbInboxMessageDecidedByFkey;
+    }
+
+    private transient MbInboxMessagePath _mbInboxMessageRecipientUserIdFkey;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.mb_inbox_message</code> table, via the
+     * <code>mb_inbox_message_recipient_user_id_fkey</code> key
+     */
+    public MbInboxMessagePath mbInboxMessageRecipientUserIdFkey() {
+        if (_mbInboxMessageRecipientUserIdFkey == null)
+            _mbInboxMessageRecipientUserIdFkey = new MbInboxMessagePath(this, null, Keys.MB_INBOX_MESSAGE__MB_INBOX_MESSAGE_RECIPIENT_USER_ID_FKEY.getInverseKey());
+
+        return _mbInboxMessageRecipientUserIdFkey;
+    }
+
+    private transient MbInboxPublishOutboxPath _mbInboxPublishOutbox;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.mb_inbox_publish_outbox</code> table
+     */
+    public MbInboxPublishOutboxPath mbInboxPublishOutbox() {
+        if (_mbInboxPublishOutbox == null)
+            _mbInboxPublishOutbox = new MbInboxPublishOutboxPath(this, null, Keys.MB_INBOX_PUBLISH_OUTBOX__MB_INBOX_PUBLISH_OUTBOX_RECIPIENT_USER_ID_FKEY.getInverseKey());
+
+        return _mbInboxPublishOutbox;
+    }
+
+    private transient MbLoginAuditOutboxPath _mbLoginAuditOutbox;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.mb_login_audit_outbox</code> table
+     */
+    public MbLoginAuditOutboxPath mbLoginAuditOutbox() {
+        if (_mbLoginAuditOutbox == null)
+            _mbLoginAuditOutbox = new MbLoginAuditOutboxPath(this, null, Keys.MB_LOGIN_AUDIT_OUTBOX__MB_LOGIN_AUDIT_OUTBOX_USER_ID_FKEY.getInverseKey());
+
+        return _mbLoginAuditOutbox;
     }
 
     private transient MbLoginLogPath _mbLoginLog;

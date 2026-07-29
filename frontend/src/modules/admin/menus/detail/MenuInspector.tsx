@@ -33,7 +33,8 @@ interface MenuInspectorProps {
 
 export function MenuInspector(props: MenuInspectorProps) {
   const { menu, parent, hasChildren, actions, locale, t, capabilities } = props;
-  if (!menu) return <PageSection title={t('menus.inspector.title')}>{t('menus.inspector.empty')}</PageSection>;
+  if (!menu)
+    return <PageSection title={t('menus.inspector.title')}>{t('menus.inspector.empty')}</PageSection>;
 
   const name = lv(menu.label, locale);
   const emptyValue = t('menus.inspector.emptyValue');

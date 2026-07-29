@@ -23,8 +23,8 @@ export function LogsScene({ permissions, systemAdmin = false }: { permissions: s
   const [keyword, setKeyword] = useState('');
   const [operationType, setOperationType] = useState<OperationType>('all');
   const [loginResult, setLoginResult] = useState<LoginResult>('all');
-  const [startDate, setStartDate] = useState('2026-06-01');
-  const [endDate, setEndDate] = useState('2026-06-30');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const operations = useQuery(operationLogsQuery(keyword, operationType, startDate, endDate));
   const logins = useQuery(loginLogsQuery(keyword, loginResult, startDate, endDate));
   const exportLogs = useMutation({
@@ -55,9 +55,10 @@ export function LogsScene({ permissions, systemAdmin = false }: { permissions: s
     }),
     [t],
   );
+  const canViewLogin = matchPermission({ permissions, systemAdmin }, 'audit:login:view');
   const tabs: PageTabItem<LogTab>[] = [
     { value: 'operation', label: t('logs.tabs.operation') },
-    { value: 'login', label: t('logs.tabs.login') },
+    ...(canViewLogin ? [{ value: 'login' as const, label: t('logs.tabs.login') }] : []),
   ];
   const canExport = matchPermission(
     { permissions, systemAdmin },

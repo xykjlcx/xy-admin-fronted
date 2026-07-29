@@ -13,14 +13,7 @@ const nodes: TreeNode[] = [
 test('Tree renders a controlled hierarchical tree with selection and meta', async () => {
   const onSelect = vi.fn();
 
-  render(
-    <Tree
-      nodes={nodes}
-      selectedId="rd"
-      onSelect={onSelect}
-      ariaLabel="部门树"
-    />,
-  );
+  render(<Tree nodes={nodes} selectedId="rd" onSelect={onSelect} ariaLabel="部门树" />);
 
   expect(screen.getByRole('tree', { name: '部门树' })).toBeInTheDocument();
   expect(screen.getAllByRole('treeitem')).toHaveLength(nodes.length);
@@ -103,8 +96,17 @@ test('Tree supports a management list variant with supporting descriptions', () 
   expect(tree).toHaveAttribute('data-variant', 'management');
   expect(tree).toHaveClass('bg-(--table-bg)', 'border-(--table-border)');
   expect(screen.getByText('m-files')).toHaveAttribute('data-slot', 'tree-description');
-  expect(screen.getByRole('treeitem', { name: '文件管理 m-files' })).toHaveAttribute(
-    'aria-selected',
-    'true',
+  expect(screen.getByRole('treeitem', { name: '文件管理 m-files' })).toHaveClass(
+    'text-(--side-list-item-fg-active)',
   );
+
+  render(
+    <Tree
+      variant="management"
+      nodes={[{ id: 'menu-company', label: '企业信息', description: 'm-company', depth: 0 }]}
+      onSelect={() => undefined}
+      ariaLabel="未选中菜单树"
+    />,
+  );
+  expect(screen.getByRole('treeitem', { name: '企业信息 m-company' })).toHaveClass('text-text');
 });

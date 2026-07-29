@@ -27,6 +27,7 @@ public class DataScopeConfiguration {
         List<DataScopeRegistry.Rule> rules = List.of(
                 whitelist("mb_authz_refresh_outbox"), whitelist("mb_credential_revocation_outbox"), whitelist("mb_dept"), whitelist("mb_login_log"),
                 whitelist("mb_company"), whitelist("mb_dictionary"), whitelist("mb_dictionary_item"),
+                whitelist("mb_inbox_message"), whitelist("mb_inbox_publish_outbox"), whitelist("mb_login_audit_outbox"),
                 whitelist("mb_menu"), whitelist("mb_menu_customization"), whitelist("mb_operation_log"),
                 whitelist("mb_permission"), whitelist("mb_permission_alias"),whitelist("mb_permission_catalog_version"),
                 whitelist("mb_refresh_token"), whitelist("mb_role"),

@@ -21,20 +21,33 @@ public final class AuthenticationService {
     private final Clock clock;
     private final Supplier<UUID> operationIds;
     private final LogoutRecoveryPort logoutRecovery;
+    private final LoginAuditPort loginAudit;
 
     public AuthenticationService(AuthUserRepository users, PasswordVerifier passwords,
             AuthorizationGraphRepository graphs, AuthorizationSnapshotCompiler compiler,
             AuthorizationSnapshotStore snapshots, AccountSessionPort sessions,
             RefreshTokenStore refreshTokens, Clock clock, Supplier<UUID> operationIds,
             LogoutRecoveryPort logoutRecovery) {
+        this(users,passwords,graphs,compiler,snapshots,sessions,refreshTokens,clock,operationIds,logoutRecovery,LoginAuditPort.NOOP);
+    }
+    public AuthenticationService(AuthUserRepository users, PasswordVerifier passwords,
+            AuthorizationGraphRepository graphs, AuthorizationSnapshotCompiler compiler,
+            AuthorizationSnapshotStore snapshots, AccountSessionPort sessions,
+            RefreshTokenStore refreshTokens, Clock clock, Supplier<UUID> operationIds,
+            LogoutRecoveryPort logoutRecovery,LoginAuditPort loginAudit) {
         this.users = users; this.passwords = passwords; this.graphs = graphs; this.compiler = compiler;
         this.snapshots = snapshots; this.sessions = sessions; this.refreshTokens = refreshTokens; this.clock = clock;
         this.operationIds = operationIds; this.logoutRecovery = logoutRecovery;
+        this.loginAudit=loginAudit;
     }
 
     public LoginResult login(String username, String password) {
+        return login(username,password,null,null);
+    }
+    public LoginResult login(String username, String password,String ip,String userAgent) {
         var user = users.findByUsername(username);
         if (user == null || !user.enabled() || user.deleted() || !passwords.matches(password, user.passwordHash())) {
+            loginAudit.record(user==null?null:user.id(),username,false,INVALID_CREDENTIALS.code(),ip,userAgent);
             throw new Unauthorized(INVALID_CREDENTIALS, "Invalid credentials");
         }
         var refresh = refreshTokens.issue(user.id(),user.credentialRevision());
@@ -45,12 +58,14 @@ public final class AuthenticationService {
             if (!snapshots.initializeReady(snapshot)) throw new AuthorizationUnavailable();
             if(users.credentialRevision(user.id())!=user.credentialRevision())
                 throw new Unauthorized(CREDENTIALS_CHANGED,"Credentials changed during sign-in");
+            loginAudit.record(user.id(),username,true,null,ip,userAgent);
             return new LoginResult(access.token(), refresh, access.expiresInSeconds());
         } catch (RuntimeException exception) {
             try { refreshTokens.revoke(refresh); } catch (RuntimeException cleanup) { exception.addSuppressed(cleanup); }
             if (access != null) {
                 try { sessions.logoutToken(access.token()); } catch (RuntimeException cleanup) { exception.addSuppressed(cleanup); }
             }
+            loginAudit.record(user.id(),username,false,exception instanceof com.metabuild.shared.kernel.DomainException domain?domain.errorCode().code():"auth.login.failed",ip,userAgent);
             throw exception;
         }
     }

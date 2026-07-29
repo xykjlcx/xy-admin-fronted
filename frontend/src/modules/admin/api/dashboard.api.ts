@@ -12,6 +12,7 @@ export type DashboardTodoItemKey = 'phone' | 'onboard' | 'interview';
 const DashboardMetricSchema = z.object({ value: z.string(), delta: z.string(), negative: z.boolean() });
 const DashboardTodoStatSchema = z.object({ value: z.string(), label: z.string() });
 const DashboardTodoItemSchema = z.object({ title: z.string(), time: z.string(), status: z.string() });
+const DashboardTrendPointSchema = z.object({ month: z.string(), value: z.number().nonnegative() });
 const DashboardOverviewSchema = z.object({
   company: z.object({
     mark: z.string(),
@@ -25,6 +26,7 @@ const DashboardOverviewSchema = z.object({
     newRoles: DashboardMetricSchema,
     auditLogs: DashboardMetricSchema,
   }),
+  trend: z.array(DashboardTrendPointSchema).min(1),
   todo: z.object({
     stats: z.object({
       pending: DashboardTodoStatSchema,

@@ -1,0 +1,3 @@
+package com.metabuild.schema.platform;
+import static org.junit.jupiter.api.Assertions.*;import java.nio.file.*;import org.junit.jupiter.api.Test;
+class Task21PlatformMigrationContractTest {@Test void ownsInboxStateAndIdempotencyConstraints() throws Exception {String sql=Files.readString(Path.of("src/main/resources/db/migration/platform/V14__add_messages_audit_dashboard.sql"));assertTrue(sql.contains("create table mb_inbox_message ("));assertTrue(sql.contains("unique (recipient_user_id, idempotency_key)"));assertTrue(sql.contains("approval_status varchar(16) check"));assertTrue(sql.contains("constraint mb_inbox_approval_shape"));assertFalse(sql.contains("gen_random_uuid"));assertFalse(sql.contains("uuid_generate_v4"));}}

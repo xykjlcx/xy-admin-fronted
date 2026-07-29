@@ -197,7 +197,7 @@ export function DashboardView({ overview }: DashboardViewProps) {
                 ))}
               </div>
             </div>
-            <TrendChart />
+              <TrendChart points={overview.trend} />
           </CardContent>
         </Card>
 
@@ -293,11 +293,20 @@ function CompanyBanner({ overview }: { overview: DashboardOverviewDto }) {
   );
 }
 
-function TrendChart() {
+function TrendChart({ points }: { points: DashboardOverviewDto['trend'] }) {
   const { t } = useTranslation('admin');
-  const linePoints =
-    '0,157.1 69.1,147.5 138.2,151.6 207.3,132.4 276.4,137.9 345.5,114.6 414.5,122.8 483.6,103.6 552.7,110.5 621.8,80.3 690.9,58.4 760,20';
+  const max = Math.max(1, ...points.map((point) => point.value));
+  const linePoints = points
+    .map((point, index) => {
+      const x = points.length === 1 ? 380 : (index / (points.length - 1)) * 760;
+      const y = 180 - (point.value / max) * 160;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
   const areaPoints = `0,200 ${linePoints} 760,200`;
+  const last = points.at(-1)!;
+  const lastY = 180 - (last.value / max) * 160;
+  const labels = points.filter((_, index) => index % 2 === 0 || index === points.length - 1);
 
   return (
     <div className="relative">
@@ -327,18 +336,13 @@ function TrendChart() {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle cx="760" cy="20" r="5" fill="var(--surface)" stroke="var(--pri)" strokeWidth="3" />
+        <circle cx="760" cy={lastY} r="5" fill="var(--surface)" stroke="var(--pri)" strokeWidth="3" />
       </svg>
       <div className="absolute left-full top-[calc(20px*var(--app-scale))] -translate-x-1/2 -translate-y-[130%] rounded-8 bg-(--accent-emphasis) px-3 py-1.5 text-[calc(12px*var(--app-scale))] text-white shadow-popover">
-        {t('dashboard.trend.tooltip')}
+        {last.value}
       </div>
       <div className="mt-2.5 flex justify-between text-[calc(11px*var(--app-scale))] text-text-3">
-        <span>{t('dashboard.trend.months.jan')}</span>
-        <span>{t('dashboard.trend.months.mar')}</span>
-        <span>{t('dashboard.trend.months.may')}</span>
-        <span>{t('dashboard.trend.months.jul')}</span>
-        <span>{t('dashboard.trend.months.sep')}</span>
-        <span>{t('dashboard.trend.months.dec')}</span>
+        {labels.map((point) => <span key={point.month}>{point.month.slice(5)}</span>)}
       </div>
     </div>
   );

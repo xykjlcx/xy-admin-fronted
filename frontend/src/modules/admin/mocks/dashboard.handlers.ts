@@ -15,6 +15,9 @@ const dashboardOverview: DashboardOverviewDto = {
     newRoles: { value: '3', delta: '1', negative: false },
     auditLogs: { value: '1,284', delta: '38', negative: true },
   },
+  trend: [
+    42, 48, 46, 55, 53, 61, 59, 66, 64, 72, 81, 96,
+  ].map((value, index) => ({ month: `2025-${String(index + 1).padStart(2, '0')}`, value })),
   todo: {
     stats: {
       pending: { value: '10', label: '待办任务' },

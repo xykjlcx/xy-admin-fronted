@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,10 +29,10 @@ public final class AuthController {
         this.authentication=authentication; this.refreshTokens=refreshTokens; this.currentUser=currentUser; this.sessions=sessions;
     }
 
-    @PostMapping("/login") public TokenResponse login(@RequestBody LoginRequest request) {
+    @PostMapping("/login") public TokenResponse login(@RequestBody LoginRequest request,HttpServletRequest httpRequest) {
         if (request.username() == null || request.username().isBlank() || request.password() == null || request.password().isBlank())
             throw new BadRequest(() -> "request.validation.failed", "Username and password are required");
-        var result = authentication.login(request.username().trim(), request.password());
+        var result = authentication.login(request.username().trim(), request.password(),httpRequest.getRemoteAddr(),httpRequest.getHeader("User-Agent"));
         return new TokenResponse(result.accessToken(), result.refreshToken(), result.expiresInSeconds());
     }
     @PostMapping("/refresh") public TokenResponse refresh(@RequestBody RefreshRequest request) {

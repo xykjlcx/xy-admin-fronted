@@ -60,15 +60,20 @@ export function DescriptionList({
           )}
         >
           <div className="min-w-0">
-            <dt className="truncate text-text-3">{item.label}</dt>
-            <dd className="mt-1 truncate text-text">{item.value}</dd>
+            <dt
+              className={cn('truncate', presentation === 'cards' ? 'font-medium text-text' : 'text-text-3')}
+            >
+              {item.label}
+            </dt>
+            <dd
+              className={cn('mt-1 truncate', presentation === 'cards' ? 'text-xs text-text-3' : 'text-text')}
+            >
+              {item.value}
+            </dd>
             {item.description && <dd className="mt-1 text-text-2">{item.description}</dd>}
           </div>
           {item.actions ? (
-            <div
-              data-slot="description-list-actions"
-              className="flex shrink-0 items-center gap-1.5"
-            >
+            <div data-slot="description-list-actions" className="flex shrink-0 items-center gap-1.5">
               {item.actions}
             </div>
           ) : null}

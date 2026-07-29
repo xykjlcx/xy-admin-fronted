@@ -38,11 +38,7 @@ import { QueryState } from '@/components/pro/QueryState';
 import { DataTableRowActions, type DataTableRowAction } from '@/components/pro/DataTableRowActions';
 import { Tree, type TreeNode } from '@/components/pro/Tree';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
-import {
-  SideCardList,
-  SideList,
-  type SideListItem,
-} from '@/components/pro/SideList';
+import { SideCardList, SideList, type SideListItem } from '@/components/pro/SideList';
 import {
   PagePane,
   PagePaneBody,

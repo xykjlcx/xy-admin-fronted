@@ -79,3 +79,18 @@ test('扫码页提供可完成的 Mock 确认登录动作', async () => {
   await userEvent.click(screen.getByRole('button', { name: '模拟扫码确认' }));
   await waitFor(() => expect(onAuthenticated).toHaveBeenCalled());
 });
+
+test('密码登录的 Tab 顺序是账号到密码，忘记密码排在密码之后', async () => {
+  render(
+    provider(
+      <LoginPage onAuthenticated={vi.fn()} onGoForgotPassword={vi.fn()} onGoRegister={vi.fn()} />,
+    ),
+  );
+  const account = screen.getByRole('textbox', { name: '账号' });
+  account.focus();
+  await userEvent.tab();
+  expect(screen.getByLabelText('密码')).toHaveFocus();
+  await userEvent.tab();
+  await userEvent.tab();
+  expect(screen.getByRole('button', { name: '忘记密码?' })).toHaveFocus();
+});

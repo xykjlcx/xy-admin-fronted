@@ -57,7 +57,11 @@ export function Tree({
   empty,
 }: TreeProps): JSX.Element {
   if (nodes.length === 0) {
-    return <div data-slot="tree-empty" className="flex min-h-64 items-center justify-center text-sm text-text-3">{empty}</div>;
+    return (
+      <div data-slot="tree-empty" className="flex min-h-64 items-center justify-center text-sm text-text-3">
+        {empty}
+      </div>
+    );
   }
 
   return (
@@ -94,13 +98,11 @@ export function Tree({
                 className={cn(
                   'group/tree-row flex items-center px-1',
                   variant === 'default' && 'min-h-[calc(44px*var(--app-scale))] rounded-8',
+                  variant === 'management' && 'min-h-[calc(54px*var(--app-scale))]',
                   variant === 'management' &&
-                    'min-h-[calc(54px*var(--app-scale))]',
-                  variant === 'management' && index < nodes.length - 1 &&
+                    index < nodes.length - 1 &&
                     'border-b border-(--table-row-border)',
-                  selected
-                    ? 'bg-(--side-list-item-bg-active)'
-                    : 'hover:bg-(--side-list-item-bg-hover)',
+                  selected ? 'bg-(--side-list-item-bg-active)' : 'hover:bg-(--side-list-item-bg-hover)',
                   node.hidden && 'pointer-events-none',
                 )}
               >
@@ -137,9 +139,13 @@ export function Tree({
                     variant === 'management' && 'min-h-[calc(46px*var(--app-scale))]',
                     selected
                       ? 'font-semibold text-(--side-list-item-fg-active)'
-                      : 'text-text-2',
+                      : variant === 'management'
+                        ? 'text-text'
+                        : 'text-text-2',
                   )}
-                  style={{ paddingLeft: `calc(${baseIndent + node.depth * indentStep}px * var(--app-scale))` }}
+                  style={{
+                    paddingLeft: `calc(${baseIndent + node.depth * indentStep}px * var(--app-scale))`,
+                  }}
                   onClick={() => onSelect(node.id)}
                 >
                   {node.leading && (

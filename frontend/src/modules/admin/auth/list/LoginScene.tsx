@@ -332,23 +332,15 @@ function PasswordFields({
           <InputGroupInput id="login-username" {...register('username')} className="text-sm text-text" />
         </InputGroup>
       </div>
-      <div className="mt-[calc(18px*var(--app-scale))]">
-        <div className="mb-2 flex items-center justify-between">
+      {/* 忘记密码在 DOM 上排在密码输入之后，Tab 才会从账号直达密码；视觉位置靠绝对定位留在标签行右侧。 */}
+      <div className="relative mt-[calc(18px*var(--app-scale))]">
+        <div className="mb-2 flex h-[calc(24px*var(--app-scale))] items-center">
           <label
             htmlFor="login-password"
             className="text-[calc(13px*var(--app-scale))] font-medium text-text-2"
           >
             {t('auth.password')}
           </label>
-          <Button
-            type="button"
-            variant="link"
-            size="xs"
-            className="text-[calc(13px*var(--app-scale))]"
-            onClick={onForgotPassword}
-          >
-            {t('auth.forgotPassword')}
-          </Button>
         </div>
         <InputGroup inputSize="lg" className="h-[calc(46px*var(--app-scale))] gap-2.5 rounded-10 px-3.5">
           <InputGroupPrefix>
@@ -373,6 +365,15 @@ function PasswordFields({
             </Button>
           </InputGroupSuffix>
         </InputGroup>
+        <Button
+          type="button"
+          variant="link"
+          size="xs"
+          className="absolute right-0 top-0 text-[calc(13px*var(--app-scale))]"
+          onClick={onForgotPassword}
+        >
+          {t('auth.forgotPassword')}
+        </Button>
       </div>
     </>
   );

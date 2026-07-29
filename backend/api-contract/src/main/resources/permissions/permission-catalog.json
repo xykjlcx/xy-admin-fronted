@@ -100,6 +100,13 @@
       "labelKey": "logs.actions.export"
     },
     {
+      "sourceKey": "/_auth/admin/logs#action:login-view",
+      "code": "audit:login:view",
+      "kind": "ACTION",
+      "routeId": "/_auth/admin/logs",
+      "labelKey": "logs.tabs.login"
+    },
+    {
       "sourceKey": "/_auth/admin/logs#action:oplog-export",
       "code": "audit:oplog:export",
       "kind": "ACTION",
@@ -373,5 +380,5 @@
       "labelKey": "suppliers.title"
     }
   ],
-  "digest": "0e36391c671beb4021db28327ac920a1fb4f39dbf7014ec7904d14cf5363ae01"
+  "digest": "dabdcebfaf2be481616645aa1786bcc97563a8975aa044847e3652d72a0f95e7"
 }
