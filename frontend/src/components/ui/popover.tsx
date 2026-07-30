@@ -24,8 +24,7 @@ function PopoverContent({
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          // 原型弹层规格：rounded-14 + shadow 0 12px 40px .16 + modal-in .18s（替换 shadcn 默认 zoom/slide）
-          'anim-modal-in z-50 w-72 rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-4 text-(--overlay-fg) shadow-(--overlay-shadow-popover) outline-hidden',
+          'anim-modal-in z-50 w-72 rounded-10 border border-(--overlay-border) bg-(--overlay-bg) p-2 text-(--overlay-fg) shadow-(--overlay-shadow-popover) outline-hidden',
           className,
         )}
         {...props}

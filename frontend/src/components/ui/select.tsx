@@ -66,7 +66,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          'anim-modal-in relative z-50 max-h-[min(var(--radix-select-content-available-height),calc(280px*var(--app-scale)))] min-w-[calc(8rem*var(--app-scale))] overflow-hidden rounded-14 border border-(--overlay-border) bg-(--overlay-bg) text-(--overlay-fg) shadow-(--overlay-shadow-popover)',
+          'anim-modal-in relative z-50 max-h-[min(var(--radix-select-content-available-height),calc(280px*var(--app-scale)))] min-w-[calc(8rem*var(--app-scale))] overflow-hidden rounded-10 border border-(--overlay-border) bg-(--overlay-bg) text-(--overlay-fg) shadow-(--overlay-shadow-popover)',
           position === 'popper' && 'w-[var(--radix-select-trigger-width)]',
           className,
         )}
@@ -105,7 +105,7 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        'relative flex min-h-[calc(34px*var(--app-scale))] w-full cursor-pointer select-none items-center gap-2 rounded-8 py-1.5 pr-8 pl-2 text-sm text-(--option-fg) outline-none focus:bg-(--option-bg-highlighted) focus:text-(--option-fg-highlighted) data-[highlighted]:bg-(--option-bg-highlighted) data-[highlighted]:text-(--option-fg-highlighted) data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[state=checked]:bg-(--option-bg-selected) data-[state=checked]:font-semibold data-[state=checked]:text-(--option-fg-selected)',
+        'relative flex min-h-[calc(32px*var(--app-scale))] w-full cursor-pointer select-none items-center gap-2 rounded-7 py-1 pr-8 pl-2 text-sm text-(--option-fg) outline-none focus:bg-(--option-bg-highlighted) focus:text-(--option-fg-highlighted) data-[highlighted]:bg-(--option-bg-highlighted) data-[highlighted]:text-(--option-fg-highlighted) data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[state=checked]:bg-(--option-bg-selected) data-[state=checked]:font-semibold data-[state=checked]:text-(--option-fg-selected)',
         '[&_[data-icon]]:pointer-events-none [&_[data-icon]]:shrink-0 [&_[data-icon]]:size-[calc(15px*var(--app-scale))]',
         className,
       )}

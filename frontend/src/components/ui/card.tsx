@@ -46,7 +46,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="card-title"
-      className={cn('text-base font-semibold text-text [text-transform:var(--title-transform)] [letter-spacing:var(--title-tracking)]', className)}
+      className={cn('text-[calc(14px*var(--app-scale))] font-semibold text-text [text-transform:var(--title-transform)] [letter-spacing:var(--title-tracking)]', className)}
       {...props}
     />
   );
@@ -54,7 +54,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
 
 function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="card-description" className={cn('text-sm text-text-3', className)} {...props} />
+    <div data-slot="card-description" className={cn('text-xs text-text-3', className)} {...props} />
   );
 }
 

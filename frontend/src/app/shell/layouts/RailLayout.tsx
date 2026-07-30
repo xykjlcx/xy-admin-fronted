@@ -36,7 +36,7 @@ export function RailLayout({ menuTree, subsystems, children }: ShellLayoutProps)
           }
           right={<HeaderActions />}
         />
-        <main id="shell-main" className="min-w-0 flex-1 overflow-y-auto pt-14">
+        <main id="shell-main" className="min-w-0 flex-1 overflow-y-auto pt-(--shell-header-h)">
           <PageFrameChromeProvider value={chrome}>
             <PageTransition>{children}</PageTransition>
           </PageFrameChromeProvider>

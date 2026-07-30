@@ -327,10 +327,12 @@ test('交互型基础组件统一使用 pointer 光标', () => {
 test('Checkbox 保持内联原语契约并压低 baseline 漂移风险', () => {
   render(<Checkbox aria-label="选择成员" />);
 
-  expect(screen.getByRole('checkbox', { name: '选择成员' }).closest('[data-slot="checkbox"]')).toHaveClass(
+  const root = screen.getByRole('checkbox', { name: '选择成员' }).closest('[data-slot="checkbox"]');
+  expect(root).toHaveClass(
     'inline-flex',
     'align-middle',
     'leading-none',
+    'size-[var(--choice-size)]',
   );
 });
 
@@ -501,19 +503,19 @@ test('SelectItem 与 DropdownMenuItem 分别消费 Option/Menu token', async () 
 
   const checkboxItem = screen.getByText('显示隐藏节点').closest('[data-slot="dropdown-menu-checkbox-item"]');
   expect(checkboxItem).toHaveClass('text-(--menu-item-fg)');
-  expect(checkboxItem).toHaveClass('rounded-8');
+  expect(checkboxItem).toHaveClass('rounded-7');
   expect(checkboxItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
   expect(checkboxItem).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
 
   const radioItem = screen.getByText('紧凑').closest('[data-slot="dropdown-menu-radio-item"]');
   expect(radioItem).toHaveClass('text-(--menu-item-fg)');
-  expect(radioItem).toHaveClass('rounded-8');
+  expect(radioItem).toHaveClass('rounded-7');
   expect(radioItem).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
   expect(radioItem).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
 
   const subTrigger = screen.getByText('更多').closest('[data-slot="dropdown-menu-sub-trigger"]');
   expect(subTrigger).toHaveClass('text-(--menu-item-fg)');
-  expect(subTrigger).toHaveClass('rounded-8');
+  expect(subTrigger).toHaveClass('rounded-7');
   expect(subTrigger).toHaveClass('focus:bg-(--menu-item-bg-highlighted)');
   expect(subTrigger).toHaveClass('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
   expect(subTrigger).toHaveClass('data-[state=open]:bg-(--menu-item-bg-highlighted)');
@@ -686,6 +688,7 @@ test('Checkbox、RadioGroup、Switch 消费 Choice token 并保留三态区分',
   const switchControl = screen.getByRole('switch', { name: '开启' });
 
   expect(checked).toHaveClass('ui-choice');
+  expect(checked).toHaveClass('size-[var(--choice-size)]');
   expect(checked).not.toHaveClass('border-(--choice-border)');
   expect(checked).not.toHaveClass('bg-(--choice-bg)');
   expect(checked).not.toHaveClass('hover:border-(--choice-border-hover)');

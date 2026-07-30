@@ -56,7 +56,7 @@ export function ShellHeader({
     // 三区永不重叠（绝对定位的 center 不产生 flex 压力，会直接叠在变宽的面包屑上）。
     <header
       className={cn(
-        'absolute inset-x-0 top-0 z-20 grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-[calc(18px*var(--app-scale))] border-b border-border px-5 transition-[background-color,box-shadow,border-color] duration-200 max-lg:grid-cols-[minmax(0,1fr)_auto_auto] max-lg:gap-2 max-lg:px-2',
+        'absolute inset-x-0 top-0 z-20 grid h-(--shell-header-h) grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-border px-(--page-frame-px) transition-[background-color,box-shadow,border-color] duration-200 max-lg:grid-cols-[minmax(0,1fr)_auto_auto] max-lg:gap-2 max-lg:px-2',
         scrolled
           ? 'bg-surface-blur shadow-header backdrop-blur-[14px] backdrop-saturate-[1.6]'
           : transparentUntilScroll
@@ -64,7 +64,7 @@ export function ShellHeader({
             : 'bg-(--shell-header-bg)',
       )}
     >
-      <div data-slot="shell-header-left" className="flex min-w-0 items-center gap-[calc(18px*var(--app-scale))]">
+      <div data-slot="shell-header-left" className="flex min-w-0 items-center gap-3">
         {left}
       </div>
       <div data-slot="shell-header-center" className="flex min-w-0 items-center justify-center gap-3">

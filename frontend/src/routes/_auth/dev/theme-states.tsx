@@ -1040,7 +1040,7 @@ function ThemeStatesRoute() {
               <Button variant="outline">{t('dev.themeStates.overlayTrigger')}</Button>
               <div
                 data-slot="popover-content"
-                className="anim-modal-in w-[calc(220px*var(--app-scale))] rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-4 text-(--overlay-fg) shadow-(--overlay-shadow-popover)"
+                className="anim-modal-in w-[calc(220px*var(--app-scale))] rounded-10 border border-(--overlay-border) bg-(--overlay-bg) p-2 text-(--overlay-fg) shadow-(--overlay-shadow-popover)"
               >
                 <div className="grid gap-1.5">
                   <p className="text-sm font-medium text-text">{t('dev.themeStates.overlayTitle')}</p>
@@ -1066,13 +1066,13 @@ function ThemeStatesRoute() {
               <div
                 data-slot="select-content"
                 role="listbox"
-                className="anim-modal-in overflow-hidden rounded-14 border border-(--overlay-border) bg-(--overlay-bg) p-1 text-(--overlay-fg) shadow-(--overlay-shadow-popover)"
+                className="anim-modal-in overflow-hidden rounded-10 border border-(--overlay-border) bg-(--overlay-bg) p-1 text-(--overlay-fg) shadow-(--overlay-shadow-popover)"
               >
                 <div
                   data-slot="select-item"
                   role="option"
                   aria-selected="true"
-                  className="relative flex min-h-[calc(34px*var(--app-scale))] w-full items-center gap-2 rounded-8 bg-(--option-bg-selected) py-1.5 pr-8 pl-2 text-sm font-semibold text-(--option-fg-selected)"
+                  className="relative flex min-h-[calc(32px*var(--app-scale))] w-full items-center gap-2 rounded-7 bg-(--option-bg-selected) py-1 pr-8 pl-2 text-sm font-semibold text-(--option-fg-selected)"
                 >
                   <span
                     data-slot="select-item-indicator"

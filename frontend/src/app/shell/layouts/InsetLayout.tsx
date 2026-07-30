@@ -47,7 +47,7 @@ export function InsetLayout({
             面包屑靠 min-w-0 截断、搜索靠自身 max-w 收缩，三区永不重叠 */}
         <div
           data-slot="inset-shell-header"
-          className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-(--page-breadcrumb-divider) px-(--page-frame-px)"
+          className="grid h-(--shell-header-h) shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-(--page-breadcrumb-divider) px-(--page-frame-px)"
         >
           <div data-slot="inset-shell-header-start" className="flex min-w-0 items-center gap-3">
             <Button

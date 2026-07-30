@@ -28,11 +28,11 @@
 
 ## 批次 B：Shell 与基础控件
 
-- [ ] ShellHeader、Sidebar、Inset、Rail 全部消费共享几何 token。
-- [ ] 导航、Sidebar Header、折叠入口和用户入口统一比例。
-- [ ] Button、Input、Select、Checkbox、Popover、Dropdown 统一紧凑几何。
-- [ ] `/dev/theme-states` 补齐基础控件状态。
-- [ ] 运行组件测试、三布局浏览器 smoke 后提交。
+- [x] ShellHeader、Sidebar、Inset、Rail 全部消费共享几何 token。
+- [x] 导航、Sidebar Header、折叠入口和用户入口统一比例。
+- [x] Button、Input、Select、Checkbox、Popover、Dropdown 统一紧凑几何。
+- [x] `/dev/theme-states` 补齐基础控件状态。
+- [x] 运行组件测试、三布局浏览器 smoke 后提交。
 
 ## 批次 C：DataTable 与筛选
 

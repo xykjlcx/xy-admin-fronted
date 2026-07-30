@@ -5,7 +5,7 @@ import { lv } from '@/lib/localized';
 import { Icon } from '@/lib/icon-registry';
 import type { MenuNode } from '@/lib/menu-tree';
 
-// Rail 导航（原型 L222-241）：76px 图标栏（每个顶级组一个图标+短名）+ 192px 二级面板（当前组的页面平铺）。
+// Rail 导航：共享 200px 总宽，60px 图标栏 + 140px 二级面板。
 // 顶级 dir = 一组，其 children = 页面；顶级 leaf 自成一组（页面即自身）。当前组 = 含当前路由的组。
 export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
   const { i18n } = useTranslation();
@@ -16,7 +16,7 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
 
   return (
     <>
-      <nav className="h-screen flex w-[calc(76px*var(--app-scale))] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-border bg-chrome py-2.5">
+      <nav className="h-screen flex w-(--shell-rail-w) shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-border bg-chrome py-2">
         {groups.map((g) => {
           const active = g === activeGroup;
           const first = g.pages[0];
@@ -25,13 +25,13 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
               key={g.node.id}
               onClick={() => first?.path && nav({ to: first.path })}
               className={cn(
-                'flex w-[calc(60px*var(--app-scale))] flex-col items-center gap-[calc(5px*var(--app-scale))] rounded-10 py-2.5',
+                'flex h-[var(--nav-item-h)] w-[calc(52px*var(--app-scale))] flex-col items-center justify-center gap-0.5 rounded-8',
                 active
                   ? 'border border-(--nav-item-border-current) bg-(--nav-item-bg-current) text-(--nav-item-fg-current) shadow-(--nav-item-shadow-current)'
                   : 'text-text-3 hover:bg-(--nav-item-bg-hover)',
               )}
             >
-              <Icon name={g.node.icon} className="size-5" />
+              <Icon name={g.node.icon} className="size-[var(--nav-icon-size)]" />
               <span className="text-center text-[calc(11px*var(--app-scale))] leading-none">
                 {lv(g.node.shortLabel ?? g.node.label, i18n.language)}
               </span>
@@ -39,8 +39,8 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
           );
         })}
       </nav>
-      <aside className="h-screen flex w-[calc(192px*var(--app-scale))] shrink-0 flex-col overflow-y-auto border-r border-border bg-chrome py-4 max-lg:hidden">
-        <div className="px-5 pb-3 text-[calc(15px*var(--app-scale))] font-bold text-text">
+      <aside className="h-screen flex w-(--shell-rail-panel-w) shrink-0 flex-col overflow-y-auto border-r border-border bg-chrome py-3 max-lg:hidden">
+        <div className="px-4 pb-2 text-[calc(14px*var(--app-scale))] font-semibold text-text">
           {activeGroup ? lv(activeGroup.node.label, i18n.language) : ''}
         </div>
         <div className="px-2">
@@ -50,7 +50,7 @@ export function NavMenuRail({ tree }: { tree: MenuNode[] }) {
                 key={p.id}
                 to={p.path}
                 className={cn(
-                  'my-0.5 flex h-[calc(38px*var(--app-scale))] items-center rounded-8 px-3.5 text-sm',
+                  'my-0.5 flex h-[var(--nav-subitem-h)] items-center rounded-8 px-3 text-sm',
                   pathname === p.path
                     ? 'border border-(--nav-item-border-current) bg-(--nav-item-bg-current) font-semibold text-(--nav-item-fg-current) shadow-(--nav-item-shadow-current)'
                     : 'text-text-2 hover:bg-(--nav-item-bg-hover)',

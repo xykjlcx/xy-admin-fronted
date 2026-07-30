@@ -49,7 +49,7 @@ test('窄屏强制使用折叠 Sidebar，避免已保存的宽布局挤压业务
 
   expect(await screen.findByText('Users content')).toBeInTheDocument();
   expect(document.querySelector('[data-shell-layout="inset"]')).not.toBeInTheDocument();
-  expect(document.querySelector('aside')).toHaveClass('w-16');
+  expect(document.querySelector('aside')).toHaveClass('w-(--shell-sidebar-collapsed-w)');
 });
 
 function renderShellWithLayout({
@@ -125,7 +125,7 @@ test('Inset 布局把子系统切换和用户入口放回侧栏', async () => {
   const sidebarFooter = await screen.findByTestId('inset-sidebar-footer');
 
   expect(aside).not.toContainElement(collapseButton);
-  expect(aside).toHaveClass('w-[calc(248px*var(--app-scale))]');
+  expect(aside).toHaveClass('w-(--shell-inset-sidebar-w)');
   expect(surface).toHaveClass('m-2');
   expect(surface).toHaveClass('ml-1');
   expect(header).toHaveClass('border-b');

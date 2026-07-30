@@ -222,6 +222,9 @@
   --shell-header-h: calc(52px * var(--app-scale));
   --shell-sidebar-w: calc(200px * var(--app-scale));
   --shell-sidebar-collapsed-w: calc(60px * var(--app-scale));
+  --shell-rail-w: calc(60px * var(--app-scale));
+  --shell-rail-panel-w: calc(140px * var(--app-scale));
+  --shell-inset-sidebar-w: calc(200px * var(--app-scale));
   --nav-item-h: calc(36px * var(--app-scale));
   --nav-subitem-h: calc(34px * var(--app-scale));
   --nav-icon-size: calc(16px * var(--app-scale));

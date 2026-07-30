@@ -370,7 +370,7 @@ html {
   --container-sm: calc(24rem * var(--app-scale));
   --container-lg: calc(32rem * var(--app-scale));
   --text-xs: calc(0.75rem * var(--app-scale));
-  --text-sm: calc(0.875rem * var(--app-scale));
+  --text-sm: calc(0.8125rem * var(--app-scale));
   --text-base: calc(1rem * var(--app-scale));
   --text-lg: calc(1.125rem * var(--app-scale));
   --text-xl: calc(1.25rem * var(--app-scale));
@@ -381,7 +381,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-size: calc(14px * var(--app-scale));
+  font-size: calc(13px * var(--app-scale));
   -webkit-font-smoothing: antialiased;
 }
 .tabular-nums {

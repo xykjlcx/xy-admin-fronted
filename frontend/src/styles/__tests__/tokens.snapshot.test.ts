@@ -40,6 +40,8 @@ const shellHeaderSource = readFileSync('src/app/shell/widgets/ShellHeader.tsx', 
 const navMenuSidebarSource = readFileSync('src/app/shell/widgets/NavMenuSidebar.tsx', 'utf8');
 const navMenuRailSource = readFileSync('src/app/shell/widgets/NavMenuRail.tsx', 'utf8');
 const navMenuInsetSource = readFileSync('src/app/shell/widgets/NavMenuInset.tsx', 'utf8');
+const sidebarLayoutSource = readFileSync('src/app/shell/layouts/SidebarLayout.tsx', 'utf8');
+const railLayoutSource = readFileSync('src/app/shell/layouts/RailLayout.tsx', 'utf8');
 const insetLayoutSource = readFileSync('src/app/shell/layouts/InsetLayout.tsx', 'utf8');
 const shellBreadcrumbsHookSource = readFileSync('src/app/shell/layouts/use-shell-breadcrumbs.ts', 'utf8');
 const subsystemSwitcherSource = readFileSync('src/app/shell/widgets/SubsystemSwitcher.tsx', 'utf8');
@@ -206,6 +208,9 @@ test('Claude 视觉契约的共享几何只能由 base profile 定义', () => {
     '--shell-header-h: calc(52px * var(--app-scale));',
     '--shell-sidebar-w: calc(200px * var(--app-scale));',
     '--shell-sidebar-collapsed-w: calc(60px * var(--app-scale));',
+    '--shell-rail-w: calc(60px * var(--app-scale));',
+    '--shell-rail-panel-w: calc(140px * var(--app-scale));',
+    '--shell-inset-sidebar-w: calc(200px * var(--app-scale));',
     '--nav-item-h: calc(36px * var(--app-scale));',
     '--nav-subitem-h: calc(34px * var(--app-scale));',
     '--nav-icon-size: calc(16px * var(--app-scale));',
@@ -237,6 +242,9 @@ test('Claude 视觉契约的共享几何只能由 base profile 定义', () => {
     '--shell-header-h',
     '--shell-sidebar-w',
     '--shell-sidebar-collapsed-w',
+    '--shell-rail-w',
+    '--shell-rail-panel-w',
+    '--shell-inset-sidebar-w',
     '--nav-item-h',
     '--nav-subitem-h',
     '--nav-icon-size',
@@ -258,6 +266,28 @@ test('Claude 视觉契约的共享几何只能由 base profile 定义', () => {
   }
 });
 
+test('三种 Shell 与导航必须消费共享几何 token，不得保留旧放大值', () => {
+  expect(shellHeaderSource).toContain('h-(--shell-header-h)');
+
+  expect(sidebarLayoutSource).toContain('w-(--shell-sidebar-w)');
+  expect(sidebarLayoutSource).toContain('w-(--shell-sidebar-collapsed-w)');
+  expect(sidebarLayoutSource).toContain('pt-(--shell-header-h)');
+  expect(sidebarLayoutSource).not.toContain('232px');
+  expect(sidebarLayoutSource).not.toContain('pt-14');
+
+  expect(railLayoutSource).toContain('pt-(--shell-header-h)');
+  expect(railLayoutSource).not.toContain('pt-14');
+  expect(insetLayoutSource).toContain('h-(--shell-header-h)');
+  expect(insetLayoutSource).not.toContain('h-14');
+
+  for (const source of [navMenuSidebarSource, navMenuRailSource, navMenuInsetSource]) {
+    expect(source).toContain('var(--nav-item-h)');
+    expect(source).toContain('var(--nav-icon-size)');
+    expect(source).not.toContain('42px');
+    expect(source).not.toContain('18px');
+  }
+});
+
 test('显示比例三档走 --app-scale token 乘法，不再使用 CSS zoom 反向补偿', () => {
   expect(css).toContain(':root { --app-scale: 1; }');
   expect(css).toContain("[data-zoom='sm'] { --app-scale: 0.9; }");
@@ -270,7 +300,7 @@ test('显示比例三档走 --app-scale token 乘法，不再使用 CSS zoom 反
 test('显示比例基础层覆盖 Tailwind spacing 与 text token', () => {
   expect(globalCss).toContain('--spacing: calc(0.25rem * var(--app-scale));');
   expect(globalCss).toContain('--text-xs: calc(0.75rem * var(--app-scale));');
-  expect(globalCss).toContain('--text-sm: calc(0.875rem * var(--app-scale));');
+  expect(globalCss).toContain('--text-sm: calc(0.8125rem * var(--app-scale));');
   expect(globalCss).toContain('--text-base: calc(1rem * var(--app-scale));');
   expect(globalCss).toContain('--text-lg: calc(1.125rem * var(--app-scale));');
   expect(globalCss).toContain('--text-xl: calc(1.25rem * var(--app-scale));');
@@ -654,7 +684,7 @@ test('Overlay 族 token 与 Step 4 合同落地', () => {
   expect(popoverSource).toContain('text-(--overlay-muted-fg)');
   expect(dropdownMenuSource).toContain('data-slot="dropdown-menu-sub-content"');
   expect(dropdownMenuSource).toContain('anim-modal-in');
-  expect(dropdownMenuSource).toContain('rounded-14');
+  expect(dropdownMenuSource).toContain('rounded-10');
   expect(dropdownMenuSource).not.toContain('zoom-in-95');
   expect(dropdownMenuSource).not.toContain('animate-in');
   for (const source of [dialogSource, sheetSource, popoverSource]) {
@@ -707,7 +737,7 @@ test('Option / Menu 族 token 与 Step 5 合同落地', () => {
   expect(dropdownMenuSource).toContain('focus:text-(--menu-item-fg-highlighted)');
   expect(dropdownMenuSource).toContain('data-[highlighted]:bg-(--menu-item-bg-highlighted)');
   expect(dropdownMenuSource).toContain('data-[highlighted]:text-(--menu-item-fg-highlighted)');
-  expect(dropdownMenuSource).toContain('rounded-8');
+  expect(dropdownMenuSource).toContain('rounded-7');
   expect(dropdownMenuSource).toContain("[&_svg:not([class*='text-'])]:text-(--menu-item-muted-fg)");
   expect(dropdownMenuSource).toContain('text-(--menu-item-muted-fg)');
   expect(dropdownMenuSource).toContain('data-[variant=destructive]:text-(--menu-item-fg-danger)');

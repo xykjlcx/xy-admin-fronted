@@ -219,7 +219,7 @@ test('DataTable selection and interactive columns do not trigger row click', asy
   const firstNameCell = screen.getByRole('cell', { name: '李长昕' });
 
   expect(firstRowCheckbox?.closest('[data-slot="checkbox"]')).toHaveClass(
-    'size-[calc(18px*var(--app-scale))]',
+    'size-[var(--choice-size)]',
   );
   expect(firstNameCell).toHaveClass('px-(--table-cell-px)');
   expect(firstNameCell).not.toHaveClass('p-0');
