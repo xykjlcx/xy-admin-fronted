@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { DescriptionList } from '@/components/pro/DescriptionList';
-import { PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
+import { DetailHeader, PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
 import { QueryState } from '@/components/pro/QueryState';
 import { StatusBadge } from '@/components/pro/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -37,32 +37,28 @@ export function CarrierDetailScene({ id, onBack }: { id: string; onBack: () => v
   }));
   return (
     <PageFrame breadcrumbs={[{ label: t('carriers.title') }, { label: t('carriers.detailTitle') }]}>
-      <Card>
-        <CardContent className="flex items-center gap-4 p-5">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="ui-page-title text-xl font-semibold">{carrier.name}</h1>
-              <StatusBadge tone={carrier.enabled ? 'success' : 'neutral'}>
-                {t(carrier.enabled ? 'common.enabled' : 'common.disabled')}
-              </StatusBadge>
-            </div>
-            <p className="mt-1 text-sm text-text-3">
-              {carrier.fullName} · {carrier.region}
-            </p>
-          </div>
-          <div className="flex-1" />
+      <DetailHeader
+        title={carrier.name}
+        subtitle={`${carrier.fullName} · ${carrier.region}`}
+        status={
+          <StatusBadge tone={carrier.enabled ? 'success' : 'neutral'}>
+            {t(carrier.enabled ? 'common.enabled' : 'common.disabled')}
+          </StatusBadge>
+        }
+        actions={
           <Button variant="outline" onClick={onBack}>
             {t('common.back')}
           </Button>
-        </CardContent>
-      </Card>
-      <Card className="mt-4">
+        }
+      />
+      <Card spacing="compact">
         <CardHeader className="border-b border-border">
           <PageTabs value={tab} items={tabs} onValueChange={setTab} />
         </CardHeader>
-        <CardContent className="p-5">
+        <CardContent>
           {tab === 'basic' && (
             <DescriptionList
+              columns={4}
               items={[
                 { label: t('carriers.fields.name'), value: carrier.name },
                 { label: t('carriers.fields.fullName'), value: carrier.fullName },

@@ -98,8 +98,8 @@ export function RoleAuditLogsPanel({
   );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col px-7 py-[calc(22px*var(--app-scale))]">
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+    <div className="flex min-h-0 flex-1 flex-col px-4 py-3">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
         <SearchField
           aria-label={t('roles.auditLogs.searchLabel')}
           placeholder={t('roles.auditLogs.searchPlaceholder')}
@@ -120,7 +120,7 @@ export function RoleAuditLogsPanel({
           onValueChange={setKind}
         />
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-3">
         <DataTable
           columns={columns}
           data={visibleLogs}

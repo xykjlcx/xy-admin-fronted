@@ -79,10 +79,8 @@ export function CompanyScene({ permissions, systemAdmin = false }: { permissions
             <CardTitle>{t('company.sections.basic')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-4 rounded-12 border border-border bg-surface-2 p-5">
-              <div className="flex size-14 items-center justify-center rounded-12 bg-(--accent-emphasis) text-lg font-semibold text-(--button-primary-fg)">
-                <Building2 />
-              </div>
+            <div className="flex items-center gap-3">
+              <Building2 className="size-5 shrink-0" />
               <div className="min-w-0">
                 <h1 className="text-lg font-semibold text-text">{company.name}</h1>
                 <div className="mt-2 flex items-center gap-2">

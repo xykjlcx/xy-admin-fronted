@@ -4,6 +4,7 @@ import { Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { DataTable } from '@/components/pro/DataTable';
+import { DataToolbar, DataToolbarGroup } from '@/components/pro/DataToolbar';
 import { FilterSelect } from '@/components/pro/FilterSelect';
 import { PageFrame, PageSurface, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
 import { SearchField } from '@/components/pro/SearchField';
@@ -78,7 +79,7 @@ export function LogsScene({ permissions, systemAdmin = false }: { permissions: s
   return (
     <PageFrame breadcrumbs={[{ label: t('logs.breadcrumbGroup') }, { label: t('logs.title') }]}>
       <PageSurface>
-        <div className="border-b border-(--page-section-divider) px-5 pt-4">
+        <div className="border-b border-(--page-section-divider) px-3 pt-2.5">
           <PageTabs
             value={tab}
             items={tabs}
@@ -88,8 +89,9 @@ export function LogsScene({ permissions, systemAdmin = false }: { permissions: s
             }}
           />
         </div>
-        <div className="flex flex-col gap-4 p-5">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col gap-3 p-3">
+          <DataToolbar variant="surface">
+            <DataToolbarGroup>
             <SearchField
               aria-label={t('logs.search')}
               placeholder={t('logs.search')}
@@ -138,14 +140,16 @@ export function LogsScene({ permissions, systemAdmin = false }: { permissions: s
                 className="w-[calc(136px*var(--app-scale))]"
               />
             </div>
-            <div className="flex-1" />
+            </DataToolbarGroup>
             {canExport && (
-              <Button variant="outline" size="sm" loading={exportLogs.isPending} onClick={exportCurrent}>
-                <Download data-icon="inline-start" />
-                {t('logs.actions.export')}
-              </Button>
+              <DataToolbarGroup align="end">
+                <Button variant="outline" size="sm" loading={exportLogs.isPending} onClick={exportCurrent}>
+                  <Download data-icon="inline-start" />
+                  {t('logs.actions.export')}
+                </Button>
+              </DataToolbarGroup>
             )}
-          </div>
+          </DataToolbar>
           {tab === 'operation' ? (
             <DataTable
               columns={operationColumns(labels)}

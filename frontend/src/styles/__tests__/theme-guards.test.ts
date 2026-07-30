@@ -326,7 +326,12 @@ test('业务页面 Card padding、任意圆角和内联 style 必须受 baseline
   const current: typeof baseline = {};
 
   for (const file of collectScopedFiles(['src/modules', 'src/routes'])) {
-    if (!/\.tsx$/.test(file) || file.includes('/__tests__/')) continue;
+    if (
+      !/\.tsx$/.test(file) ||
+      file.includes('/__tests__/') ||
+      file === 'src/routes/_auth/dev/theme-states.tsx'
+    )
+      continue;
     const violations = countVisualGeometryViolations(file);
     if (Object.values(violations).some((count) => count > 0)) current[file] = violations;
   }

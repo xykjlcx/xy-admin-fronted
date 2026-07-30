@@ -255,19 +255,10 @@ function HeroPanel() {
   const { t } = useTranslation();
   return (
     <section
-      className="relative hidden max-w-[calc(640px*var(--app-scale))] flex-col overflow-hidden px-[calc(48px*var(--app-scale))] py-[calc(48px*var(--app-scale))] lg:flex"
-      style={{
-        width: '44%',
-        background:
-          'linear-gradient(135deg, color-mix(in srgb, var(--pri) 14%, var(--surface)), var(--surface) 55%, color-mix(in srgb, var(--pri) 6%, var(--surface)))',
-      }}
+      className="ui-auth-hero relative hidden w-[44%] max-w-[calc(640px*var(--app-scale))] flex-col overflow-hidden px-[calc(48px*var(--app-scale))] py-[calc(48px*var(--app-scale))] lg:flex"
     >
       <div
-        className="absolute right-[calc(-40px*var(--app-scale))] top-[calc(-80px*var(--app-scale))] size-[calc(340px*var(--app-scale))] rounded-full blur-[20px]"
-        style={{
-          background:
-            'radial-gradient(circle, color-mix(in srgb, var(--pri) 35%, transparent), transparent 70%)',
-        }}
+        className="ui-auth-hero-glow absolute right-[calc(-40px*var(--app-scale))] top-[calc(-80px*var(--app-scale))] size-[calc(340px*var(--app-scale))] rounded-full blur-[20px]"
       />
       <div className="relative flex items-center gap-3">
         <div className="flex size-[calc(40px*var(--app-scale))] items-center justify-center rounded-11 bg-(--accent-emphasis) text-[calc(18px*var(--app-scale))] font-bold text-white">

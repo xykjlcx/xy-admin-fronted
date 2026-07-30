@@ -16,5 +16,5 @@ export function ProfileTab({ user, deptById }: ProfileTabProps) {
     { label: t('users.detail.status'), value: t(`users.status.${user.status}`) },
   ];
 
-  return <DescriptionList items={detailItems} />;
+  return <DescriptionList columns={2} items={detailItems} />;
 }

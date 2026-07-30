@@ -150,7 +150,7 @@ export function DictionariesScene({ permissions, systemAdmin = false }: { permis
       <PageFrame
         breadcrumbs={[{ label: t('dictionaries.breadcrumbGroup') }, { label: t('dictionaries.title') }]}
       >
-        <PageSurface className="items-center justify-center gap-3 p-8">
+        <PageSurface className="items-center justify-center gap-3 p-4">
           <p className="text-sm text-text-3">{t('dictionaries.error')}</p>
           <Button variant="secondary" onClick={() => void dictionariesResult.refetch()}>
             {t('dictionaries.actions.retry')}
@@ -199,7 +199,7 @@ export function DictionariesScene({ permissions, systemAdmin = false }: { permis
         />
 
         <section className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <header className="flex items-center justify-between gap-4 border-b border-(--page-section-divider) px-5 py-4">
+          <header className="flex items-center justify-between gap-3 border-b border-(--page-section-divider) px-4 py-2.5">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <h2 className="truncate text-base font-semibold text-text">
@@ -238,7 +238,7 @@ export function DictionariesScene({ permissions, systemAdmin = false }: { permis
               )}
             </div>
           </header>
-          <div className="border-b border-(--page-section-divider) px-5 py-3">
+          <div className="border-b border-(--page-section-divider) px-4 py-2.5">
             <SearchField
               value={itemKeyword}
               aria-label={t('dictionaries.itemSearch')}
@@ -246,7 +246,7 @@ export function DictionariesScene({ permissions, systemAdmin = false }: { permis
               onChange={(event) => setItemKeyword(event.currentTarget.value)}
             />
           </div>
-          <div className="min-h-0 flex-1 overflow-auto p-5">
+          <div className="min-h-0 flex-1 overflow-auto p-3">
             <DataTable
               columns={columns}
               data={visibleItems}

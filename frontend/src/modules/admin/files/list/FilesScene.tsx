@@ -5,11 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/pro/ConfirmDialog';
 import { DataTable } from '@/components/pro/DataTable';
+import { DataToolbar, DataToolbarGroup } from '@/components/pro/DataToolbar';
 import { FormDialogContent } from '@/components/pro/FormDialog';
-import { PageFrame, PageSurface } from '@/components/pro/PageScaffold';
+import { PageFrame, PagePaneBody, PageSurface } from '@/components/pro/PageScaffold';
 import { QueryState } from '@/components/pro/QueryState';
 import { SearchField } from '@/components/pro/SearchField';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ProgressBar } from '@/components/ui/progress';
@@ -135,30 +137,32 @@ export function FilesScene({
   };
   return (
     <PageFrame breadcrumbs={[{ label: t('files.breadcrumbGroup') }, { label: t('files.title') }]}>
-      <div className="mb-4 rounded-12 border border-border bg-surface p-5 shadow-(--page-surface-shadow)">
-        <div className="flex items-baseline gap-3">
-          <h2 className="text-base font-semibold">{t('files.storage.title')}</h2>
+      <Card spacing="compact" className="mb-3">
+        <CardHeader className="flex-row items-baseline gap-3">
+          <CardTitle>{t('files.storage.title')}</CardTitle>
           <span className="text-sm text-text-3">
             {t('files.storage.used', { used: storage.data?.used ?? 0, total: storage.data?.total ?? 0 })}
           </span>
-        </div>
-        <ProgressBar
-          className="mt-3 h-2.5"
-          value={storage.data ? storage.data.used : 0}
-          max={storage.data?.total ?? 15}
-          aria-label={t('files.storage.title')}
-        />
-        <div className="mt-3 flex flex-wrap gap-4 text-xs text-text-2">
-          {storage.data?.segments.map((segment) => (
-            <span key={segment.kind}>
-              {t(`files.storage.${segment.kind}`)} {segment.percent}%
-            </span>
-          ))}
-        </div>
-      </div>
+        </CardHeader>
+        <CardContent className="block">
+          <ProgressBar
+            className="h-2"
+            value={storage.data ? storage.data.used : 0}
+            max={storage.data?.total ?? 15}
+            aria-label={t('files.storage.title')}
+          />
+          <div className="mt-2 flex flex-wrap gap-3 text-xs text-text-2">
+            {storage.data?.segments.map((segment) => (
+              <span key={segment.kind}>
+                {t(`files.storage.${segment.kind}`)} {segment.percent}%
+              </span>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
       <PageSurface>
-        <div className="flex flex-wrap items-center gap-3 p-5 pb-4">
-          <div className="flex items-center gap-1">
+        <DataToolbar variant="surface">
+          <DataToolbarGroup>
             <Button
               variant="link"
               size="sm"
@@ -182,19 +186,18 @@ export function FilesScene({
                 </Button>
               </span>
             ))}
-          </div>
-          <span className="text-sm text-text-3">
-            {t('files.total', { count: listResult.data?.total ?? 0 })}
-          </span>
-          <div className="flex-1" />
-          <SearchField
-            aria-label={t('files.search')}
-            placeholder={t('files.search')}
-            value={keyword}
-            onChange={(event) => setKeyword(event.target.value)}
-            containerClassName="w-[calc(220px*var(--app-scale))]"
-          />
-          <div className="flex gap-1">
+            <span className="text-xs text-text-3">
+              {t('files.total', { count: listResult.data?.total ?? 0 })}
+            </span>
+          </DataToolbarGroup>
+          <DataToolbarGroup align="end">
+            <SearchField
+              aria-label={t('files.search')}
+              placeholder={t('files.search')}
+              value={keyword}
+              onChange={(event) => setKeyword(event.target.value)}
+              containerClassName="w-[calc(220px*var(--app-scale))]"
+            />
             <Button
               variant={view === 'grid' ? 'secondary' : 'ghost'}
               size="icon-sm"
@@ -211,28 +214,28 @@ export function FilesScene({
             >
               <List />
             </Button>
-          </div>
-          {canUpload && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setName(t('files.defaultFolderName'));
-                  setNameMode('folder');
-                }}
-              >
-                <FolderPlus data-icon="inline-start" />
-                {t('files.actions.newFolder')}
-              </Button>
-              <Button size="sm" onClick={() => setUploadOpen(true)}>
-                <Upload data-icon="inline-start" />
-                {t('files.actions.upload')}
-              </Button>
-            </>
-          )}
-        </div>
-        <div className="min-h-[calc(420px*var(--app-scale))] p-5 pt-0">
+            {canUpload && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setName(t('files.defaultFolderName'));
+                    setNameMode('folder');
+                  }}
+                >
+                  <FolderPlus data-icon="inline-start" />
+                  {t('files.actions.newFolder')}
+                </Button>
+                <Button size="sm" onClick={() => setUploadOpen(true)}>
+                  <Upload data-icon="inline-start" />
+                  {t('files.actions.upload')}
+                </Button>
+              </>
+            )}
+          </DataToolbarGroup>
+        </DataToolbar>
+        <PagePaneBody className="min-h-[calc(420px*var(--app-scale))]">
           {view === 'grid' ? (
             <QueryState
               data={listResult.data}
@@ -249,7 +252,7 @@ export function FilesScene({
                     <Button
                       key={entry.id}
                       variant="outline"
-                      className="h-auto min-h-[calc(130px*var(--app-scale))] flex-col px-4 py-5"
+                      className="h-auto min-h-[calc(108px*var(--app-scale))] flex-col px-3 py-3"
                       aria-label={
                         entry.kind === 'folder'
                           ? `${t('files.actions.openFolder')} ${entry.name}`
@@ -257,7 +260,7 @@ export function FilesScene({
                       }
                       onClick={() => open(entry)}
                     >
-                      {entry.kind === 'folder' ? <Folder className="size-8" /> : <FileText className="size-8" />}
+                      {entry.kind === 'folder' ? <Folder className="size-6" /> : <FileText className="size-6" />}
                       <span className="max-w-full truncate">{entry.name}</span>
                       <span className="text-xs font-normal text-text-3">
                         {formatFileSize(entry, t('files.folderUnit'))}
@@ -282,7 +285,7 @@ export function FilesScene({
               loadingText={t('files.loading')}
             />
           )}
-        </div>
+        </PagePaneBody>
       </PageSurface>
 
       <UploadFileDialog

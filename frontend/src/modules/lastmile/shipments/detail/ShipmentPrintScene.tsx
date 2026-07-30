@@ -67,9 +67,9 @@ export function ShipmentPrintScene({ id, onBack }: { id: string; onBack: () => v
         </Button>
       </div>
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_calc(320px*var(--app-scale))]">
-        <Card className="bg-surface-2">
-          <CardContent className="flex justify-center p-8">
-            <div className="w-[calc(400px*var(--app-scale))] border border-black bg-white p-4 text-black">
+        <Card spacing="comfortable" className="bg-surface-2">
+          <CardContent className="flex justify-center">
+            <div className="w-[calc(400px*var(--app-scale))] border border-black bg-white px-4 py-4 text-black">
               <div className="flex justify-between border-b-2 border-black pb-3 text-xl font-black">
                 <span>DHL</span>
                 <span className="text-sm">PAKET</span>

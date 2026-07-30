@@ -26,12 +26,12 @@ export function RegisterScene({ onGoLogin }: { onGoLogin: () => void }) {
     return (
       <AuthPageLayout>
         <div className="text-center">
-          <CheckCircle2 className="mx-auto size-14 text-success" />
-          <h1 className="mt-5 text-2xl font-bold">{t('auth.registerPage.success')}</h1>
+          <CheckCircle2 className="mx-auto size-10 text-success" />
+          <h1 className="mt-4 text-xl font-bold">{t('auth.registerPage.success')}</h1>
           <p className="mt-2 text-sm text-text-3">
             {t('auth.registerPage.successDesc', { email: registeredEmail })}
           </p>
-          <Button block size="lg" className="mt-7" onClick={onGoLogin}>
+          <Button block className="mt-5" onClick={onGoLogin}>
             {t('auth.registerPage.goLogin')}
           </Button>
         </div>
@@ -47,9 +47,9 @@ export function RegisterScene({ onGoLogin }: { onGoLogin: () => void }) {
           register.mutate({ name: form.name, email: form.email, password: form.password, agree: true });
         }}
       >
-        <h1 className="ui-page-title text-3xl font-extrabold">{t('auth.registerPage.title')}</h1>
+        <h1 className="ui-page-title text-2xl font-bold">{t('auth.registerPage.title')}</h1>
         <p className="mt-2 text-sm text-text-3">{t('auth.registerPage.desc')}</p>
-        <div className="mt-7 grid gap-4">
+        <div className="mt-5 grid gap-3">
           {(['name', 'email'] as const).map((key) => (
             <Field key={key}>
               <FieldLabel htmlFor={`register-${key}`} required>
@@ -87,7 +87,7 @@ export function RegisterScene({ onGoLogin }: { onGoLogin: () => void }) {
             <span>{t('auth.registerPage.agree')}</span>
           </label>
           {error && <FieldError role="alert">{error}</FieldError>}
-          <Button type="submit" block size="lg" disabled={!valid} loading={register.isPending}>
+          <Button type="submit" block disabled={!valid} loading={register.isPending}>
             {t('auth.registerPage.submit')}
           </Button>
           <p className="text-center text-sm text-text-3">

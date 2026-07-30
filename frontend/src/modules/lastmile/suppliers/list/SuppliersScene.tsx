@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { DataTable } from '@/components/pro/DataTable';
+import { DataToolbar, DataToolbarGroup } from '@/components/pro/DataToolbar';
 import { DataTableRowActions } from '@/components/pro/DataTableRowActions';
 import { PageFrame, PageSurface } from '@/components/pro/PageScaffold';
 import { SearchField } from '@/components/pro/SearchField';
@@ -81,28 +82,31 @@ export function SuppliersScene({
   ];
   return (
     <PageFrame breadcrumbs={[{ label: t('common.subsystem') }, { label: t('suppliers.title') }]}>
-      <div className="mb-4">
+      <div className="mb-3">
         <h1 className="ui-page-title text-xl font-semibold">{t('suppliers.title')}</h1>
         <p className="mt-1 text-sm text-text-3">{t('suppliers.description')}</p>
       </div>
       <PageSurface>
-        <div className="flex items-center gap-3 p-5">
-          <SearchField
-            aria-label={t('suppliers.search')}
-            placeholder={t('suppliers.search')}
-            value={keyword}
-            onChange={(event) => onKeywordChange(event.currentTarget.value)}
-            containerClassName="w-[calc(260px*var(--app-scale))]"
-          />
-          <div className="flex-1" />
-          {matchPermission({ permissions, systemAdmin }, 'lastmile:supplier:create') && (
-            <Button onClick={() => setCreating(true)}>
-              <Plus data-icon="inline-start" />
-              {t('suppliers.create')}
-            </Button>
-          )}
-        </div>
-        <div className="px-5 pb-5">
+        <DataToolbar variant="surface" aria-label={t('suppliers.title')}>
+          <DataToolbarGroup>
+            <SearchField
+              aria-label={t('suppliers.search')}
+              placeholder={t('suppliers.search')}
+              value={keyword}
+              onChange={(event) => onKeywordChange(event.currentTarget.value)}
+              containerClassName="w-[calc(240px*var(--app-scale))]"
+            />
+          </DataToolbarGroup>
+          <DataToolbarGroup align="end">
+            {matchPermission({ permissions, systemAdmin }, 'lastmile:supplier:create') && (
+              <Button size="sm" onClick={() => setCreating(true)}>
+                <Plus data-icon="inline-start" />
+                {t('suppliers.create')}
+              </Button>
+            )}
+          </DataToolbarGroup>
+        </DataToolbar>
+        <div className="px-3 pt-3">
           <DataTable
             columns={columns}
             data={result.data?.list ?? []}

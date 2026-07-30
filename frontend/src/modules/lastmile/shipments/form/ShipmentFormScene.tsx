@@ -166,7 +166,7 @@ export function ShipmentFormScene({
               {parcels.fields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="grid items-end gap-3 rounded-10 border border-border p-3 md:grid-cols-[1.3fr_1fr_80px_100px_110px_110px_auto]"
+                  className="grid items-end gap-3 rounded-10 border border-border px-3 py-2.5 md:grid-cols-[1.3fr_1fr_80px_100px_110px_110px_auto]"
                 >
                   <TextField
                     name={`parcels.${index}.name`}

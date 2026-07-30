@@ -74,7 +74,7 @@ export function MessagesScene({ permissions, systemAdmin = false }: { permission
       className="h-[calc(100vh-3.5rem)] overflow-hidden"
     >
       <PageSurface className="min-h-0 flex-1">
-        <div className="flex items-end justify-between gap-4 border-b border-(--page-section-divider) px-5 pt-4">
+        <div className="flex items-end justify-between gap-3 border-b border-(--page-section-divider) px-3 pt-2.5">
           <PageTabs
             value={status}
             items={tabs}
@@ -122,7 +122,7 @@ export function MessagesScene({ permissions, systemAdmin = false }: { permission
               meta: message.occurredAt.slice(5, 16),
             }))}
           />
-          <section className="min-h-0 min-w-0 flex-1 overflow-y-auto p-7">
+          <section className="min-h-0 min-w-0 flex-1 overflow-y-auto p-4">
             {selected ? (
               <article>
                 <div className="flex items-center justify-between gap-4">
@@ -140,16 +140,16 @@ export function MessagesScene({ permissions, systemAdmin = false }: { permission
                     </Button>
                   )}
                 </div>
-                <h1 className="mt-4 text-xl font-semibold text-text">{selected.title}</h1>
-                <div className="mt-3 flex items-center gap-4 border-b border-(--page-section-divider) pb-5 text-sm text-text-3">
+                <h1 className="mt-3 text-lg font-semibold text-text">{selected.title}</h1>
+                <div className="mt-2 flex items-center gap-3 border-b border-(--page-section-divider) pb-3 text-xs text-text-3">
                   <span>{t('messages.from', { from: selected.from })}</span>
                   <span>{selected.occurredAt}</span>
                 </div>
-                <p className="mt-5 max-w-3xl text-sm leading-7 text-text-2">{selected.body}</p>
+                <p className="mt-4 max-w-3xl text-sm leading-6 text-text-2">{selected.body}</p>
                 {canHandleApproval &&
                   selected.category === 'approval' &&
                   selected.approvalStatus === 'pending' && (
-                    <div className="mt-7 flex gap-3">
+                    <div className="mt-5 flex gap-2">
                       <Button
                         loading={handleApproval.isPending}
                         onClick={() => handleApproval.mutate({ id: selected.id, action: 'approve' })}
@@ -166,12 +166,12 @@ export function MessagesScene({ permissions, systemAdmin = false }: { permission
                     </div>
                   )}
                 {selected.approvalStatus === 'approved' && (
-                  <Badge className="mt-7" variant="success">
+                  <Badge className="mt-5" variant="success">
                     {t('messages.approval.approved')}
                   </Badge>
                 )}
                 {selected.approvalStatus === 'rejected' && (
-                  <Badge className="mt-7" variant="danger">
+                  <Badge className="mt-5" variant="danger">
                     {t('messages.approval.rejected')}
                   </Badge>
                 )}

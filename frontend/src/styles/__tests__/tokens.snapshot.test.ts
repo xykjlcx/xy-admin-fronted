@@ -214,8 +214,8 @@ test('Claude 视觉契约的共享几何只能由 base profile 定义', () => {
     '--nav-item-h: calc(36px * var(--app-scale));',
     '--nav-subitem-h: calc(34px * var(--app-scale));',
     '--nav-icon-size: calc(16px * var(--app-scale));',
-    '--page-frame-px: calc(22px * var(--app-scale));',
-    '--page-frame-py: calc(16px * var(--app-scale));',
+    '--page-frame-px: calc(18px * var(--app-scale));',
+    '--page-frame-py: calc(14px * var(--app-scale));',
     '--table-header-h: calc(38px * var(--app-scale));',
     '--table-row-h: calc(44px * var(--app-scale));',
     '--table-cell-px: calc(12px * var(--app-scale));',
@@ -1100,11 +1100,11 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(pageScaffoldSource).toContain('bg-(--page-surface-bg)');
   expect(pageScaffoldSource).toContain('shadow-(--page-surface-shadow)');
   expect(pageTransitionSource).toContain('className="flex min-h-full flex-col"');
-  expect(css).toContain('--page-frame-px: calc(22px * var(--app-scale));');
-  expect(css).toContain('--page-frame-py: calc(16px * var(--app-scale));');
+  expect(css).toContain('--page-frame-px: calc(18px * var(--app-scale));');
+  expect(css).toContain('--page-frame-py: calc(14px * var(--app-scale));');
   expect(css).toContain('--page-frame-flex: 0 0 auto;');
   expect(css).toContain('--page-frame-min-h: 0px;');
-  expect(css).toContain('--page-breadcrumb-mb: calc(10px * var(--app-scale));');
+  expect(css).toContain('--page-breadcrumb-mb: calc(8px * var(--app-scale));');
   expect(css).toContain('--page-surface-flex: 0 0 auto;');
   expect(css).toContain('--page-surface-min-h: calc(640px * var(--app-scale));');
   expect(css).toContain('--page-frame-bg: var(--pro-page-bg);');
@@ -1114,9 +1114,9 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(animatedTabsSource).toContain('px-(--page-tabs-px)');
   expect(animatedTabsSource).toContain('pt-(--page-tabs-pt)');
   expect(animatedTabsSource).toContain('gap-(--page-tabs-gap)');
-  expect(css).toContain('--page-tabs-px: calc(24px * var(--app-scale));');
-  expect(css).toContain('--page-tabs-pt: calc(18px * var(--app-scale));');
-  expect(css).toContain('--page-tabs-gap: calc(28px * var(--app-scale));');
+  expect(css).toContain('--page-tabs-px: calc(10px * var(--app-scale));');
+  expect(css).toContain('--page-tabs-pt: calc(10px * var(--app-scale));');
+  expect(css).toContain('--page-tabs-gap: calc(20px * var(--app-scale));');
   for (const source of [membersSceneSource, deptSceneSource]) {
     expect(source).toContain('px-(--page-scene-px)');
     expect(source).toContain('py-(--page-scene-py)');
@@ -1124,21 +1124,21 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   }
   expect(deptTreeSource).toContain('px-(--page-side-px)');
   expect(deptTreeSource).toContain('py-(--page-side-py)');
-  expect(css).toContain('--page-scene-px: calc(24px * var(--app-scale));');
-  expect(css).toContain('--page-scene-py: calc(18px * var(--app-scale));');
-  expect(css).toContain('--page-side-px: calc(12px * var(--app-scale));');
-  expect(css).toContain('--page-side-py: calc(16px * var(--app-scale));');
+  expect(css).toContain('--page-scene-px: calc(18px * var(--app-scale));');
+  expect(css).toContain('--page-scene-py: calc(14px * var(--app-scale));');
+  expect(css).toContain('--page-side-px: calc(10px * var(--app-scale));');
+  expect(css).toContain('--page-side-py: calc(12px * var(--app-scale));');
   expect(globalCss).toContain("[data-shell-layout='inset']");
-  expect(globalCss).toContain('--page-frame-px: calc(20px * var(--app-scale));');
+  expect(globalCss).toContain('--page-frame-px: calc(18px * var(--app-scale));');
   expect(globalCss).toContain('--page-frame-py: calc(14px * var(--app-scale));');
   expect(globalCss).toContain('--page-frame-flex: 1 1 auto;');
   expect(globalCss).toContain('--page-frame-min-h: 100%;');
-  expect(globalCss).toContain('--page-breadcrumb-mb: calc(12px * var(--app-scale));');
+  expect(globalCss).toContain('--page-breadcrumb-mb: calc(8px * var(--app-scale));');
   expect(globalCss).toContain('--page-surface-flex: 1 1 auto;');
   expect(globalCss).toContain('--page-surface-min-h: 0px;');
   expect(globalCss).toContain('--page-tabs-px: var(--page-side-px);');
-  expect(globalCss).toContain('--page-tabs-pt: calc(12px * var(--app-scale));');
-  expect(globalCss).toContain('--page-tabs-gap: calc(24px * var(--app-scale));');
+  expect(globalCss).toContain('--page-tabs-pt: calc(10px * var(--app-scale));');
+  expect(globalCss).toContain('--page-tabs-gap: calc(20px * var(--app-scale));');
   expect(globalCss).toContain('--page-scene-px: calc(18px * var(--app-scale));');
   expect(globalCss).toContain('--page-scene-py: calc(14px * var(--app-scale));');
   expect(globalCss).toContain('--page-side-px: calc(10px * var(--app-scale));');

@@ -41,11 +41,11 @@ export function ProfilePreferencesPanel() {
       </QueryState>
     );
   return (
-    <Card>
+    <Card spacing="compact">
       <CardHeader>
         <CardTitle>{t('profile.sections.preferences')}</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-5">
+      <CardContent className="grid gap-3">
         <Field>
           <FieldLabel>{t('profile.preferences.language')}</FieldLabel>
           <SelectControl

@@ -321,7 +321,7 @@ export function PagePaneHeader({
       data-slot="page-pane-header"
       role={ariaLabel ? 'toolbar' : undefined}
       aria-label={ariaLabel}
-      className="flex min-h-[calc(52px*var(--app-scale))] items-center justify-between gap-3 border-b border-(--page-section-divider) px-4 py-2"
+      className="flex min-h-[calc(44px*var(--app-scale))] items-center justify-between gap-3 border-b border-(--page-section-divider) px-3 py-2"
     >
       <div data-slot="page-pane-heading" className="flex min-w-0 flex-col items-start">
         <h2 className="max-w-full truncate text-sm font-semibold text-text">{title}</h2>
@@ -409,7 +409,7 @@ export function PageSection({
           {leading ? (
             <span
               data-slot="page-section-leading"
-              className="flex size-9 shrink-0 items-center justify-center rounded-10 bg-(--accent-emphasis-soft) text-(--accent-emphasis)"
+              className="flex size-8 shrink-0 items-center justify-center rounded-10 bg-(--accent-emphasis-soft) text-(--accent-emphasis)"
             >
               {leading}
             </span>

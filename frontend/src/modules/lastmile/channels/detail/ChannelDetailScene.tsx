@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { matchPermission } from '@/lib/permission';
 import { toast } from 'sonner';
 import { DescriptionList } from '@/components/pro/DescriptionList';
-import { PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
+import { SummaryStrip } from '@/components/pro/DataToolbar';
+import { DetailHeader, PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
 import { QueryState } from '@/components/pro/QueryState';
 import { StatusBadge } from '@/components/pro/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -66,67 +67,61 @@ export function ChannelDetailScene({
   }));
   return (
     <PageFrame breadcrumbs={[{ label: t('channels.title') }, { label: t('channels.detailTitle') }]}>
-      <Card>
-        <CardContent className="flex flex-wrap items-center gap-4 p-5">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="ui-page-title text-xl font-semibold">{channel.name}</h1>
-              <StatusBadge tone={channelKindTone[channel.kind]}>
-                {t(`channels.kind.${channel.kind}`)}
-              </StatusBadge>
-              <StatusBadge tone={channel.enabled ? 'success' : 'neutral'}>
-                {t(channel.enabled ? 'common.enabled' : 'common.disabled')}
-              </StatusBadge>
-            </div>
-            <p className="mt-1 text-sm text-text-3">
-              {channel.code} · {channel.supplier} · {channel.carrier}
-            </p>
-          </div>
-          <div className="flex-1" />
-          <Button variant="outline" onClick={onBack}>
-            {t('common.back')}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={onEdit}
-            disabled={!matchPermission({ permissions, systemAdmin }, 'lastmile:channel:update')}
-          >
-            {t('common.edit')}
-          </Button>
-          <Button variant="outline" loading={test.isPending} onClick={() => test.mutate()}>
-            {t('channels.test')}
-          </Button>
-          <Button
-            variant={channel.enabled ? 'destructive' : 'primary'}
-            loading={toggle.isPending}
-            onClick={() => toggle.mutate(!channel.enabled)}
-          >
-            {t(channel.enabled ? 'common.disabled' : 'common.enabled')}
-          </Button>
-        </CardContent>
-      </Card>
-      <div className="my-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {[
-          [t('channels.summary.sevenDays'), '8,462'],
-          [t('channels.summary.successRate'), '99.28%'],
-          [t('channels.summary.countries'), String(channel.countries.length)],
-          [t('channels.summary.lastSync'), channel.updatedAt],
-        ].map(([label, value]) => (
-          <Card key={label}>
-            <CardContent className="p-4">
-              <p className="text-xs text-text-3">{label}</p>
-              <p className="mt-2 text-lg font-semibold">{value}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <Card>
+      <DetailHeader
+        title={channel.name}
+        subtitle={`${channel.code} · ${channel.supplier} · ${channel.carrier}`}
+        status={
+          <>
+            <StatusBadge tone={channelKindTone[channel.kind]}>
+              {t(`channels.kind.${channel.kind}`)}
+            </StatusBadge>
+            <StatusBadge tone={channel.enabled ? 'success' : 'neutral'}>
+              {t(channel.enabled ? 'common.enabled' : 'common.disabled')}
+            </StatusBadge>
+          </>
+        }
+        actions={
+          <>
+            <Button variant="outline" onClick={onBack}>
+              {t('common.back')}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onEdit}
+              disabled={!matchPermission({ permissions, systemAdmin }, 'lastmile:channel:update')}
+            >
+              {t('common.edit')}
+            </Button>
+            <Button variant="outline" loading={test.isPending} onClick={() => test.mutate()}>
+              {t('channels.test')}
+            </Button>
+            <Button
+              variant={channel.enabled ? 'destructive' : 'primary'}
+              loading={toggle.isPending}
+              onClick={() => toggle.mutate(!channel.enabled)}
+            >
+              {t(channel.enabled ? 'common.disabled' : 'common.enabled')}
+            </Button>
+          </>
+        }
+      />
+      <SummaryStrip
+        className="mb-3"
+        items={[
+          { label: t('channels.summary.sevenDays'), value: '8,462' },
+          { label: t('channels.summary.successRate'), value: '99.28%' },
+          { label: t('channels.summary.countries'), value: String(channel.countries.length) },
+          { label: t('channels.summary.lastSync'), value: channel.updatedAt },
+        ]}
+      />
+      <Card spacing="compact">
         <CardHeader className="border-b border-border">
           <PageTabs value={tab} items={tabs} onValueChange={setTab} />
         </CardHeader>
-        <CardContent className="p-5">
+        <CardContent>
           {tab === 'basic' && (
             <DescriptionList
+              columns={4}
               items={[
                 { label: t('channels.fields.name'), value: channel.name },
                 { label: t('channels.fields.code'), value: channel.code },
@@ -141,6 +136,7 @@ export function ChannelDetailScene({
           )}{' '}
           {tab === 'api' && (
             <DescriptionList
+              columns={3}
               items={[
                 { label: 'Base URL', value: channel.api.baseUrl },
                 { label: t('channels.api.productCode'), value: channel.api.productCode },

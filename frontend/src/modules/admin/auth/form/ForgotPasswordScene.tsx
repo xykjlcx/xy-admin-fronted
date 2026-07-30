@@ -28,10 +28,10 @@ export function ForgotPasswordScene({ onGoLogin }: { onGoLogin: () => void }) {
     return (
       <AuthPageLayout>
         <div className="text-center">
-          <MailCheck className="mx-auto size-14 text-success" />
-          <h1 className="mt-5 text-2xl font-bold">{t('auth.forgotPage.success')}</h1>
+          <MailCheck className="mx-auto size-10 text-success" />
+          <h1 className="mt-4 text-xl font-bold">{t('auth.forgotPage.success')}</h1>
           <p className="mt-2 text-sm leading-6 text-text-3">{t('auth.forgotPage.successDesc', sent)}</p>
-          <div className="mt-7 grid gap-3">
+          <div className="mt-5 grid gap-3">
             <Button
               block
               onClick={() => {
@@ -57,9 +57,9 @@ export function ForgotPasswordScene({ onGoLogin }: { onGoLogin: () => void }) {
           submit();
         }}
       >
-        <h1 className="ui-page-title text-3xl font-extrabold">{t('auth.forgotPage.title')}</h1>
+        <h1 className="ui-page-title text-2xl font-bold">{t('auth.forgotPage.title')}</h1>
         <p className="mt-2 text-sm text-text-3">{t('auth.forgotPage.desc')}</p>
-        <div className="mt-7 grid gap-4">
+        <div className="mt-5 grid gap-3">
           <Field>
             <FieldLabel htmlFor="forgot-email" required>
               {t('auth.forgotPage.email')}

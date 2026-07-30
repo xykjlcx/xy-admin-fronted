@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { DescriptionList } from '@/components/pro/DescriptionList';
-import { PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
+import { DetailHeader, PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
 import { QueryState } from '@/components/pro/QueryState';
 import { StatusBadge } from '@/components/pro/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -37,32 +37,28 @@ export function SupplierDetailScene({ id, onBack }: { id: string; onBack: () => 
   }));
   return (
     <PageFrame breadcrumbs={[{ label: t('suppliers.title') }, { label: t('suppliers.detailTitle') }]}>
-      <Card>
-        <CardContent className="flex items-center gap-4 p-5">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="ui-page-title text-xl font-semibold">{supplier.name}</h1>
-              <StatusBadge tone={supplier.enabled ? 'success' : 'neutral'}>
-                {t(supplier.enabled ? 'common.enabled' : 'common.disabled')}
-              </StatusBadge>
-            </div>
-            <p className="mt-1 text-sm text-text-3">
-              {supplier.code} · {supplier.type}
-            </p>
-          </div>
-          <div className="flex-1" />
+      <DetailHeader
+        title={supplier.name}
+        subtitle={`${supplier.code} · ${supplier.type}`}
+        status={
+          <StatusBadge tone={supplier.enabled ? 'success' : 'neutral'}>
+            {t(supplier.enabled ? 'common.enabled' : 'common.disabled')}
+          </StatusBadge>
+        }
+        actions={
           <Button variant="outline" onClick={onBack}>
             {t('common.back')}
           </Button>
-        </CardContent>
-      </Card>
-      <Card className="mt-4">
+        }
+      />
+      <Card spacing="compact">
         <CardHeader className="border-b border-border">
           <PageTabs value={tab} items={tabs} onValueChange={setTab} />
         </CardHeader>
-        <CardContent className="p-5">
+        <CardContent>
           {tab === 'basic' && (
             <DescriptionList
+              columns={3}
               items={[
                 { label: t('suppliers.fields.name'), value: supplier.name },
                 { label: t('suppliers.fields.type'), value: supplier.type },
@@ -77,6 +73,7 @@ export function SupplierDetailScene({ id, onBack }: { id: string; onBack: () => 
           )}
           {tab === 'credentials' && (
             <DescriptionList
+              columns={3}
               items={[
                 { label: t('suppliers.fields.account'), value: supplier.credentialLabel },
                 { label: 'Base URL', value: supplier.baseUrl },

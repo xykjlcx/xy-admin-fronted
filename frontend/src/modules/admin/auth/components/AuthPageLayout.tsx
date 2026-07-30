@@ -18,7 +18,7 @@ export function AuthPageLayout({ children }: { children: ReactNode }) {
     <main className="fixed inset-0 z-[200] flex bg-surface text-text">
       <section className="relative hidden w-[44%] max-w-[calc(640px*var(--app-scale))] flex-col overflow-hidden bg-surface-2 px-[calc(48px*var(--app-scale))] py-[calc(48px*var(--app-scale))] lg:flex">
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-11 bg-(--accent-emphasis) font-bold text-(--button-primary-fg)">
+          <div className="flex size-8 items-center justify-center rounded-10 bg-(--accent-emphasis) text-sm font-bold text-(--button-primary-fg)">
             {t('auth.hero.mark')}
           </div>
           <div>
@@ -44,7 +44,7 @@ export function AuthPageLayout({ children }: { children: ReactNode }) {
         </div>
       </section>
       <section className="flex min-w-0 flex-1 flex-col overflow-y-auto px-[calc(40px*var(--app-scale))] py-[calc(32px*var(--app-scale))]">
-        <div className="flex justify-end gap-5 text-sm text-text-2">
+        <div className="flex justify-end gap-3 text-sm text-text-2">
           <Button
             type="button"
             variant="text"

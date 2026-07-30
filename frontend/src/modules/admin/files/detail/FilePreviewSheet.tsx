@@ -95,10 +95,10 @@ export function FilePreviewSheet({
                 </Button>
               )}
             </div>
-            <div className="m-4 flex min-h-0 flex-1 items-center justify-center rounded-12 bg-surface-2 p-8 text-center">
+            <div className="m-4 flex min-h-0 flex-1 items-center justify-center rounded-12 bg-surface-2 p-4 text-center">
               <div>
-                <FileText className="mx-auto size-12 text-text-3" />
-                <p className="mt-3 text-sm text-text-2">
+                <FileText className="mx-auto size-8 text-text-3" />
+                <p className="mt-2 text-sm text-text-2">
                   {file.kind === 'image' ? labels.imagePreview : labels.documentPreview}
                 </p>
               </div>

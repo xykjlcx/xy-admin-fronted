@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { DataTable } from '@/components/pro/DataTable';
+import { DataToolbar, DataToolbarGroup } from '@/components/pro/DataToolbar';
 import { PageFrame, PageSurface } from '@/components/pro/PageScaffold';
 import { SearchField } from '@/components/pro/SearchField';
 import { Button } from '@/components/ui/button';
@@ -60,23 +61,26 @@ export function CustomersScene({
   return (
     <PageFrame breadcrumbs={[{ label: t('common.subsystem') }, { label: t('customers.title') }]}>
       <PageSurface>
-        <div className="flex flex-wrap items-center gap-3 p-5">
-          <SearchField
-            aria-label={t('customers.search')}
-            placeholder={t('customers.search')}
-            value={keyword}
-            onChange={(event) => onKeywordChange(event.currentTarget.value)}
-            containerClassName="w-[calc(280px*var(--app-scale))]"
-          />
-          <div className="flex-1" />
-          {matchPermission({ permissions, systemAdmin }, 'lastmile:customer:create') && (
-            <Button onClick={() => setCreating(true)}>
-              <Plus data-icon="inline-start" />
-              {t('customers.create')}
-            </Button>
-          )}
-        </div>
-        <div className="px-5 pb-5">
+        <DataToolbar variant="surface" aria-label={t('customers.title')}>
+          <DataToolbarGroup>
+            <SearchField
+              aria-label={t('customers.search')}
+              placeholder={t('customers.search')}
+              value={keyword}
+              onChange={(event) => onKeywordChange(event.currentTarget.value)}
+              containerClassName="w-[calc(260px*var(--app-scale))]"
+            />
+          </DataToolbarGroup>
+          <DataToolbarGroup align="end">
+            {matchPermission({ permissions, systemAdmin }, 'lastmile:customer:create') && (
+              <Button size="sm" onClick={() => setCreating(true)}>
+                <Plus data-icon="inline-start" />
+                {t('customers.create')}
+              </Button>
+            )}
+          </DataToolbarGroup>
+        </DataToolbar>
+        <div className="px-3 pt-3">
           <DataTable
             columns={customerColumns(labels, onDetail)}
             data={result.data?.list ?? []}
@@ -91,7 +95,7 @@ export function CustomersScene({
             onRowClick={(row) => onDetail(row.id)}
           />
         </div>
-        <div className="border-t border-border px-5 py-3 text-sm text-text-3">
+        <div className="mt-3 border-t border-border px-3 py-2 text-sm text-text-3">
           {t('common.total', { count: result.data?.total ?? 0 })}
         </div>
       </PageSurface>

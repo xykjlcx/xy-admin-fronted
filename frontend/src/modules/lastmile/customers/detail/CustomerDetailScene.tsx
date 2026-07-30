@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { matchPermission } from '@/lib/permission';
 import { toast } from 'sonner';
 import { DescriptionList } from '@/components/pro/DescriptionList';
-import { PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
+import { SummaryStrip } from '@/components/pro/DataToolbar';
+import { DetailHeader, PageFrame, PageTabs, type PageTabItem } from '@/components/pro/PageScaffold';
 import { QueryState } from '@/components/pro/QueryState';
 import { StatusBadge } from '@/components/pro/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -64,47 +65,37 @@ export function CustomerDetailScene({
     : 0;
   return (
     <PageFrame breadcrumbs={[{ label: t('customers.title') }, { label: t('customers.detailTitle') }]}>
-      <Card>
-        <CardContent className="flex flex-wrap items-center gap-4 p-5">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="ui-page-title text-xl font-semibold">{customer.name}</h1>
-              <StatusBadge tone={customerTone[customer.status]}>
-                {t(`customers.status.${customer.status}`)}
-              </StatusBadge>
-            </div>
-            <p className="mt-1 text-sm text-text-3">
-              {customer.code} · {customer.type}
-            </p>
-          </div>
-          <div className="flex-1" />
+      <DetailHeader
+        title={customer.name}
+        subtitle={`${customer.code} · ${customer.type}`}
+        status={
+          <StatusBadge tone={customerTone[customer.status]}>
+            {t(`customers.status.${customer.status}`)}
+          </StatusBadge>
+        }
+        actions={
           <Button variant="outline" onClick={onBack}>
             {t('common.back')}
           </Button>
-        </CardContent>
-      </Card>
-      <div className="my-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {[
-          [t('customers.summary.balance'), money(customer.balance)],
-          [t('customers.summary.credit'), money(customer.credit)],
-          [t('customers.summary.usage'), `${usage}%`],
-          [t('customers.summary.pricing'), customer.pricingPlan],
-        ].map(([label, value]) => (
-          <Card key={label}>
-            <CardContent className="p-4">
-              <p className="text-xs text-text-3">{label}</p>
-              <p className="mt-2 text-lg font-semibold">{value}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <Card>
+        }
+      />
+      <SummaryStrip
+        className="mb-3"
+        items={[
+          { label: t('customers.summary.balance'), value: money(customer.balance) },
+          { label: t('customers.summary.credit'), value: money(customer.credit) },
+          { label: t('customers.summary.usage'), value: `${usage}%` },
+          { label: t('customers.summary.pricing'), value: customer.pricingPlan },
+        ]}
+      />
+      <Card spacing="compact">
         <CardHeader className="border-b border-border">
           <PageTabs value={tab} items={tabs} onValueChange={setTab} />
         </CardHeader>
-        <CardContent className="p-5">
+        <CardContent>
           {tab === 'basic' && (
             <DescriptionList
+              columns={3}
               items={[
                 { label: t('customers.fields.name'), value: customer.name },
                 { label: t('customers.fields.code'), value: customer.code },

@@ -60,11 +60,11 @@
 
 ## 批次 F：全量生产页面迁移
 
-- [ ] Admin 全部页面迁移。
-- [ ] Lastmile 全部列表、详情、表单迁移。
-- [ ] Auth 页面迁移。
-- [ ] Dialog、Sheet、Popover、Dropdown、表单特殊状态收敛。
-- [ ] 清零本轮定义的页面视觉越权，运行全量测试后提交。
+- [x] Admin 全部页面迁移。
+- [x] Lastmile 全部列表、详情、表单迁移。
+- [x] Auth 页面迁移。
+- [x] Dialog、Sheet、Popover、Dropdown、表单特殊状态收敛。
+- [x] 清零本轮定义的页面视觉越权，运行全量测试后提交。
 
 ## 批次 G：矩阵验收与收口
 
