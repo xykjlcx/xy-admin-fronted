@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Sera-Admin
-description: shadcn 官方 base-sera 风格的后台适配版。复用 zinc 中性黑白色阶（与 shadcn 逐字节同色，D1），差异化全交几何与排印——直角（radius-factor 0）、按钮大写 + 加宽字距 + 40px 高、输入框只剩底边线、表头大写、卡片 32 内距、badge 裸文字。整体气质：印刷体标签语言的 editorial 克制。
+description: shadcn 官方 base-sera 风格的后台适配版。复用 zinc 中性黑白色阶（与 shadcn 逐字节同色，D1），在共享紧凑几何上保留直角、按钮大写与加宽字距、底边线输入、表头大写、badge 裸文字。整体气质：印刷体标签语言的 editorial 克制。
 colors:
   primary: "#18181b"
   primary-fg: "#fafafa"
@@ -56,7 +56,7 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.body-md}"
     rounded: "{rounded.md}"
-    height: 40px
+    height: 36px
     padding: 0 12px
   text-input-focused:
     backgroundColor: transparent
@@ -67,22 +67,22 @@ components:
     textColor: "{colors.on-primary}"
     typography: "{typography.button}"
     rounded: "{rounded.md}"
-    height: 40px
-    padding: 0 24px
+    height: 32px
+    padding: 0 18px
   button-secondary:
     backgroundColor: "{colors.surface-muted}"
     textColor: "{colors.ink}"
     typography: "{typography.button}"
     rounded: "{rounded.md}"
-    height: 40px
-    padding: 0 24px
+    height: 32px
+    padding: 0 18px
   button-outline:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.button}"
     rounded: "{rounded.md}"
-    height: 40px
-    padding: 0 24px
+    height: 32px
+    padding: 0 18px
   select-option-highlighted:
     backgroundColor: "{colors.surface-muted}"
     textColor: "{colors.ink}"
@@ -95,14 +95,14 @@ components:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.muted}"
     typography: "{typography.caption}"
-    height: 48px
+    height: 38px
     padding: 0 12px
   badge:
     rounded: 0px
     padding: 0px 0px
   card:
     rounded: 0px
-    padding: 32px
+    padding: 16px
 ---
 
 ## Overview
@@ -123,7 +123,7 @@ sera 官方本身不携带独立色系——它的身份**全部落在几何与�
   （button `0.1em`、label `0.025em`、表头 / 标题 `0.05em`）。走 `--*-transform` / `--*-tracking` token 束。
 - **底边线输入**：输入框透明底 + 仅底边着色（`{colors.hairline}`），其余三边透明；聚焦 / 校验错误
   **只变底边颜色、不起 ring**（对比 shadcn 的全框 + 晕染 ring）。
-- **疏朗尺寸**：按钮 40px 高（h-10）、卡片 32px 内距 + `shadow-sm`、表头 48px、badge 裸文字（无内距 / 无底色）。
+- **共享密度**：输入 36px、默认按钮 32px、表头 38px、数据行 44px、默认卡片内距 16px；只保留 `shadow-sm`、直角与 badge 裸文字等气质差异。
 - **ring 收窄**：按钮 / 复选 / 开关的 focus ring 从 3px 收到 2px（`--focus-ring`）。
 
 ## Colors
@@ -142,8 +142,7 @@ accent 默认 = shadcn 中性黑；差异化不靠颜色，靠几何 / 排印。
 
 ## Layout
 
-4px 网格。按钮 40px 高（h-10）、px-6；输入 40px 高、水平内距 12px（`--field-px`，见有意偏离）；
-表头 48px（h-12）；卡片 32px 内距（spacing-8）。
+4px 网格。几何与其他 flavor 共享：默认按钮 32px、输入 36px、表头 38px、数据行 44px、默认卡片内距 16px。
 
 ## Elevation & Depth
 
@@ -157,15 +156,15 @@ accent 默认 = shadcn 中性黑；差异化不靠颜色，靠几何 / 排印。
 
 ## Components
 
-- **`text-input`**：**透明底** + 仅底边 `{colors.hairline}` 线、40px 高、直角（无圆角）。
+- **`text-input`**：**透明底** + 仅底边 `{colors.hairline}` 线、36px 高、直角（无圆角）。
   聚焦 `text-input-focused` 只把底边变主色（`--field-border-focus` = primary），**无 ring**；
   校验错误只把底边变红（`aria-invalid` → `border-b-destructive`），**红 ring 关闭**（`--field-ring-invalid: transparent`）。
   **disabled/readonly 同为透明底**（`--field-bg-disabled/--field-bg-readonly: transparent`）——base 默认灰块在无底输入族里会呈"假四边框"（2026-07-08 菜单弹窗实测）；不可用态区分靠文字降级 + cursor。
-- **`button-primary`**：墨黑底 + `{colors.on-primary}` 字、40px 高、直角、`uppercase` + `0.1em` 字距、无阴影。
+- **`button-primary`**：墨黑底 + `{colors.on-primary}` 字、32px 高、直角、`uppercase` + `0.1em` 字距、无阴影。
 - **`button-secondary` / `button-outline`**：surface-muted / canvas 底、`{colors.ink}` 字，其余同 primary 几何。
-- **`table-header`**：canvas 底 + `{colors.muted}` 小号文字、48px 高、`uppercase` + `0.05em` 字距。
+- **`table-header`**：canvas 底 + `{colors.muted}` 小号文字、38px 高、`uppercase` + `0.05em` 字距。
 - **`badge`**：裸文字——无内距、无底色、直角（`--badge-px/py: 0`、10px 字号、semibold）。
-- **`card`**：直角 + 32px 内距 + `shadow-sm`（`--card-spacing: 32`、`--card-shadow: --shadow-card-sm`）。
+- **`card`**：直角 + 默认 16px 内距 + `shadow-sm`；紧凑/舒适档继续由 Card `spacing` 语义选择。
 
 ## 有意偏离（Intentional Deviations）
 
@@ -189,8 +188,8 @@ accent 默认 = shadcn 中性黑；差异化不靠颜色，靠几何 / 排印。
 
 - 输入框只用底边线表达聚焦 / 错误，绝不加 ring。
 - 按钮 / 标签 / 表头一律 `uppercase` + 加宽字距，保持印刷体标签语言。
-- 控件保持直角（`rounded-none`）、40px 高、疏朗内距。
-- badge 用裸文字，card 用 `shadow-sm` + 32 内距。
+- 控件保持直角（`rounded-none`），几何遵循共享紧凑契约。
+- badge 用裸文字，card 保留 `shadow-sm`，但不再扩大内距。
 
 ### Don't
 

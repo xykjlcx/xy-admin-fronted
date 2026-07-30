@@ -155,9 +155,9 @@ const MUST_CONTAIN = [
   '--radius-factor: 0.28;',
   '--radius-factor: 1.55;',
   '--field-px: calc(12px * var(--app-scale));',
-  '--table-cell-px: var(--field-px);',
+  '--table-cell-px: calc(12px * var(--app-scale));',
   '--table-row-h: calc(44px * var(--app-scale));',
-  '--table-header-h: calc(48px * var(--app-scale));',
+  '--table-header-h: calc(38px * var(--app-scale));',
   // Badge 几何/排印挂点（S3，值=现状，零视觉变化）：radius/px/py/font-size/font-weight
   '--badge-radius: var(--radius-5);',
   '--badge-px: calc(8px * var(--app-scale));',
@@ -174,8 +174,10 @@ const MUST_CONTAIN = [
   '--avatar-badge-bg: var(--pri);',
   '--avatar-badge-fg: var(--on-pri);',
   // Card 几何挂点（S4，值=统一档，零视觉变化）：spacing/radius/shadow
-  '--card-spacing: calc(24px * var(--app-scale));',
-  '--card-radius: var(--radius-12);',
+  '--card-spacing: calc(16px * var(--app-scale));',
+  '--card-spacing-compact: calc(14px * var(--app-scale));',
+  '--card-spacing-comfortable: calc(24px * var(--app-scale));',
+  '--card-radius: var(--radius-10);',
   '--card-shadow: var(--shadow-card);',
   // 排印 transform/tracking 挂点（S5 批1，值=none/normal，零视觉变化，sera 批2 兑现）
   '--button-transform: none;',
@@ -189,19 +191,71 @@ const MUST_CONTAIN = [
 ];
 test.each(MUST_CONTAIN)('token %s 与原型一致', (t) => expect(css).toContain(t));
 
-// field 水平内距分档（密度轴）：feishu/shadcn 紧凑 12px（:root 默认），claude 宽松 16px
-test('field 水平内距分档：claude 覆盖为宽松档', () => {
-  expect(css).toContain('--field-px: calc(12px * var(--app-scale));'); // :root 默认（feishu/shadcn）
-  expect(css).toContain('--field-px: calc(16px * var(--app-scale));'); // claude 覆盖
+test('field 水平内距跨 flavor 共享', () => {
+  expect(css).toContain('--field-px: calc(12px * var(--app-scale));');
 });
 
-// table 密度分档（几何轴）：cell 内距链 field-px；行高 feishu/shadcn 44、claude 48；表头 feishu/claude 48、shadcn 44
-test('table 密度分档：claude 行高宽松、shadcn 表头收紧', () => {
-  expect(css).toContain('--table-cell-px: var(--field-px);'); // cell 内距链 field-px 单一真相源
-  expect(css).toContain('--table-row-h: calc(44px * var(--app-scale));'); // :root 数据行 44（feishu/shadcn）
-  expect(css).toContain('--table-header-h: calc(48px * var(--app-scale));'); // :root 表头 48（feishu/claude）
-  expect(css).toContain('--table-row-h: calc(48px * var(--app-scale));'); // claude 覆盖：数据行 48
-  expect(css).toContain('--table-header-h: calc(44px * var(--app-scale));'); // shadcn 覆盖：表头 44
+test('table 密度跨 flavor 共享 Claude 视觉契约', () => {
+  expect(css).toContain('--table-cell-px: calc(12px * var(--app-scale));');
+  expect(css).toContain('--table-row-h: calc(44px * var(--app-scale));');
+  expect(css).toContain('--table-header-h: calc(38px * var(--app-scale));');
+});
+
+test('Claude 视觉契约的共享几何只能由 base profile 定义', () => {
+  const sharedGeometry = [
+    '--shell-header-h: calc(52px * var(--app-scale));',
+    '--shell-sidebar-w: calc(200px * var(--app-scale));',
+    '--shell-sidebar-collapsed-w: calc(60px * var(--app-scale));',
+    '--nav-item-h: calc(36px * var(--app-scale));',
+    '--nav-subitem-h: calc(34px * var(--app-scale));',
+    '--nav-icon-size: calc(16px * var(--app-scale));',
+    '--page-frame-px: calc(22px * var(--app-scale));',
+    '--page-frame-py: calc(16px * var(--app-scale));',
+    '--table-header-h: calc(38px * var(--app-scale));',
+    '--table-row-h: calc(44px * var(--app-scale));',
+    '--table-cell-px: calc(12px * var(--app-scale));',
+    '--choice-size: calc(14px * var(--app-scale));',
+    '--card-spacing: calc(16px * var(--app-scale));',
+    '--card-spacing-compact: calc(14px * var(--app-scale));',
+    '--card-spacing-comfortable: calc(24px * var(--app-scale));',
+    '--metric-min-h: calc(96px * var(--app-scale));',
+    '--metric-spacing: calc(14px * var(--app-scale));',
+    '--detail-aside-w: calc(296px * var(--app-scale));',
+  ];
+
+  for (const declaration of sharedGeometry) {
+    expect(css).toContain(declaration);
+  }
+
+  const forbiddenProfileDensityTokens = [
+    '--field-px',
+    '--control-btn-md',
+    '--table-cell-px',
+    '--table-row-h',
+    '--table-header-h',
+    '--card-spacing',
+    '--shell-header-h',
+    '--shell-sidebar-w',
+    '--shell-sidebar-collapsed-w',
+    '--nav-item-h',
+    '--nav-subitem-h',
+    '--nav-icon-size',
+    '--page-frame-px',
+    '--page-frame-py',
+    '--choice-size',
+    '--metric-min-h',
+    '--metric-spacing',
+    '--detail-aside-w',
+  ];
+
+  for (const profile of ['claude', 'feishu', 'sera', 'shadcn']) {
+    const source = readFileSync(`src/styles/tokens.${profile}.css`, 'utf8');
+    for (const token of forbiddenProfileDensityTokens) {
+      expect(source, `${profile} 不得覆盖共享密度 ${token}`).not.toMatch(
+        new RegExp(`${token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*:`),
+      );
+    }
+  }
 });
 
 test('显示比例三档走 --app-scale token 乘法，不再使用 CSS zoom 反向补偿', () => {
@@ -375,10 +429,8 @@ test('sera 第四风格 profile 落地：直角/大写/下划线关键值', () =
   // 颜色抄 shadcn 明暗块（D1）——断言 sera 自家明暗块存在
   expect(css).toContain("[data-flavor='sera'][data-mode='light']");
   expect(css).toContain("[data-flavor='sera'][data-mode='dark']");
-  // 几何（量）：直角、按钮 40 高、卡片 32 内距 + shadow-sm、badge 裸文字、ring 收窄 2px
+  // flavor 只保留形状、阴影与排印差异，不再覆盖共享密度。
   expect(css).toContain("html:not([data-radius])[data-flavor='sera'] { --radius-factor: 0; }");
-  expect(css).toContain('--control-btn-md: calc(40px * var(--app-scale));');
-  expect(css).toContain('--card-spacing: calc(32px * var(--app-scale));');
   expect(css).toContain('--card-shadow: var(--shadow-card-sm);');
   expect(css).toContain('--badge-px: 0;');
   expect(css).toContain('--badge-py: 0;');
@@ -433,10 +485,10 @@ test('圆角因子三档 + 四条 calc 公式', () => {
   expect(css).toContain('--radius-xl: calc(14px * var(--radius-factor) * var(--app-scale));');
 });
 
-test('形态轴控制按钮高度与字重，按钮消费独立 button token', () => {
+test('flavor 只控制按钮字重与状态气质，不再覆盖按钮高度', () => {
   expect(css).toContain("[data-flavor='claude'] {");
   expect(css).toContain('--field-bg: var(--surface);');
-  expect(css).toContain('--control-btn-md: calc(36px * var(--app-scale));');
+  expect(css).toContain('--control-btn-md: calc(32px * var(--app-scale));');
   expect(css).toContain("[data-flavor='shadcn'] {");
   expect(css).toContain('--field-bg: transparent;');
   const shadcnBlock = css.slice(
@@ -1010,11 +1062,11 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(pageScaffoldSource).toContain('bg-(--page-surface-bg)');
   expect(pageScaffoldSource).toContain('shadow-(--page-surface-shadow)');
   expect(pageTransitionSource).toContain('className="flex min-h-full flex-col"');
-  expect(css).toContain('--page-frame-px: calc(28px * var(--app-scale));');
-  expect(css).toContain('--page-frame-py: calc(20px * var(--app-scale));');
+  expect(css).toContain('--page-frame-px: calc(22px * var(--app-scale));');
+  expect(css).toContain('--page-frame-py: calc(16px * var(--app-scale));');
   expect(css).toContain('--page-frame-flex: 0 0 auto;');
   expect(css).toContain('--page-frame-min-h: 0px;');
-  expect(css).toContain('--page-breadcrumb-mb: calc(16px * var(--app-scale));');
+  expect(css).toContain('--page-breadcrumb-mb: calc(10px * var(--app-scale));');
   expect(css).toContain('--page-surface-flex: 0 0 auto;');
   expect(css).toContain('--page-surface-min-h: calc(640px * var(--app-scale));');
   expect(css).toContain('--page-frame-bg: var(--pro-page-bg);');

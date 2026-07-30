@@ -65,22 +65,22 @@ components:
     textColor: "{colors.on-primary}"
     typography: "{typography.button}"
     rounded: "{rounded.md}"
-    height: 36px
-    padding: 0 16px
+    height: 32px
+    padding: 0 18px
   button-secondary:
     backgroundColor: "{colors.surface-muted}"
     textColor: "{colors.ink}"
     typography: "{typography.button}"
     rounded: "{rounded.md}"
-    height: 36px
-    padding: 0 16px
+    height: 32px
+    padding: 0 18px
   button-outline:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.button}"
     rounded: "{rounded.md}"
-    height: 36px
-    padding: 0 16px
+    height: 32px
+    padding: 0 18px
   select-option-highlighted:
     backgroundColor: "{colors.surface-muted}"
     textColor: "{colors.ink}"
@@ -93,14 +93,14 @@ components:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.muted}"
     typography: "{typography.caption}"
-    height: 44px
+    height: 38px
     padding: 0 12px
   badge:
     rounded: 5px
     padding: 2px 8px
   card:
     rounded: 12px
-    padding: 24px
+    padding: 16px
 ---
 
 ## Overview
@@ -141,7 +141,8 @@ shadcn/ui 官方风格（new-york 线 / zinc 基色）是工程模板的中性�
 
 ## Layout
 
-4px 网格，控件高 36px（input/button 官方源码 h-9）、input 内边距 12px（px-3）/ button 16px（px-4）。
+4px 网格；共享后台契约采用输入 36px、默认按钮 32px、表头 38px、数据行 44px、默认卡片内距 16px。
+shadcn 只保留中性灰阶、圆角、焦点和字重气质，不覆盖密度。
 
 ## Elevation & Depth
 
@@ -164,7 +165,7 @@ shadcn/ui 官方风格（new-york 线 / zinc 基色）是工程模板的中性�
   `{colors.ink}` 字；选中项靠 check 图标标识，不靠颜色。
 - **`table-header`**：白底（或 muted 底）+ `{colors.muted}` 小号文字。
 - **`badge`**：5px 圆角（走 `--radius-5`）、内距 2px/8px、12px 字号、medium 500 字重；几何/排印三 flavor 统一（挂点 `--badge-*`）。原型无 badge，值 = 脚手架现状；官方 registry 对照见 `research/registry-badge-card-values.md`。
-- **`card`**：12px 圆角（走 `--radius-12`）、内距 24px（=现状主流 p-6）、`--shadow-card` 投影；`border` + surface 底，标题走页面卡片惯例（text-base/semibold）；几何走挂点 `--card-*` 三 flavor 统一。dashboard 现存 p-5/p-6 为散写遗留，纵切迁移时收敛到 `--card-spacing`；flavor 档差（claude 宽松 / sera 32+shadow-sm）S5 激活。官方 registry 对照见 `research/registry-badge-card-values.md`。
+- **`card`**：默认内距 16px；紧凑区块 14px；表单和打印场景 24px。三档只由 Card `spacing` 语义选择，flavor 不覆盖密度。
 
 ## Do's and Don'ts
 
@@ -172,7 +173,7 @@ shadcn/ui 官方风格（new-york 线 / zinc 基色）是工程模板的中性�
 
 - focus 一律用半透明晕染 ring，边框只到中灰为止。
 - 高亮/选中用中性灰 + 图标语义，保持全界面无彩色。
-- 控件保持 36px 高度（h-9）和 10px 圆角。
+- 输入保持 36px，默认按钮保持 32px，并延续 10px 圆角气质。
 - 用字重（600/500/400）做层次，别用颜色。
 
 ### Don't

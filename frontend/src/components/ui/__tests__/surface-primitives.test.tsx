@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -141,6 +142,33 @@ test('SheetContent 各方向使用本地抽屉动画而不是 shadcn 默认 slid
     expect(content?.className).not.toContain('slide-in-from');
     unmount();
   }
+});
+
+test('Card 用受控 spacing 语义切换内距，不接受页面级 padding 约定', () => {
+  render(
+    <>
+      <Card>
+        <CardContent>默认面板</CardContent>
+      </Card>
+      <Card spacing="compact">
+        <CardContent>紧凑区块</CardContent>
+      </Card>
+      <Card spacing="comfortable">
+        <CardContent>舒适表单</CardContent>
+      </Card>
+    </>,
+  );
+
+  expect(screen.getByText('默认面板').closest('[data-slot="card"]')).toHaveAttribute(
+    'data-spacing',
+    'default',
+  );
+  expect(screen.getByText('紧凑区块').closest('[data-slot="card"]')).toHaveClass(
+    '[--card-spacing:var(--card-spacing-compact)]',
+  );
+  expect(screen.getByText('舒适表单').closest('[data-slot="card"]')).toHaveClass(
+    '[--card-spacing:var(--card-spacing-comfortable)]',
+  );
 });
 
 test('DialogContent 和 SheetContent 使用统一关闭按钮视觉', () => {

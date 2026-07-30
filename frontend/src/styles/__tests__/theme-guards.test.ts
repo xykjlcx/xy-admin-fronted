@@ -3,6 +3,10 @@ import { resolve } from 'node:path';
 
 const projectRoot = resolve(__dirname, '../../..');
 const baselinePath = resolve(__dirname, 'theme-token-violations-baseline.json');
+const visualGeometryBaselinePath = resolve(
+  __dirname,
+  'visual-geometry-violations-baseline.json',
+);
 
 function tokenProfileFiles() {
   return readdirSync(resolve(projectRoot, 'src/styles'))
@@ -214,6 +218,19 @@ function countForbiddenClasses(file: string) {
   }, 0);
 }
 
+function countVisualGeometryViolations(file: string) {
+  const source = readProjectFile(file);
+  return {
+    cardPadding: [
+      ...source.matchAll(
+        /<CardContent\b[\s\S]*?className=(?:"[^"]*\bp-(?:\d|\[)|\{[^}]*\bp-(?:\d|\[))/g,
+      ),
+    ].length,
+    arbitraryRadius: [...source.matchAll(/rounded-\[/g)].length,
+    inlineStyle: [...source.matchAll(/\bstyle=\{\{/g)].length,
+  };
+}
+
 function classNameBoundaryRe(className: string) {
   const escaped = className.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`(?<![\\w-])${escaped}(?![\\w-])`, 'g');
@@ -295,6 +312,26 @@ test('基础状态 class 命中数必须受 baseline 棘轮约束', () => {
 
   expect(current).toEqual(baseline);
   expect(Object.keys(baseline).sort()).toEqual(Object.keys(baselineNotes).sort());
+});
+
+test('业务页面 Card padding、任意圆角和内联 style 必须受 baseline 棘轮约束', () => {
+  expect(
+    existsSync(visualGeometryBaselinePath),
+    'visual-geometry-violations-baseline.json must exist',
+  ).toBe(true);
+  const baseline = JSON.parse(readFileSync(visualGeometryBaselinePath, 'utf8')) as Record<
+    string,
+    { cardPadding: number; arbitraryRadius: number; inlineStyle: number }
+  >;
+  const current: typeof baseline = {};
+
+  for (const file of collectScopedFiles(['src/modules', 'src/routes'])) {
+    if (!/\.tsx$/.test(file) || file.includes('/__tests__/')) continue;
+    const violations = countVisualGeometryViolations(file);
+    if (Object.values(violations).some((count) => count > 0)) current[file] = violations;
+  }
+
+  expect(current).toEqual(baseline);
 });
 
 test('已完成 token 化的 UI/Pro/Shell/样板页不得回退到 primitive 状态 class', () => {

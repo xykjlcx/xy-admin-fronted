@@ -1,0 +1,16 @@
+stage: batch-b
+branch: codex/metabuilder-fullstack
+head: 618b32e
+completed:
+  - v2 视觉规格获用户批准
+  - 当前分支与独立嵌套仓库边界已确认
+  - 批次 A 共享几何、flavor 密度守卫、Card spacing 语义与设计值表
+in_progress:
+  - 批次 B Shell 与基础控件
+verified:
+  - git 工作区除 banking-vsa 外无脏文件
+  - 主题守卫 200 项通过
+  - design lint 0 errors
+  - TypeScript noEmit 通过
+blocked: []
+next_action: 先写 Shell 几何消费者失败测试，再迁移三种布局与导航

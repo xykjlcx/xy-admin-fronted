@@ -1,7 +1,7 @@
 /* src/styles/tokens.sera.css —— sera 风格自包含 profile（第四风格，S5 北极星验收）。
    颜色抄 shadcn 明暗块（D1：sera 官方本无自带色系，复用 zinc 黑白硬朗基线贴 editorial 气质，
-   差异化全交几何/排印，零幻想色轴）。几何=直角（radius-factor 0）、按钮 40 高、卡片 32 内距+shadow-sm、
-   badge 裸文字、ring 收窄 2px。排印束=uppercase + 加宽字距（tracking 用 em 原值，不乘 --app-scale）。
+   差异化交给颜色、圆角、阴影与排印，不再覆盖共享密度。排印束=uppercase + 加宽字距
+   （tracking 用 em 原值，不乘 --app-scale）。
    输入族=透明底 + 仅底边线：几何由 global.css D4 唯一型分支落，颜色/无 ring 由本文件 field token 落。 */
 
 [data-flavor='sera'][data-mode='light'] {
@@ -30,11 +30,7 @@
   --field-bg-readonly: transparent;
   --field-border: var(--border);
   --field-ring-invalid: transparent;
-  /* 几何（量）：直角起步的疏朗版式。 */
-  --control-btn-md: calc(40px * var(--app-scale));
   --button-font-weight: 600;
-  --table-row-h: calc(48px * var(--app-scale));
-  --card-spacing: calc(32px * var(--app-scale));
   --card-shadow: var(--shadow-card-sm);
   --badge-px: 0;
   --badge-py: 0;

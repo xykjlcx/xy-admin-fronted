@@ -103,7 +103,7 @@ components:
     backgroundColor: transparent
     textColor: "{colors.ink}"
     typography: "{typography.body-md}"
-    height: 48px
+    height: 38px
     padding: 0 12px
   sidebar:
     backgroundColor: "{colors.sidebar}"
@@ -112,8 +112,8 @@ components:
     rounded: 5px
     padding: 2px 8px
   card:
-    rounded: 12px
-    padding: 24px
+    rounded: 8px
+    padding: 16px
 ---
 
 ## Overview
@@ -159,7 +159,7 @@ divider N900@15%。主蓝保留 admin 实测 `#3370FF`（主应用当代蓝 `#14
 ## Layout
 
 4px 基础网格；控件间距 8/12px，区块间距 16/24px。密度倾向紧凑：
-表格实测（2026-07-08 admin.feishu.cn 真机 computed style）：表头行 48px、数据行 44px、单元格水平内距 12px、字号 14px、行分隔 1px hairline。旧「≈40px / 真身 28-32」估值作废，以实测为准。
+共享后台契约采用表头 38px、数据行 44px、单元格水平内距 12px；这是对 Claude Design 原型与飞书任务密度的工程化融合值，flavor 不再覆盖。
 
 ## Elevation & Depth
 
@@ -183,7 +183,7 @@ divider N900@15%。主蓝保留 admin 实测 `#3370FF`（主应用当代蓝 `#14
 - **`nav-item-current`**：同 option 选中语义（浅蓝底 + 蓝字）。
 - **`table-header`**：**透明底**（不是灰底表头）、`{colors.ink}` 文字、字重 400。
 - **`badge`**：5px 圆角（走 `--radius-5`）、内距 2px/8px、12px 字号、medium 500 字重；7 语义色（neutral/primary/success/warning/danger/purple/teal）各走软底 + 前景，几何/排印三 flavor 统一（挂点 `--badge-*`）。原型无 badge，值 = 脚手架现状；官方 registry 对照见 `research/registry-badge-card-values.md`。
-- **`card`**：12px 圆角（走 `--radius-12`）、内距 24px（=现状主流 p-6）、`--shadow-card` 投影；`border` + surface 底，标题走页面卡片惯例（text-base/semibold）；几何走挂点 `--card-*` 三 flavor 统一。dashboard 现存 p-5/p-6 为散写遗留，纵切迁移时收敛到 `--card-spacing`；flavor 档差（claude 宽松 / sera 32+shadow-sm）S5 激活。官方 registry 对照见 `research/registry-badge-card-values.md`。
+- **`card`**：默认内距 16px；紧凑区块 14px；表单和打印场景 24px。三档只由 Card `spacing` 语义选择，flavor 不覆盖密度。
 
 ## Do's and Don'ts
 

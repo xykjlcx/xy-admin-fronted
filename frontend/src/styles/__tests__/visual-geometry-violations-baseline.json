@@ -1,0 +1,77 @@
+{
+  "src/modules/admin/auth/list/LoginScene.tsx": {
+    "cardPadding": 0,
+    "arbitraryRadius": 0,
+    "inlineStyle": 2
+  },
+  "src/modules/admin/company/detail/CompanyScene.tsx": {
+    "cardPadding": 1,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/admin/pages/dashboard/index.tsx": {
+    "cardPadding": 2,
+    "arbitraryRadius": 0,
+    "inlineStyle": 1
+  },
+  "src/modules/lastmile/carriers/detail/CarrierDetailScene.tsx": {
+    "cardPadding": 2,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/channels/detail/ChannelDetailScene.tsx": {
+    "cardPadding": 3,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/channels/list/ChannelsScene.tsx": {
+    "cardPadding": 1,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/customers/detail/CustomerDetailScene.tsx": {
+    "cardPadding": 3,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/overview/list/OverviewScene.tsx": {
+    "cardPadding": 1,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/shipments/detail/ShipmentDetailScene.tsx": {
+    "cardPadding": 4,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/shipments/detail/ShipmentPrintScene.tsx": {
+    "cardPadding": 1,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/shipments/detail/ShipmentTrackScene.tsx": {
+    "cardPadding": 1,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/shipments/form/ShipmentFormScene.tsx": {
+    "cardPadding": 1,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/shipments/list/ShipmentsScene.tsx": {
+    "cardPadding": 1,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/modules/lastmile/suppliers/detail/SupplierDetailScene.tsx": {
+    "cardPadding": 2,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  },
+  "src/routes/_auth/dev/theme-states.tsx": {
+    "cardPadding": 1,
+    "arbitraryRadius": 0,
+    "inlineStyle": 0
+  }
+}

@@ -3,15 +3,23 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 // Card 原语：结构照 shadcn 官方惯例（data-slot 齐全），几何全走 --card-* 挂点。
-// spacing/radius/shadow 默认旧三套 flavor 统一（S4 值=统一档），flavor 档差 S5 sera 激活。
-// 局部 [--card-spacing:...] 变量模式不采用——直接消费全局 token，更简单。
+// spacing 是内容语义，不是主题或用户密度轴；业务层只能选受控档位，不能覆盖 Card padding。
 
-function Card({ className, ...props }: React.ComponentProps<'div'>) {
+type CardSpacing = 'compact' | 'default' | 'comfortable';
+
+function Card({
+  className,
+  spacing = 'default',
+  ...props
+}: React.ComponentProps<'div'> & { spacing?: CardSpacing }) {
   return (
     <div
       data-slot="card"
+      data-spacing={spacing}
       className={cn(
         'flex flex-col gap-(--card-spacing) rounded-(--card-radius) border border-border bg-surface py-(--card-spacing) text-text shadow-(--card-shadow)',
+        spacing === 'compact' && '[--card-spacing:var(--card-spacing-compact)]',
+        spacing === 'comfortable' && '[--card-spacing:var(--card-spacing-comfortable)]',
         className,
       )}
       {...props}

@@ -27,9 +27,6 @@
   --field-border-focus: var(--pri);
   --field-ring-focus: color-mix(in srgb, var(--pri) 15%, transparent);
   --field-shadow: none;
-  --field-px: calc(16px * var(--app-scale));
-  --table-row-h: calc(48px * var(--app-scale));
-  --control-btn-md: calc(36px * var(--app-scale));
   --button-font-weight: 400;
   --option-fg-highlighted: var(--pri-active);
   --option-fg-selected: var(--pri-active);

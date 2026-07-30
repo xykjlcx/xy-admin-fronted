@@ -72,7 +72,7 @@ components:
     typography: "{typography.body-md}"
     rounded: "{rounded.md}"
     height: 36px
-    padding: 0 16px
+    padding: 0 12px
   text-input-focused:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
@@ -98,8 +98,8 @@ components:
     textColor: "{colors.on-primary}"
     typography: "{typography.button}"
     rounded: "{rounded.md}"
-    height: 36px
-    padding: 0 20px
+    height: 32px
+    padding: 0 18px
   button-primary-active:
     backgroundColor: "{colors.primary-active}"
     textColor: "{colors.on-primary}"
@@ -113,8 +113,8 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.button}"
     rounded: "{rounded.md}"
-    height: 36px
-    padding: 0 20px
+    height: 32px
+    padding: 0 18px
   status-success-dot:
     backgroundColor: "{colors.success}"
     rounded: "{rounded.pill}"
@@ -139,14 +139,14 @@ components:
     padding: 4px 12px
   table-header:
     typography: "{typography.caption}"
-    height: 48px
-    padding: 0 16px
+    height: 38px
+    padding: 0 12px
   badge:
     rounded: 5px
     padding: 2px 8px
   card:
-    rounded: 12px
-    padding: 24px
+    rounded: 10px
+    padding: 16px
 ---
 
 ## Overview
@@ -195,7 +195,8 @@ soft 改为 `rgba(217, 119, 87, 0.12)`；主按钮跟随官方白字取舍。边
 
 ## Layout
 
-4px 网格；后台密度取"常规"档（不追营销站的 96px 呼吸感）：卡片内边距 16-24px、控件高 36px。
+4px 网格；密度遵循共享 Claude 视觉契约：输入 36px、默认按钮 32px、表头 38px、数据行 44px、默认卡片内距 16px。
+flavor 只保留暖色、圆角、阴影和展示字体气质，不覆盖这些共享几何。
 
 ## Elevation & Depth
 
@@ -220,7 +221,7 @@ soft 改为 `rgba(217, 119, 87, 0.12)`；主按钮跟随官方白字取舍。边
   `{colors.primary-active}` 深陶土字（不用 `{colors.primary}` 做小字号文字，对比度不够）。
 - **`badge-pill`**：`{colors.surface-card}` 奶油底 + pill 圆角。
 - **`badge`**（后台徽章）：5px 圆角（走 `--radius-5`）、内距 2px/8px、12px 字号、medium 500 字重；几何/排印三 flavor 统一（挂点 `--badge-*`）。已有 `badge-pill`（L134）为 marketing 站测量，后台 badge 不采用；后台 badge 走统一挂点值。
-- **`card`**：12px 圆角（走 `--radius-12`）、内距 24px（=现状主流 p-6）、`--shadow-card` 投影；`border` + surface 底，标题走页面卡片惯例（text-base/semibold）；几何走挂点 `--card-*` 三 flavor 统一。dashboard 现存 p-5/p-6 为散写遗留，纵切迁移时收敛到 `--card-spacing`；flavor 档差（claude 宽松 32+shadow-sm）S5 激活。官方 registry 对照见 `research/registry-badge-card-values.md`。
+- **`card`**：默认内距 16px；紧凑区块 14px；表单和打印场景 24px。三档只由 Card `spacing` 语义选择，flavor 不覆盖密度。
 
 ## Do's and Don'ts
 
