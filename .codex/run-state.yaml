@@ -1,6 +1,6 @@
-stage: batch-g
+stage: complete
 branch: codex/metabuilder-fullstack
-head: b818941
+head: 8757dc7
 completed:
   - v2 视觉规格获用户批准
   - 当前分支与独立嵌套仓库边界已确认
@@ -10,8 +10,8 @@ completed:
   - 批次 D DetailWorkspace、紧凑 DescriptionList 与运单详情工作台
   - 批次 E Metric、Dashboard、尾程 Overview 与渠道 Summary Strip
   - 批次 F Admin/Lastmile/Auth 全量生产页紧凑迁移与视觉越权清零
-in_progress:
-  - 批次 G 视觉矩阵、生产构建与终审收口
+  - 批次 G 视觉矩阵、生产构建、产物净化检查与对抗终审
+in_progress: []
 verified:
   - git 工作区除 banking-vsa 外无脏文件
   - 主题守卫 200 项通过
@@ -29,5 +29,10 @@ verified:
   - Lastmile 四类详情在 1024x768 下均无横向溢出
   - Admin 文件、日志、字典、消息在 1024x768 下均无横向溢出
   - Login 1440x900 无横向溢出，页面内联视觉 style 清零
+  - 最终视觉报告包含 20 组原型/实现、3 档比例、24 格主题矩阵与 18 格布局矩阵
+  - Rail 1024px Header 竖排缺陷已修复并通过 18 格布局复测
+  - 最终 TypeScript、ESLint、775 项 Vitest、202 项主题/架构守卫与生产构建通过
+  - dist 未检出 faker、msw import 或 mockServiceWorker
+  - Impeccable detector 单次终检 0 findings
 blocked: []
-next_action: 运行四 flavor、明暗、显示比例、三布局矩阵，完成生产构建与对抗性终审
+next_action: 等待用户复看页面并决定是否继续做业务层交互或后端对接
