@@ -68,10 +68,10 @@
 
 ## 批次 G：矩阵验收与收口
 
-- [ ] Feishu 明暗 × 90/100/108 × 五个样板页面。
-- [ ] Claude/Shadcn/Sera 明暗 × 100% 风险 smoke。
-- [ ] Sidebar/Inset/Rail × 1440/1280/1024 布局 smoke。
-- [ ] 运行 TypeScript、ESLint、Vitest、theme guard、design lint、生产构建。
-- [ ] 检查构建产物无 faker、msw、mockServiceWorker。
-- [ ] 运行 Impeccable detector 和对抗性终审。
-- [ ] 把截图、DOM 尺寸和差异结论回填规格并提交。
+- [x] Feishu 明暗 × 90/100/108 × 五个样板页面。
+- [x] Claude/Shadcn/Sera 明暗 × 100% 风险 smoke。
+- [x] Sidebar/Inset/Rail × 1440/1280/1024 布局 smoke。
+- [x] 运行 TypeScript、ESLint、Vitest、theme guard、design lint、生产构建。
+- [x] 检查构建产物无 faker、msw、mockServiceWorker。
+- [x] 运行 Impeccable detector 和对抗性终审。
+- [x] 把截图、DOM 尺寸和差异结论回填规格并提交。

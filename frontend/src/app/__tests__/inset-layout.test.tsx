@@ -56,7 +56,7 @@ function renderShellWithLayout({
   layout = 'inset',
   collapsed = false,
 }: {
-  layout?: 'sidebar' | 'inset';
+  layout?: 'sidebar' | 'inset' | 'rail';
   collapsed?: boolean;
 } = {}) {
   act(() => {
@@ -188,6 +188,7 @@ test('Sidebar 布局用子系统切换和页面面包屑替代左上角品牌位
   renderShellWithLayout({ layout: 'sidebar' });
 
   expect(await screen.findByText('Users content')).toBeInTheDocument();
+  expect(document.querySelector('[data-shell-layout="sidebar"]')).toBeInTheDocument();
   const header = document.querySelector('header') as HTMLElement;
   const main = document.querySelector('#shell-main') as HTMLElement;
 
@@ -196,4 +197,11 @@ test('Sidebar 布局用子系统切换和页面面包屑替代左上角品牌位
   expect(within(header).getByText('组织与权限')).toBeInTheDocument();
   expect(within(header).getByText('成员与部门')).toBeInTheDocument();
   expect(main.querySelector('[data-slot="page-breadcrumb"]')).not.toBeInTheDocument();
+});
+
+test('Rail 布局暴露稳定的布局身份供矩阵验收', async () => {
+  renderShellWithLayout({ layout: 'rail' });
+
+  expect(await screen.findByText('Users content')).toBeInTheDocument();
+  expect(document.querySelector('[data-shell-layout="rail"]')).toBeInTheDocument();
 });

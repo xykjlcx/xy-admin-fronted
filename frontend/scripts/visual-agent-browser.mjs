@@ -600,6 +600,8 @@ function assertSeraComputedContracts(session) {
     const fieldStyle = getComputedStyle(field);
     const buttonStyle = getComputedStyle(button);
     const cardStyle = getComputedStyle(card);
+    const appScale = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-scale')) || 1;
+    const expectedCardPadding = 16 * appScale;
 
     if (!isTransparent(badgeStyle.backgroundColor)) {
       throw new Error('sera computed contract failed: badge background expected transparent, got ' + badgeStyle.backgroundColor);
@@ -616,8 +618,11 @@ function assertSeraComputedContracts(session) {
     if (buttonStyle.textTransform !== 'uppercase') {
       throw new Error('sera computed contract failed: button textTransform expected uppercase, got ' + buttonStyle.textTransform);
     }
-    if (Number.parseFloat(cardStyle.paddingTop) < 28) {
-      throw new Error('sera computed contract failed: card paddingTop expected >= 28px, got ' + cardStyle.paddingTop);
+    if (Math.abs(Number.parseFloat(cardStyle.paddingTop) - expectedCardPadding) > 0.2) {
+      throw new Error(
+        'sera computed contract failed: card paddingTop must follow shared density: ' +
+          JSON.stringify({ expectedCardPadding, actual: cardStyle.paddingTop }),
+      );
     }
     true;
     `,
@@ -705,17 +710,22 @@ function assertRoleDataPermissions(session) {
     session,
     `
     const editor = document.querySelector('[data-role-data-permission-editor]');
+    const content = editor?.querySelector('[data-role-data-permission-content]');
     const table = editor?.querySelector('table');
     const tableContainer = table?.parentElement;
     const defaultScope = editor?.querySelector('[aria-label="角色默认数据范围"]');
     const saveButton = [...(editor?.querySelectorAll('button') ?? [])].find((item) => item.textContent?.trim() === '保存数据权限');
-    if (!editor || !table || !tableContainer || !defaultScope || !saveButton) {
+    if (!editor || !content || !defaultScope || !saveButton) {
       throw new Error('data permissions editor incomplete');
     }
-    if (tableContainer.scrollWidth > tableContainer.clientWidth + 1) {
+    if (tableContainer && tableContainer.scrollWidth > tableContainer.clientWidth + 1) {
       throw new Error('data permissions table overflow: ' + tableContainer.scrollWidth + ' > ' + tableContainer.clientWidth);
     }
-    ({ tableWidth: table.scrollWidth, containerWidth: tableContainer.clientWidth });
+    ({
+      resourceState: table ? 'table' : 'empty',
+      tableWidth: table?.scrollWidth ?? 0,
+      containerWidth: tableContainer?.clientWidth ?? content.clientWidth,
+    });
     `,
   );
 }
@@ -1072,6 +1082,92 @@ async function runThemeMatrix() {
   }
 }
 
+function setLayout(session, layout) {
+  const next = { ...appearanceState, layout };
+  evalIn(
+    session,
+    `
+    localStorage.setItem('appearance', JSON.stringify({ state: ${JSON.stringify(next)}, version: 0 }));
+    true;
+    `,
+  );
+}
+
+async function runLayoutMatrix() {
+  const layoutDir = path.join(reportDir, 'layout-matrix');
+  await ensureDir(layoutDir);
+  const server = await ensureDevServer();
+  const cells = [];
+  const scenarios = [
+    { key: 'dashboard', url: '/admin/dashboard' },
+    { key: 'users', url: '/admin/users?page=1&pageSize=10&status=all&keyword=' },
+  ];
+  const viewports = [
+    { width: 1440, height: 900 },
+    { width: 1280, height: 720 },
+    { width: 1024, height: 768 },
+  ];
+  const expectedCells = 18;
+
+  try {
+    setStableMedia(appSession);
+    loginAsAdmin(appSession);
+
+    for (const layout of ['sidebar', 'inset', 'rail']) {
+      for (const currentViewport of viewports) {
+        agent(appSession, [
+          'set',
+          'viewport',
+          String(currentViewport.width),
+          String(currentViewport.height),
+        ]);
+        for (const scenario of scenarios) {
+          setLayout(appSession, layout);
+          agent(appSession, ['open', new URL(scenario.url, baseOrigin).href]);
+          agent(appSession, ['wait', '700']);
+          assertAppScreen(appSession, scenario.key);
+          assertNoHorizontalOverflow(appSession);
+          evalIn(
+            appSession,
+            `
+            const shell = document.querySelector('[data-shell-layout]');
+            if (!shell) throw new Error('layout matrix failed: shell not found');
+            if (shell.getAttribute('data-shell-layout') !== ${JSON.stringify(layout)}) {
+              throw new Error(
+                'layout matrix failed: expected ${layout}, got ' + shell.getAttribute('data-shell-layout'),
+              );
+            }
+            true;
+            `,
+          );
+          const file = path.join(
+            layoutDir,
+            `${layout}-${currentViewport.width}x${currentViewport.height}-${scenario.key}.png`,
+          );
+          agent(appSession, ['screenshot', file]);
+          cells.push({
+            layout,
+            viewport: currentViewport,
+            scenario: scenario.key,
+            file: path.relative(root, file),
+            assertions: ['page ready', 'layout applied', 'no horizontal overflow'],
+          });
+        }
+      }
+    }
+
+    return {
+      cells,
+      expectedCells,
+      actualCells: cells.length,
+      noHorizontalOverflowPassed: cells.length === expectedCells,
+      serverReused: server.reused,
+    };
+  } finally {
+    await server.stop();
+  }
+}
+
 async function writeReport(data) {
   await ensureDir(reportDir);
   const lines = [
@@ -1128,6 +1224,19 @@ async function writeReport(data) {
     }
     lines.push('');
   }
+  if (data.layout?.cells?.length) {
+    lines.push('## 布局矩阵（layout × viewport × page）', '');
+    lines.push(
+      `- 矩阵截图总数: ${data.layout.actualCells ?? data.layout.cells.length}/${data.layout.expectedCells ?? data.layout.cells.length}`,
+    );
+    lines.push(`- 水平溢出检查: ${data.layout.noHorizontalOverflowPassed ? '全部通过' : '未全部通过'}`);
+    for (const cell of data.layout.cells) {
+      lines.push(
+        `- ${cell.layout} / ${cell.viewport.width}x${cell.viewport.height} / ${cell.scenario}: ${cell.file}`,
+      );
+    }
+    lines.push('');
+  }
 
   await writeFile(path.join(reportDir, 'report.md'), `${lines.join('\n')}\n`);
   await writeFile(path.join(reportDir, 'report.json'), `${JSON.stringify(data, null, 2)}\n`);
@@ -1150,7 +1259,10 @@ async function main() {
   if (command === 'matrix' || command === 'all') {
     data.matrix = await runThemeMatrix();
   }
-  if (!['baseline', 'app', 'scale', 'matrix', 'all'].includes(command)) {
+  if (command === 'layout' || command === 'all') {
+    data.layout = await runLayoutMatrix();
+  }
+  if (!['baseline', 'app', 'scale', 'matrix', 'layout', 'all'].includes(command)) {
     throw new Error(`unknown command: ${command}`);
   }
 

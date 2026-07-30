@@ -70,7 +70,7 @@ export function SubsystemSwitcher({
         ) : (
           <button
             aria-label={active ? lv(active.label, i18n.language) : t('shell.switcher.title')}
-            className="flex h-9 items-center gap-[calc(9px*var(--app-scale))] rounded-7 pl-2.5 pr-3 hover:bg-(--nav-item-bg-hover) max-lg:px-2"
+            className="flex h-9 items-center gap-[calc(9px*var(--app-scale))] rounded-7 pl-2.5 pr-3 hover:bg-(--nav-item-bg-hover) max-xl:px-2"
           >
             <span
               className="flex size-6 shrink-0 items-center justify-center rounded-6 text-white"
@@ -78,11 +78,11 @@ export function SubsystemSwitcher({
             >
               <Icon name={active?.icon} className="size-[calc(15px*var(--app-scale))]" />
             </span>
-            <span className="text-sm font-semibold text-text max-lg:hidden">
+            <span className="text-sm font-semibold text-text max-xl:hidden">
               {active ? lv(active.label, i18n.language) : ''}
             </span>
             <ChevronDown
-              className={cn('size-3.5 text-text-3 transition-transform max-lg:hidden', open && 'rotate-180')}
+              className={cn('size-3.5 text-text-3 transition-transform max-xl:hidden', open && 'rotate-180')}
             />
           </button>
         )}

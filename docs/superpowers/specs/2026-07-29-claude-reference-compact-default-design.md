@@ -834,3 +834,42 @@ Agent Browser 在 Feishu / light / 100% / Sidebar / 1440×900 下实测：
 - 待办计数改为 Summary Strip，状态改用 StatusBadge，裸按钮和页面内联 padding 已清理；
 - 尾程 Overview 统一使用 Metric；运单、渠道列表的大 KPI 卡均降级为 Summary Strip；
 - 截图保存在忽略提交的 `frontend/test-results/claude-alignment/batch-e/`。
+
+### 18.4 批次 F：全量生产页面迁移
+
+2026-07-30 完成 Admin、Lastmile 与 Auth 的生产页面清点和迁移：
+
+- Admin 的日志、消息、文件、字典、角色审计、个人偏好与用户详情统一收紧页面内距、工具栏和内容节奏；
+- Lastmile 的客户、承运商、供应商、账单列表统一使用 `DataToolbar`，四类详情统一使用 `DetailHeader`，客户与渠道摘要统一使用 `SummaryStrip`；
+- Auth 去除页面内联视觉 style，注册、忘记密码、品牌入口和表单间距统一收紧；
+- 页面场景 token 在 Sidebar / Inset / Rail 之间共享同一组紧凑值，不再只有 Inset 布局紧凑；
+- 业务页面的 Card padding、任意圆角和内联视觉 style 棘轮基线清零。
+
+Agent Browser 在 1440×900 和 1024×768 下反向打开客户、渠道、承运商、供应商详情，以及文件、日志、字典、消息页面，全部无横向溢出。全量 Vitest 774 项通过；最终批次增加布局身份测试后为 775 项。
+
+### 18.5 批次 G：矩阵验收与终审
+
+最终聚合报告位于忽略提交的 `frontend/test-results/m0-visual/report.md`，包含：
+
+| 证据组 | 数量 | 结果 |
+| --- | ---: | --- |
+| Claude 原型基线 | 20 | 全部采集 |
+| 实现侧生产页面 | 20 | 页面文本、登录态和横向溢出断言通过 |
+| 90% / 100% / 108% | 3 档 | 浮层、抽屉、菜单弹窗及全量已完成页面通过 |
+| flavor × mode × scale | 24 / 24 | 状态应用、无横向溢出、Sera 计算样式契约通过 |
+| layout × viewport × page | 18 / 18 | Sidebar / Inset / Rail 在 1440×900、1280×720、1024×768 下通过 |
+
+20 组像素 diff 的差异范围为 2.90%–9.72%。差异主要来自实现侧保留真实路由、权限、表格列、可操作控件和本轮用 `SummaryStrip` 取代大 KPI 卡的结构决策；diff 仅作为差异定位证据，不以删真实功能或恢复大卡片换取更低比例。
+
+对抗终审发现 Rail 布局在 1024px 下子系统名称会被 Header 压成竖排。最终修正为该宽度隐藏名称与箭头、保留可访问名称和子系统图标；18 格布局矩阵复测通过。
+
+最终工程门禁：
+
+- TypeScript `--noEmit` 通过；
+- ESLint 0 error，保留 1 条 TanStack Table 与 React Compiler 的既有兼容提示；
+- Vitest 120 个测试文件、775 项测试通过；
+- theme / token / profile / architecture 守卫 202 项通过；
+- design lint 0 error，40 条已登记白名单 warning；
+- Vite 生产构建通过；
+- `dist` 未检出 `faker`、`msw` import 或 `mockServiceWorker`；
+- Impeccable detector 单次终检结果为 0。

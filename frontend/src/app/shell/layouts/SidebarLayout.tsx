@@ -22,7 +22,10 @@ export function SidebarLayout({
   const { breadcrumbs, chrome } = useShellBreadcrumbs();
 
   return (
-    <div className="h-screen relative flex w-full flex-col overflow-hidden bg-bg text-text">
+    <div
+      data-shell-layout="sidebar"
+      className="h-screen relative flex w-full flex-col overflow-hidden bg-bg text-text"
+    >
       <ShellHeader
         left={
           <div className="flex min-w-0 items-center gap-3">

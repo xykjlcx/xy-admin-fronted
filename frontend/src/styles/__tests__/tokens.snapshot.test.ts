@@ -1243,6 +1243,7 @@ test('Table / Pro / Shell 族 token 与 Step 7 合同落地', () => {
   expect(treeSource).toContain('hover:bg-(--side-list-item-bg-hover)');
   expect(menuTreeSource).not.toContain('--side-list-item');
   expect(subsystemSwitcherSource).toContain("var(--accent-emphasis)' :");
+  expect(subsystemSwitcherSource).toContain('max-xl:hidden');
   expect(roleDetailsPanelSource).toContain('text-(--accent-emphasis)');
   expect(rolePermissionEditorSource).toContain('text-(--accent-emphasis)');
   expect(rolePermissionEditorSource).toContain('bg-(--accent-emphasis-soft)');
