@@ -54,6 +54,7 @@ import {
 import { Pagination } from '@/components/pro/Pagination';
 import { SearchField } from '@/components/pro/SearchField';
 import { FileDropzone } from '@/components/pro/FileDropzone';
+import { Metric } from '@/components/pro/Metric';
 
 export const Route = createFileRoute('/_auth/dev/theme-states')({
   // dev 组件状态矩阵：仅开发态 / 视觉验收（VITE_ENABLE_VISUAL_DEBUG）可见，生产环境视同不存在。
@@ -781,6 +782,27 @@ function ThemeStatesRoute() {
           <div>
             <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.dataTableMatrix')}</p>
             <div className="grid gap-4">
+              <div className="grid gap-3 md:grid-cols-3">
+                <Metric
+                  label={t('dev.themeStates.tableName')}
+                  value="12,840"
+                  trend={{
+                    label: t('dev.themeStates.paginationRefreshing'),
+                    value: '12%',
+                    direction: 'positive',
+                  }}
+                />
+                <Metric
+                  label={t('dev.themeStates.tableStatus')}
+                  value="-8"
+                  trend={{
+                    label: t('dev.themeStates.paginationRefreshing'),
+                    value: '8%',
+                    direction: 'negative',
+                  }}
+                />
+                <Metric label={t('dev.themeStates.dataTableNormal')} value="3" />
+              </div>
               <SummaryStrip
                 aria-label={t('dev.themeStates.dataTableMatrix')}
                 items={[

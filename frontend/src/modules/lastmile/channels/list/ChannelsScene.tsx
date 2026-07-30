@@ -5,11 +5,15 @@ import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { DataTable } from '@/components/pro/DataTable';
+import {
+  DataToolbar,
+  DataToolbarGroup,
+  SummaryStrip,
+} from '@/components/pro/DataToolbar';
 import { FilterSelect } from '@/components/pro/FilterSelect';
 import { PageFrame, PageSurface } from '@/components/pro/PageScaffold';
 import { SearchField } from '@/components/pro/SearchField';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { matchPermission } from '@/lib/permission';
 import {
   channelApi,
@@ -98,7 +102,7 @@ export function ChannelsScene({
   const statuses: ChannelStatusFilter[] = ['all', 'enabled', 'disabled'];
   return (
     <PageFrame breadcrumbs={[{ label: t('common.subsystem') }, { label: t('channels.title') }]}>
-      <div className="mb-4 flex flex-wrap items-end gap-3">
+      <div className="mb-3 flex flex-wrap items-end gap-3">
         <div>
           <h1 className="ui-page-title text-xl font-semibold">{t('channels.title')}</h1>
           <p className="mt-1 text-sm text-text-3">{t('channels.description')}</p>
@@ -111,68 +115,62 @@ export function ChannelsScene({
           </Button>
         )}
       </div>
-      <div className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
+      <SummaryStrip
+        className="mb-3"
+        aria-label={t('channels.title')}
+        items={[
           [
-            t('channels.metrics.enabled'),
+            `${t('channels.metrics.enabled')} · ${t('channels.metrics.channelTotal', { count: channelStats?.total ?? 0 })}`,
             String(channelStats?.enabled ?? 0),
-            t('channels.metrics.channelTotal', { count: channelStats?.total ?? 0 }),
           ],
           [
-            t('channels.metrics.countries'),
+            `${t('channels.metrics.countries')} · ${t('channels.metrics.globalCoverage')}`,
             String(channelStats?.countries ?? 0),
-            t('channels.metrics.globalCoverage'),
           ],
           [
-            t('channels.metrics.today'),
+            `${t('channels.metrics.today')} · ${t('channels.metrics.todayTrend')}`,
             new Intl.NumberFormat(i18n.language).format(channelStats?.today ?? 0),
-            t('channels.metrics.todayTrend'),
           ],
           [
-            t('channels.metrics.success'),
+            `${t('channels.metrics.success')} · ${t('channels.metrics.successTrend')}`,
             `${(channelStats?.successRate ?? 0).toFixed(2)}%`,
-            t('channels.metrics.successTrend'),
           ],
-        ].map(([label, value, hint]) => (
-          <Card key={label}>
-            <CardContent className="p-5">
-              <p className="text-sm text-text-3">{label}</p>
-              <p className="mt-2 text-2xl font-semibold text-text">{value}</p>
-              <p className="mt-1 text-xs text-text-3">{hint}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        ].map(([label, value]) => ({ label, value }))}
+      />
       <PageSurface>
-        <div className="flex flex-wrap items-center gap-3 p-5">
-          <SearchField
-            aria-label={t('channels.search')}
-            placeholder={t('channels.search')}
-            value={keyword}
-            onChange={(event) => onFiltersChange({ keyword: event.currentTarget.value, kind, status })}
-            containerClassName="w-[calc(260px*var(--app-scale))]"
-          />
-          <FilterSelect
-            label={t('channels.columns.kind')}
-            value={kind}
-            options={kinds.map((value) => ({ value, label: t(`channels.kind.${value}`) }))}
-            onValueChange={(next) => onFiltersChange({ keyword, kind: next, status })}
-          />
-          <FilterSelect
-            label={t('common.status')}
-            value={status}
-            options={statuses.map((value) => ({ value, label: t(`channels.status.${value}`) }))}
-            onValueChange={(next) => onFiltersChange({ keyword, kind, status: next })}
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onFiltersChange({ keyword: '', kind: 'all', status: 'all' })}
-          >
-            {t('channels.reset')}
-          </Button>
-        </div>
-        <div className="px-5 pb-5">
+        <DataToolbar variant="surface" aria-label={t('channels.title')}>
+          <DataToolbarGroup>
+            <SearchField
+              aria-label={t('channels.search')}
+              placeholder={t('channels.search')}
+              value={keyword}
+              onChange={(event) => onFiltersChange({ keyword: event.currentTarget.value, kind, status })}
+              containerClassName="w-[calc(240px*var(--app-scale))]"
+            />
+            <FilterSelect
+              label={t('channels.columns.kind')}
+              value={kind}
+              options={kinds.map((value) => ({ value, label: t(`channels.kind.${value}`) }))}
+              onValueChange={(next) => onFiltersChange({ keyword, kind: next, status })}
+            />
+            <FilterSelect
+              label={t('common.status')}
+              value={status}
+              options={statuses.map((value) => ({ value, label: t(`channels.status.${value}`) }))}
+              onValueChange={(next) => onFiltersChange({ keyword, kind, status: next })}
+            />
+          </DataToolbarGroup>
+          <DataToolbarGroup align="end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onFiltersChange({ keyword: '', kind: 'all', status: 'all' })}
+            >
+              {t('channels.reset')}
+            </Button>
+          </DataToolbarGroup>
+        </DataToolbar>
+        <div className="px-3 pt-3">
           <DataTable
             columns={columns}
             data={result.data?.list ?? []}

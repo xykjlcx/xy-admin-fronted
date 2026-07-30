@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { render } from '@testing-library/react';
 import { beforeAll } from 'vitest';
 import { i18nInit } from '@/lib/i18n';
@@ -39,15 +40,20 @@ const overviewFixture: DashboardOverviewDto = {
   },
 };
 
-test('dashboard 展示卡片使用 Card 原语承接 card token', () => {
+test('dashboard 指标统一使用紧凑 Metric，并移除业务内联样式和大图标底座', () => {
   render(<DashboardView overview={overviewFixture} />);
 
+  const metrics = document.querySelectorAll('[data-slot="metric"]');
   const cards = document.querySelectorAll('[data-slot="card"]');
+  const source = readFileSync('src/modules/admin/pages/dashboard/index.tsx', 'utf8');
 
-  expect(cards).toHaveLength(8);
+  expect(metrics).toHaveLength(4);
+  expect(cards).toHaveLength(4);
   for (const card of cards) {
     expect(card).toHaveClass('py-(--card-spacing)');
     expect(card).toHaveClass('rounded-(--card-radius)');
     expect(card).toHaveClass('shadow-(--card-shadow)');
   }
+  expect(source).not.toContain('style={{');
+  expect(source).not.toContain('size-[calc(48px*var(--app-scale))]');
 });

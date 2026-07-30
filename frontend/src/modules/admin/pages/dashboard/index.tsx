@@ -15,9 +15,20 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Metric } from '@/components/pro/Metric';
+import { PageFrame } from '@/components/pro/PageScaffold';
+import { SummaryStrip } from '@/components/pro/DataToolbar';
+import { StatusBadge, type StatusBadgeTone } from '@/components/pro/StatusBadge';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import {
   dashboardOverviewQuery,
   type DashboardMetricKey,
@@ -39,19 +50,19 @@ export function DashboardPage() {
 }
 
 const metrics = [
-  { key: 'newMembers', tone: 'primary', icon: UserPlus },
-  { key: 'activeUsers', tone: 'success', icon: Activity },
-  { key: 'newRoles', tone: 'violet', icon: Shield },
-  { key: 'auditLogs', tone: 'warning', icon: List },
-] satisfies { key: DashboardMetricKey; tone: keyof typeof toneClass; icon: typeof UserPlus }[];
+  { key: 'newMembers', icon: UserPlus },
+  { key: 'activeUsers', icon: Activity },
+  { key: 'newRoles', icon: Shield },
+  { key: 'auditLogs', icon: List },
+] satisfies { key: DashboardMetricKey; icon: typeof UserPlus }[];
 
 const quickEntries = [
-  { key: 'members', icon: Users, tone: 'primary' },
-  { key: 'roles', icon: Shield, tone: 'violet' },
-  { key: 'logs', icon: FileText, tone: 'teal' },
-  { key: 'files', icon: Folder, tone: 'warning' },
-  { key: 'company', icon: Building2, tone: 'cyan' },
-  { key: 'reports', icon: BarChart3, tone: 'danger' },
+  { key: 'members', icon: Users },
+  { key: 'roles', icon: Shield },
+  { key: 'logs', icon: FileText },
+  { key: 'files', icon: Folder },
+  { key: 'company', icon: Building2 },
+  { key: 'reports', icon: BarChart3 },
 ] as const;
 
 // 有真实页面的快捷入口直接导航；没有的走 stub toast（不留无反馈的假按钮）。
@@ -66,27 +77,16 @@ function isNavEntry(key: (typeof quickEntries)[number]['key']): key is keyof typ
 }
 
 const todoItems = [
-  { key: 'phone', icon: Phone, tone: 'primary', statusTone: 'primary' },
-  { key: 'onboard', icon: Check, tone: 'success', statusTone: 'danger' },
-  { key: 'interview', icon: UserPlus, tone: 'warning', statusTone: 'warning' },
+  { key: 'phone', icon: Phone, statusTone: 'neutral' },
+  { key: 'onboard', icon: Check, statusTone: 'danger' },
+  { key: 'interview', icon: UserPlus, statusTone: 'warning' },
 ] satisfies {
   key: DashboardTodoItemKey;
-  tone: keyof typeof toneClass;
-  statusTone: keyof typeof toneClass;
+  statusTone: StatusBadgeTone;
   icon: typeof UserPlus;
 }[];
 
 const todoStatKeys = ['pending', 'done', 'overdue'] satisfies DashboardTodoStatKey[];
-
-const toneClass = {
-  primary: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)',
-  success: 'bg-success-soft text-success',
-  warning: 'bg-warning-soft text-warning',
-  danger: 'bg-danger-soft text-danger',
-  violet: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)',
-  teal: 'bg-success-soft text-success',
-  cyan: 'bg-(--accent-emphasis-soft) text-(--accent-emphasis)',
-} as const;
 
 export function DashboardView({ overview }: DashboardViewProps) {
   const { t } = useTranslation('admin');
@@ -95,164 +95,111 @@ export function DashboardView({ overview }: DashboardViewProps) {
   const stub = () => toast(tCommon('shell.toast.stub'));
 
   return (
-    <section
-      className="flex min-h-0 flex-col gap-4 text-text"
-      style={{ padding: 'calc(24px * var(--app-scale)) calc(28px * var(--app-scale))' }}
-    >
+    <PageFrame breadcrumbs={[{ label: t('dashboard.navGroup') }, { label: t('dashboard.navTitle') }]}>
+      <div className="grid gap-3">
       <CompanyBanner overview={overview} />
 
-      <div className="grid gap-4 lg:grid-cols-4">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         {metrics.map((item) => {
           const Icon = item.icon;
           const metric = overview.metrics[item.key];
           return (
-            <Card key={item.key} className="gap-0">
-              <CardContent className="flex flex-1 flex-col">
-                <div className="mb-4 flex items-start justify-between">
-                  <span className="text-[calc(13px*var(--app-scale))] text-text-3">
-                    {t(`dashboard.metrics.${item.key}.label`)}
-                  </span>
-                  <span
-                    className={cn(
-                      'flex size-[calc(38px*var(--app-scale))] items-center justify-center rounded-10',
-                      toneClass[item.tone],
-                    )}
-                  >
-                    <Icon className="size-[calc(18px*var(--app-scale))]" />
-                  </span>
-                </div>
-                <div className="text-[calc(30px*var(--app-scale))] font-semibold leading-none text-text tabular-nums">
-                  {metric.value}
-                </div>
-                <div className="mt-3 flex items-center gap-1 text-[calc(12px*var(--app-scale))] text-text-3">
-                  <span>{t('dashboard.metrics.compare')}</span>
-                  <span className={cn(metric.negative ? 'text-danger' : 'text-success')}>
-                    {metric.negative ? '▼' : '▲'} {metric.delta}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+            <Metric
+              key={item.key}
+              label={t(`dashboard.metrics.${item.key}.label`)}
+              value={metric.value}
+              icon={<Icon />}
+              trend={{
+                label: t('dashboard.metrics.compare'),
+                value: metric.delta,
+                direction: metric.negative ? 'negative' : 'positive',
+              }}
+            />
           );
         })}
       </div>
 
-      <Card>
+      <Card spacing="compact">
         <CardHeader>
           <CardTitle>{t('dashboard.quick.title')}</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
+        <CardContent className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
           {quickEntries.map((item) => {
             const Icon = item.icon;
             return (
-              <button
+              <Button
                 key={item.key}
                 type="button"
-                className="flex flex-col items-center gap-3 rounded-10 p-2 text-sm text-text-2 transition-colors hover:bg-bg"
+                variant="ghost"
+                size="sm"
+                className="justify-start"
                 onClick={() => {
                   if (isNavEntry(item.key)) void navigate(quickEntryNav[item.key]);
                   else stub();
                 }}
               >
-                <span
-                  className={cn(
-                    'flex size-[calc(48px*var(--app-scale))] items-center justify-center rounded-12 text-white',
-                    quickTone(item.tone),
-                  )}
-                >
-                  <Icon className="size-[calc(22px*var(--app-scale))]" />
-                </span>
+                <Icon data-icon="inline-start" />
                 <span>{t(`dashboard.quick.${item.key}`)}</span>
-              </button>
+              </Button>
             );
           })}
         </CardContent>
       </Card>
 
-      <div className="grid min-h-0 gap-4 lg:grid-cols-[minmax(0,1fr)_calc(416px*var(--app-scale))]">
-        <Card>
-          <CardContent>
-            <div className="mb-3 flex items-center justify-between">
-              <div>
-                <h2 className="flex items-center gap-2 text-base font-semibold text-text">
-                  <span className="h-[calc(16px*var(--app-scale))] w-[calc(3px*var(--app-scale))] rounded-full bg-(--accent-emphasis)" />
-                  {t('dashboard.trend.title')}
-                </h2>
-                <p className="mt-2 text-[calc(12px*var(--app-scale))] text-text-3">
-                  {t('dashboard.trend.unit')}
-                </p>
-              </div>
-              <div className="flex rounded-10 bg-surface-2 p-1 text-[calc(12px*var(--app-scale))] text-text-2">
+      <div className="grid min-h-0 gap-3 lg:grid-cols-[minmax(0,1fr)_calc(360px*var(--app-scale))]">
+        <Card spacing="compact">
+          <CardHeader>
+            <CardTitle>{t('dashboard.trend.title')}</CardTitle>
+            <CardDescription>{t('dashboard.trend.unit')}</CardDescription>
+            <CardAction>
+              <div className="flex items-center gap-1">
                 {['month', 'quarter', 'halfYear', 'year'].map((key) => (
-                  <button
+                  <Button
                     key={key}
                     type="button"
-                    className={cn(
-                      'rounded-8 px-3 py-1.5',
-                      key === 'halfYear' ? 'bg-(--accent-emphasis) text-white shadow-card-sm' : 'hover:text-text',
-                    )}
+                    size="xs"
+                    variant={key === 'halfYear' ? 'primary' : 'ghost'}
                     onClick={stub}
                   >
                     {t(`dashboard.trend.ranges.${key}`)}
-                  </button>
+                  </Button>
                 ))}
               </div>
-            </div>
-              <TrendChart points={overview.trend} />
+            </CardAction>
+          </CardHeader>
+          <CardContent>
+            <TrendChart points={overview.trend} />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card spacing="compact">
+          <CardHeader>
+            <CardTitle>{t('dashboard.todo.title')}</CardTitle>
+          </CardHeader>
           <CardContent>
-            <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-text">
-              <span className="h-[calc(16px*var(--app-scale))] w-[calc(3px*var(--app-scale))] rounded-full bg-success" />
-              {t('dashboard.todo.title')}
-            </h2>
-            <div className="grid grid-cols-3 gap-3">
-              {todoStatKeys.map((key) => {
-                const stat = overview.todo.stats[key];
-                return (
-                  <div key={key} className="rounded-10 bg-surface-2 py-3 text-center">
-                    <div
-                      className={cn(
-                        'text-[calc(25px*var(--app-scale))] font-semibold tabular-nums',
-                        key === 'done' ? 'text-success' : key === 'overdue' ? 'text-danger' : 'text-(--accent-emphasis)',
-                      )}
-                    >
-                      {stat.value}
-                    </div>
-                    <div className="mt-1 text-[calc(12px*var(--app-scale))] text-text-3">{stat.label}</div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-4 divide-y divide-border">
+            <SummaryStrip
+              aria-label={t('dashboard.todo.title')}
+              items={todoStatKeys.map((key) => ({
+                label: overview.todo.stats[key].label,
+                value: overview.todo.stats[key].value,
+              }))}
+            />
+            <div className="mt-3 divide-y divide-border">
               {todoItems.map((item) => {
                 const Icon = item.icon;
                 const todo = overview.todo.items[item.key];
                 return (
-                  <div key={item.key} className="flex items-center gap-3 py-3">
-                    <span
-                      className={cn(
-                        'flex size-[calc(36px*var(--app-scale))] items-center justify-center rounded-10',
-                        toneClass[item.tone],
-                      )}
-                    >
-                      <Icon className="size-[calc(17px*var(--app-scale))]" />
-                    </span>
+                  <div key={item.key} className="flex items-center gap-2 py-2">
+                    <Icon data-icon="inline-start" className="size-4 shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[calc(13px*var(--app-scale))] font-medium text-text">
+                      <div className="truncate text-sm font-medium text-text">
                         {todo.title}
                       </div>
-                      <div className="mt-0.5 text-[calc(12px*var(--app-scale))] text-text-3">{todo.time}</div>
+                      <div className="mt-0.5 text-xs text-text-3">{todo.time}</div>
                     </div>
-                    <span
-                      className={cn(
-                        'rounded-6 px-2 py-1 text-[calc(12px*var(--app-scale))]',
-                        toneClass[item.statusTone],
-                      )}
-                    >
+                    <StatusBadge tone={item.statusTone}>
                       {todo.status}
-                    </span>
+                    </StatusBadge>
                   </div>
                 );
               })}
@@ -260,7 +207,8 @@ export function DashboardView({ overview }: DashboardViewProps) {
           </CardContent>
         </Card>
       </div>
-    </section>
+      </div>
+    </PageFrame>
   );
 }
 
@@ -269,26 +217,24 @@ function CompanyBanner({ overview }: { overview: DashboardOverviewDto }) {
   const { t: tCommon } = useTranslation();
 
   return (
-    <Card className="flex-row items-center justify-between px-(--card-spacing)">
-      <div className="flex min-w-0 items-center gap-4">
-        <div className="flex size-[calc(54px*var(--app-scale))] shrink-0 items-center justify-center rounded-12 bg-(--accent-emphasis) text-[calc(26px*var(--app-scale))] font-semibold text-white">
-          {overview.company.mark}
-        </div>
+    <Card spacing="compact">
+      <CardContent className="flex items-center gap-3">
+        <Avatar>
+          <AvatarFallback>{overview.company.mark}</AvatarFallback>
+        </Avatar>
         <div className="min-w-0">
           <div className="flex items-center gap-3">
-            <h1 className="ui-page-title truncate text-[calc(20px*var(--app-scale))] font-semibold text-text">
+            <h1 className="ui-page-title truncate text-xl font-semibold text-text">
               {overview.company.name}
             </h1>
-            <span className="rounded-6 bg-surface-2 px-2 py-1 text-[calc(12px*var(--app-scale))] text-text-3">
-              {overview.company.status}
-            </span>
+            <StatusBadge tone="neutral">{overview.company.status}</StatusBadge>
           </div>
-          <p className="mt-2 text-sm text-text-2">{overview.company.meta}</p>
+          <p className="mt-1 text-xs text-text-3">{overview.company.meta}</p>
         </div>
-      </div>
-      <Button type="button" size="sm" onClick={() => toast(tCommon('shell.toast.stub'))}>
-        {t('dashboard.company.action')}
-      </Button>
+        <Button className="ml-auto" type="button" size="sm" onClick={() => toast(tCommon('shell.toast.stub'))}>
+          {t('dashboard.company.action')}
+        </Button>
+      </CardContent>
     </Card>
   );
 }
@@ -346,13 +292,4 @@ function TrendChart({ points }: { points: DashboardOverviewDto['trend'] }) {
       </div>
     </div>
   );
-}
-
-function quickTone(tone: (typeof quickEntries)[number]['tone']) {
-  if (tone === 'warning') return 'bg-warning';
-  if (tone === 'danger') return 'bg-danger';
-  if (tone === 'teal') return 'bg-success';
-  if (tone === 'cyan') return 'bg-(--accent-emphasis)';
-  if (tone === 'violet') return 'bg-(--accent-emphasis)';
-  return 'bg-(--accent-emphasis)';
 }

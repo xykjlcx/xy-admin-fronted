@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Metric } from '@/components/pro/Metric';
 import { PageFrame } from '@/components/pro/PageScaffold';
 import { QueryState } from '@/components/pro/QueryState';
 import { StatusBadge, type StatusBadgeTone } from '@/components/pro/StatusBadge';
@@ -35,17 +36,16 @@ export function OverviewScene() {
         <div className="grid gap-4">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {data.stats.map((stat) => (
-              <Card key={stat.key}>
-                <CardContent className="p-5">
-                  <p className="text-sm text-text-3">{t(`overview.stats.${stat.key}`)}</p>
-                  <p className="mt-2 text-2xl font-semibold text-text">{stat.value}</p>
-                  <p className="mt-1 text-xs text-text-3">{stat.hint}</p>
-                </CardContent>
-              </Card>
+              <Metric
+                key={stat.key}
+                label={t(`overview.stats.${stat.key}`)}
+                value={stat.value}
+                trend={{ label: t('overview.realtime'), value: stat.hint }}
+              />
             ))}
           </div>
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)]">
-            <Card>
+            <Card spacing="compact">
               <CardHeader>
                 <CardTitle>{t('overview.recent')}</CardTitle>
                 <span className="text-xs text-text-3">{t('overview.realtime')}</span>
@@ -69,7 +69,7 @@ export function OverviewScene() {
                 ))}
               </CardContent>
             </Card>
-            <Card>
+            <Card spacing="compact">
               <CardHeader>
                 <CardTitle>{t('overview.channelUsage')}</CardTitle>
               </CardHeader>

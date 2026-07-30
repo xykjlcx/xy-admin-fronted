@@ -52,11 +52,11 @@
 
 ## 批次 E：Dashboard 与 Metric
 
-- [ ] 先检查 Coss，再实现或 copy-in 并 token 化 Metric。
-- [ ] Dashboard 和 Lastmile Overview 迁移统一 Metric。
-- [ ] 移除大图标底座、业务内联视觉状态和裸按钮。
-- [ ] 列表页 KPI 全部降级为 Summary Strip 或移除。
-- [ ] 运行组件测试和浏览器视觉回证后提交。
+- [x] 先检查 Coss，再实现或 copy-in 并 token 化 Metric。
+- [x] Dashboard 和 Lastmile Overview 迁移统一 Metric。
+- [x] 移除大图标底座、业务内联视觉状态和裸按钮。
+- [x] 列表页 KPI 全部降级为 Summary Strip 或移除。
+- [x] 运行组件测试和浏览器视觉回证后提交。
 
 ## 批次 F：全量生产页面迁移
 

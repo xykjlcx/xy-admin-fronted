@@ -14,7 +14,7 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 test('运营概览展示指标、最近运单和渠道排行', async () => {
-  render(
+  const { container } = render(
     <QueryClientProvider client={new QueryClient()}>
       <OverviewPage />
     </QueryClientProvider>,
@@ -22,4 +22,5 @@ test('运营概览展示指标、最近运单和渠道排行', async () => {
   expect(await screen.findByText('待打单运单')).toBeInTheDocument();
   expect(screen.getByText('MM26063001')).toBeInTheDocument();
   expect(screen.getByText('渠道用量 Top 5')).toBeInTheDocument();
+  expect(container.querySelectorAll('[data-slot="metric"]')).toHaveLength(4);
 });

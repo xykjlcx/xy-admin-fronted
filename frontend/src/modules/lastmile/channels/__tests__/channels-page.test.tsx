@@ -20,8 +20,8 @@ function provider(children: React.ReactNode) {
   return <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{children}</QueryClientProvider>;
 }
 
-test('物流渠道展示原型中的渠道运营指标', async () => {
-  render(
+test('物流渠道用紧凑摘要条展示运营指标', async () => {
+  const { container } = render(
     <QueryClientProvider client={new QueryClient()}>
       <ChannelsScene
         permissions={['*:*:*']}
@@ -34,10 +34,12 @@ test('物流渠道展示原型中的渠道运营指标', async () => {
     </QueryClientProvider>,
   );
 
-  expect(await screen.findByText('已启用渠道')).toBeInTheDocument();
-  expect(screen.getByText('覆盖国家/区域')).toBeInTheDocument();
-  expect(screen.getByText('今日打单量')).toBeInTheDocument();
-  expect(screen.getByText('API 成功率')).toBeInTheDocument();
+  expect(await screen.findByText(/已启用渠道/)).toBeInTheDocument();
+  expect(screen.getByText(/覆盖国家\/区域/)).toBeInTheDocument();
+  expect(screen.getByText(/今日打单量/)).toBeInTheDocument();
+  expect(screen.getByText(/API 成功率/)).toBeInTheDocument();
+  expect(container.querySelector('[data-slot="summary-strip"]')).toBeInTheDocument();
+  expect(container.querySelector('[data-slot="card"]')).not.toBeInTheDocument();
 });
 
 test('渠道表单保存草稿后重新进入仍恢复未提交内容', async () => {

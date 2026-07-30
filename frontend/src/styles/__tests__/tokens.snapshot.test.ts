@@ -225,6 +225,11 @@ test('Claude 视觉契约的共享几何只能由 base profile 定义', () => {
     '--card-spacing-comfortable: calc(24px * var(--app-scale));',
     '--metric-min-h: calc(96px * var(--app-scale));',
     '--metric-spacing: calc(14px * var(--app-scale));',
+    '--metric-bg: var(--surface);',
+    '--metric-border: var(--border);',
+    '--metric-shadow: var(--shadow-card);',
+    '--metric-label-fg: var(--text-3);',
+    '--metric-value-fg: var(--text);',
     '--detail-aside-w: calc(296px * var(--app-scale));',
   ];
 

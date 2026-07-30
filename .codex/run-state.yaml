@@ -1,6 +1,6 @@
-stage: batch-e
+stage: batch-f
 branch: codex/metabuilder-fullstack
-head: 3971e21
+head: 1bc193f
 completed:
   - v2 视觉规格获用户批准
   - 当前分支与独立嵌套仓库边界已确认
@@ -8,8 +8,9 @@ completed:
   - 批次 B 三布局 Shell、导航、基础控件与 13px 正文比例
   - 批次 C DataTable、DataToolbar、Summary Strip 与运单/用户/部门样板页
   - 批次 D DetailWorkspace、紧凑 DescriptionList 与运单详情工作台
+  - 批次 E Metric、Dashboard、尾程 Overview 与渠道 Summary Strip
 in_progress:
-  - 批次 E Dashboard 与 Metric
+  - 批次 F 全量生产页面迁移
 verified:
   - git 工作区除 banking-vsa 外无脏文件
   - 主题守卫 200 项通过
@@ -21,5 +22,7 @@ verified:
   - 运单详情 1440x900 下侧栏 296px 且七个详情区块进入首屏
   - 运单详情 1024x768 下侧栏进入主内容下方且无横向溢出
   - customers/channels/carriers/suppliers 详情反向 smoke 均无横向溢出
+  - Dashboard 与尾程 Overview 在 1440x900 下各 4 个等高 Metric 且无横向溢出
+  - Dashboard 大图标底座计数为 0，整页首屏无额外滚动
 blocked: []
-next_action: 先检查 Coss 的 Metric 实现，再写 Metric 失败测试并迁移 Dashboard 与尾程 Overview
+next_action: 清点全量生产页面剩余 Card padding、内联 style、裸控件和大间距，按 Admin/Lastmile/Auth 逐域收敛

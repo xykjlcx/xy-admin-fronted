@@ -9,11 +9,6 @@
     "arbitraryRadius": 0,
     "inlineStyle": 0
   },
-  "src/modules/admin/pages/dashboard/index.tsx": {
-    "cardPadding": 2,
-    "arbitraryRadius": 0,
-    "inlineStyle": 1
-  },
   "src/modules/lastmile/carriers/detail/CarrierDetailScene.tsx": {
     "cardPadding": 2,
     "arbitraryRadius": 0,
@@ -24,18 +19,8 @@
     "arbitraryRadius": 0,
     "inlineStyle": 0
   },
-  "src/modules/lastmile/channels/list/ChannelsScene.tsx": {
-    "cardPadding": 1,
-    "arbitraryRadius": 0,
-    "inlineStyle": 0
-  },
   "src/modules/lastmile/customers/detail/CustomerDetailScene.tsx": {
     "cardPadding": 3,
-    "arbitraryRadius": 0,
-    "inlineStyle": 0
-  },
-  "src/modules/lastmile/overview/list/OverviewScene.tsx": {
-    "cardPadding": 1,
     "arbitraryRadius": 0,
     "inlineStyle": 0
   },

@@ -813,3 +813,24 @@ UI 复刻与视觉融合批次必须执行 `pnpm visual`，采集三档显示比
 - 记录头、五列基础字段、双栏关联方、包裹、费用、296px 状态工作栏和轨迹使用统一 Pro 详情契约；
 - 1440×900 下七个详情区块均已进入首屏，右栏没有独立滚动容器；
 - 截图保存在忽略提交的 `frontend/test-results/claude-alignment/batch-d/`。
+
+### 18.3 批次 E：Dashboard 与 Metric
+
+2026-07-30 先检查 Coss 组件目录：当前有 Card、Meter 等基础件，但没有满足“业务 KPI 值 + 趋势 + 可选图标”的独立 Metric。Meter 表达范围进度，不与 KPI 语义等价，因此在 Pro 层实现 Metric，并继续复用现有 token 和 Radix/shadcn 底座。
+
+Agent Browser 在 Feishu / light / 100% / Sidebar / 1440×900 下实测：
+
+| 页面 | Metric | 实际高度 | 大图标底座 | 横向溢出 |
+| --- | ---: | ---: | ---: | --- |
+| 企业概览 | 4 | 102px | 0 | 无 |
+| 尾程运营概览 | 4 | 102px | 0 | 无 |
+
+102px 是内容驱动后的实际高度，满足 96px `min-height` 合同；四张 Metric 等高。
+
+结论：
+
+- Dashboard 的 KPI、趋势正负方向、无趋势和大数值由统一 Pro Metric 承载；
+- 快捷入口改为 30px 的图标 + 文字按钮，移除 48px 彩色图标底座；
+- 待办计数改为 Summary Strip，状态改用 StatusBadge，裸按钮和页面内联 padding 已清理；
+- 尾程 Overview 统一使用 Metric；运单、渠道列表的大 KPI 卡均降级为 Summary Strip；
+- 截图保存在忽略提交的 `frontend/test-results/claude-alignment/batch-e/`。
