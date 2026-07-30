@@ -117,6 +117,150 @@ export function PageSurface({ children, className, ...props }: PageSurfaceProps)
   );
 }
 
+export function DetailHeader({
+  title,
+  subtitle,
+  status,
+  actions,
+  className,
+  ...props
+}: Omit<ComponentProps<'header'>, 'title'> & {
+  title: ReactNode;
+  subtitle?: ReactNode;
+  status?: ReactNode;
+  actions?: ReactNode;
+}) {
+  return (
+    <header
+      data-slot="detail-header"
+      className={cn(
+        'mb-3 flex min-h-[calc(56px*var(--app-scale))] flex-wrap items-center gap-3 rounded-10 border border-(--page-section-divider) bg-(--pro-panel-bg) px-[calc(14px*var(--app-scale))] py-[calc(10px*var(--app-scale))] shadow-(--page-surface-shadow)',
+        className,
+      )}
+      {...props}
+    >
+      <div className="min-w-0">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <h1 className="ui-page-title truncate text-lg font-semibold text-text">{title}</h1>
+          {status}
+        </div>
+        {subtitle ? <p className="mt-0.5 truncate text-xs text-text-3">{subtitle}</p> : null}
+      </div>
+      {actions ? (
+        <div data-slot="detail-header-actions" className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          {actions}
+        </div>
+      ) : null}
+    </header>
+  );
+}
+
+export function DetailWorkspace({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="detail-workspace"
+      className={cn(
+        'grid min-w-0 items-start gap-3 xl:grid-cols-[minmax(0,1fr)_var(--detail-aside-w)]',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function DetailMain({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="detail-main"
+      className={cn('grid min-w-0 content-start gap-3', className)}
+      {...props}
+    />
+  );
+}
+
+export function DetailAside({ className, ...props }: ComponentProps<'aside'>) {
+  return (
+    <aside
+      data-slot="detail-aside"
+      className={cn(
+        'grid min-w-0 content-start gap-3 xl:sticky xl:top-[calc(var(--shell-header-h)+var(--page-frame-py))]',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function DetailSection({
+  title,
+  description,
+  actions,
+  children,
+  className,
+  ...props
+}: Omit<ComponentProps<'section'>, 'title'> & {
+  title: ReactNode;
+  description?: ReactNode;
+  actions?: ReactNode;
+}) {
+  return (
+    <section
+      data-slot="detail-section"
+      className={cn(
+        'min-w-0 overflow-hidden rounded-10 border border-(--page-section-divider) bg-(--pro-panel-bg)',
+        className,
+      )}
+      {...props}
+    >
+      <div
+        data-slot="detail-section-header"
+        className="flex min-h-[calc(40px*var(--app-scale))] items-center gap-3 border-b border-(--page-section-divider) px-[calc(14px*var(--app-scale))] py-[calc(8px*var(--app-scale))]"
+      >
+        <div className="min-w-0">
+          <h2 className="truncate text-sm font-semibold text-text">{title}</h2>
+          {description ? <p className="mt-0.5 truncate text-xs text-text-3">{description}</p> : null}
+        </div>
+        {actions ? <div className="ml-auto flex shrink-0 items-center gap-2">{actions}</div> : null}
+      </div>
+      <div data-slot="detail-section-body" className="p-[calc(14px*var(--app-scale))]">
+        {children}
+      </div>
+    </section>
+  );
+}
+
+export interface DetailTimelineItem {
+  id: string;
+  title: ReactNode;
+  meta?: ReactNode;
+  state?: 'complete' | 'current' | 'pending';
+}
+
+export function DetailTimeline({ items, className }: { items: DetailTimelineItem[]; className?: string }) {
+  return (
+    <ol data-slot="detail-timeline" className={cn('grid gap-3', className)}>
+      {items.map((item) => (
+        <li
+          key={item.id}
+          data-slot="detail-timeline-item"
+          data-state={item.state ?? 'pending'}
+          className="grid grid-cols-[calc(12px*var(--app-scale))_minmax(0,1fr)] gap-2.5"
+        >
+          <span
+            aria-hidden="true"
+            data-state={item.state ?? 'pending'}
+            className="mt-1 size-2.5 rounded-full border border-(--pro-timeline-marker-border) bg-(--pro-timeline-marker-bg) data-[state=complete]:border-(--pro-timeline-marker-active) data-[state=complete]:bg-(--pro-timeline-marker-active) data-[state=current]:border-(--pro-timeline-marker-active) data-[state=current]:bg-(--pro-timeline-marker-active)"
+          />
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-text">{item.title}</p>
+            {item.meta ? <p className="mt-0.5 text-xs text-text-3">{item.meta}</p> : null}
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 export function PageSplit({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div

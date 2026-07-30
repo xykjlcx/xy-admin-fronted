@@ -44,11 +44,11 @@
 
 ## 批次 D：详情工作台
 
-- [ ] 演进 `PageScaffold`，新增 DetailWorkspace、DetailHeader、DetailSection、DetailAside。
-- [ ] 收敛 `DescriptionList` 为紧凑多列字段。
-- [ ] 运单详情迁移为主工作区 + 296px 侧栏。
-- [ ] customers、channels、carriers、suppliers 详情反向验证。
-- [ ] 验证 1440×900 首屏信息覆盖和 1024px 重排后提交。
+- [x] 演进 `PageScaffold`，新增 DetailWorkspace、DetailHeader、DetailSection、DetailAside。
+- [x] 收敛 `DescriptionList` 为紧凑多列字段。
+- [x] 运单详情迁移为主工作区 + 296px 侧栏。
+- [x] customers、channels、carriers、suppliers 详情反向验证。
+- [x] 验证 1440×900 首屏信息覆盖和 1024px 重排后提交。
 
 ## 批次 E：Dashboard 与 Metric
 

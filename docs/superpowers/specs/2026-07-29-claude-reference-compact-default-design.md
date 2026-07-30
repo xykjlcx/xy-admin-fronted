@@ -795,3 +795,21 @@ UI 复刻与视觉融合批次必须执行 `pnpm visual`，采集三档显示比
 - DataTable 选择列收敛到 40px，Checkbox 继续由统一 selection API 管理；
 - 部门列表因数据集只有 8 条，首屏完整展示全部 8 条，不以补造 mock 数据伪造“10 行”；
 - 截图保存在忽略提交的 `frontend/test-results/claude-alignment/batch-c/`，作为本地复查产物。
+
+### 18.2 批次 D：详情工作台
+
+2026-07-30 使用 Agent Browser 在 Feishu / light / 100% 下实测：
+
+| 视口 | 主区 / 侧栏 | 侧栏行为 | 首屏覆盖 | 横向溢出 |
+| --- | --- | --- | --- | --- |
+| 1440×900 | 870px / 296px | sticky | 记录头、基础信息、收发件、包裹、费用起始、状态与完整轨迹 | 无 |
+| 1024×768 | 单列 762px | 下沉、static | 主工作区后连续呈现 | 无 |
+
+反向打开 customers、channels、carriers、suppliers 四类详情，紧凑 `DescriptionList` 均正常渲染且无横向溢出。
+
+结论：
+
+- 运单详情已移除四张单属性 Card 和用于隐藏连续信息的 Tabs；
+- 记录头、五列基础字段、双栏关联方、包裹、费用、296px 状态工作栏和轨迹使用统一 Pro 详情契约；
+- 1440×900 下七个详情区块均已进入首屏，右栏没有独立滚动容器；
+- 截图保存在忽略提交的 `frontend/test-results/claude-alignment/batch-d/`。

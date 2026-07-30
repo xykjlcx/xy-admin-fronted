@@ -41,6 +41,10 @@ import { Tree, type TreeNode } from '@/components/pro/Tree';
 import { TableShell, TableShellHeader, TableShellRow } from '@/components/pro/TableShell';
 import { SideCardList, SideList, type SideListItem } from '@/components/pro/SideList';
 import {
+  DetailAside,
+  DetailHeader,
+  DetailSection,
+  DetailWorkspace,
   PagePane,
   PagePaneBody,
   PagePaneFooter,
@@ -1039,6 +1043,25 @@ function ThemeStatesRoute() {
                 <PagePaneBody>{t('dev.themeStates.tableStatusEnabled')}</PagePaneBody>
               </PagePane>
             </PageThreePane>
+          </div>
+
+          <div data-testid="detailWorkspaceMatrix" className="xl:col-span-2">
+            <DetailHeader
+              title={t('dev.themeStates.tableSelected')}
+              subtitle={t('dev.themeStates.dataTableNormal')}
+              status={<Badge variant="success">{t('dev.themeStates.tableStatusEnabled')}</Badge>}
+              actions={<Button size="sm">{t('dev.themeStates.tableActionView')}</Button>}
+            />
+            <DetailWorkspace>
+              <DetailSection title={t('dev.themeStates.tableName')}>
+                {t('dev.themeStates.dataTableNormal')}
+              </DetailSection>
+              <DetailAside>
+                <DetailSection title={t('dev.themeStates.tableStatus')}>
+                  {t('dev.themeStates.tableStatusEnabled')}
+                </DetailSection>
+              </DetailAside>
+            </DetailWorkspace>
           </div>
         </div>
       </section>

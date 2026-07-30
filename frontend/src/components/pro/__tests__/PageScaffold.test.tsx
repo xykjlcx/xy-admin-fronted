@@ -1,5 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import {
+  DetailAside,
+  DetailHeader,
+  DetailSection,
+  DetailWorkspace,
   PageFrame,
   PageFrameChromeProvider,
   PagePane,
@@ -12,6 +16,34 @@ import {
   PageSurface,
   PageThreePane,
 } from '@/components/pro/PageScaffold';
+
+test('detail workspace owns compact record header, responsive main-aside geometry and sections', () => {
+  const { container } = render(
+    <>
+      <DetailHeader
+        title="MM26063001"
+        subtitle="德坤海外仓 · 德国 DE"
+        status={<span>待打单</span>}
+        actions={<button type="button">打印面单</button>}
+      />
+      <DetailWorkspace>
+        <DetailSection title="基础信息">主工作区</DetailSection>
+        <DetailAside>
+          <DetailSection title="当前状态">侧栏</DetailSection>
+        </DetailAside>
+      </DetailWorkspace>
+    </>,
+  );
+
+  expect(container.querySelector('[data-slot="detail-header"]')).toHaveClass(
+    'min-h-[calc(56px*var(--app-scale))]',
+  );
+  expect(container.querySelector('[data-slot="detail-workspace"]')).toHaveClass(
+    'xl:grid-cols-[minmax(0,1fr)_var(--detail-aside-w)]',
+  );
+  expect(container.querySelector('[data-slot="detail-aside"]')).toHaveClass('xl:sticky');
+  expect(screen.getByRole('heading', { name: '基础信息' })).toHaveClass('text-sm', 'font-semibold');
+});
 
 test('PageFrame 和 PageSurface 暴露稳定 class 供 shell 布局降噪', () => {
   const { container } = render(

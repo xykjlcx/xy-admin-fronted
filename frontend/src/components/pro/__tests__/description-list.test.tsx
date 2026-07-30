@@ -39,3 +39,24 @@ test('DescriptionList supports card records with a dedicated trailing action slo
     screen.getByRole('button', { name: '编辑上传文件' }).closest('[data-slot="description-list-actions"]'),
   ).toBeInTheDocument();
 });
+
+test('DescriptionList defaults to compact fields and supports five-column detail workspaces', () => {
+  const { container } = render(
+    <DescriptionList
+      columns={5}
+      items={[
+        { label: '物流渠道', value: 'DHL Paket' },
+        { label: '跟踪号', value: 'GE773120045' },
+      ]}
+    />,
+  );
+
+  const list = container.querySelector('[data-slot="description-list"]');
+  const firstItem = container.querySelector('[data-slot="description-list-item"]');
+
+  expect(list).toHaveAttribute('data-density', 'compact');
+  expect(list).toHaveClass('xl:grid-cols-5');
+  expect(firstItem).toHaveClass('min-h-[calc(38px*var(--app-scale))]');
+  expect(screen.getByText('物流渠道')).toHaveClass('text-xs', 'text-text-3');
+  expect(screen.getByText('DHL Paket')).toHaveClass('text-sm', 'font-medium', 'text-text');
+});

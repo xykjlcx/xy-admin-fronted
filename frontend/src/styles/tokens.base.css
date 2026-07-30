@@ -190,6 +190,9 @@
   --pro-panel-border: var(--border);
   --pro-toolbar-bg: var(--surface);
   --pro-filter-bg: var(--surface);
+  --pro-timeline-marker-bg: var(--surface-2);
+  --pro-timeline-marker-border: var(--border);
+  --pro-timeline-marker-active: var(--pri);
   --side-list-bg: var(--surface);
   --side-list-border: var(--border);
   --page-pane-divider: var(--side-list-border);

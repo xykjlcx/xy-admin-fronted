@@ -11,15 +11,17 @@ export interface DescriptionListItem {
 export function DescriptionList({
   items,
   columns = 1,
-  density = 'default',
+  density = 'compact',
   presentation = 'plain',
   empty,
+  className,
 }: {
   items: DescriptionListItem[];
-  columns?: 1 | 2;
+  columns?: 1 | 2 | 3 | 4 | 5;
   density?: 'default' | 'compact';
   presentation?: 'plain' | 'cards';
   empty?: ReactNode;
+  className?: string;
 }) {
   if (items.length === 0) {
     return (
@@ -47,6 +49,10 @@ export function DescriptionList({
         presentation === 'plain' && (density === 'default' ? 'mt-6 gap-4' : 'mt-2 gap-x-6 gap-y-1'),
         presentation === 'cards' && 'mt-3 gap-1.5',
         presentation === 'plain' && columns === 2 && 'sm:grid-cols-2',
+        presentation === 'plain' && columns === 3 && 'md:grid-cols-3',
+        presentation === 'plain' && columns === 4 && 'md:grid-cols-2 xl:grid-cols-4',
+        presentation === 'plain' && columns === 5 && 'md:grid-cols-2 xl:grid-cols-5',
+        className,
       )}
     >
       {items.map((item, index) => (
@@ -54,19 +60,27 @@ export function DescriptionList({
           key={index}
           data-slot="description-list-item"
           className={cn(
-            presentation === 'plain' && density === 'compact' && 'min-h-12 py-1',
+            presentation === 'plain' &&
+              density === 'compact' &&
+              'flex min-h-[calc(38px*var(--app-scale))] items-start justify-between gap-3 py-1',
             presentation === 'cards' &&
               'flex min-h-[calc(58px*var(--app-scale))] items-center justify-between gap-3 rounded-10 border border-(--page-section-divider) bg-(--pro-panel-bg) px-3 py-2.5 shadow-card-sm',
           )}
         >
           <div className="min-w-0">
             <dt
-              className={cn('truncate', presentation === 'cards' ? 'font-medium text-text' : 'text-text-3')}
+              className={cn(
+                'truncate',
+                presentation === 'cards' ? 'font-medium text-text' : 'text-xs text-text-3',
+              )}
             >
               {item.label}
             </dt>
             <dd
-              className={cn('mt-1 truncate', presentation === 'cards' ? 'text-xs text-text-3' : 'text-text')}
+              className={cn(
+                'mt-0.5 truncate',
+                presentation === 'cards' ? 'text-xs text-text-3' : 'text-sm font-medium text-text',
+              )}
             >
               {item.value}
             </dd>
