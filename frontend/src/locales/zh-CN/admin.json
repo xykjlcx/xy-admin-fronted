@@ -67,6 +67,7 @@
     "allMembers": "全部成员",
     "deptSearchPlaceholder": "搜索部门",
     "searchPlaceholder": "搜索姓名、角色、手机号",
+    "toolbarLabel": "成员筛选与操作",
     "selectedCount": "已选 {{count}} 人",
     "empty": "暂无成员",
     "loading": "正在加载成员",

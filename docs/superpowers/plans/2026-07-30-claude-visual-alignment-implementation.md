@@ -36,11 +36,11 @@
 
 ## 批次 C：DataTable 与筛选
 
-- [ ] DataTable 表头、正文、选择列、行操作和分页统一契约。
-- [ ] 新增 `DataToolbar` 并收敛 SearchField、FilterSelect、AdvancedFilter。
-- [ ] 运单列表移除大 KPI 卡，迁移为紧凑 Summary Strip。
-- [ ] 用户与部门页面迁移并回证树表密度。
-- [ ] 验证 1440×900 首屏不少于 10 行后提交。
+- [x] DataTable 表头、正文、选择列、行操作和分页统一契约。
+- [x] 新增 `DataToolbar` 并收敛 SearchField、FilterSelect、AdvancedFilter。
+- [x] 运单列表移除大 KPI 卡，迁移为紧凑 Summary Strip。
+- [x] 用户与部门页面迁移并回证树表密度。
+- [x] 验证 1440×900 首屏不少于 10 行后提交。
 
 ## 批次 D：详情工作台
 

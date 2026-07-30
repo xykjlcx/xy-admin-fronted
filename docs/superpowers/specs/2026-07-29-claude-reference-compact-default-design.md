@@ -775,3 +775,23 @@ mockServiceWorker
 ```
 
 UI 复刻与视觉融合批次必须执行 `pnpm visual`，采集三档显示比例并把结论写回本规格。
+
+## 18. 分批视觉回证
+
+### 18.1 批次 C：DataTable 与筛选
+
+2026-07-30 使用 Agent Browser 在 Feishu / light / 100% / Sidebar / 1440×900 下实测：
+
+| 页面 | 表头 | 正文行 | 工具栏 | 首屏有效行 | 横向溢出 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 运单列表 | 38px | 44px | 47px | 10 / 10 | 无 |
+| 成员列表 | 38px | 44px | 46px | 10 / 10 | 无 |
+| 部门列表 | 38px | 44px | 不适用 | 8 / 8 | 无 |
+
+结论：
+
+- 运单列表的四张大 KPI 卡已降级为 42px Summary Strip；
+- 搜索、筛选和操作收敛到同一 `DataToolbar`，搜索框高度为 30px；
+- DataTable 选择列收敛到 40px，Checkbox 继续由统一 selection API 管理；
+- 部门列表因数据集只有 8 条，首屏完整展示全部 8 条，不以补造 mock 数据伪造“10 行”；
+- 截图保存在忽略提交的 `frontend/test-results/claude-alignment/batch-c/`，作为本地复查产物。

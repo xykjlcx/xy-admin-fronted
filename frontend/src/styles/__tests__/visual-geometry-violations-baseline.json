@@ -59,11 +59,6 @@
     "arbitraryRadius": 0,
     "inlineStyle": 0
   },
-  "src/modules/lastmile/shipments/list/ShipmentsScene.tsx": {
-    "cardPadding": 1,
-    "arbitraryRadius": 0,
-    "inlineStyle": 0
-  },
   "src/modules/lastmile/suppliers/detail/SupplierDetailScene.tsx": {
     "cardPadding": 2,
     "arbitraryRadius": 0,

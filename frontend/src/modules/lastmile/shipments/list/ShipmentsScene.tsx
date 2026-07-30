@@ -4,11 +4,15 @@ import { Download, Plus, Printer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { DataTable } from '@/components/pro/DataTable';
+import {
+  DataToolbar,
+  DataToolbarGroup,
+  SummaryStrip,
+} from '@/components/pro/DataToolbar';
 import { FilterSelect } from '@/components/pro/FilterSelect';
 import { PageFrame, PageSurface } from '@/components/pro/PageScaffold';
 import { SearchField } from '@/components/pro/SearchField';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { downloadFile } from '@/lib/download';
 import { matchPermission } from '@/lib/permission';
 import { shipmentApi, shipmentKeys, shipmentsQuery, type ShipmentFilter } from '../api';
@@ -91,7 +95,7 @@ export function ShipmentsScene({
   ];
   return (
     <PageFrame breadcrumbs={[{ label: t('common.subsystem') }, { label: t('shipments.title') }]}>
-      <div className="mb-4 flex flex-wrap items-end gap-3">
+      <div className="mb-3 flex flex-wrap items-end gap-3">
         <div>
           <h1 className="ui-page-title text-xl font-semibold">{t('shipments.title')}</h1>
           <p className="mt-1 text-sm text-text-3">{t('shipments.description')}</p>
@@ -104,61 +108,59 @@ export function ShipmentsScene({
           </Button>
         )}
       </div>
-      <div className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
+      <SummaryStrip
+        className="mb-3"
+        aria-label={t('shipments.summaryLabel')}
+        items={[
           [t('shipments.stats.pending'), stats?.pending ?? 0],
           [t('shipments.stats.transit'), stats?.transit ?? 0],
           [t('shipments.stats.delivered'), stats?.delivered ?? 0],
           [t('shipments.stats.issues'), (stats?.exception ?? 0) + (stats?.returned ?? 0)],
-        ].map(([label, value]) => (
-          <Card key={label}>
-            <CardContent className="p-5">
-              <p className="text-sm text-text-3">{label}</p>
-              <p className="mt-2 text-2xl font-semibold text-text">{value}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        ].map(([label, value]) => ({ label, value }))}
+      />
       <PageSurface>
-        <div className="flex flex-wrap items-center gap-3 p-5">
-          <SearchField
-            aria-label={t('shipments.search')}
-            placeholder={t('shipments.search')}
-            value={search.keyword}
-            onChange={(event) => onSearchChange({ ...search, keyword: event.currentTarget.value })}
-            containerClassName="w-[calc(300px*var(--app-scale))]"
-          />
-          <FilterSelect
-            label={t('common.status')}
-            value={search.status}
-            options={statuses.map((value) => ({ value, label: t(`shipments.status.${value}`) }))}
-            onValueChange={(status) => onSearchChange({ ...search, status })}
-          />
-          <div className="flex-1" />
-          {matchPermission({ permissions, systemAdmin }, 'lastmile:shipment:export') && (
-            <Button
-              variant="outline"
-              size="sm"
-              loading={exportShipments.isPending}
-              onClick={() => exportShipments.mutate()}
-            >
-              <Download data-icon="inline-start" />
-              {t('shipments.export')}
-            </Button>
-          )}
-          {matchPermission({ permissions, systemAdmin }, 'lastmile:shipment:print') && (
-            <Button
-              variant="outline"
-              size="sm"
-              loading={batchPrint.isPending}
-              onClick={() => batchPrint.mutate()}
-            >
-              <Printer data-icon="inline-start" />
-              {t('shipments.batchPrint')}
-            </Button>
-          )}
-        </div>
-        <div className="px-5 pb-5">
+        <DataToolbar variant="surface" aria-label={t('shipments.toolbarLabel')}>
+          <DataToolbarGroup>
+            <SearchField
+              aria-label={t('shipments.search')}
+              placeholder={t('shipments.search')}
+              value={search.keyword}
+              onChange={(event) => onSearchChange({ ...search, keyword: event.currentTarget.value })}
+              containerClassName="w-[calc(260px*var(--app-scale))]"
+            />
+            <FilterSelect
+              label={t('common.status')}
+              value={search.status}
+              options={statuses.map((value) => ({ value, label: t(`shipments.status.${value}`) }))}
+              onValueChange={(status) => onSearchChange({ ...search, status })}
+            />
+          </DataToolbarGroup>
+          <DataToolbarGroup align="end">
+            {matchPermission({ permissions, systemAdmin }, 'lastmile:shipment:export') && (
+              <Button
+                variant="outline"
+                size="sm"
+                loading={exportShipments.isPending}
+                onClick={() => exportShipments.mutate()}
+              >
+                <Download data-icon="inline-start" />
+                {t('shipments.export')}
+              </Button>
+            )}
+            {matchPermission({ permissions, systemAdmin }, 'lastmile:shipment:print') && (
+              <Button
+                variant="outline"
+                size="sm"
+                loading={batchPrint.isPending}
+                onClick={() => batchPrint.mutate()}
+              >
+                <Printer data-icon="inline-start" />
+                {t('shipments.batchPrint')}
+              </Button>
+            )}
+          </DataToolbarGroup>
+        </DataToolbar>
+        <div className="px-3 pt-3">
           <DataTable
             columns={columns}
             data={result.data?.list ?? []}
@@ -173,7 +175,7 @@ export function ShipmentsScene({
             onRowClick={(row) => onNavigate('detail', row.id)}
           />
         </div>
-        <div className="border-t border-border px-5 py-3 text-sm text-text-3">
+        <div className="mt-3 border-t border-border px-3 py-2 text-sm text-text-3">
           {t('common.total', { count: result.data?.total ?? 0 })}
         </div>
       </PageSurface>

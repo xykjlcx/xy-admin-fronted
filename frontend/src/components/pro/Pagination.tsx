@@ -66,7 +66,7 @@ export function Pagination({
   const items = buildPaginationItems(currentPage, normalizedPageCount);
 
   return (
-    <div className="mt-4 flex items-center justify-between">
+    <div className="mt-3 flex items-center justify-between">
       <span className="text-[calc(13px*var(--app-scale))] text-text-3">
         {totalLabel}
         {refreshingLabel && <span className="ml-3 text-(--pagination-current-fg)">{refreshingLabel}</span>}

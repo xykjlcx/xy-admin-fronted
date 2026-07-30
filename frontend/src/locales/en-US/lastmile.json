@@ -42,6 +42,8 @@
     "title": "Shipments",
     "description": "Manage last-mile shipments, labels and end-to-end tracking",
     "search": "Search shipment, customer or tracking number",
+    "toolbarLabel": "Shipment filters",
+    "summaryLabel": "Shipment status summary",
     "create": "Create Shipment",
     "export": "Export",
     "batchPrint": "Batch Print",

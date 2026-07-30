@@ -2,6 +2,7 @@ import { Plus } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AdvancedFilter, type AdvancedFilterField } from '@/components/pro/AdvancedFilter';
+import { DataToolbar, DataToolbarGroup } from '@/components/pro/DataToolbar';
 import { FilterButton, FilterSelect } from '@/components/pro/FilterSelect';
 import { SearchField } from '@/components/pro/SearchField';
 import { Button } from '@/components/ui/button';
@@ -114,62 +115,65 @@ export function UsersToolbar({ variant, search, canCreate, onSearchChange, onCre
   }, [statusFilterOptions, t, variant]);
 
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-3">
-      <SearchField
-        aria-label={t('users.searchPlaceholder')}
-        placeholder={t('users.searchPlaceholder')}
-        value={keyword}
-        containerClassName="w-[calc(240px*var(--app-scale))]"
-        onChange={(event) => handleKeywordChange(event.currentTarget.value)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter') submitKeyword(event.currentTarget.value);
-        }}
-      />
-      <AdvancedFilter
-        fields={advancedFields}
-        value={advancedFilters}
-        labels={{
-          button: t('users.filters.advanced'),
-          activeButton: t('users.filters.advancedActive'),
-          title: t('users.filters.advanced'),
-          add: t('users.filters.addCondition'),
-          clear: t('users.filters.clearConditions'),
-          field: t('users.filters.field'),
-          operator: t('users.filters.operator'),
-          value: t('users.filters.value'),
-          valuePlaceholder: t('users.filters.valuePlaceholder'),
-          remove: t('users.filters.removeCondition'),
-          empty: t('users.filters.emptyConditions'),
-        }}
-        onChange={(next) => onSearchChange({ filters: stringifyUserFilters(sanitizeUserFilters(next)), page: 1 })}
-      />
-      {variant === 'members' && (
-        <>
-          <FilterSelect
-            label={t('users.filters.accountStatus')}
-            value={search.status === 'left' ? 'all' : search.status}
-            options={statusFilterOptions}
-            onValueChange={(status) => onSearchChange({ status, page: 1 })}
-          />
-          <FilterButton
-            data-role-filter-control="toggle"
-            data-state={search.directOnly ? 'open' : 'closed'}
-            type="button"
-            aria-pressed={!!search.directOnly}
-            disabled={!search.deptId}
-            onClick={() => onSearchChange({ directOnly: !search.directOnly, page: 1 })}
-          >
-            {t('users.filters.directOnly')}
-          </FilterButton>
-        </>
-      )}
-      <div className="flex-1" />
-      {variant === 'members' && canCreate && onCreate && (
-        <Button type="button" size="sm" onClick={onCreate}>
-          <Plus data-icon="inline-start" />
-          {t('users.actions.create')}
-        </Button>
-      )}
-    </div>
+    <DataToolbar className="mb-3 px-0" aria-label={t('users.toolbarLabel')}>
+      <DataToolbarGroup>
+        <SearchField
+          aria-label={t('users.searchPlaceholder')}
+          placeholder={t('users.searchPlaceholder')}
+          value={keyword}
+          containerClassName="w-[calc(240px*var(--app-scale))]"
+          onChange={(event) => handleKeywordChange(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') submitKeyword(event.currentTarget.value);
+          }}
+        />
+        <AdvancedFilter
+          fields={advancedFields}
+          value={advancedFilters}
+          labels={{
+            button: t('users.filters.advanced'),
+            activeButton: t('users.filters.advancedActive'),
+            title: t('users.filters.advanced'),
+            add: t('users.filters.addCondition'),
+            clear: t('users.filters.clearConditions'),
+            field: t('users.filters.field'),
+            operator: t('users.filters.operator'),
+            value: t('users.filters.value'),
+            valuePlaceholder: t('users.filters.valuePlaceholder'),
+            remove: t('users.filters.removeCondition'),
+            empty: t('users.filters.emptyConditions'),
+          }}
+          onChange={(next) => onSearchChange({ filters: stringifyUserFilters(sanitizeUserFilters(next)), page: 1 })}
+        />
+        {variant === 'members' && (
+          <>
+            <FilterSelect
+              label={t('users.filters.accountStatus')}
+              value={search.status === 'left' ? 'all' : search.status}
+              options={statusFilterOptions}
+              onValueChange={(status) => onSearchChange({ status, page: 1 })}
+            />
+            <FilterButton
+              data-role-filter-control="toggle"
+              data-state={search.directOnly ? 'open' : 'closed'}
+              type="button"
+              aria-pressed={!!search.directOnly}
+              disabled={!search.deptId}
+              onClick={() => onSearchChange({ directOnly: !search.directOnly, page: 1 })}
+            >
+              {t('users.filters.directOnly')}
+            </FilterButton>
+          </>
+        )}
+      </DataToolbarGroup>
+      <DataToolbarGroup align="end">
+        {variant === 'members' && canCreate && onCreate && (
+          <Button type="button" size="sm" onClick={onCreate}>
+            <Plus data-icon="inline-start" />
+            {t('users.actions.create')}
+          </Button>
+        )}
+      </DataToolbarGroup>
+    </DataToolbar>
   );
 }

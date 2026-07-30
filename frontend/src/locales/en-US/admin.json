@@ -67,6 +67,7 @@
     "allMembers": "All members",
     "deptSearchPlaceholder": "Search departments",
     "searchPlaceholder": "Search name, role, or phone",
+    "toolbarLabel": "Member filters and actions",
     "selectedCount": "{{count}} selected",
     "empty": "No members",
     "loading": "Loading members",

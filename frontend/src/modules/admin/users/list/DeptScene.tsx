@@ -113,7 +113,7 @@ export function DeptScene({ permissions, systemAdmin = false }: DeptSceneProps):
   return (
     <>
       <main className="flex min-w-0 flex-1 flex-col px-(--page-scene-px) py-(--page-scene-py)">
-        <div className="mb-4 flex items-center gap-3">
+        <div className="mb-3 flex items-center gap-3">
           <div className="min-w-0">
             <div className="text-base font-bold">{t('users.deptList.title')}</div>
             <div className="mt-1 text-[calc(13px*var(--app-scale))] text-text-3">

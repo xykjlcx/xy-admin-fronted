@@ -42,6 +42,8 @@
     "title": "运单列表",
     "description": "管理跨境尾程运单、面单打印与全程轨迹追踪",
     "search": "搜索运单号、客户、跟踪号",
+    "toolbarLabel": "运单筛选",
+    "summaryLabel": "运单状态摘要",
     "create": "新建运单",
     "export": "导出",
     "batchPrint": "批量打单",

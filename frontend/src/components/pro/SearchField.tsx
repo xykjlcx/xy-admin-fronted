@@ -14,7 +14,7 @@ export function SearchField({ className, containerClassName, variant = 'default'
       inputSize="sm"
       data-variant={variant === 'default' ? undefined : variant}
       className={cn(
-        'h-[calc(34px*var(--app-scale))]',
+        'h-[var(--control-sm)]',
         containerClassName,
       )}
     >

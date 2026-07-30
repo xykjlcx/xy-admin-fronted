@@ -34,6 +34,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
 import { AnimatedTabs, type AnimatedTabItem } from '@/components/pro/AnimatedTabs';
 import { DataTable } from '@/components/pro/DataTable';
+import { DataToolbar, DataToolbarGroup, SummaryStrip } from '@/components/pro/DataToolbar';
 import { QueryState } from '@/components/pro/QueryState';
 import { DataTableRowActions, type DataTableRowAction } from '@/components/pro/DataTableRowActions';
 import { Tree, type TreeNode } from '@/components/pro/Tree';
@@ -776,6 +777,23 @@ function ThemeStatesRoute() {
           <div>
             <p className="mb-3 text-sm font-medium text-text">{t('dev.themeStates.dataTableMatrix')}</p>
             <div className="grid gap-4">
+              <SummaryStrip
+                aria-label={t('dev.themeStates.dataTableMatrix')}
+                items={[
+                  { label: t('dev.themeStates.tableStatusEnabled'), value: 42 },
+                  { label: t('dev.themeStates.dataTableSelected'), value: 3 },
+                ]}
+              />
+              <DataToolbar variant="surface" aria-label={t('dev.themeStates.dataTableMatrix')}>
+                <DataToolbarGroup>
+                  <SearchField placeholder={t('dev.themeStates.fieldSearchPlaceholder')} />
+                </DataToolbarGroup>
+                <DataToolbarGroup align="end">
+                  <Button size="sm" variant="outline">
+                    {t('dev.themeStates.tableActionView')}
+                  </Button>
+                </DataToolbarGroup>
+              </DataToolbar>
               {dataTableSelectionStates.map((state) => (
                 <div key={state.id} data-testid={`datatable-selection-${state.id}`} className="grid gap-2">
                   <p className="text-sm font-medium text-text">

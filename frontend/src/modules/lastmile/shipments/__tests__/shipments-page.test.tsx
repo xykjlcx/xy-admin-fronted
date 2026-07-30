@@ -14,8 +14,8 @@ beforeAll(async () => {
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-test('运单列表展示原型中的四项状态指标', async () => {
-  render(
+test('运单列表用紧凑摘要条和统一工具栏展示状态与筛选', async () => {
+  const { container } = render(
     <QueryClientProvider client={new QueryClient()}>
       <ShipmentsScene
         permissions={['*:*:*']}
@@ -30,4 +30,7 @@ test('运单列表展示原型中的四项状态指标', async () => {
   expect(screen.getByText('运输中')).toBeInTheDocument();
   expect(screen.getByText('已签收')).toBeInTheDocument();
   expect(screen.getByText('异常/退件')).toBeInTheDocument();
+  expect(container.querySelector('[data-slot="summary-strip"]')).toBeInTheDocument();
+  expect(screen.getByRole('toolbar', { name: '运单筛选' })).toBeInTheDocument();
+  expect(container.querySelector('[data-slot="card"]')).not.toBeInTheDocument();
 });

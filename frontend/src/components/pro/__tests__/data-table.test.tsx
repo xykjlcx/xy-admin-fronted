@@ -413,3 +413,12 @@ test('DataTable injects selection as a ColumnDef instead of rendering special se
   expect(source).not.toContain('selectionEnabled && (');
   expect(source).not.toContain('selectionEnabled && <');
 });
+
+test('DataTable selection column follows the compact 40px geometry contract', () => {
+  const source = readFileSync('src/components/pro/DataTable.tsx', 'utf8');
+
+  expect(source).toContain('size: 40');
+  expect(source).toContain('minSize: 40');
+  expect(source).toContain('maxSize: 40');
+  expect(source).not.toContain('size: 44');
+});

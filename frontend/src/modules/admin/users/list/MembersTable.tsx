@@ -88,7 +88,7 @@ export function MembersTable({
 
   return (
     <>
-      <div className="mb-4 flex items-center">
+      <div className="mb-3 flex items-center">
         <span className="text-base font-bold">{selectedDeptLabel}</span>
         <span className="ml-3 text-[calc(13px*var(--app-scale))] text-text-3">
           {t('users.countPeople', { count: usersPage.total })}
@@ -110,7 +110,7 @@ export function MembersTable({
           selectAllAriaLabel: t('users.selectPage'),
           rowSelectAriaLabel,
           renderBulkBar: (selectedVisibleIds) => (
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-8 bg-(--table-row-bg-selected) px-3.5 py-2.5">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-8 bg-(--table-row-bg-selected) px-3 py-2">
               <span className="text-[calc(13px*var(--app-scale))] text-text-2">
                 {t('users.selectedCount', { count: selectedVisibleIds.length })}
               </span>

@@ -156,9 +156,9 @@ export function DataTable<T>({
   const selectionColumn = useMemo<ColumnDef<T>>(
     () => ({
       id: rowSelectionColumnId,
-      size: 44,
-      minSize: 44,
-      maxSize: 44,
+      size: 40,
+      minSize: 40,
+      maxSize: 40,
       enableSorting: false,
       enablePinning: true,
       meta: { headerAlign: 'center', cellAlign: 'center', pin: 'left' },
