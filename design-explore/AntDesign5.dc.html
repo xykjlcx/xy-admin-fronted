@@ -1,0 +1,294 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #f5f5f5; }
+    * { box-sizing: border-box; }
+    a { color: #1677ff; text-decoration: none; }
+    a:hover { color: #4096ff; }
+    .antmenu { display: flex; align-items: center; gap: 9px; height: 36px; margin: 2px 4px; padding: 0 14px; border-radius: 6px; font-size: 13.5px; color: rgba(0,0,0,0.88); cursor: default; }
+    .antmenu:hover { background: rgba(0,0,0,0.06); }
+    .antgrp { font-size: 12.5px; color: rgba(0,0,0,0.45); padding: 8px 14px 2px; }
+    /* Ant Table size="small"：cell padding 8px → 行高 39px（官方 small/middle/default = 39/47/55） */
+    .antrow { display: grid; grid-template-columns: 36px 82px 70px 78px 104px 96px 118px 148px 88px 84px 42px 78px; align-items: center; column-gap: 8px; height: 39px; padding: 0 8px; border-bottom: 1px solid #f0f0f0; }
+    .antrow:hover { background: #fafafa; }
+    .antth { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.88); }
+    .antfld { display: flex; align-items: center; height: 28px; padding: 0 10px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; font-size: 13px; color: rgba(0,0,0,0.25); }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 850px; display: flex; flex-direction: column; font-family: -apple-system, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;">
+
+  <div style="height: 72px; flex-shrink: 0; background: #18181b; color: #fafafa; display: flex; align-items: center; justify-content: space-between; padding: 0 28px;">
+    <div style="display: flex; align-items: baseline; gap: 13px;">
+      <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: #71717a;">方向 J</span>
+      <span style="font-size: 19px; font-weight: 600; letter-spacing: -0.01em;">Ant Design 5</span>
+      <span style="font-size: 12px; color: #a1a1aa;">阿里</span>
+      <span style="font-size: 11px; color: #4ade80; padding: 2px 8px; border-radius: 999px; background: rgba(74,222,128,0.14);">12 行 × 12 列</span>
+    </div>
+    <div style="display: flex; gap: 24px; font-size: 11.5px; line-height: 1.5;">
+      <div style="max-width: 370px;"><span style="color: #4ade80;">规范 </span><span style="color: #d4d4d8;">Table size="small" 行高 39px（官方三档 39/47/55）+ seed token 原值 #1677ff / 圆角 6px / 控件 32px。彩色 Tag、带边框表格、quick-jumper 分页</span></div>
+      <div style="max-width: 195px;"><span style="color: #fb923c;">代价 </span><span style="color: #d4d4d8;">太眼熟；Tag 一多，颜色就开始互相打架</span></div>
+    </div>
+  </div>
+
+  <div style="flex: 1; display: flex; min-height: 0; background: #f5f5f5;">
+
+    <div style="width: 184px; flex-shrink: 0; display: flex; flex-direction: column; background: #ffffff;">
+      <div style="height: 52px; display: flex; align-items: center; gap: 9px; padding: 0 16px;">
+        <div style="width: 26px; height: 26px; border-radius: 6px; background: #1677ff; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">昕</div>
+        <span style="font-size: 15px; font-weight: 600; color: rgba(0,0,0,0.88);">昕越后台</span>
+      </div>
+      <div class="antgrp">工作台</div>
+      <div class="antmenu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>企业概览</div>
+      <div class="antmenu" style="background:#e6f4ff;color:#1677ff;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>成员与部门</div>
+      <div class="antmenu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 5h8"/><path d="M3 12h8"/><path d="M3 19h8"/><path d="M15 5h6"/><path d="M15 12h6"/><path d="M15 19h6"/></svg>角色与权限</div>
+      <div class="antmenu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>菜单管理</div>
+      <div class="antmenu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>日志审计</div>
+      <div class="antmenu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>文件管理</div>
+      <div class="antmenu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="M10 2v8l3-2 3 2V2"/></svg>企业信息</div>
+      <div class="antmenu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>字典管理</div>
+    </div>
+
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+      <div style="height: 52px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 20px; background: #ffffff;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span style="color: rgba(0,0,0,0.45);">首页</span><span style="color: rgba(0,0,0,0.45);">/</span>
+          <span style="color: rgba(0,0,0,0.45);">组织与权限</span><span style="color: rgba(0,0,0,0.45);">/</span>
+          <span style="color: rgba(0,0,0,0.88);">成员与部门</span>
+        </div>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 18px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.65)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <div style="position: relative;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.65)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+            <span style="position: absolute; top: -5px; right: -7px; min-width: 15px; height: 15px; padding: 0 4px; border-radius: 999px; background: #ff4d4f; color: #fff; font-size: 10.5px; display: flex; align-items: center; justify-content: center;">3</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <div style="width: 26px; height: 26px; border-radius: 999px; background: #1677ff; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11.5px;">昕</div>
+            <span style="font-size: 13px; color: rgba(0,0,0,0.88);">李长昕</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex: 1; min-height: 0; padding: 12px 16px 0;">
+        <div style="background: #ffffff; border-radius: 8px; padding: 14px 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px;">
+            <span style="font-size: 17px; font-weight: 600; color: rgba(0,0,0,0.88);">成员与部门</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 13px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; color: rgba(0,0,0,0.88);">批量导入</div>
+              <div style="display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 13px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; color: rgba(0,0,0,0.88);">导出</div>
+              <div style="display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 13px; border-radius: 6px; background: #1677ff; color: #fff; font-size: 13px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>新建成员
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px;"><span style="font-size: 13px; color: rgba(0,0,0,0.88);">姓名</span><div class="antfld" style="width: 130px;">请输入</div></div>
+            <div style="display: flex; align-items: center; gap: 6px;"><span style="font-size: 13px; color: rgba(0,0,0,0.88);">部门</span><div class="antfld" style="width: 128px; justify-content: space-between;">请选择<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div></div>
+            <div style="display: flex; align-items: center; gap: 6px;"><span style="font-size: 13px; color: rgba(0,0,0,0.88);">角色</span><div class="antfld" style="width: 120px; justify-content: space-between;">请选择<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div></div>
+            <div style="display: flex; align-items: center; gap: 6px;"><span style="font-size: 13px; color: rgba(0,0,0,0.88);">状态</span><div class="antfld" style="width: 104px; justify-content: space-between;">全部<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div></div>
+            <div style="display: flex; align-items: center; height: 28px; padding: 0 13px; border-radius: 6px; background: #1677ff; color: #fff; font-size: 13px;">查询</div>
+            <div style="display: flex; align-items: center; height: 28px; padding: 0 13px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; color: rgba(0,0,0,0.88);">重置</div>
+            <span style="font-size: 13px; color: #1677ff; margin-left: auto;">已选 2 项 · 批量停用 · 批量调岗</span>
+          </div>
+
+          <div style="border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 36px 82px 70px 78px 104px 96px 118px 148px 88px 84px 42px 78px; align-items: center; column-gap: 8px; height: 39px; padding: 0 8px; background: #fafafa; border-bottom: 1px solid #f0f0f0;">
+              <div class="antth"></div><div class="antth">工号</div><div class="antth">姓名</div><div class="antth">状态</div><div class="antth">部门</div><div class="antth">角色</div><div class="antth">手机号</div><div class="antth">邮箱</div><div class="antth">入职</div><div class="antth">最近登录</div><div class="antth" style="text-align:center;">2FA</div><div class="antth">操作</div>
+            </div>
+            <div class="antrow" style="background:#e6f4ff;">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border-radius:4px;background:#1677ff;display:flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1043</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">李长昕</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">产品研发中心</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#fff1f0;border:1px solid #ffccc7;color:#cf1322;font-size:11.5px;">超级管理员</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">158 0611 9676</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">leah@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2021-03-15</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">2 小时前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1044</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">王思远</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">前端组</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#e6f4ff;border:1px solid #91caff;color:#0958d9;font-size:11.5px;">开发工程师</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">139 2288 1043</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">siyuan@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2022-07-01</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">1 天前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1051</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">陈嘉怡</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">后端组</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#e6f4ff;border:1px solid #91caff;color:#0958d9;font-size:11.5px;">开发工程师</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">137 5501 8829</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">jiayi@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2022-09-12</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">1 天前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d9d9d9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow" style="background:#e6f4ff;">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border-radius:4px;background:#1677ff;display:flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1052</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">赵敏杰</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">后端组</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#e6f4ff;border:1px solid #91caff;color:#0958d9;font-size:11.5px;">开发工程师</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">186 7742 3310</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">minjie@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2023-02-06</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">3 天前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1058</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">刘婉婷</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#faad14;"></span>待激活</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">测试组</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#e6fffb;border:1px solid #87e8de;color:#08979c;font-size:11.5px;">测试工程师</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">135 9908 4471</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">wanting@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2026-08-11</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">—</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d9d9d9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1061</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">孙浩然</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">市场营销部</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#f6ffed;border:1px solid #b7eb8f;color:#389e0d;font-size:11.5px;">运营专员</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">182 3345 6672</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">haoran@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2023-05-22</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">5 天前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d9d9d9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1062</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">周雅雯</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">市场营销部</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#f6ffed;border:1px solid #b7eb8f;color:#389e0d;font-size:11.5px;">运营专员</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">138 6620 9915</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">yawen@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2023-05-22</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">1 周前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1070</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">吴静琳</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">人力资源部</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#f9f0ff;border:1px solid #d3adf7;color:#531dab;font-size:11.5px;">HRBP</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">159 8834 2201</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">jinglin@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2021-11-08</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">47 分钟前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1073</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">郑一帆</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#faad14;"></span>待激活</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">财务部</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#fff7e6;border:1px solid #ffd591;color:#d46b08;font-size:11.5px;">财务专员</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">187 2290 5514</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">yifan@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2026-08-18</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">—</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d9d9d9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1075</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">马志强</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">行政部</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#fff0f6;border:1px solid #ffadd2;color:#c41d7f;font-size:11.5px;">行政主管</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">136 7712 8830</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">zhiqiang@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2020-06-30</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">1 天前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d9d9d9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1081</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">林晓莹</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">产品研发中心</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#f0f5ff;border:1px solid #adc6ff;color:#1d39c4;font-size:11.5px;">产品经理</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">133 4456 1092</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">xiaoying@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2022-01-17</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">15 分钟前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+            <div class="antrow">
+              <div style="display:flex;justify-content:center;"><div style="width:14px;height:14px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;"></div></div>
+              <div style="font-size:13px;color:#1677ff;">E-1085</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">何雨桐</div>
+              <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(0,0,0,0.88);"><span style="width:6px;height:6px;border-radius:999px;background:#52c41a;"></span>正常</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">财务部</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:4px;background:#fff7e6;border:1px solid #ffd591;color:#d46b08;font-size:11.5px;">会计</span></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">188 9903 4417</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">yutong@acme.com</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.88);">2023-08-01</div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.65);">2 小时前</div>
+              <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#1677ff;white-space:nowrap;"><span>编辑</span><span style="width:1px;height:12px;background:#f0f0f0;"></span><span>停用</span></div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: flex-end; gap: 7px; padding-top: 12px;">
+            <span style="font-size: 13px; color: rgba(0,0,0,0.88); margin-right: 6px;">共 14 条</span>
+            <div style="width: 28px; height: 28px; border: 1px solid #d9d9d9; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(0,0,0,0.25);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></div>
+            <div style="min-width: 28px; height: 28px; border: 1px solid #1677ff; border-radius: 6px; color: #1677ff; font-size: 13px; display: flex; align-items: center; justify-content: center;">1</div>
+            <div style="min-width: 28px; height: 28px; border: 1px solid #d9d9d9; border-radius: 6px; color: rgba(0,0,0,0.88); font-size: 13px; display: flex; align-items: center; justify-content: center;">2</div>
+            <div style="width: 28px; height: 28px; border: 1px solid #d9d9d9; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(0,0,0,0.88);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="antfld" style="width: 92px; justify-content: space-between; color: rgba(0,0,0,0.88);">12 条/页<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            <span style="font-size: 13px; color: rgba(0,0,0,0.88);">跳至</span>
+            <div class="antfld" style="width: 46px;"></div>
+            <span style="font-size: 13px; color: rgba(0,0,0,0.88);">页</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

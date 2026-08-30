@@ -1,0 +1,453 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin:0; background:#eef1f4; }
+    * { box-sizing:border-box; }
+    a { color:#15599b; text-decoration:none; }
+    a:hover { color:#0e4275; }
+    .num { font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:11.5px; }
+    .gmenu { display:flex; align-items:center; height:30px; padding:0 13px; font-size:13px; color:#1f3346; cursor:default; }
+    .gmenu:hover { background:#dce6f0; }
+    .gtool { display:flex; align-items:center; gap:5px; height:26px; padding:0 9px; border:1px solid #c3ccd5; background:linear-gradient(#ffffff,#f2f5f8); font-size:12px; color:#1f3346; cursor:default; }
+    .gtool:hover { border-color:#15599b; color:#15599b; }
+    /* ERP 数据网格：28px 行高、每格右边框（Excel 感）、左两列冻结 */
+    .grow { display:grid; grid-template-columns:30px 74px 62px 58px 66px 96px 92px 112px 126px 78px 76px 38px 66px 66px 68px 46px; height:28px; border-bottom:1px solid #e4e9ee; }
+    .grow:hover { background:#eaf3fb !important; }
+    .gc { display:flex; align-items:center; padding:0 6px; font-size:12px; color:#12283a; border-right:1px solid #eef1f4; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+    .gth { display:flex; align-items:center; padding:0 6px; font-size:11.5px; font-weight:600; color:#33465a; border-right:1px solid #ccd6e0; }
+    .frz2 { box-shadow:2px 0 4px -2px rgba(0,0,0,0.18); }
+  </style>
+</helmet>
+
+<div style="width:1440px;height:850px;display:flex;flex-direction:column;font-family:-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;">
+
+  <div style="height:72px;flex-shrink:0;background:#18181b;color:#fafafa;display:flex;align-items:center;justify-content:space-between;padding:0 28px;">
+    <div style="display:flex;align-items:baseline;gap:13px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.14em;color:#71717a;">方向 P</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-0.01em;">企业数据网格</span>
+      <span style="font-size:12px;color:#a1a1aa;">金蝶 / 用友 / SAP 那一类，你的傲翼凭证页就是这个形态</span>
+      <span style="font-size:11px;color:#4ade80;padding:2px 8px;border-radius:999px;background:rgba(74,222,128,0.14);">18 行 × 16 列</span>
+    </div>
+    <div style="display:flex;gap:24px;font-size:11.5px;line-height:1.5;">
+      <div style="max-width:370px;"><span style="color:#4ade80;">规范 </span><span style="color:#d4d4d8;">28px 行高 + 每格右边框（Excel 感）+ 左两列冻结带投影 + 斑马纹 + <span style="color:#fafafa;font-weight:600;">行内直接编辑</span> + 底部固定合计行。密度是 Carbon 的 1.7 倍</span></div>
+      <div style="max-width:195px;"><span style="color:#fb923c;">代价 </span><span style="color:#d4d4d8;">毫无美感可言，纯功能导向；新人上手成本高</span></div>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-height:0;background:#eef1f4;">
+
+    <div style="height:36px;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 12px;background:#15599b;color:#fff;">
+      <span style="font-size:14px;font-weight:600;">昕越业务平台</span>
+      <span style="font-size:12px;opacity:0.75;">· 组织管理</span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;">
+        <span style="padding:2px 8px;background:rgba(255,255,255,0.18);">当前主体：昕越国际</span>
+        <span>管理员 admin</span>
+        <span style="opacity:0.75;">退出</span>
+      </div>
+    </div>
+
+    <div style="height:30px;flex-shrink:0;display:flex;align-items:center;background:#dce6f0;border-bottom:1px solid #c3ccd5;">
+      <div class="gmenu">组织架构<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:5px;opacity:0.7;"><path d="m6 9 6 6 6-6"/></svg></div>
+      <div class="gmenu" style="background:#15599b;color:#fff;font-weight:600;">成员管理<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:5px;opacity:0.7;"><path d="m6 9 6 6 6-6"/></svg></div>
+      <div class="gmenu">角色权限<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:5px;opacity:0.7;"><path d="m6 9 6 6 6-6"/></svg></div>
+      <div class="gmenu">菜单配置<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:5px;opacity:0.7;"><path d="m6 9 6 6 6-6"/></svg></div>
+      <div class="gmenu">数据权限<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:5px;opacity:0.7;"><path d="m6 9 6 6 6-6"/></svg></div>
+      <div class="gmenu">安全审计<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:5px;opacity:0.7;"><path d="m6 9 6 6 6-6"/></svg></div>
+      <div class="gmenu">系统设置<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:5px;opacity:0.7;"><path d="m6 9 6 6 6-6"/></svg></div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:3px;padding:5px 12px;background:#f2f5f8;border-bottom:1px solid #c3ccd5;">
+        <div class="gtool"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7"/><circle cx="12" cy="12" r="3"/></svg>查看</div>
+        <div class="gtool"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M5 12h14"/><path d="M12 5v14"/></svg>新增</div>
+        <div class="gtool"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>修改</div>
+        <div class="gtool"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/></svg>删除</div>
+        <div class="gtool"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18.36 6.64A9 9 0 1 1 5.64 5.64"/><path d="M12 2v10"/></svg>停用</div>
+        <div class="gtool"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/></svg>调岗</div>
+        <div class="gtool"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12 15V3"/><path d="m8 7 4-4 4 4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>导入</div>
+        <div class="gtool"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>导出</div>
+        <div class="gtool"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/><path d="M6 9V2h12v7"/></svg>打印</div>
+      <span style="width:1px;height:18px;background:#c3ccd5;margin:0 6px;"></span>
+      <div class="gtool">显示列</div>
+      <div class="gtool">冻结</div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:#33465a;">
+        <span>关键字</span>
+        <div style="width:150px;height:24px;border:1px solid #c3ccd5;background:#fff;"></div>
+        <span>部门</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:112px;height:24px;padding:0 6px;border:1px solid #c3ccd5;background:#fff;color:#8b98a5;">全部<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8b98a5" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+        <div style="height:24px;padding:0 12px;background:#15599b;color:#fff;display:flex;align-items:center;font-size:12px;">查询</div>
+        <div class="gtool" style="height:24px;">高级</div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;background:#fff;margin:0 12px;border:1px solid #c3ccd5;border-top:none;">
+      <div style="display:grid;grid-template-columns:30px 74px 62px 58px 66px 96px 92px 112px 126px 78px 76px 38px 66px 66px 68px 46px;height:30px;background:linear-gradient(#f7f9fb,#e9eef3);border-bottom:1px solid #ccd6e0;">
+        <div class="gth"></div><div class="gth">工号</div><div class="gth">姓名</div><div class="gth">状态</div><div class="gth">部门编码</div><div class="gth">部门名称</div><div class="gth">岗位</div><div class="gth">手机号</div><div class="gth">邮箱</div><div class="gth">入职日期</div><div class="gth">最近登录</div><div class="gth" style="justify-content:center;">2FA</div><div class="gth">数据范围</div><div class="gth">直属上级</div><div class="gth" style="justify-content:flex-end;">工龄</div><div class="gth" style="justify-content:center;">操作</div>
+      </div>
+        <div class="grow" style="background:#ffffff;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1043</span></div>
+          <div class="gc frz2">李长昕</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-100</span></div>
+          <div class="gc">产品研发中心</div>
+          <div class="gc">超级管理员</div>
+          <div class="gc"><span class="num">158 0611 9676</span></div>
+          <div class="gc" style="color:#4a5762;">leah@acme.com</div>
+          <div class="gc"><span class="num">2021-03-15</span></div>
+          <div class="gc" style="color:#4a5762;">2 小时前</div>
+          <div class="gc" style="justify-content:center;color:#1e7d32;font-weight:700;">✓</div>
+          <div class="gc" style="color:#4a5762;">全公司</div>
+          <div class="gc">—</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">5.4</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#fbfcfd;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1044</span></div>
+          <div class="gc frz2">王思远</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-110</span></div>
+          <div class="gc">前端组</div>
+          <div class="gc">开发工程师</div>
+          <div class="gc"><span class="num">139 2288 1043</span></div>
+          <div class="gc" style="color:#4a5762;">siyuan@acme.com</div>
+          <div class="gc"><span class="num">2022-07-01</span></div>
+          <div class="gc" style="color:#4a5762;">1 天前</div>
+          <div class="gc" style="justify-content:center;color:#1e7d32;font-weight:700;">✓</div>
+          <div class="gc" style="color:#4a5762;">本部门</div>
+          <div class="gc">李长昕</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">4.1</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#e8f0fa;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #15599b;background:#15599b;display:flex;align-items:center;justify-content:center;"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1051</span></div>
+          <div class="gc frz2">陈嘉怡</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-120</span></div>
+          <div class="gc">后端组</div>
+          <div class="gc">开发工程师</div>
+          <div class="gc"><span class="num">137 5501 8829</span></div>
+          <div class="gc" style="color:#4a5762;">jiayi@acme.com</div>
+          <div class="gc"><span class="num">2022-09-12</span></div>
+          <div class="gc" style="color:#4a5762;">1 天前</div>
+          <div class="gc" style="justify-content:center;color:#c3ccd5;font-weight:700;">—</div>
+          <div class="gc" style="color:#4a5762;">本部门</div>
+          <div class="gc">李长昕</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">3.9</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#fbfcfd;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1052</span></div>
+          <div class="gc frz2">赵敏杰</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-120</span></div>
+          <div class="gc">后端组</div>
+          <div class="gc">开发工程师</div>
+          <div class="gc"><span class="num">186 7742 3310</span></div>
+          <div class="gc" style="color:#4a5762;">minjie@acme.com</div>
+          <div class="gc"><span class="num">2023-02-06</span></div>
+          <div class="gc" style="color:#4a5762;">3 天前</div>
+          <div class="gc" style="justify-content:center;color:#1e7d32;font-weight:700;">✓</div>
+          <div class="gc" style="color:#4a5762;">本部门</div>
+          <div class="gc">李长昕</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">3.5</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#ffffff;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1058</span></div>
+          <div class="gc frz2">刘婉婷</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#e08600;">●</span> 待激活</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-130</span></div>
+          <div class="gc">测试组</div>
+          <div class="gc">测试工程师</div>
+          <div class="gc"><span class="num">135 9908 4471</span></div>
+          <div class="gc" style="color:#4a5762;">wanting@acme.com</div>
+          <div class="gc"><span class="num">2026-08-11</span></div>
+          <div class="gc" style="color:#4a5762;">—</div>
+          <div class="gc" style="justify-content:center;color:#c3ccd5;font-weight:700;">—</div>
+          <div class="gc" style="color:#4a5762;">本人</div>
+          <div class="gc">李长昕</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">0.0</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#fbfcfd;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1061</span></div>
+          <div class="gc frz2">孙浩然</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-200</span></div>
+          <div class="gc">市场营销部</div>
+          <div class="gc">运营专员</div>
+          <div class="gc"><div style="height:20px;margin:0 -5px;padding:0 4px;border:2px solid #15599b;background:#fff;display:flex;align-items:center;font-size:12px;color:#12283a;">182 3345 6672<span style="width:1px;height:12px;background:#15599b;margin-left:2px;"></span></div></div>
+          <div class="gc" style="color:#4a5762;">haoran@acme.com</div>
+          <div class="gc"><span class="num">2023-05-22</span></div>
+          <div class="gc" style="color:#4a5762;">5 天前</div>
+          <div class="gc" style="justify-content:center;color:#c3ccd5;font-weight:700;">—</div>
+          <div class="gc" style="color:#4a5762;">本部门</div>
+          <div class="gc">周雅雯</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">3.3</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#ffffff;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1062</span></div>
+          <div class="gc frz2">周雅雯</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-200</span></div>
+          <div class="gc">市场营销部</div>
+          <div class="gc">运营专员</div>
+          <div class="gc"><span class="num">138 6620 9915</span></div>
+          <div class="gc" style="color:#4a5762;">yawen@acme.com</div>
+          <div class="gc"><span class="num">2023-05-22</span></div>
+          <div class="gc" style="color:#4a5762;">1 周前</div>
+          <div class="gc" style="justify-content:center;color:#1e7d32;font-weight:700;">✓</div>
+          <div class="gc" style="color:#4a5762;">本部门</div>
+          <div class="gc">周雅雯</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">3.3</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#fbfcfd;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1070</span></div>
+          <div class="gc frz2">吴静琳</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-300</span></div>
+          <div class="gc">人力资源部</div>
+          <div class="gc">HRBP</div>
+          <div class="gc"><span class="num">159 8834 2201</span></div>
+          <div class="gc" style="color:#4a5762;">jinglin@acme.com</div>
+          <div class="gc"><span class="num">2021-11-08</span></div>
+          <div class="gc" style="color:#4a5762;">47 分钟前</div>
+          <div class="gc" style="justify-content:center;color:#1e7d32;font-weight:700;">✓</div>
+          <div class="gc" style="color:#4a5762;">全公司</div>
+          <div class="gc">吴静琳</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">4.8</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#ffffff;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1073</span></div>
+          <div class="gc frz2">郑一帆</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#e08600;">●</span> 待激活</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-400</span></div>
+          <div class="gc">财务部</div>
+          <div class="gc">财务专员</div>
+          <div class="gc"><span class="num">187 2290 5514</span></div>
+          <div class="gc" style="color:#4a5762;">yifan@acme.com</div>
+          <div class="gc"><span class="num">2026-08-18</span></div>
+          <div class="gc" style="color:#4a5762;">—</div>
+          <div class="gc" style="justify-content:center;color:#c3ccd5;font-weight:700;">—</div>
+          <div class="gc" style="color:#4a5762;">本人</div>
+          <div class="gc">何雨桐</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">0.0</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#fbfcfd;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1075</span></div>
+          <div class="gc frz2">马志强</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-500</span></div>
+          <div class="gc">行政部</div>
+          <div class="gc">行政主管</div>
+          <div class="gc"><span class="num">136 7712 8830</span></div>
+          <div class="gc" style="color:#4a5762;">zhiqiang@acme.com</div>
+          <div class="gc"><span class="num">2020-06-30</span></div>
+          <div class="gc" style="color:#4a5762;">1 天前</div>
+          <div class="gc" style="justify-content:center;color:#c3ccd5;font-weight:700;">—</div>
+          <div class="gc" style="color:#4a5762;">本部门</div>
+          <div class="gc">马志强</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">6.2</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#ffffff;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1081</span></div>
+          <div class="gc frz2">林晓莹</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-100</span></div>
+          <div class="gc">产品研发中心</div>
+          <div class="gc">产品经理</div>
+          <div class="gc"><span class="num">133 4456 1092</span></div>
+          <div class="gc" style="color:#4a5762;">xiaoying@acme.com</div>
+          <div class="gc"><span class="num">2022-01-17</span></div>
+          <div class="gc" style="color:#4a5762;">15 分钟前</div>
+          <div class="gc" style="justify-content:center;color:#1e7d32;font-weight:700;">✓</div>
+          <div class="gc" style="color:#4a5762;">跨部门</div>
+          <div class="gc">—</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">4.6</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#fbfcfd;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1085</span></div>
+          <div class="gc frz2">何雨桐</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-400</span></div>
+          <div class="gc">财务部</div>
+          <div class="gc">会计</div>
+          <div class="gc"><span class="num">188 9903 4417</span></div>
+          <div class="gc" style="color:#4a5762;">yutong@acme.com</div>
+          <div class="gc"><span class="num">2023-08-01</span></div>
+          <div class="gc" style="color:#4a5762;">2 小时前</div>
+          <div class="gc" style="justify-content:center;color:#1e7d32;font-weight:700;">✓</div>
+          <div class="gc" style="color:#4a5762;">本部门</div>
+          <div class="gc">何雨桐</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">3.1</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#ffffff;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1088</span></div>
+          <div class="gc frz2">徐嘉豪</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-110</span></div>
+          <div class="gc">前端组</div>
+          <div class="gc">开发工程师</div>
+          <div class="gc"><span class="num">150 2231 7708</span></div>
+          <div class="gc" style="color:#4a5762;">jiahao@acme.com</div>
+          <div class="gc"><span class="num">2024-03-04</span></div>
+          <div class="gc" style="color:#4a5762;">31 分钟前</div>
+          <div class="gc" style="justify-content:center;color:#c3ccd5;font-weight:700;">—</div>
+          <div class="gc" style="color:#4a5762;">本人</div>
+          <div class="gc">李长昕</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">2.5</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#fbfcfd;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1091</span></div>
+          <div class="gc frz2">高雪莹</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-500</span></div>
+          <div class="gc">行政部</div>
+          <div class="gc">行政专员</div>
+          <div class="gc"><span class="num">137 8845 2093</span></div>
+          <div class="gc" style="color:#4a5762;">xueying@acme.com</div>
+          <div class="gc"><span class="num">2024-06-12</span></div>
+          <div class="gc" style="color:#4a5762;">2 天前</div>
+          <div class="gc" style="justify-content:center;color:#c3ccd5;font-weight:700;">—</div>
+          <div class="gc" style="color:#4a5762;">本人</div>
+          <div class="gc">马志强</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">2.2</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#ffffff;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1094</span></div>
+          <div class="gc frz2">黄泽楷</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-120</span></div>
+          <div class="gc">后端组</div>
+          <div class="gc">开发工程师</div>
+          <div class="gc"><span class="num">135 2278 4419</span></div>
+          <div class="gc" style="color:#4a5762;">zekai@acme.com</div>
+          <div class="gc"><span class="num">2024-09-02</span></div>
+          <div class="gc" style="color:#4a5762;">4 小时前</div>
+          <div class="gc" style="justify-content:center;color:#1e7d32;font-weight:700;">✓</div>
+          <div class="gc" style="color:#4a5762;">本部门</div>
+          <div class="gc">李长昕</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">2.0</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#fbfcfd;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1097</span></div>
+          <div class="gc frz2">唐婉清</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-200</span></div>
+          <div class="gc">市场营销部</div>
+          <div class="gc">内容运营</div>
+          <div class="gc"><span class="num">186 5590 1123</span></div>
+          <div class="gc" style="color:#4a5762;">wanqing@acme.com</div>
+          <div class="gc"><span class="num">2025-01-13</span></div>
+          <div class="gc" style="color:#4a5762;">2 天前</div>
+          <div class="gc" style="justify-content:center;color:#c3ccd5;font-weight:700;">—</div>
+          <div class="gc" style="color:#4a5762;">本人</div>
+          <div class="gc">周雅雯</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">1.6</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#ffffff;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1102</span></div>
+          <div class="gc frz2">邓子涵</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#e08600;">●</span> 待激活</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-100</span></div>
+          <div class="gc">产品研发中心</div>
+          <div class="gc">UI 设计师</div>
+          <div class="gc"><span class="num">139 8802 6674</span></div>
+          <div class="gc" style="color:#4a5762;">zihan@acme.com</div>
+          <div class="gc"><span class="num">2026-08-20</span></div>
+          <div class="gc" style="color:#4a5762;">—</div>
+          <div class="gc" style="justify-content:center;color:#c3ccd5;font-weight:700;">—</div>
+          <div class="gc" style="color:#4a5762;">本人</div>
+          <div class="gc">—</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">0.0</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+        <div class="grow" style="background:#fbfcfd;">
+          <div class="gc" style="justify-content:center;"><div style="width:12px;height:12px;border:1px solid #b8c2cc;background:#fff;"></div></div>
+          <div class="gc frz"><span class="num" style="color:#15599b;">E-1105</span></div>
+          <div class="gc frz2">石雨萱</div>
+          <div class="gc" style="font-size:11.5px;"><span style="color:#1e7d32;">●</span> 在职</div>
+          <div class="gc"><span class="num" style="color:#6b7885;">D-300</span></div>
+          <div class="gc">人力资源部</div>
+          <div class="gc">招聘专员</div>
+          <div class="gc"><span class="num">150 3346 8890</span></div>
+          <div class="gc" style="color:#4a5762;">yuxuan@acme.com</div>
+          <div class="gc"><span class="num">2025-06-05</span></div>
+          <div class="gc" style="color:#4a5762;">1 小时前</div>
+          <div class="gc" style="justify-content:center;color:#1e7d32;font-weight:700;">✓</div>
+          <div class="gc" style="color:#4a5762;">本部门</div>
+          <div class="gc">吴静琳</div>
+          <div class="gc" style="justify-content:flex-end;"><span class="num">1.2</span></div>
+          <div class="gc" style="justify-content:center;color:#15599b;">编辑</div>
+        </div>
+
+      <div style="display:grid;grid-template-columns:30px 74px 62px 58px 66px 96px 92px 112px 126px 78px 76px 38px 66px 66px 68px 46px;height:28px;background:#fff8e1;border-top:2px solid #d9a441;font-weight:600;">
+        <div class="gc" style="border-right-color:#f0e2bd;"></div>
+        <div class="gc" style="border-right-color:#f0e2bd;color:#7a5b12;">合计</div>
+        <div class="gc" style="border-right-color:#f0e2bd;"><span class="num">18</span></div>
+        <div class="gc" style="border-right-color:#f0e2bd;font-size:11.5px;color:#7a5b12;">15 / 3</div>
+        <div class="gc" style="border-right-color:#f0e2bd;"></div>
+        <div class="gc" style="border-right-color:#f0e2bd;font-size:11.5px;color:#7a5b12;">8 个部门</div>
+        <div class="gc" style="border-right-color:#f0e2bd;"></div><div class="gc" style="border-right-color:#f0e2bd;"></div>
+        <div class="gc" style="border-right-color:#f0e2bd;"></div><div class="gc" style="border-right-color:#f0e2bd;"></div>
+        <div class="gc" style="border-right-color:#f0e2bd;"></div>
+        <div class="gc" style="border-right-color:#f0e2bd;justify-content:center;color:#7a5b12;"><span class="num">9</span></div>
+        <div class="gc" style="border-right-color:#f0e2bd;"></div><div class="gc" style="border-right-color:#f0e2bd;"></div>
+        <div class="gc" style="border-right-color:#f0e2bd;justify-content:flex-end;color:#7a5b12;"><span class="num">3.2</span></div>
+        <div class="gc" style="border-right-color:#f0e2bd;"></div>
+      </div>
+    </div>
+
+    <div style="height:28px;flex-shrink:0;display:flex;align-items:center;gap:16px;padding:0 14px;background:#f2f5f8;border-top:1px solid #c3ccd5;font-size:12px;color:#33465a;">
+      <span>已选 <span class="num" style="color:#15599b;font-weight:600;">1</span> 行</span>
+      <span>共 <span class="num">18</span> 条，本页 1–18</span>
+      <span style="color:#6b7885;">平均工龄 <span class="num">3.2</span> 年 · 2FA 开启率 <span class="num">50%</span></span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:5px;">
+        <div class="gtool" style="height:20px;padding:0 7px;">首页</div>
+        <div class="gtool" style="height:20px;padding:0 7px;">上页</div>
+        <span class="num">1</span><span>/</span><span class="num">1</span>
+        <div class="gtool" style="height:20px;padding:0 7px;">下页</div>
+        <div class="gtool" style="height:20px;padding:0 7px;">末页</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:76px;height:20px;padding:0 5px;border:1px solid #c3ccd5;background:#fff;"><span class="num">20</span> 条<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#8b98a5" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

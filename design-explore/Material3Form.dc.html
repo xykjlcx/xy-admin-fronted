@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+  <style>
+    body { margin:0; background:#FEF7FF; }
+    * { box-sizing:border-box; }
+    a { color: #6750A4; text-decoration: none; }
+    a:hover { color: #4F378B; }
+    .m3nav { display: flex; align-items: center; gap: 11px; height: 44px; padding: 0 20px; border-radius: 999px; font-size: 13.5px; color: #49454F; cursor: default; }
+    .m3nav:hover { background: #ECE6F0; }
+    .m3chip { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 8px; border: 1px solid #79747E; font-size: 12.5px; color: #49454F; cursor: default; }
+    /* M3 三行 list item（规范 three-line 88dp，此处压到 48px 以承载 20 项） */
+    .m3li { height: 48px; display: flex; flex-direction: column; justify-content: center; padding: 0 16px; border-radius: 8px; }
+    .m3li:hover { background: #F7F2FA; }
+    .m3ov { font-size: 10.5px; line-height: 14px; letter-spacing: 0.06em; color: #49454F; }
+    .m3hd { font-size: 13.5px; line-height: 18px; color: #1D1B20; }
+    .m3sp { font-size: 11px; line-height: 14px; color: #79747E; }
+    /* M3 dense data table 行高 40dp（列表页同款） */
+    .m3trow { display: grid; grid-template-columns: 116px 92px 118px 152px 68px 1fr; align-items: center; column-gap: 12px; height: 24px; padding: 0 16px; }
+    .m3trow > div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  </style>
+</helmet>
+
+<div style="width:1440px;height:850px;display:flex;flex-direction:column;font-family:Roboto, 'PingFang SC', -apple-system, sans-serif;">
+  <div style="height:72px;flex-shrink:0;background:#18181b;color:#fafafa;display:flex;align-items:center;justify-content:space-between;padding:0 28px;">
+    <div style="display:flex;align-items:baseline;gap:13px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.14em;color:#71717a;">方向 I · 表单页</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-0.01em;">Material Design 3</span>
+      <span style="font-size:12px;color:#a1a1aa;">Google</span>
+      <span style="font-size:11px;color:#4ade80;padding:2px 8px;border-radius:999px;background:rgba(74,222,128,0.14);">16 字段 · 3 分区</span>
+    </div>
+    <div style="display:flex;gap:24px;font-size:11.5px;line-height:1.5;">
+      <div style="max-width:370px;"><span style="color:#4ade80;">规范 </span><span style="color:#d4d4d8;">Outlined / Filled TextField 容器高 <span style="color:#fafafa;font-weight:600;">56dp</span>、标签浮进上边框缺口、必填 * 跟在标签<span style="color:#fafafa;font-weight:600;">后面</span>、supporting text 12sp、Switch track 52×32</span></div>
+      <div style="max-width:195px;"><span style="color:#fb923c;">代价 </span><span style="color:#d4d4d8;">56dp 字段 + 18px 说明位，一屏只装得下 16 个</span></div>
+    </div>
+  </div>
+  <div style="flex: 1; display: flex; flex-direction: column; min-height: 0; background: #FEF7FF;">
+      <div style="height: 60px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 14px;">
+        <div style="width: 38px; height: 38px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: #49454F;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+        </div>
+        <span style="font-size: 19px; color: #1D1B20;">昕越管理后台</span>
+        <div style="margin-left: 20px; display: flex; align-items: center; gap: 11px; height: 42px; padding: 0 16px; border-radius: 999px; background: #ECE6F0; color: #49454F; width: 340px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span style="font-size: 14px;">搜索成员、部门、角色</span>
+        </div>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+          <div style="width: 38px; height: 38px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: #49454F; position: relative;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+            <span style="position: absolute; top: 7px; right: 8px; width: 6px; height: 6px; border-radius: 999px; background: #B3261E;"></span>
+          </div>
+          <div style="width: 32px; height: 32px; border-radius: 999px; background: #6750A4; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500;">昕</div>
+        </div>
+      </div>
+
+    <div style="flex: 1; display: flex; min-height: 0;">
+        <div style="width: 244px; flex-shrink: 0; padding: 4px 10px;">
+        <div style="font-size: 11px; font-weight: 500; letter-spacing: 0.09em; color: #49454F; padding: 8px 20px 6px;">组织管理</div>
+        <div class="m3nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>企业概览</div>
+        <div class="m3nav" style="background: #E8DEF8; color: #1D192B; font-weight: 500;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>成员与部门</div>
+        <div class="m3nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>角色与权限</div>
+        <div class="m3nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 5h8"/><path d="M3 12h8"/><path d="M3 19h8"/><path d="M15 5h6"/><path d="M15 12h6"/><path d="M15 19h6"/></svg>菜单管理</div>
+        <div class="m3nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>日志审计</div>
+        <div class="m3nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>文件管理</div>
+        <div class="m3nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>企业信息</div>
+        </div>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 0 24px 0 0;">
+        <div style="height: 52px; flex-shrink: 0; display: flex; align-items: center; gap: 12px;">
+          <div style="width: 36px; height: 36px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: #49454F;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 22px; line-height: 28px; color: #1D1B20;">新增成员</div>
+          </div>
+          <span style="margin-left: 14px; font-size: 12.5px; color: #49454F;">组织管理 · 成员与部门 · 新增</span>
+          <span style="margin-left: auto; font-size: 12.5px; color: #49454F;">标签后带 * 为必填项 · 草稿已于 14:02 自动保存</span>
+        </div>
+
+        <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+          <div style="height: 34px; display: flex; align-items: center;"><span style="font-size: 24px; line-height: 32px; color: #1D1B20;">身份信息</span><span style="font-size: 12px; color: #49454F; margin-left: 12px;">Filled TextField</span></div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 20px; margin-top: 0px;">
+            <div style="width: 100%;">
+              <div style="height: 56px; border-radius: 4px 4px 0 0; background: #E6E0E9; border-bottom: 1px solid #79747E; padding: 8px 16px; display: flex; align-items: center; gap: 10px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 12px; line-height: 16px; color: #49454F;">工号<span style="letter-spacing:0.06em;"> *</span></div>
+                  <div style="font-size: 16px; line-height: 24px; color: #1D1B20; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">E-1092</div>
+                </div>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">保存后不可修改</div>
+            </div>
+            <div style="width: 100%;">
+              <div style="height: 56px; border-radius: 4px 4px 0 0; background: #E6E0E9; border-bottom: 1px solid #79747E; padding: 8px 16px; display: flex; align-items: center; gap: 10px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 12px; line-height: 16px; color: #49454F;">姓名<span style="letter-spacing:0.06em;"> *</span></div>
+                  <div style="font-size: 16px; line-height: 24px; color: #1D1B20; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">沈知远</div>
+                </div>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">与身份证一致</div>
+            </div>
+            <div style="width: 100%;">
+              <div style="height: 56px; border-radius: 4px 4px 0 0; background: #E6E0E9; border-bottom: 1px solid #79747E; padding: 0 16px; display: flex; align-items: center;">
+                <span style="font-size: 16px; color: #49454F;">英文名</span>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">未填写 · 标签留在框内</div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 20px; margin-top: 0px;">
+            <div style="width: 100%;">
+              <div style="height: 56px; border-radius: 4px 4px 0 0; background: #E6E0E9; border-bottom: 2px solid #B3261E; padding: 8px 16px; display: flex; align-items: center; gap: 10px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 12px; line-height: 16px; color: #B3261E;">企业邮箱<span style="letter-spacing:0.06em;"> *</span></div>
+                  <div style="font-size: 16px; line-height: 24px; color: #1D1B20; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">zhiyuan@acme.com</div>
+                </div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #B3261E;">该邮箱已被 E-1052 占用</div>
+            </div>
+            <div style="width: 100%;">
+              <div style="height: 56px; border-radius: 4px 4px 0 0; background: #E6E0E9; border-bottom: 1px solid #79747E; padding: 8px 16px; display: flex; align-items: center; gap: 10px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 12px; line-height: 16px; color: #49454F;">手机号<span style="letter-spacing:0.06em;"> *</span></div>
+                  <div style="font-size: 16px; line-height: 24px; color: #1D1B20; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">158 0611 9676</div>
+                </div>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">用于登录与二次验证</div>
+            </div>
+            <div style="width: 100%;">
+              <div style="height: 56px; border-radius: 4px 4px 0 0; background: #E6E0E9; border-bottom: 1px solid #79747E; padding: 8px 16px; display: flex; align-items: center; gap: 10px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 12px; line-height: 16px; color: #49454F;">入职日期<span style="letter-spacing:0.06em;"> *</span></div>
+                  <div style="font-size: 16px; line-height: 24px; color: #1D1B20; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">2026-08-25</div>
+                </div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;"></div>
+            </div>
+          </div>
+          <div style="height: 34px; display: flex; align-items: center;"><span style="font-size: 24px; line-height: 32px; color: #1D1B20;">组织与岗位</span><span style="font-size: 12px; color: #49454F; margin-left: 12px;">Outlined TextField</span></div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 20px; margin-top: 0px;">
+            <div style="width: 100%;">
+              <div style="position: relative; height: 56px; border: 1px solid #79747E; border-radius: 4px; padding: 0 16px; display: flex; align-items: center; gap: 10px;">
+                <span style="position: absolute; top: -8px; left: 12px; padding: 0 4px; background: #FEF7FF; font-size: 12px; line-height: 16px; color: #49454F;">部门<span style="letter-spacing:0.06em;"> *</span></span><span style="flex: 1; font-size: 16px; color: #1D1B20; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">产品研发中心 / 前端组</span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">继承上级部门数据范围</div>
+            </div>
+            <div style="width: 100%;">
+              <div style="position: relative; height: 56px; border: 1px solid #79747E; border-radius: 4px; padding: 0 16px; display: flex; align-items: center; gap: 10px;">
+                <span style="position: absolute; top: -8px; left: 12px; padding: 0 4px; background: #FEF7FF; font-size: 12px; line-height: 16px; color: #49454F;">岗位</span><span style="flex: 1; font-size: 16px; color: #1D1B20; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">高级前端工程师</span>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;"></div>
+            </div>
+            <div style="width: 100%;">
+              <div style="position: relative; height: 56px; border: 1px solid #79747E; border-radius: 4px; padding: 0 16px; display: flex; align-items: center; gap: 10px;">
+                <span style="flex: 1; font-size: 16px; color: #49454F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">直属上级</span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">未填写 · 标签留在框内</div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 20px; margin-top: 12px;">
+            <div style="width: 100%;">
+              <div style="position: relative; height: 56px; border: 2px solid #6750A4; border-radius: 4px; padding: 0 12px; display: flex; align-items: center; gap: 6px;">
+                <span style="position: absolute; top: -8px; left: 12px; padding: 0 4px; background: #FEF7FF; font-size: 12px; line-height: 16px; color: #6750A4;">系统角色（多选） *</span>
+                <span style="display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 8px 0 10px; border-radius: 8px; background: #E8DEF8; color: #1D192B; font-size: 12.5px;">开发工程师<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1D192B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span><span style="display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 8px 0 10px; border-radius: 8px; background: #E8DEF8; color: #1D192B; font-size: 12.5px;">发布审批人<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1D192B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                <span style="margin-left: auto;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6750A4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></span>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">已选 2 项 · 聚焦态：描边 2dp + 标签转 primary</div>
+            </div>
+            <div style="width: 100%;">
+              <div style="position: relative; height: 56px; border: 1px solid #79747E; border-radius: 4px; padding: 0 16px; display: flex; align-items: center; gap: 10px;">
+                <span style="position: absolute; top: -8px; left: 12px; padding: 0 4px; background: #FEF7FF; font-size: 12px; line-height: 16px; color: #49454F;">试用期至</span><span style="flex: 1; font-size: 16px; color: #1D1B20; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">2026-11-25</span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">入职满 3 个月自动转正</div>
+            </div>
+            <div style="width: 100%;">
+              <div style="position: relative; height: 56px; border: 1px solid #79747E; border-radius: 4px; padding: 0 16px; display: flex; align-items: center; gap: 10px;">
+                <span style="position: absolute; top: -8px; left: 12px; padding: 0 4px; background: #FEF7FF; font-size: 12px; line-height: 16px; color: #49454F;">数据范围<span style="letter-spacing:0.06em;"> *</span></span><span style="flex: 1; font-size: 16px; color: #1D1B20; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">本部门及下级</span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;"></div>
+            </div>
+          </div>
+          <div style="height: 34px; display: flex; align-items: center;"><span style="font-size: 24px; line-height: 32px; color: #1D1B20;">安全 · 状态 · 备注</span></div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 20px; margin-top: 0px;">
+            <div style="width: 100%;">
+              <div style="height: 56px; border-radius: 12px; background: #F3EDF7; padding: 0 16px; display: flex; align-items: center; gap: 12px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 14px; line-height: 20px; color: #1D1B20;">强制两步验证</div>
+                  <div style="font-size: 11.5px; line-height: 15px; color: #49454F;">下次登录起要求绑定 TOTP</div>
+                </div>
+                <div style="width: 52px; height: 32px; border-radius: 999px; background: #6750A4; display: flex; align-items: center; justify-content: flex-end; padding: 0 4px; flex-shrink: 0;"><div style="width: 24px; height: 24px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6750A4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+              </div>
+              <div style="height: 18px;"></div>
+            </div>
+            <div style="width: 100%;">
+              <div style="height: 56px; border-radius: 12px; background: #F3EDF7; padding: 0 16px; display: flex; align-items: center; gap: 12px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 14px; line-height: 20px; color: #1D1B20;">账号状态</div>
+                  <div style="font-size: 11.5px; line-height: 15px; color: #49454F;">关闭后立即失效所有会话</div>
+                </div>
+                <div style="width: 52px; height: 32px; border-radius: 999px; background: #6750A4; display: flex; align-items: center; justify-content: flex-end; padding: 0 4px; flex-shrink: 0;"><div style="width: 24px; height: 24px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6750A4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+              </div>
+              <div style="height: 18px;"></div>
+            </div>
+            <div style="width: 100%;">
+              <div style="position: relative; height: 56px; border: 1px solid #79747E; border-radius: 4px; padding: 0 16px; display: flex; align-items: center; gap: 10px;">
+                <span style="flex: 1; font-size: 16px; color: #49454F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">登录 IP 白名单</span>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">留空表示不限制 · 支持 CIDR</div>
+            </div>
+          </div>
+          <div style="margin-top: 8px;"><div style="width: 100%;">
+              <div style="position: relative; height: 78px; border: 1px solid #79747E; border-radius: 4px; padding: 14px 16px 0; display: flex;">
+                <span style="position: absolute; top: -8px; left: 12px; padding: 0 4px; background: #FEF7FF; font-size: 12px; line-height: 16px; color: #49454F;">备注</span>
+                <span style="font-size: 16px; line-height: 24px; color: #1D1B20;">由前端组 T3 招聘计划转入，试用期考核由林晓莹负责；设备已由行政部预留 MacBook Pro 一台。</span>
+              </div>
+              <div style="height: 18px; padding: 2px 16px 0; font-size: 12px; line-height: 16px; color: #49454F;">96 / 500</div>
+            </div></div>
+        </div>
+
+        <div style="height: 72px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; border-top: 1px solid #E6E0E9;">
+          <span style="font-size: 12.5px; color: #49454F;">共 16 个字段 · 1 项校验未通过</span>
+          <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+            <div style="display: flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 999px; color: #49454F; font-size: 14px; font-weight: 500;">取消</div>
+            <div style="display: flex; align-items: center; height: 40px; padding: 0 24px; border-radius: 999px; border: 1px solid #79747E; color: #6750A4; font-size: 14px; font-weight: 500;">保存草稿</div>
+            <div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 24px; border-radius: 999px; background: #E8DEF8; color: #1D192B; font-size: 14px; font-weight: 500;">保存并继续新增</div>
+            <div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 24px; border-radius: 999px; background: #6750A4; color: #FFFFFF; font-size: 14px; font-weight: 500;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg>创建成员</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

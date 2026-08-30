@@ -1,0 +1,299 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin:0; background:#ffffff; }
+    * { box-sizing:border-box; }
+    a { color:#1a65a6; }
+    .gvnav { display:flex; align-items:center; height:40px; padding:0 0 0 15px; border-left:4px solid transparent; font-size:16px; color:#1a65a6; text-decoration:underline; text-underline-offset:2px; cursor:default; }
+    .gvnav:hover { color:#0f385c; border-left-color:#cecece; }
+    .gvrow { display:grid; grid-template-columns:68px 60px 150px 68px 100px 88px 118px 92px 78px 38px 66px 58px; align-items:center; column-gap:15px; height:32px; border-bottom:1px solid #cecece; font-size:16px; color:#0b0c0c; }
+    .gvrow > div { white-space:nowrap; overflow:hidden; }
+    .gvrow:hover { background:#f3f3f3; }
+    .gvth { font-size:16px; font-weight:700; color:#0b0c0c; white-space:nowrap; }
+    .gvbtn { display:inline-flex; align-items:center; gap:8px; height:38px; padding:0 12px; border:0; border-radius:0; background:#0f7a52; box-shadow:0 2px 0 #083d29; color:#ffffff; font-size:17px; font-weight:400; cursor:default; }
+    .gvbtn2 { display:inline-flex; align-items:center; gap:8px; height:38px; padding:0 12px; border:0; border-radius:0; background:#f3f3f3; box-shadow:0 2px 0 #858686; color:#0b0c0c; font-size:17px; cursor:default; }
+    .gvinput { display:flex; align-items:center; height:38px; padding:0 8px; border:2px solid #0b0c0c; border-radius:0; background:#ffffff; font-size:16px; color:#0b0c0c; }
+    .gvtag { display:inline-flex; align-items:center; height:22px; padding:0 7px; border-radius:0; font-size:13px; font-weight:700; letter-spacing:0.4px; }
+    .gvlink { color:#1a65a6; text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px; }
+  </style>
+</helmet>
+
+<div style="width:1440px;height:850px;display:flex;flex-direction:column;font-family:arial,'Helvetica Neue','PingFang SC',helvetica,sans-serif;">
+  <div style="height:72px;flex-shrink:0;background:#18181b;color:#fafafa;display:flex;align-items:center;justify-content:space-between;padding:0 28px;">
+    <div style="display:flex;align-items:baseline;gap:13px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.14em;color:#71717a;">方向 AQ</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-0.01em;">GOV.UK Design System</span>
+      <span style="font-size:12px;color:#a1a1aa;">英国政府数字服务 GDS · 反装饰极端</span>
+      <span style="font-size:11px;color:#4ade80;padding:2px 8px;border-radius:999px;background:rgba(74,222,128,0.14);">13 行 × 12 列</span>
+    </div>
+    <div style="display:flex;gap:24px;font-size:11.5px;line-height:1.5;">
+      <div style="max-width:370px;"><span style="color:#4ade80;">规范 </span><span style="color:#d4d4d8;">零圆角 / 零阴影（按钮只有 <span style="color:#fafafa;font-weight:600;">0 2px 0 #083d29</span> 实边）+ 表头 2px 黑下框 + 深绿按钮 <span style="color:#fafafa;font-weight:600;">#0f7a52</span> + 焦点态一律 <span style="color:#fafafa;font-weight:600;">#FFDD00 黄底 + 黑下边</span>（图中输入框与"部门层级"均为聚焦中）</span></div>
+      <div style="max-width:195px;"><span style="color:#fb923c;">代价 </span><span style="color:#d4d4d8;">16px 正文已是它的压缩极限，同屏信息量只有 Linear 的一半</span></div>
+    </div>
+  </div>
+
+  <div style="height:50px;flex-shrink:0;background:#0b0c0c;border-bottom:10px solid #1d70b8;display:flex;align-items:center;gap:10px;padding:0 30px;">
+    <svg width="30" height="16" viewBox="0 0 30 16" fill="#ffffff" style="flex-shrink:0;"><path d="M3 10 L6.5 3 L10 8.5 L15 2 L20 8.5 L23.5 3 L27 10 Z"/><rect x="3" y="11" width="24" height="3.2"/><circle cx="6.5" cy="2.4" r="1.7"/><circle cx="15" cy="1.6" r="1.9"/><circle cx="23.5" cy="2.4" r="1.7"/></svg>
+    <span style="font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">GOV.UK</span>
+    <span style="width:1px;height:22px;background:rgba(255,255,255,0.35);margin:0 6px;"></span>
+    <span style="font-size:17px;color:#ffffff;">组织成员管理服务</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:20px;font-size:15px;color:#ffffff;">
+      <span style="text-decoration:underline;text-underline-offset:3px;">李长昕</span>
+      <span style="text-decoration:underline;text-underline-offset:3px;">退出</span>
+    </div>
+  </div>
+  <div style="height:36px;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 30px;border-bottom:1px solid #cecece;background:#ffffff;">
+    <span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;background:#1d70b8;color:#ffffff;font-size:13px;font-weight:700;letter-spacing:1px;">BETA</span>
+    <span style="font-size:15px;color:#0b0c0c;">这是新服务 —— 你的<span class="gvlink">反馈意见</span>将帮助我们改进它。</span>
+  </div>
+  <div style="height:28px;flex-shrink:0;display:flex;align-items:center;gap:9px;padding:0 30px;font-size:15px;background:#ffffff;">
+    <span class="gvlink">首页</span><span style="color:#484949;">›</span>
+    <span class="gvlink">组织与权限</span><span style="color:#484949;">›</span>
+    <span style="color:#0b0c0c;">成员与部门</span>
+  </div>
+  <div style="flex:1;min-height:0;display:flex;gap:30px;padding:14px 30px 0;background:#ffffff;">
+      <div style="width:200px;flex-shrink:0;">
+        <h2 style="margin:0 0 6px;padding:0 0 8px 15px;border-bottom:1px solid #cecece;font-size:17px;font-weight:700;color:#0b0c0c;">本服务内</h2>
+        <div class="gvnav">企业概览</div>
+        <div class="gvnav" style="border-left-color:#0b0c0c;color:#0b0c0c;font-weight:700;text-decoration:none;">成员与部门</div>
+        <div class="gvnav">角色与权限</div>
+        <div class="gvnav">菜单管理</div>
+        <div class="gvnav">日志审计</div>
+        <div class="gvnav">文件管理</div>
+        <div class="gvnav">企业信息</div>
+        <div class="gvnav" style="border-left-color:transparent;text-decoration:none;color:#0b0c0c;"><span style="background:#ffdd00;color:#0b0c0c;box-shadow:0 -2px #ffdd00,0 4px #0b0c0c;">部门层级</span></div>
+        
+      </div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+        <div style="height:56px;flex-shrink:0;">
+          <div style="font-size:15px;line-height:16px;color:#484949;">组织与权限</div>
+          <h1 style="margin:0;font-size:28px;font-weight:700;color:#0b0c0c;line-height:32px;">成员与部门</h1>
+        </div>
+        <div style="height:50px;flex-shrink:0;display:flex;align-items:flex-end;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <span style="font-size:14px;color:#484949;">姓名或工号</span>
+            <div class="gvinput" style="width:214px;box-shadow:0 0 0 3px #ffdd00;color:#0b0c0c;">李<span style="width:1.5px;height:19px;background:#0b0c0c;margin-left:1px;"></span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <span style="font-size:14px;color:#484949;">部门</span>
+            <div class="gvinput" style="width:160px;justify-content:space-between;">全部部门<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0b0c0c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <span style="font-size:14px;color:#484949;">状态</span>
+            <div class="gvinput" style="width:128px;justify-content:space-between;">全部<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0b0c0c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></div>
+          </div>
+          <div class="gvbtn2">筛选</div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+            <div class="gvbtn2">下载 CSV</div>
+            <div class="gvbtn">新增成员</div>
+          </div>
+        </div>
+        <div style="height:24px;flex-shrink:0;display:flex;align-items:center;font-size:15px;color:#484949;">
+          共 <span style="font-weight:700;color:#0b0c0c;">&nbsp;14&nbsp;</span> 名成员，其中 2 名待激活。正在显示第 1 至 13 名。
+        </div>
+        <div style="display:grid;grid-template-columns:68px 60px 150px 68px 100px 88px 118px 92px 78px 38px 66px 58px;align-items:center;column-gap:15px;height:36px;border-bottom:2px solid #0b0c0c;">
+          <div class="gvth" style="">工号</div><div class="gvth" style="">姓名</div><div class="gvth" style="">邮箱</div><div class="gvth" style="">状态</div><div class="gvth" style="">部门</div><div class="gvth" style="">角色</div><div class="gvth" style="">手机号</div><div class="gvth" style="">入职日期</div><div class="gvth" style="">最近登录</div><div class="gvth" style="text-align:center;">2FA</div><div class="gvth" style="">数据范围</div><div class="gvth" style="">操作</div>
+        </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1043</span></div>
+            <div>李长昕</div>
+            <div style="text-overflow:ellipsis;color:#484949;">leah@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>产品研发中心</div>
+            <div style="color:#484949;">超级管理员</div>
+            <div style="color:#484949;">158 0611 9676</div>
+            <div style="color:#484949;">2021-03-15</div>
+            <div style="color:#484949;">2 小时前</div>
+            <div style="text-align:center;"><span style="font-weight:700;color:#0b5c3e;">是</span></div>
+            <div style="color:#484949;">全公司</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1044</span></div>
+            <div>王思远</div>
+            <div style="text-overflow:ellipsis;color:#484949;">siyuan@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>前端组</div>
+            <div style="color:#484949;">开发工程师</div>
+            <div style="color:#484949;">139 2288 1043</div>
+            <div style="color:#484949;">2022-07-01</div>
+            <div style="color:#484949;">1 天前</div>
+            <div style="text-align:center;"><span style="font-weight:700;color:#0b5c3e;">是</span></div>
+            <div style="color:#484949;">本部门</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1051</span></div>
+            <div>陈嘉怡</div>
+            <div style="text-overflow:ellipsis;color:#484949;">jiayi@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>后端组</div>
+            <div style="color:#484949;">开发工程师</div>
+            <div style="color:#484949;">137 5501 8829</div>
+            <div style="color:#484949;">2022-09-12</div>
+            <div style="color:#484949;">1 天前</div>
+            <div style="text-align:center;"><span style="color:#484949;">否</span></div>
+            <div style="color:#484949;">本部门</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1052</span></div>
+            <div>赵敏杰</div>
+            <div style="text-overflow:ellipsis;color:#484949;">minjie@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>后端组</div>
+            <div style="color:#484949;">开发工程师</div>
+            <div style="color:#484949;">186 7742 3310</div>
+            <div style="color:#484949;">2023-02-06</div>
+            <div style="color:#484949;">3 天前</div>
+            <div style="text-align:center;"><span style="font-weight:700;color:#0b5c3e;">是</span></div>
+            <div style="color:#484949;">本部门</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1058</span></div>
+            <div>刘婉婷</div>
+            <div style="text-overflow:ellipsis;color:#484949;">wanting@acme.com</div>
+            <div><span class="gvtag" style="background:#fff8cc;color:#806f00;">待激活</span></div>
+            <div>测试组</div>
+            <div style="color:#484949;">测试工程师</div>
+            <div style="color:#484949;">135 9908 4471</div>
+            <div style="color:#484949;">2026-08-11</div>
+            <div style="color:#484949;">—</div>
+            <div style="text-align:center;"><span style="color:#484949;">否</span></div>
+            <div style="color:#484949;">本人</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1061</span></div>
+            <div>孙浩然</div>
+            <div style="text-overflow:ellipsis;color:#484949;">haoran@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>市场营销部</div>
+            <div style="color:#484949;">运营专员</div>
+            <div style="color:#484949;">182 3345 6672</div>
+            <div style="color:#484949;">2023-05-22</div>
+            <div style="color:#484949;">5 天前</div>
+            <div style="text-align:center;"><span style="color:#484949;">否</span></div>
+            <div style="color:#484949;">本部门</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1062</span></div>
+            <div>周雅雯</div>
+            <div style="text-overflow:ellipsis;color:#484949;">yawen@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>市场营销部</div>
+            <div style="color:#484949;">运营专员</div>
+            <div style="color:#484949;">138 6620 9915</div>
+            <div style="color:#484949;">2023-05-22</div>
+            <div style="color:#484949;">1 周前</div>
+            <div style="text-align:center;"><span style="font-weight:700;color:#0b5c3e;">是</span></div>
+            <div style="color:#484949;">本部门</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1070</span></div>
+            <div>吴静琳</div>
+            <div style="text-overflow:ellipsis;color:#484949;">jinglin@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>人力资源部</div>
+            <div style="color:#484949;">HRBP</div>
+            <div style="color:#484949;">159 8834 2201</div>
+            <div style="color:#484949;">2021-11-08</div>
+            <div style="color:#484949;">47 分钟前</div>
+            <div style="text-align:center;"><span style="font-weight:700;color:#0b5c3e;">是</span></div>
+            <div style="color:#484949;">全公司</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1073</span></div>
+            <div>郑一帆</div>
+            <div style="text-overflow:ellipsis;color:#484949;">yifan@acme.com</div>
+            <div><span class="gvtag" style="background:#fff8cc;color:#806f00;">待激活</span></div>
+            <div>财务部</div>
+            <div style="color:#484949;">财务专员</div>
+            <div style="color:#484949;">187 2290 5514</div>
+            <div style="color:#484949;">2026-08-18</div>
+            <div style="color:#484949;">—</div>
+            <div style="text-align:center;"><span style="color:#484949;">否</span></div>
+            <div style="color:#484949;">本人</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1075</span></div>
+            <div>马志强</div>
+            <div style="text-overflow:ellipsis;color:#484949;">zhiqiang@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>行政部</div>
+            <div style="color:#484949;">行政主管</div>
+            <div style="color:#484949;">136 7712 8830</div>
+            <div style="color:#484949;">2020-06-30</div>
+            <div style="color:#484949;">1 天前</div>
+            <div style="text-align:center;"><span style="color:#484949;">否</span></div>
+            <div style="color:#484949;">本部门</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1081</span></div>
+            <div>林晓莹</div>
+            <div style="text-overflow:ellipsis;color:#484949;">xiaoying@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>产品研发中心</div>
+            <div style="color:#484949;">产品经理</div>
+            <div style="color:#484949;">133 4456 1092</div>
+            <div style="color:#484949;">2022-01-17</div>
+            <div style="color:#484949;">15 分钟前</div>
+            <div style="text-align:center;"><span style="font-weight:700;color:#0b5c3e;">是</span></div>
+            <div style="color:#484949;">跨部门</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1085</span></div>
+            <div>何雨桐</div>
+            <div style="text-overflow:ellipsis;color:#484949;">yutong@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>财务部</div>
+            <div style="color:#484949;">会计</div>
+            <div style="color:#484949;">188 9903 4417</div>
+            <div style="color:#484949;">2023-08-01</div>
+            <div style="color:#484949;">2 小时前</div>
+            <div style="text-align:center;"><span style="font-weight:700;color:#0b5c3e;">是</span></div>
+            <div style="color:#484949;">本部门</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+          <div class="gvrow">
+            <div><span class="gvlink">E-1088</span></div>
+            <div>徐嘉豪</div>
+            <div style="text-overflow:ellipsis;color:#484949;">jiahao@acme.com</div>
+            <div><span class="gvtag" style="background:#cfe4dc;color:#0b5c3e;">在职</span></div>
+            <div>前端组</div>
+            <div style="color:#484949;">开发工程师</div>
+            <div style="color:#484949;">150 2231 7708</div>
+            <div style="color:#484949;">2024-03-04</div>
+            <div style="color:#484949;">31 分钟前</div>
+            <div style="text-align:center;"><span style="color:#484949;">否</span></div>
+            <div style="color:#484949;">本人</div>
+            <div><span class="gvlink">变更</span></div>
+          </div>
+        <div style="margin-top:auto;height:46px;flex-shrink:0;display:flex;align-items:center;gap:18px;font-size:16px;">
+          <span style="display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;background:#1d70b8;color:#ffffff;font-weight:700;">1</span>
+          <span class="gvlink">2</span>
+          <span style="color:#484949;">…</span>
+          <span class="gvlink">下一页 ›</span>
+          <span style="margin-left:auto;color:#484949;font-size:15px;">本表格无批量勾选：GDS 的复选框最小点击区 40px，放进表格会把行高撑到 44px 以上。</span>
+        </div>
+      </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

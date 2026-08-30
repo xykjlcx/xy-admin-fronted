@@ -30,8 +30,12 @@ lerna-debug.log*
 # Test / build artifacts
 test-results/
 coverage/
+.playwright-mcp/
 .tanstack/
 .superpowers/
 **/target/
 .flattened-pom.xml
 .metabuilder-dev/
+
+# 独立嵌套 git 仓库（TS/VSA 后端试点，有自己的版本控制）
+banking-vsa/

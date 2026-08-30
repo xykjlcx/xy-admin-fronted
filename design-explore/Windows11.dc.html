@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin:0; background:#EAEEF6; }
+    * { box-sizing:border-box; }
+    a { color:#0067C0; text-decoration:none; }
+    a:hover { color:#004E8C; }
+    /* Win11：Mica 半透明材质 + 8px 窗口圆角 + 控件顶部高光边 + 选中项左侧 accent 竖条 */
+    .nav { position:relative; display:flex; align-items:center; gap:11px; height:36px; margin:2px 0; padding:0 12px 0 16px; border-radius:5px; font-size:14px; color:#1A1A1A; cursor:default; }
+    .nav:hover { background:rgba(255,255,255,0.5); }
+    .row { display:grid; grid-template-columns:36px 72px 62px 144px 74px 96px 88px 110px 80px 38px 62px 34px; align-items:center; column-gap:10px; height:38px; padding:0 12px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px; }
+    .row:hover { background:rgba(0,0,0,0.03); }
+    .th { display:flex; align-items:center; font-size:12.5px; font-weight:600; color:#5D5D5D; }
+    .btn { display:flex; align-items:center; gap:7px; height:32px; padding:0 14px; border:1px solid rgba(0,0,0,0.07); border-top-color:rgba(255,255,255,0.9); border-radius:5px; background:linear-gradient(rgba(255,255,255,0.85),rgba(255,255,255,0.6)); box-shadow:0 1px 2px rgba(0,0,0,0.05); font-size:13px; color:#1A1A1A; cursor:default; }
+    .fld { display:flex; align-items:center; height:32px; padding:0 11px; border:1px solid rgba(0,0,0,0.08); border-bottom:2px solid #8A8A8A; border-radius:5px; background:rgba(255,255,255,0.7); font-size:13px; color:#8A8A8A; }
+  </style>
+</helmet>
+
+<div style="width:1440px;height:850px;display:flex;flex-direction:column;font-family:'Segoe UI Variable','Segoe UI','PingFang SC',sans-serif;">
+  <div style="height:72px;flex-shrink:0;background:#18181b;color:#fafafa;display:flex;align-items:center;justify-content:space-between;padding:0 28px;">
+    <div style="display:flex;align-items:baseline;gap:13px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.14em;color:#71717a;">方向 U</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-0.01em;">Windows 11 · Mica</span>
+      <span style="font-size:12px;color:#a1a1aa;">Microsoft 的另一支（和 Fluent 2 Web 不是一回事）</span>
+      <span style="font-size:11px;color:#4ade80;padding:2px 8px;border-radius:999px;background:rgba(74,222,128,0.14);">13 行 × 12 列</span>
+    </div>
+    <div style="display:flex;gap:24px;font-size:11.5px;line-height:1.5;">
+      <div style="max-width:370px;"><span style="color:#4ade80;">规范 </span><span style="color:#d4d4d8;"><span style="color:#fafafa;font-weight:600;">Mica 半透明材质</span>侧栏（透出桌面壁纸色）+ 窗口 8px / 控件 5px 圆角 + 控件顶部一道高光边和底部一道加重边 + 选中项左侧 accent 竖条 + accent #0067C0</span></div>
+      <div style="max-width:195px;"><span style="color:#fb923c;">代价 </span><span style="color:#d4d4d8;">半透明材质在网页里只能模拟，做不到真正的背景模糊采样</span></div>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;min-height:0;background:linear-gradient(140deg,#EAEEF6 0%,#F3F0F7 45%,#EDF2F2 100%);padding:8px;">
+    <div style="width:214px;flex-shrink:0;padding:8px 8px 0;">
+      <div style="height:44px;display:flex;align-items:center;gap:10px;padding:0 12px;">
+        <div style="width:26px;height:26px;border-radius:5px;background:#0067C0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">昕</div>
+        <span style="font-size:14px;font-weight:600;color:#1A1A1A;">昕越管理后台</span>
+      </div>
+      <div class="fld" style="margin:0 0 10px;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>搜索</div>
+        <div class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>企业概览</div>
+        <div class="nav" style="background:rgba(255,255,255,0.7);box-shadow:0 1px 2px rgba(0,0,0,0.08);font-weight:600;"><span style="position:absolute;left:4px;top:50%;transform:translateY(-50%);width:3px;height:16px;border-radius:999px;background:#0067C0;"></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>成员与部门</div>
+        <div class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>角色与权限</div>
+        <div class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 5h8"/><path d="M3 12h8"/><path d="M3 19h8"/><path d="M15 5h6"/><path d="M15 12h6"/><path d="M15 19h6"/></svg>菜单管理</div>
+        <div class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>日志审计</div>
+        <div class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>文件管理</div>
+        <div class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>企业信息</div>
+    </div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;border-radius:8px;background:rgba(255,255,255,0.85);border:1px solid rgba(255,255,255,0.9);box-shadow:0 8px 28px rgba(0,0,0,0.08);overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;">
+        <div>
+          <div style="font-size:22px;font-weight:600;color:#1A1A1A;">成员与部门</div>
+          <div style="font-size:13px;color:#5D5D5D;margin-top:3px;">14 名成员 · 8 个部门 · 2 人待激活</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>导出</div>
+          <div class="btn">批量导入</div>
+          <div style="display:flex;align-items:center;gap:6px;height:32px;padding:0 15px;border-radius:5px;background:#0067C0;border:1px solid rgba(0,0,0,0.1);border-top-color:rgba(255,255,255,0.35);color:#fff;font-size:13px;box-shadow:0 1px 2px rgba(0,0,0,0.12);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M5 12h14"/><path d="M12 5v14"/></svg>新增成员</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:0 18px 12px;">
+        <div class="fld" style="width:200px;gap:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>姓名 / 工号</div>
+        <div class="btn">全部部门<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></div>
+        <div class="btn">全部角色<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></div>
+        <div class="btn">全部状态<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></div>
+        <span style="margin-left:auto;font-size:13px;color:#5D5D5D;">已选 2 项 · <span style="color:#0067C0;">批量停用</span></span>
+      </div>
+      <div style="display:grid;grid-template-columns:36px 72px 62px 144px 74px 96px 88px 110px 80px 38px 62px 34px;align-items:center;column-gap:10px;height:36px;padding:0 12px;background:rgba(0,0,0,0.025);border-top:1px solid rgba(0,0,0,0.05);border-bottom:1px solid rgba(0,0,0,0.06);">
+        <div class="th"></div><div class="th">工号</div><div class="th">姓名</div><div class="th">邮箱</div><div class="th">状态</div><div class="th">部门</div><div class="th">角色</div><div class="th">手机号</div><div class="th">最近登录</div><div class="th" style="justify-content:center;">2FA</div><div class="th">数据范围</div><div class="th"></div>
+      </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1043</div><div style="color:#1A1A1A;font-weight:600;">李长昕</div>
+            <div style="color:#5D5D5D;">leah@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">产品研发中心</div><div style="color:#5D5D5D;">超级管理员</div>
+            <div style="color:#5D5D5D;">158 0611 9676</div><div style="color:#8A8A8A;">2 小时前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0F7B0F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="color:#5D5D5D;">全公司</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;background:rgba(0,103,192,0.08);">
+            <span style="position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;border-radius:999px;background:#0067C0;"></span>
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;background:#0067C0;display:flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+            <div style="color:#0067C0;">E-1044</div><div style="color:#1A1A1A;font-weight:600;">王思远</div>
+            <div style="color:#5D5D5D;">siyuan@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">前端组</div><div style="color:#5D5D5D;">开发工程师</div>
+            <div style="color:#5D5D5D;">139 2288 1043</div><div style="color:#8A8A8A;">1 天前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0F7B0F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="color:#5D5D5D;">本部门</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1051</div><div style="color:#1A1A1A;font-weight:600;">陈嘉怡</div>
+            <div style="color:#5D5D5D;">jiayi@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">后端组</div><div style="color:#5D5D5D;">开发工程师</div>
+            <div style="color:#5D5D5D;">137 5501 8829</div><div style="color:#8A8A8A;">1 天前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C4C4C4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+            <div style="color:#5D5D5D;">本部门</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1052</div><div style="color:#1A1A1A;font-weight:600;">赵敏杰</div>
+            <div style="color:#5D5D5D;">minjie@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">后端组</div><div style="color:#5D5D5D;">开发工程师</div>
+            <div style="color:#5D5D5D;">186 7742 3310</div><div style="color:#8A8A8A;">3 天前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0F7B0F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="color:#5D5D5D;">本部门</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;background:rgba(0,103,192,0.08);">
+            <span style="position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;border-radius:999px;background:#0067C0;"></span>
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;background:#0067C0;display:flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+            <div style="color:#0067C0;">E-1058</div><div style="color:#1A1A1A;font-weight:600;">刘婉婷</div>
+            <div style="color:#5D5D5D;">wanting@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(157,93,0,0.1);color:#9D5D00;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#9D5D00;"></span>待激活</span></div>
+            <div style="color:#1A1A1A;">测试组</div><div style="color:#5D5D5D;">测试工程师</div>
+            <div style="color:#5D5D5D;">135 9908 4471</div><div style="color:#8A8A8A;">—</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C4C4C4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+            <div style="color:#5D5D5D;">本人</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1061</div><div style="color:#1A1A1A;font-weight:600;">孙浩然</div>
+            <div style="color:#5D5D5D;">haoran@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">市场营销部</div><div style="color:#5D5D5D;">运营专员</div>
+            <div style="color:#5D5D5D;">182 3345 6672</div><div style="color:#8A8A8A;">5 天前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C4C4C4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+            <div style="color:#5D5D5D;">本部门</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1062</div><div style="color:#1A1A1A;font-weight:600;">周雅雯</div>
+            <div style="color:#5D5D5D;">yawen@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">市场营销部</div><div style="color:#5D5D5D;">运营专员</div>
+            <div style="color:#5D5D5D;">138 6620 9915</div><div style="color:#8A8A8A;">1 周前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0F7B0F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="color:#5D5D5D;">本部门</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1070</div><div style="color:#1A1A1A;font-weight:600;">吴静琳</div>
+            <div style="color:#5D5D5D;">jinglin@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">人力资源部</div><div style="color:#5D5D5D;">HRBP</div>
+            <div style="color:#5D5D5D;">159 8834 2201</div><div style="color:#8A8A8A;">47 分钟前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0F7B0F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="color:#5D5D5D;">全公司</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1073</div><div style="color:#1A1A1A;font-weight:600;">郑一帆</div>
+            <div style="color:#5D5D5D;">yifan@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(157,93,0,0.1);color:#9D5D00;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#9D5D00;"></span>待激活</span></div>
+            <div style="color:#1A1A1A;">财务部</div><div style="color:#5D5D5D;">财务专员</div>
+            <div style="color:#5D5D5D;">187 2290 5514</div><div style="color:#8A8A8A;">—</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C4C4C4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+            <div style="color:#5D5D5D;">本人</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1075</div><div style="color:#1A1A1A;font-weight:600;">马志强</div>
+            <div style="color:#5D5D5D;">zhiqiang@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">行政部</div><div style="color:#5D5D5D;">行政主管</div>
+            <div style="color:#5D5D5D;">136 7712 8830</div><div style="color:#8A8A8A;">1 天前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C4C4C4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+            <div style="color:#5D5D5D;">本部门</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1081</div><div style="color:#1A1A1A;font-weight:600;">林晓莹</div>
+            <div style="color:#5D5D5D;">xiaoying@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">产品研发中心</div><div style="color:#5D5D5D;">产品经理</div>
+            <div style="color:#5D5D5D;">133 4456 1092</div><div style="color:#8A8A8A;">15 分钟前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0F7B0F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="color:#5D5D5D;">跨部门</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1085</div><div style="color:#1A1A1A;font-weight:600;">何雨桐</div>
+            <div style="color:#5D5D5D;">yutong@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">财务部</div><div style="color:#5D5D5D;">会计</div>
+            <div style="color:#5D5D5D;">188 9903 4417</div><div style="color:#8A8A8A;">2 小时前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0F7B0F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="color:#5D5D5D;">本部门</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+          <div class="row" style="position:relative;">
+            
+            <div style="display:flex;justify-content:center;"><div style="width:15px;height:15px;border-radius:4px;border:1px solid #8A8A8A;background:rgba(255,255,255,0.6);"></div></div>
+            <div style="color:#0067C0;">E-1088</div><div style="color:#1A1A1A;font-weight:600;">徐嘉豪</div>
+            <div style="color:#5D5D5D;">jiahao@acme.com</div><div><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:4px;background:rgba(15,123,15,0.1);color:#0F7B0F;font-size:11.5px;"><span style="width:5px;height:5px;border-radius:999px;background:#0F7B0F;"></span>在职</span></div>
+            <div style="color:#1A1A1A;">前端组</div><div style="color:#5D5D5D;">开发工程师</div>
+            <div style="color:#5D5D5D;">150 2231 7708</div><div style="color:#8A8A8A;">31 分钟前</div>
+            <div style="display:flex;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C4C4C4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+            <div style="color:#5D5D5D;">本人</div>
+            <div style="display:flex;justify-content:flex-end;color:#8A8A8A;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

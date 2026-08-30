@@ -1,0 +1,284 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: #ffffff; }
+    * { box-sizing: border-box; }
+    a { color: #18181b; text-decoration: none; }
+    a:hover { color: #000000; }
+    .ic { flex-shrink: 0; }
+    .m2 { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+    .kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 4px; background: #f4f4f5; color: #71717a; font-size: 10.5px; font-family: "JetBrains Mono", ui-monospace, monospace; }
+    .tab { display: flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px; border-radius: 8px; font-size: 12.5px; color: #71717a; cursor: default; }
+    .tab:hover { background: #f4f4f5; color: #18181b; }
+    .cmdrow { display: flex; align-items: center; gap: 11px; height: 40px; padding: 0 14px; border-radius: 9px; cursor: default; }
+    .cmdrow:hover { background: #f7f7f8; }
+    .cgroup { font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #a1a1aa; padding: 0 14px; margin: 12px 0 4px; }
+    .brow { display: grid; grid-template-columns: minmax(0,1.9fr) 100px minmax(0,1.2fr) 116px; align-items: center; column-gap: 20px; height: 48px; border-bottom: 1px solid #f4f4f5; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 850px; display: flex; flex-direction: column; font-family: 'Public Sans', 'PingFang SC', -apple-system, sans-serif;">
+
+  <div style="height: 72px; flex-shrink: 0; background: #18181b; color: #fafafa; display: flex; align-items: center; justify-content: space-between; padding: 0 28px;">
+    <div style="display: flex; align-items: baseline; gap: 14px;">
+      <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: #71717a;">方向 H</span>
+      <span style="font-size: 19px; font-weight: 600; letter-spacing: -0.01em;">命令驱动</span>
+      <span style="font-size: 12.5px; color: #a1a1aa;">Raycast / Superhuman / Linear 血统</span>
+    </div>
+    <div style="display: flex; gap: 26px; font-size: 11.5px; line-height: 1.5;">
+      <div style="max-width: 350px;"><span style="color: #4ade80;">骨架 </span><span style="color: #d4d4d8;"><span style="color: #fafafa; font-weight: 600;">完全没有侧边栏</span>。导航靠 ⌘K + 顶部最近访问。内容拿到整个 1440px 宽度，一个像素都不给 chrome。菜单再多也不占地方</span></div>
+      <div style="max-width: 215px;"><span style="color: #fb923c;">代价 </span><span style="color: #d4d4d8;">新用户会迷路——看不见的功能等于不存在。必须配可发现性设计</span></div>
+    </div>
+  </div>
+
+  <div style="flex: 1; position: relative; min-height: 0; background: #ffffff; overflow: hidden;">
+
+    <!-- 常态：顶栏（无侧边栏）+ 通栏内容 -->
+    <div style="height: 100%; display: flex; flex-direction: column;">
+
+      <div style="height: 54px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 28px; border-bottom: 1px solid #f4f4f5;">
+        <div style="display: flex; align-items: center; gap: 9px;">
+          <div style="width: 23px; height: 23px; border-radius: 6px; background: #18181b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">昕</div>
+          <span style="font-size: 13px; font-weight: 600; color: #18181b;">昕越</span>
+        </div>
+        <span style="width: 1px; height: 16px; background: #e4e4e7;"></span>
+        <!-- 导航的替代品：最近访问 -->
+        <div style="display: flex; align-items: center; gap: 2px;">
+          <div class="tab" style="background: #f4f4f5; color: #18181b; font-weight: 500;">
+            <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            成员与部门
+          </div>
+          <div class="tab"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>角色与权限</div>
+          <div class="tab"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>日志审计</div>
+          <div class="tab" style="color: #c4c4c8;">最近访问的页面会留在这里</div>
+        </div>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 11px; border-radius: 8px; border: 1px solid #e4e4e7; color: #a1a1aa;">
+            <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <span style="font-size: 12.5px;">去任何地方，做任何事</span>
+            <span class="kbd" style="margin-left: 22px;">⌘K</span>
+          </div>
+          <div style="width: 26px; height: 26px; border-radius: 999px; background: #e4e4e7; color: #52525b; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 600;">昕</div>
+        </div>
+      </div>
+
+      <div style="flex: 1; min-height: 0; padding: 26px 28px 0;">
+        <div style="max-width: 1180px; margin: 0 auto;">
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 20px;">
+            <div>
+              <div style="font-size: 24px; font-weight: 600; color: #09090b; letter-spacing: -0.02em;">成员与部门</div>
+              <div style="margin-top: 5px; font-size: 12.5px; color: #71717a;">14 名成员 · 8 个部门 · 2 人待激活</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 9px; font-size: 12px; color: #a1a1aa;">
+              <span>按 <span class="kbd">N</span> 新建 · <span class="kbd">F</span> 筛选 · <span class="kbd">E</span> 导出</span>
+            </div>
+          </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">李长昕</span>
+                <span style="font-size: 12px; color: #a1a1aa;">leah@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">产品研发中心 · 超级管理员</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">2 小时前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">王思远</span>
+                <span style="font-size: 12px; color: #a1a1aa;">siyuan@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">前端组 · 开发工程师</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">1 天前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">陈嘉怡</span>
+                <span style="font-size: 12px; color: #a1a1aa;">jiayi@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">后端组 · 开发工程师</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">1 天前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">赵敏杰</span>
+                <span style="font-size: 12px; color: #a1a1aa;">minjie@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">后端组 · 开发工程师</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">3 天前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #71717a;">刘婉婷</span>
+                <span style="font-size: 12px; color: #a1a1aa;">wanting@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #f59e0b;"></span>待激活</div>
+              <div style="font-size: 12.5px; color: #71717a;">测试组 · 测试工程师</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">从未登录</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">孙浩然</span>
+                <span style="font-size: 12px; color: #a1a1aa;">haoran@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">市场营销部 · 运营专员</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">5 天前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">周雅雯</span>
+                <span style="font-size: 12px; color: #a1a1aa;">yawen@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">市场营销部 · 运营专员</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">1 周前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">吴静琳</span>
+                <span style="font-size: 12px; color: #a1a1aa;">jinglin@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">人力资源部 · HRBP</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">47 分钟前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #71717a;">郑一帆</span>
+                <span style="font-size: 12px; color: #a1a1aa;">yifan@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #f59e0b;"></span>待激活</div>
+              <div style="font-size: 12.5px; color: #71717a;">财务部 · 财务专员</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">从未登录</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">马志强</span>
+                <span style="font-size: 12px; color: #a1a1aa;">zhiqiang@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">行政部 · 行政主管</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">1 天前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">林晓莹</span>
+                <span style="font-size: 12px; color: #a1a1aa;">xiaoying@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">产品研发中心 · 产品经理</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">15 分钟前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">何雨桐</span>
+                <span style="font-size: 12px; color: #a1a1aa;">yutong@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">财务部 · 会计</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">2 小时前</div>
+            </div>
+            <div class="brow">
+              <div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 500; color: #18181b;">徐嘉豪</span>
+                <span style="font-size: 12px; color: #a1a1aa;">jiahao@acme.com</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #52525b;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #22c55e;"></span>正常</div>
+              <div style="font-size: 12.5px; color: #71717a;">前端组 · 开发工程师</div>
+              <div class="m2" style="font-size: 12px; color: #a1a1aa; text-align: right;">31 分钟前</div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⌘K 命令面板：导航、搜索、执行三合一 -->
+    <div style="position: absolute; inset: 0; background: rgba(9,9,11,0.32);"></div>
+    <div style="position: absolute; left: 50%; top: 92px; transform: translateX(-50%); width: 620px; border-radius: 15px; background: #ffffff; box-shadow: 0 24px 64px rgba(9,9,11,0.28), 0 4px 12px rgba(9,9,11,0.10); overflow: hidden;">
+
+      <div style="display: flex; align-items: center; gap: 11px; height: 54px; padding: 0 17px; border-bottom: 1px solid #f4f4f5;">
+        <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <span style="font-size: 14.5px; color: #18181b;">成员</span>
+        <span style="width: 1px; height: 17px; background: #18181b; margin-left: -6px;"></span>
+        <span style="margin-left: auto; font-size: 11px; color: #d4d4d8;">在 14 条记录、23 个页面、41 个操作中搜索</span>
+      </div>
+
+      <div style="padding: 4px 6px 6px; max-height: 452px;">
+        <div class="cgroup">跳转</div>
+          <div class="cmdrow" style="background: #18181b;">
+            <svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            <span style="font-size: 13px; color: #ffffff;">成员与部门</span>
+            <span style="font-size: 11.5px; color: rgba(255,255,255,0.5);">组织与权限</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;"><span class="kbd" style="background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.8);">↵</span></div>
+          </div>
+          <div class="cmdrow">
+            <svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+            <span style="font-size: 13px; color: #18181b;">角色与权限</span>
+            <span style="font-size: 11.5px; color: #a1a1aa;">组织与权限</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;"></div>
+          </div>
+          <div class="cmdrow">
+            <svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>
+            <span style="font-size: 13px; color: #18181b;">成员变更日志</span>
+            <span style="font-size: 11.5px; color: #a1a1aa;">安全审计</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;"></div>
+          </div>
+
+        <div class="cgroup">操作</div>
+          <div class="cmdrow">
+            <svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            <span style="font-size: 13px; color: #18181b;">新建成员</span>
+            <span style="font-size: 11.5px; color: #a1a1aa;">打开新建表单</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;"><span class="kbd">N</span></div>
+          </div>
+          <div class="cmdrow">
+            <svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m8 7 4-4 4 4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            <span style="font-size: 13px; color: #18181b;">批量导入成员</span>
+            <span style="font-size: 11.5px; color: #a1a1aa;">上传 Excel / CSV</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;"></div>
+          </div>
+          <div class="cmdrow">
+            <svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            <span style="font-size: 13px; color: #18181b;">导出成员名单</span>
+            <span style="font-size: 11.5px; color: #a1a1aa;">当前筛选 14 条</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;"><span class="kbd">E</span></div>
+          </div>
+
+        <div class="cgroup">成员</div>
+          <div class="cmdrow">
+            <div style="width: 22px; height: 22px; border-radius: 999px; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0;">昕</div>
+            <span style="font-size: 13px; color: #18181b;">李长昕</span>
+            <span style="font-size: 11.5px; color: #a1a1aa;">产品研发中心 · 超级管理员</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;"></div>
+          </div>
+          <div class="cmdrow">
+            <div style="width: 22px; height: 22px; border-radius: 999px; background: #f59e0b; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0;">婷</div>
+            <span style="font-size: 13px; color: #18181b;">刘婉婷</span>
+            <span style="font-size: 11.5px; color: #a1a1aa;">测试组 · 待激活</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;"></div>
+          </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 16px; height: 38px; padding: 0 17px; border-top: 1px solid #f4f4f5; background: #fcfcfd;">
+        <span style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: #a1a1aa;"><span class="kbd">↑</span><span class="kbd">↓</span> 移动</span>
+        <span style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: #a1a1aa;"><span class="kbd">↵</span> 打开</span>
+        <span style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: #a1a1aa;"><span class="kbd">⌘</span><span class="kbd">↵</span> 后台打开</span>
+        <span style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: #a1a1aa; margin-left: auto;"><span class="kbd">esc</span> 关闭</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

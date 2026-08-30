@@ -1,0 +1,353 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+  <style>
+    body { margin:0; background:#ffffff; }
+    * { box-sizing:border-box; }
+    .dnav { display:flex; align-items:center; gap:9px; height:38px; padding:0 14px; border-left:4px solid transparent; font-size:13.5px; color:#333333; cursor:default; }
+    .dnav:hover { background:#f2f2f2; }
+    .dsec { font-size:11px; font-weight:700; color:#767676; letter-spacing:0.06em; padding:0 18px; margin:14px 0 4px; }
+    .drow { display:grid; grid-template-columns:26px 62px 118px 138px 60px 106px 88px 62px 100px 78px 84px 32px 62px 28px; align-items:center; column-gap:8px; height:36px; padding:0 12px; border-bottom:1px solid #e6e6e6; }
+    .drow > div { white-space:nowrap; overflow:hidden; }
+    .drow:hover { background:#e8f1fe; }
+    .dth { font-size:11.5px; font-weight:700; color:#4d4d4d; white-space:nowrap; }
+    .dsub { font-size:10px; color:#666666; line-height:13px; }
+    .dmain { font-size:12.5px; color:#333333; line-height:16px; }
+    .dbtn { display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 14px; border:1px solid #cccccc; border-radius:8px; background:#ffffff; font-size:13px; font-weight:700; color:#0017c1; cursor:default; }
+    .dbtn:hover { background:#f2f2f2; }
+    .dpri { display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 16px; border:1px solid #0017c1; border-radius:8px; background:#0017c1; color:#ffffff; font-size:13px; font-weight:700; cursor:default; }
+    .dpri:hover { background:#00118f; }
+    .dfld { display:flex; align-items:center; height:32px; padding:0 10px; border:1px solid #cccccc; border-radius:4px; background:#ffffff; font-size:12.5px; color:#333333; }
+    .dreq { display:inline-flex; align-items:center; height:16px; padding:0 5px; border-radius:4px; background:#ec0000; color:#ffffff; font-size:9.5px; font-weight:700; }
+    .dbadge { display:inline-flex; align-items:center; height:20px; padding:0 7px; border-radius:4px; font-size:11px; font-weight:700; }
+  </style>
+</helmet>
+
+<div style="width:1440px;height:850px;display:flex;flex-direction:column;font-family:'Noto Sans JP','Hiragino Sans','PingFang SC',sans-serif;">
+  <div style="height:72px;flex-shrink:0;background:#18181b;color:#fafafa;display:flex;align-items:center;justify-content:space-between;padding:0 28px;">
+    <div style="display:flex;align-items:baseline;gap:13px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.14em;color:#71717a;">方向 AR</span>
+      <span style="font-size:19px;font-weight:600;letter-spacing:-0.01em;">デジタル庁 Design System</span>
+      <span style="font-size:12px;color:#a1a1aa;">日本 · 数字厅（政务体系）</span>
+      <span style="font-size:11px;color:#4ade80;padding:2px 8px;border-radius:999px;background:rgba(74,222,128,0.14);">13 行 × 14 列</span>
+    </div>
+    <div style="display:flex;gap:24px;font-size:11.5px;line-height:1.5;">
+      <div style="max-width:370px;"><span style="color:#4ade80;">规范 </span><span style="color:#d4d4d8;">key color <span style="color:#fafafa;font-weight:600;">#0017C1</span>（blue-900，近乎藏青）+ 圆角 4/8px + 每行两层：主信息 12.5px 上、<span style="color:#fafafa;font-weight:600;">10px 灰色補足テキスト</span> 下 + 顶部常驻文字大小/对比度切换条</span></div>
+      <div style="max-width:195px;"><span style="color:#fb923c;">代价 </span><span style="color:#d4d4d8;">两行行结构一旦列多就糊；補足信息真假难辨</span></div>
+    </div>
+  </div>
+
+  <div style="height:26px;flex-shrink:0;display:flex;align-items:center;gap:14px;padding:0 20px;background:#f2f2f2;border-bottom:1px solid #e6e6e6;font-size:11px;color:#666666;">
+    <span>本システムは社内限定です</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+      <span>文字サイズ</span>
+      <span style="display:inline-flex;align-items:center;height:17px;padding:0 7px;border:1px solid #cccccc;border-radius:4px;background:#fff;">小</span>
+      <span style="display:inline-flex;align-items:center;height:17px;padding:0 7px;border:1px solid #0017c1;border-radius:4px;background:#0017c1;color:#fff;font-weight:700;">中</span>
+      <span style="display:inline-flex;align-items:center;height:17px;padding:0 7px;border:1px solid #cccccc;border-radius:4px;background:#fff;">大</span>
+      <span style="width:1px;height:13px;background:#cccccc;"></span>
+      <span>コントラスト変更</span><span>ふりがな表示</span>
+    </div>
+  </div>
+  <div style="height:48px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 20px;background:#ffffff;border-bottom:1px solid #e6e6e6;">
+    <span style="width:26px;height:26px;border-radius:4px;background:#0017c1;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">昕</span>
+    <span style="font-size:15px;font-weight:700;color:#1a1a1a;">昕越 組織管理システム</span>
+    <span style="font-size:11px;color:#666666;border-left:1px solid #cccccc;padding-left:10px;">職員・部署管理</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:14px;">
+      <div class="dfld" style="width:200px;gap:7px;color:#767676;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#767676" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>氏名・職員番号で検索</div>
+      <span style="color:#4d4d4d;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg></span>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span style="width:26px;height:26px;border-radius:999px;background:#0017c1;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">李</span>
+        <div style="line-height:1.2;"><div style="font-size:12px;font-weight:700;color:#1a1a1a;">李长昕</div><div style="font-size:9.5px;color:#666666;">システム管理者</div></div>
+      </div>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;min-height:0;background:#ffffff;">
+    <div style="width:224px;flex-shrink:0;background:#ffffff;border-right:1px solid #e6e6e6;display:flex;flex-direction:column;">
+      <div class="dsec">組織・権限</div>
+        <div class="dnav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>企业概览</div>
+        <div class="dnav" style="border-left-color:#0017c1;background:#e8f1fe;color:#0017c1;font-weight:700;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>成员与部门</div>
+        <div class="dnav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>角色与权限</div>
+        <div class="dnav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 5h8"/><path d="M3 12h8"/><path d="M3 19h8"/><path d="M15 5h6"/><path d="M15 12h6"/><path d="M15 19h6"/></svg>菜单管理</div>
+        <div class="dnav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>日志审计</div>
+        <div class="dnav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>文件管理</div>
+        <div class="dnav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>企业信息</div>
+        
+      <div class="dsec">補助メニュー</div>
+        <div class="dnav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>一括登録</div>
+        <div class="dnav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>システム設定</div>
+      <div style="margin-top:auto;padding:12px 18px;border-top:1px solid #e6e6e6;">
+        <div style="font-size:10px;color:#666666;line-height:1.6;">最終同期 2026-08-25 09:12<br>人事システム連携：<span style="color:#197a4b;font-weight:700;">正常</span></div>
+      </div>
+    </div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;padding:8px 20px 0;background:#ffffff;">
+        <div style="height:26px;flex-shrink:0;display:flex;align-items:center;gap:7px;font-size:11.5px;color:#666666;">
+          <span style="color:#0017c1;">ホーム</span><span>＞</span><span style="color:#0017c1;">組織・権限</span><span>＞</span><span style="color:#333333;">職員・部署</span>
+        </div>
+        <div style="height:54px;flex-shrink:0;">
+          <div style="display:flex;align-items:baseline;gap:10px;">
+            <h1 style="margin:0;font-size:22px;font-weight:700;color:#1a1a1a;line-height:32px;">職員・部署の管理</h1>
+            <span class="dbadge" style="background:#d9e6ff;color:#0017c1;">全 14 件</span>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+              <div class="dbtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0017c1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>CSV 出力</div>
+              <div class="dbtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0017c1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12 15V3"/><path d="m8 7 4-4 4 4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>一括登録</div>
+              <div class="dpri"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M5 12h14"/><path d="M12 5v14"/></svg>職員を追加</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#666666;margin-top:2px;">補足テキスト：人事システムと 15 分ごとに同期しています。氏名・部署の変更は人事システム側で行ってください。</div>
+        </div>
+        <div style="height:58px;flex-shrink:0;display:flex;align-items:flex-end;gap:10px;border:1px solid #e6e6e6;border-radius:8px;background:#f2f2f2;padding:8px 12px;">
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;"><span style="font-size:11px;font-weight:700;color:#4d4d4d;">部署</span><span class="dreq">必須</span></div>
+            <div class="dfld" style="width:150px;justify-content:space-between;">全部署<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:11px;font-weight:700;color:#4d4d4d;">役職</span>
+            <div class="dfld" style="width:130px;justify-content:space-between;">すべて<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:11px;font-weight:700;color:#4d4d4d;">状態</span>
+            <div class="dfld" style="width:110px;justify-content:space-between;">すべて<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:11px;font-weight:700;color:#4d4d4d;">最終ログイン</span>
+            <div class="dfld" style="width:150px;justify-content:space-between;">2026-08-01 〜<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></div>
+          </div>
+          <div class="dpri" style="height:32px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>絞り込む</div>
+          <div class="dbtn" style="height:32px;">条件をクリア</div>
+          <div style="margin-left:auto;font-size:10px;color:#666666;line-height:1.5;text-align:right;">補足：部署は必須です。<br>権限のない部署は表示されません。</div>
+        </div>
+        <div style="height:32px;flex-shrink:0;display:flex;align-items:center;font-size:11.5px;color:#666666;">
+          全 <span style="color:#1a1a1a;font-weight:700;">&nbsp;14&nbsp;</span> 件中 <span style="color:#1a1a1a;font-weight:700;">&nbsp;1〜13&nbsp;</span> 件を表示　/　選択中 <span style="color:#0017c1;font-weight:700;">&nbsp;2&nbsp;</span> 件
+          <span style="margin-left:auto;display:flex;align-items:center;gap:6px;">表示件数<span class="dfld" style="height:24px;padding:0 8px;gap:5px;font-size:11px;">13 件<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m6 9 6 6 6-6"/></svg></span></span>
+        </div>
+        <div style="display:grid;grid-template-columns:26px 62px 118px 138px 60px 106px 88px 62px 100px 78px 84px 32px 62px 28px;align-items:center;column-gap:8px;height:32px;padding:0 12px;background:#f2f2f2;border-top:1px solid #cccccc;border-bottom:1px solid #cccccc;">
+          <div class="dth" style=""></div><div class="dth" style="">職員番号</div><div class="dth" style="">氏名 / ふりがな</div><div class="dth" style="">メールアドレス</div><div class="dth" style="">状態</div><div class="dth" style="">部署 / コード</div><div class="dth" style="">役職 / 権限</div><div class="dth" style="">上長</div><div class="dth" style="">電話 / 内線</div><div class="dth" style="">入社日 / 勤続</div><div class="dth" style="">ログイン / IP</div><div class="dth" style="text-align:center;">2FA</div><div class="dth" style="">データ範囲</div><div class="dth" style=""></div>
+        </div>
+          <div class="drow" style="background:#e8f1fe;">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;background:#0017c1;display:inline-flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1043</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">李长昕</span></div><div class="dsub">リ・チョウキン</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">leah@acme.com</span></div><div class="dsub">認証済み</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">产品研发中心</div><div class="dsub">DEPT-001</div></div>
+            <div><div class="dmain" style="color:#333333;">超级管理员</div><div class="dsub">全権限</div></div>
+            <div><div class="dmain" style="color:#767676;">—</div><div class="dsub">最上位</div></div>
+            <div><div class="dmain" style="color:#333333;">158 0611 9676</div><div class="dsub">内線 2043</div></div>
+            <div><div class="dmain" style="color:#333333;">2021-03-15</div><div class="dsub">勤続 5 年</div></div>
+            <div><div class="dmain" style="color:#333333;">2 小时前</div><div class="dsub">192.168.1.42</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;font-weight:700;color:#197a4b;">済</span></div>
+            <div><div class="dmain" style="color:#333333;">全公司</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1044</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">王思远</span></div><div class="dsub">オウ・シエン</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">siyuan@acme.com</span></div><div class="dsub">認証済み</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">前端组</div><div class="dsub">DEPT-011</div></div>
+            <div><div class="dmain" style="color:#333333;">开发工程师</div><div class="dsub">開発権限</div></div>
+            <div><div class="dmain" style="color:#333333;">李长昕</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">139 2288 1043</div><div class="dsub">内線 2044</div></div>
+            <div><div class="dmain" style="color:#333333;">2022-07-01</div><div class="dsub">勤続 4 年</div></div>
+            <div><div class="dmain" style="color:#333333;">1 天前</div><div class="dsub">10.0.3.118</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;font-weight:700;color:#197a4b;">済</span></div>
+            <div><div class="dmain" style="color:#333333;">本部门</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1051</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">陈嘉怡</span></div><div class="dsub">チン・カイ</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">jiayi@acme.com</span></div><div class="dsub">未認証</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">后端组</div><div class="dsub">DEPT-012</div></div>
+            <div><div class="dmain" style="color:#333333;">开发工程师</div><div class="dsub">開発権限</div></div>
+            <div><div class="dmain" style="color:#333333;">李长昕</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">137 5501 8829</div><div class="dsub">内線 3051</div></div>
+            <div><div class="dmain" style="color:#333333;">2022-09-12</div><div class="dsub">勤続 3 年</div></div>
+            <div><div class="dmain" style="color:#333333;">1 天前</div><div class="dsub">10.0.3.204</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;color:#767676;">未</span></div>
+            <div><div class="dmain" style="color:#333333;">本部门</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1052</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">赵敏杰</span></div><div class="dsub">チョウ・ビンケツ</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">minjie@acme.com</span></div><div class="dsub">認証済み</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">后端组</div><div class="dsub">DEPT-012</div></div>
+            <div><div class="dmain" style="color:#333333;">开发工程师</div><div class="dsub">開発権限</div></div>
+            <div><div class="dmain" style="color:#333333;">李长昕</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">186 7742 3310</div><div class="dsub">内線 3052</div></div>
+            <div><div class="dmain" style="color:#333333;">2023-02-06</div><div class="dsub">勤続 3 年</div></div>
+            <div><div class="dmain" style="color:#333333;">3 天前</div><div class="dsub">172.16.8.9</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;font-weight:700;color:#197a4b;">済</span></div>
+            <div><div class="dmain" style="color:#333333;">本部门</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1058</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">刘婉婷</span></div><div class="dsub">リュウ・エンテイ</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">wanting@acme.com</span></div><div class="dsub">未認証</div></div>
+            <div><span class="dbadge" style="background:#ffeee2;color:#ac3e00;">待激活</span></div>
+            <div><div class="dmain" style="color:#333333;">测试组</div><div class="dsub">DEPT-013</div></div>
+            <div><div class="dmain" style="color:#333333;">测试工程师</div><div class="dsub">検証権限</div></div>
+            <div><div class="dmain" style="color:#333333;">林晓莹</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">135 9908 4471</div><div class="dsub">内線 4058</div></div>
+            <div><div class="dmain" style="color:#333333;">2026-08-11</div><div class="dsub">試用期間中</div></div>
+            <div><div class="dmain" style="color:#333333;">—</div><div class="dsub">—</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;color:#767676;">未</span></div>
+            <div><div class="dmain" style="color:#333333;">本人</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1061</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">孙浩然</span></div><div class="dsub">ソン・コウゼン</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">haoran@acme.com</span></div><div class="dsub">未認証</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">市场营销部</div><div class="dsub">DEPT-020</div></div>
+            <div><div class="dmain" style="color:#333333;">运营专员</div><div class="dsub">閲覧権限</div></div>
+            <div><div class="dmain" style="color:#333333;">马志强</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">182 3345 6672</div><div class="dsub">内線 5061</div></div>
+            <div><div class="dmain" style="color:#333333;">2023-05-22</div><div class="dsub">勤続 3 年</div></div>
+            <div><div class="dmain" style="color:#333333;">5 天前</div><div class="dsub">203.0.113.7</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;color:#767676;">未</span></div>
+            <div><div class="dmain" style="color:#333333;">本部门</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1062</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">周雅雯</span></div><div class="dsub">シュウ・ガブン</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">yawen@acme.com</span></div><div class="dsub">認証済み</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">市场营销部</div><div class="dsub">DEPT-020</div></div>
+            <div><div class="dmain" style="color:#333333;">运营专员</div><div class="dsub">閲覧権限</div></div>
+            <div><div class="dmain" style="color:#333333;">马志强</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">138 6620 9915</div><div class="dsub">内線 5062</div></div>
+            <div><div class="dmain" style="color:#333333;">2023-05-22</div><div class="dsub">勤続 3 年</div></div>
+            <div><div class="dmain" style="color:#333333;">1 周前</div><div class="dsub">203.0.113.9</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;font-weight:700;color:#197a4b;">済</span></div>
+            <div><div class="dmain" style="color:#333333;">本部门</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1070</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">吴静琳</span></div><div class="dsub">ゴ・セイリン</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">jinglin@acme.com</span></div><div class="dsub">認証済み</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">人力资源部</div><div class="dsub">DEPT-030</div></div>
+            <div><div class="dmain" style="color:#333333;">HRBP</div><div class="dsub">人事権限</div></div>
+            <div><div class="dmain" style="color:#333333;">李长昕</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">159 8834 2201</div><div class="dsub">内線 6070</div></div>
+            <div><div class="dmain" style="color:#333333;">2021-11-08</div><div class="dsub">勤続 4 年</div></div>
+            <div><div class="dmain" style="color:#333333;">47 分钟前</div><div class="dsub">192.168.1.77</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;font-weight:700;color:#197a4b;">済</span></div>
+            <div><div class="dmain" style="color:#333333;">全公司</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="background:#e8f1fe;">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;background:#0017c1;display:inline-flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1073</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">郑一帆</span></div><div class="dsub">テイ・イッパン</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">yifan@acme.com</span></div><div class="dsub">未認証</div></div>
+            <div><span class="dbadge" style="background:#ffeee2;color:#ac3e00;">待激活</span></div>
+            <div><div class="dmain" style="color:#333333;">财务部</div><div class="dsub">DEPT-040</div></div>
+            <div><div class="dmain" style="color:#333333;">财务专员</div><div class="dsub">経理権限</div></div>
+            <div><div class="dmain" style="color:#333333;">马志强</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">187 2290 5514</div><div class="dsub">内線 7073</div></div>
+            <div><div class="dmain" style="color:#333333;">2026-08-18</div><div class="dsub">試用期間中</div></div>
+            <div><div class="dmain" style="color:#333333;">—</div><div class="dsub">—</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;color:#767676;">未</span></div>
+            <div><div class="dmain" style="color:#333333;">本人</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1075</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">马志强</span></div><div class="dsub">バ・シキョウ</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">zhiqiang@acme.com</span></div><div class="dsub">未認証</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">行政部</div><div class="dsub">DEPT-050</div></div>
+            <div><div class="dmain" style="color:#333333;">行政主管</div><div class="dsub">管理権限</div></div>
+            <div><div class="dmain" style="color:#333333;">李长昕</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">136 7712 8830</div><div class="dsub">内線 8075</div></div>
+            <div><div class="dmain" style="color:#333333;">2020-06-30</div><div class="dsub">勤続 6 年</div></div>
+            <div><div class="dmain" style="color:#333333;">1 天前</div><div class="dsub">10.0.5.31</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;color:#767676;">未</span></div>
+            <div><div class="dmain" style="color:#333333;">本部门</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1081</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">林晓莹</span></div><div class="dsub">リン・ギョウエイ</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">xiaoying@acme.com</span></div><div class="dsub">認証済み</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">产品研发中心</div><div class="dsub">DEPT-001</div></div>
+            <div><div class="dmain" style="color:#333333;">产品经理</div><div class="dsub">企画権限</div></div>
+            <div><div class="dmain" style="color:#333333;">李长昕</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">133 4456 1092</div><div class="dsub">内線 2081</div></div>
+            <div><div class="dmain" style="color:#333333;">2022-01-17</div><div class="dsub">勤続 4 年</div></div>
+            <div><div class="dmain" style="color:#333333;">15 分钟前</div><div class="dsub">192.168.1.19</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;font-weight:700;color:#197a4b;">済</span></div>
+            <div><div class="dmain" style="color:#333333;">跨部门</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1085</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">何雨桐</span></div><div class="dsub">カ・ウトウ</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">yutong@acme.com</span></div><div class="dsub">認証済み</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">财务部</div><div class="dsub">DEPT-040</div></div>
+            <div><div class="dmain" style="color:#333333;">会计</div><div class="dsub">経理権限</div></div>
+            <div><div class="dmain" style="color:#333333;">马志强</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">188 9903 4417</div><div class="dsub">内線 7085</div></div>
+            <div><div class="dmain" style="color:#333333;">2023-08-01</div><div class="dsub">勤続 3 年</div></div>
+            <div><div class="dmain" style="color:#333333;">2 小时前</div><div class="dsub">172.16.8.55</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;font-weight:700;color:#197a4b;">済</span></div>
+            <div><div class="dmain" style="color:#333333;">本部门</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+          <div class="drow" style="">
+            <div style="display:flex;"><span style="width:14px;height:14px;border-radius:2px;border:1.5px solid #767676;background:#fff;"></span></div>
+            <div><div class="dmain" style="color:#333333;">E-1088</div><div class="dsub">正社員</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="font-weight:700;color:#1a1a1a;">徐嘉豪</span></div><div class="dsub">ジョ・カゴウ</div></div>
+            <div><div class="dmain" style="color:#333333;"><span style="color:#0017c1;">jiahao@acme.com</span></div><div class="dsub">未認証</div></div>
+            <div><span class="dbadge" style="background:#e6f5ec;color:#197a4b;">在职</span></div>
+            <div><div class="dmain" style="color:#333333;">前端组</div><div class="dsub">DEPT-011</div></div>
+            <div><div class="dmain" style="color:#333333;">开发工程师</div><div class="dsub">開発権限</div></div>
+            <div><div class="dmain" style="color:#333333;">李长昕</div><div class="dsub">承認者</div></div>
+            <div><div class="dmain" style="color:#333333;">150 2231 7708</div><div class="dsub">内線 2088</div></div>
+            <div><div class="dmain" style="color:#333333;">2024-03-04</div><div class="dsub">勤続 2 年</div></div>
+            <div><div class="dmain" style="color:#333333;">31 分钟前</div><div class="dsub">10.0.3.90</div></div>
+            <div style="text-align:center;"><span style="font-size:11.5px;color:#767676;">未</span></div>
+            <div><div class="dmain" style="color:#333333;">本人</div><div class="dsub">8 部署</div></div>
+            <div style="display:flex;justify-content:flex-end;color:#767676;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+          </div>
+        <div style="margin-top:auto;height:40px;flex-shrink:0;display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:4px;background:#0017c1;color:#fff;font-size:11.5px;font-weight:700;">1</span>
+          <span style="display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:4px;border:1px solid #cccccc;font-size:11.5px;color:#333333;">2</span>
+          <span style="display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 10px;border-radius:4px;border:1px solid #cccccc;font-size:11.5px;color:#0017c1;font-weight:700;">次へ ＞</span>
+          <span style="margin-left:auto;font-size:10px;color:#666666;">補足：本一覧は個人情報を含みます。画面の印刷・撮影は禁止されています。</span>
+        </div>
+      </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
