@@ -160,6 +160,8 @@ const MUST_CONTAIN = [
   '--table-cell-px: calc(12px * var(--app-scale));',
   '--table-row-h: calc(44px * var(--app-scale));',
   '--table-header-h: calc(38px * var(--app-scale));',
+  // 行内头像挂点(拆 31px 行高地板,值=现状,零视觉变化)
+  '--table-avatar-size: calc(30px * var(--app-scale));',
   // Badge 几何/排印挂点（S3，值=现状，零视觉变化）：radius/px/py/font-size/font-weight
   '--badge-radius: var(--radius-5);',
   '--badge-px: calc(8px * var(--app-scale));',

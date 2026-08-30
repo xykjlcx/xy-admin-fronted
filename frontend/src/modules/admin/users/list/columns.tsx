@@ -46,7 +46,7 @@ export function userColumns({
           <div className="flex min-w-0 items-center gap-2.5">
             <div
               className={cn(
-                'flex size-[calc(30px*var(--app-scale))] shrink-0 items-center justify-center rounded-full text-[calc(13px*var(--app-scale))] font-semibold text-white',
+                'flex size-(--table-avatar-size) shrink-0 items-center justify-center rounded-full text-[calc(13px*var(--app-scale))] font-semibold text-white',
                 avatarClasses[index % avatarClasses.length],
               )}
             >

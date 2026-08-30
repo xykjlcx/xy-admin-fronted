@@ -13,7 +13,7 @@ export function RoleMembersPanel({ members }: { members: RoleMemberDto[] }) {
         <div key={member.id} className="flex items-center gap-2.5 rounded-10 border border-border px-3 py-2.5">
           <div
             className={cn(
-              'flex size-[calc(30px*var(--app-scale))] shrink-0 items-center justify-center rounded-full text-[calc(13px*var(--app-scale))] font-semibold text-white',
+              'flex size-(--table-avatar-size) shrink-0 items-center justify-center rounded-full text-[calc(13px*var(--app-scale))] font-semibold text-white',
               avatarClasses[index % avatarClasses.length],
             )}
           >

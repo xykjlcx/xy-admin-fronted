@@ -1,8 +1,8 @@
 # design-explore —— 脚手架视觉重设计探索
 
-> 最后更新：2026-08-25
+> 最后更新：2026-08-30
 > 在线画布：https://claude.ai/code/artifact/aac29e03-87f9-4843-95f3-e673eb8733fd
-> 本目录 **未纳入 git**（`git status` 显示 `?? design-explore/`），7.1M / 66 个文件，只在本地磁盘。
+> 本目录已于 2026-08-30 纳入 git（baseline 收编时提交进 main）。
 
 ## 这是什么
 
@@ -147,7 +147,11 @@ choice-size 14 / card-spacing 16·14·24 / metric-min-h 96 / metric-spacing 14 +
 
 ## 下次可以接着做的
 
-- [ ] **最小验证**：只 token 化头像那一处，跑 guard + 视觉回归，确认拆地板的路走得通
+- [x] **最小验证**：只 token 化头像那一处，跑 guard + 视觉回归，确认拆地板的路走得通
+      —— 2026-08-30 完成。新增 `--table-avatar-size` 挂点（值=现状 30px），替换 users/columns 与
+      RoleMembersPanel 两处硬编码。实测：默认 44/30 零变化；token 设 28px+头像 18px → 行高真到 28px，
+      地板拆除确认。守卫全绿（tsc / eslint / vitest 776）。**下一层地板已定位：行内按钮内高 24px**
+      （压到 20px 档时停在 25px，名称列 link 按钮与操作列按钮是新短板）——方案 A 动工时第二个要 token 化的就是它。
 - [ ] 深色版（60 张里只有约 6 张深色，深色最能暴露 token 架构问题）
 - [ ] 窄屏 1280（全部是 1440，12–20 列的表在 1280 上怎么塌完全未知）
 - [ ] 剩余体系：Datadog / Sentry / Retool / Airtable / Monday / Slack / Discord /
