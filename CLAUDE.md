@@ -7,7 +7,7 @@
 
 - Vite + React + TypeScript + Tailwind CSS v4 + shadcn/ui + TanStack(Router / Query / Table) 的企业后台管理模板。
 - 前端工程位于 `frontend/`;高保真视觉基准为 `frontend/后台管理脚手架.dc.html`。工程架构真相源是 `docs/architecture.md`;当文档与实现冲突,以 `docs/architecture.md` 和当前代码为准。`docs/superpowers/specs/` 下是历史设计草案,只作执行记录。
-- 交付形态:此仓库作为脚手架范本,新业务域复制既定纵切结构开发(见「模块纵切」);唯一纵切范本是 `modules/admin/users/`,`modules/admin/pages/{roles,menus,dashboard}` 是待迁移的横切遗留,勿模仿。
+- 交付形态:此仓库作为脚手架范本,新业务域复制既定纵切结构开发(见「模块纵切」);唯一纵切范本是 `modules/admin/users/`(roles、menus 已完成纵切迁移);`modules/admin/pages/dashboard` 及 `admin/api`、`admin/mocks` 中的配套文件是仅存的待迁移横切遗留,勿模仿。
 
 ## 全局目录总览(先建立地图)
 

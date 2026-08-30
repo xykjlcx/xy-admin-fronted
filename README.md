@@ -74,7 +74,7 @@ pnpm design:lint    # 三套 flavor 的 DESIGN.md 校验
 └── compose.dev.yml  PostgreSQL / Redis 本地依赖
 ```
 
-> 新业务复制 `modules/admin/users/` 的纵切结构（唯一范本）。`modules/admin/pages/{roles,menus,dashboard}` 是待迁移的横切遗留，勿模仿。
+> 新业务复制 `modules/admin/users/` 的纵切结构（唯一范本，roles、menus 已完成纵切迁移）。`modules/admin/pages/dashboard` 及 `admin/api`、`admin/mocks` 中的配套文件是仅存的待迁移横切遗留，勿模仿。
 
 ## 当前交付
 
