@@ -1,5 +1,9 @@
 # MetaBuilder 全栈后端与真实联调实施计划
 
+> ⚠️ **2026-08-30 终止注记**：本计划 Task 21–29 不再续作。后端路线已拍板切换为 banking-vsa（TS/VSA），
+> 见 `docs/superpowers/specs/2026-08-30-backend-vsa-architecture-decision.md`。
+> Task 1–20 的成果作为执行记录保留；**任何 AI 会话不得依据本计划继续实施 Java 后端**。
+
 关联设计：`docs/superpowers/specs/2026-07-10-metabuilder-monorepo-backend-design.md`（v4）
 
 ## Goal
